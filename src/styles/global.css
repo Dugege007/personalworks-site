@@ -74,7 +74,7 @@ button {
 
 @media (pointer: fine) {
   .grain {
-    animation: grain-shift 0.8s steps(2) infinite;
+    animation: grain-shift calc(0.8s * var(--motion-grain)) steps(2) infinite;
   }
 }
 

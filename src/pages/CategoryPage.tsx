@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { categories } from "../content/site";
+import { listPublishedWorks } from "../content/works";
 import "../styles/placeholder.css";
 
 type CategoryPageProps = {
@@ -36,35 +37,33 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
             <p className="note">位置已留，作品待收录。不进入详情占位。</p>
           ) : null}
           <div className="card-grid">
-            {collection.frames.map((label, index) => {
-              const card = (
-                <>
-                  <small>
-                    0{index + 1} / {collection.comingSoon ? "SOON" : "SAMPLE"}
-                  </small>
-                  <div>
-                    <h2>{label}</h2>
-                    <p>{collection.comingSoon ? "待收录。" : "待替换作品。点击进入详情占位。"}</p>
-                  </div>
-                </>
-              );
-              if (collection.comingSoon) {
-                return (
+            {collection.comingSoon
+              ? collection.frames.map((label, index) => (
                   <div className="card is-soon" key={label}>
-                    {card}
+                    <small>
+                      0{index + 1} / SOON
+                    </small>
+                    <div>
+                      <h2>{label}</h2>
+                      <p>待收录。</p>
+                    </div>
                   </div>
-                );
-              }
-              return (
-                <Link className="card" key={label} to={`${collection.detailBase}/sample-${index + 1}`}>
-                  {card}
-                </Link>
-              );
-            })}
+                ))
+              : listPublishedWorks(collection.id).map((work, index) => (
+                  <Link className="card" key={work.id} to={`${collection.detailBase}/${work.id}`}>
+                    <small>
+                      0{index + 1} / {work.year}
+                    </small>
+                    <div>
+                      <h2>{work.title}</h2>
+                      <p>{work.summary}</p>
+                    </div>
+                  </Link>
+                ))}
           </div>
         </section>
       ))}
-      <p className="note">第一批仅验证分类到细目的路径，不加载真实媒体。</p>
+      <p className="note">详情为占位正文与框景；媒体地址走 VITE_ASSET_BASE，本轮不加载原片。</p>
     </div>
   );
 }

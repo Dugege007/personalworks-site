@@ -26,13 +26,13 @@ export function NoteDetailPage() {
       <div className="page-kicker">{note.date}</div>
       <h1>{note.title}</h1>
       <p className="page-lead">{note.summary}</p>
-      <p>{note.body}</p>
+      <p className="archive-body">{note.body}</p>
       {note.previewImages.length > 0 ? (
-        <div className="note-previews note-previews-detail" aria-label="文章配图">
+        <div className="media-grid" aria-label="文章配图">
           {note.previewImages.map((label) => (
-            <span className="note-preview" key={label}>
-              {label}
-            </span>
+            <figure className="media-frame" key={label}>
+              <span>{label}</span>
+            </figure>
           ))}
         </div>
       ) : null}

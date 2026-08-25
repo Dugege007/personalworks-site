@@ -8,7 +8,7 @@ import { GamesMenuPage } from "./pages/GamesMenuPage";
 import { HomePage } from "./pages/HomePage";
 import { NoteDetailPage } from "./pages/NoteDetailPage";
 import { NotesPage } from "./pages/NotesPage";
-import { WorkDetailPlaceholderPage } from "./pages/WorkDetailPlaceholderPage";
+import { WorkDetailPage } from "./pages/WorkDetailPage";
 
 type RedirectIdProps = {
   to: (id: string) => string;
@@ -25,14 +25,14 @@ export function App() {
       <Route element={<SiteShell />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/twin-sim" element={<CategoryPage categoryId="twin-sim" />} />
-        <Route path="/twin-sim/twin/:id" element={<WorkDetailPlaceholderPage />} />
-        <Route path="/twin-sim/factory/:id" element={<WorkDetailPlaceholderPage />} />
+        <Route path="/twin-sim/twin/:id" element={<WorkDetailPage />} />
+        <Route path="/twin-sim/factory/:id" element={<WorkDetailPage />} />
         <Route path="/landscape" element={<CategoryPage categoryId="landscape" />} />
-        <Route path="/landscape/render/:id" element={<WorkDetailPlaceholderPage />} />
-        <Route path="/landscape/construction/:id" element={<WorkDetailPlaceholderPage />} />
+        <Route path="/landscape/render/:id" element={<WorkDetailPage />} />
+        <Route path="/landscape/construction/:id" element={<WorkDetailPage />} />
         <Route path="/photo" element={<CategoryPage categoryId="photo" />} />
-        <Route path="/photo/landscape/:id" element={<WorkDetailPlaceholderPage />} />
-        <Route path="/photo/portrait/:id" element={<WorkDetailPlaceholderPage />} />
+        <Route path="/photo/landscape/:id" element={<WorkDetailPage />} />
+        <Route path="/photo/portrait/:id" element={<WorkDetailPage />} />
         <Route path="/games" element={<GamesHubPage />} />
         <Route path="/games/menu" element={<GamesMenuPage />} />
         <Route path="/games/:id" element={<GamePlayPlaceholderPage />} />

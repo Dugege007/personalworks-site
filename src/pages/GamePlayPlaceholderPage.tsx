@@ -32,6 +32,7 @@ export function GamePlayPlaceholderPage() {
           <p>WebGL 画布占位 · {game.titleEn}</p>
           <p>操作：{game.input}</p>
           <p>{game.sizeHint}</p>
+          <p>存档：{game.saveMode}</p>
         </div>
       </div>
       <p className="note">

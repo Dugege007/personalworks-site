@@ -47,6 +47,7 @@ export type GameCard = {
   accent: string;
   sizeHint: string;
   input: string;
+  saveMode: string;
 };
 
 export type NoteCard = {
@@ -212,27 +213,30 @@ export const placeholderGames: GameCard[] = [
     title: "脊线",
     titleEn: "RIDGE",
     lead: "在简化地形上走一条还没铺完的路。",
-    accent: "#C4A574",
+    accent: "var(--gold)",
     sizeHint: "约 40MB，首次加载较慢",
     input: "键盘 / 触屏",
+    saveMode: "仅保存在本机浏览器",
   },
   {
     id: "sample-line",
     title: "节拍",
     titleEn: "LINE",
     lead: "一条被放慢的产线，用来看堵塞如何形成。",
-    accent: "#C9925A",
+    accent: "var(--signal)",
     sizeHint: "约 28MB，首次加载较慢",
     input: "鼠标 / 触屏",
+    saveMode: "仅保存在本机浏览器",
   },
   {
     id: "sample-garden",
     title: "借景",
     titleEn: "BORROWED",
     lead: "把窗口外的一层山，框进庭院。",
-    accent: "#7BA3A8",
+    accent: "var(--mist)",
     sizeHint: "约 35MB，首次加载较慢",
     input: "键盘 / 触屏",
+    saveMode: "仅保存在本机浏览器",
   },
 ];
 

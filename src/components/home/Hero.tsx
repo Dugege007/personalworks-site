@@ -14,6 +14,14 @@ export function Hero() {
     if (!wrap || !spot || reduced) {
       return;
     }
+    // 令牌关闭光斑时不绑定指针跟踪
+    const spotOn =
+      Number.parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue("--motion-spot"),
+      ) > 0;
+    if (!spotOn) {
+      return;
+    }
     const fine = window.matchMedia("(pointer: fine)").matches;
     if (!fine) {
       spot.style.opacity = "0";

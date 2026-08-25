@@ -293,3 +293,19 @@
     width: 100%;
   }
 }
+
+@media (max-width: 390px) {
+  .header {
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  .header-start {
+    gap: 12px;
+  }
+
+  .brand-cn {
+    font-size: 16px;
+    letter-spacing: 0.12em;
+  }
+}
