@@ -1,10 +1,12 @@
+import { lexicon } from "./lexicon";
+
 export type WorkChannel =
-  | "twin"
-  | "factory"
-  | "render"
-  | "construction"
-  | "landscape-photo"
-  | "portrait";
+  | typeof lexicon.digitalTwin.key
+  | typeof lexicon.lineSimulation.key
+  | typeof lexicon.landscapeRendering.key
+  | typeof lexicon.landscapeCDs.key
+  | typeof lexicon.landscapePhoto.key
+  | typeof lexicon.portraitPhoto.key;
 
 export type WorkMedia = {
   kind: "image" | "video";
@@ -41,7 +43,7 @@ function images(...labels: string[]): WorkMedia[] {
 export const placeholderWorks: WorkRecord[] = [
   {
     id: "sample-1",
-    channel: "twin",
+    channel: "digital-twin",
     title: "总图叠合",
     year: "2024",
     tags: ["场地", "分层"],
@@ -52,7 +54,7 @@ export const placeholderWorks: WorkRecord[] = [
   },
   {
     id: "sample-2",
-    channel: "twin",
+    channel: "digital-twin",
     title: "运行剖切",
     year: "2024",
     tags: ["剖切"],
@@ -63,7 +65,7 @@ export const placeholderWorks: WorkRecord[] = [
   },
   {
     id: "sample-3",
-    channel: "twin",
+    channel: "digital-twin",
     title: "测点归档",
     year: "2023",
     tags: ["测点"],
@@ -74,7 +76,7 @@ export const placeholderWorks: WorkRecord[] = [
   },
   {
     id: "sample-1",
-    channel: "factory",
+    channel: "line-sim",
     title: "工位节拍",
     year: "2024",
     tags: ["节拍"],
@@ -86,7 +88,7 @@ export const placeholderWorks: WorkRecord[] = [
   },
   {
     id: "sample-2",
-    channel: "factory",
+    channel: "line-sim",
     title: "物流回路",
     year: "2024",
     lineType: "循环物流",
@@ -97,7 +99,7 @@ export const placeholderWorks: WorkRecord[] = [
   },
   {
     id: "sample-3",
-    channel: "factory",
+    channel: "line-sim",
     title: "瓶颈回放",
     year: "2023",
     lineType: "瓶颈观察",
@@ -107,7 +109,7 @@ export const placeholderWorks: WorkRecord[] = [
   },
   {
     id: "sample-1",
-    channel: "render",
+    channel: "landscape-rendering",
     title: "主视角",
     year: "2022",
     role: "方案与空间叙事",
@@ -118,7 +120,7 @@ export const placeholderWorks: WorkRecord[] = [
   },
   {
     id: "sample-2",
-    channel: "render",
+    channel: "landscape-rendering",
     title: "黄昏庭院",
     year: "2021",
     role: "效果图",
@@ -129,7 +131,7 @@ export const placeholderWorks: WorkRecord[] = [
   },
   {
     id: "sample-3",
-    channel: "render",
+    channel: "landscape-rendering",
     title: "林缘断面",
     year: "2021",
     role: "断面叙事",
@@ -139,17 +141,17 @@ export const placeholderWorks: WorkRecord[] = [
   },
   {
     id: "sample-1",
-    channel: "construction",
+    channel: "landscape-cds",
     title: "总图选页",
     year: "2020",
     sheetType: "总图",
     summary: "脱敏后的总图选页，只展示图纸能力。",
-    body: "占位正文。正式施工图须为网图版本后再入库。本页不作施工依据。",
+    body: "占位正文。正式景观施工图须为网图版本后再入库。本页不作施工依据。",
     media: images("总图选页", "图框", "索引"),
   },
   {
     id: "sample-2",
-    channel: "construction",
+    channel: "landscape-cds",
     title: "铺装详图",
     year: "2020",
     sheetType: "详图",
@@ -159,7 +161,7 @@ export const placeholderWorks: WorkRecord[] = [
   },
   {
     id: "sample-3",
-    channel: "construction",
+    channel: "landscape-cds",
     title: "索引裁切",
     year: "2019",
     sheetType: "索引",
@@ -201,7 +203,7 @@ export const placeholderWorks: WorkRecord[] = [
   },
   {
     id: "sample-1",
-    channel: "portrait",
+    channel: "portrait-photo",
     title: "留白",
     year: "2025",
     consent: "granted",
@@ -211,7 +213,7 @@ export const placeholderWorks: WorkRecord[] = [
   },
   {
     id: "sample-2",
-    channel: "portrait",
+    channel: "portrait-photo",
     title: "侧光",
     year: "2024",
     consent: "granted",
@@ -221,7 +223,7 @@ export const placeholderWorks: WorkRecord[] = [
   },
   {
     id: "sample-3",
-    channel: "portrait",
+    channel: "portrait-photo",
     title: "静场",
     year: "2024",
     consent: "granted",
@@ -231,7 +233,7 @@ export const placeholderWorks: WorkRecord[] = [
   },
   {
     id: "held",
-    channel: "portrait",
+    channel: "portrait-photo",
     title: "未授权条目",
     year: "2024",
     consent: "denied",

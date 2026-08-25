@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { profile } from "../../content/site";
+import { lexicon } from "../../content/lexicon";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { ScrollHint } from "./ScrollHint";
 
@@ -48,7 +49,7 @@ export function Hero() {
         <div className="portrait-frame">
           <div className="portrait-grid" />
           <div className="portrait-spot" ref={spotRef} />
-          <div className="portrait-caption">PORTRAIT / 形象占位</div>
+          <div className="portrait-caption">{lexicon.profile.deco} / 形象占位</div>
         </div>
       </div>
 

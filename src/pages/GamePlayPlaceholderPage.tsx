@@ -1,4 +1,5 @@
 import { Link, useParams } from "react-router-dom";
+import { lexicon } from "../content/lexicon";
 import { placeholderGames } from "../content/site";
 import "../styles/placeholder.css";
 
@@ -8,8 +9,8 @@ export function GamePlayPlaceholderPage() {
 
   if (!game) {
     return (
-      <div className="page" data-theme="games">
-        <Link className="back" to="/games/menu">
+      <div className="page" data-theme={lexicon.gamePlay.key}>
+        <Link className="back" to={`/${lexicon.gameDev.key}/${lexicon.gameMenu.key}`}>
           ← 返回选单
         </Link>
         <h1>该游戏未开放</h1>
@@ -19,11 +20,11 @@ export function GamePlayPlaceholderPage() {
   }
 
   return (
-    <div className="page" data-theme="games" style={{ ["--game-accent" as string]: game.accent }}>
-      <Link className="back" to="/games/menu">
+    <div className="page" data-theme={lexicon.gamePlay.key} style={{ ["--game-accent" as string]: game.accent }}>
+      <Link className="back" to={`/${lexicon.gameDev.key}/${lexicon.gameMenu.key}`}>
         ← 返回选单
       </Link>
-      <div className="page-kicker">03.2 / PLAY</div>
+      <div className="page-kicker">03.2 / {lexicon.gamePlay.deco}</div>
       <h1>{game.title}</h1>
       <p className="page-lead">{game.lead}</p>
       <div className="play-stage">

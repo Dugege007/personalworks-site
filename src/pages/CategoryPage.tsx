@@ -31,6 +31,7 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
       <p className="page-lead">{category.lead}</p>
       {category.collections.map((collection) => (
         <section key={collection.id} className="category-block" data-theme={collection.theme}>
+          <div className="page-kicker">{collection.titleDeco}</div>
           <h2>{collection.title}</h2>
           <p>{collection.lead}</p>
           {collection.comingSoon ? (
@@ -41,7 +42,7 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
               ? collection.frames.map((label, index) => (
                   <div className="card is-soon" key={label}>
                     <small>
-                      0{index + 1} / SOON
+                      0{index + 1} / {collection.titleDeco}
                     </small>
                     <div>
                       <h2>{label}</h2>

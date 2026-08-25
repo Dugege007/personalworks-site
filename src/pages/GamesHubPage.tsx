@@ -1,15 +1,21 @@
 import { Link } from "react-router-dom";
+import { lexicon } from "../content/lexicon";
+import { categories } from "../content/site";
 import "../styles/placeholder.css";
 
 export function GamesHubPage() {
+  const category = categories.find((item) => item.id === lexicon.gameDev.key);
+
   return (
-    <div className="page" data-theme="games">
-      <div className="page-kicker">03 / GAME DEV</div>
-      <h1>游戏开发</h1>
+    <div className="page" data-theme={lexicon.gameDev.key}>
+      <div className="page-kicker">
+        {category?.index} / {category?.indexEn}
+      </div>
+      <h1>{category?.title ?? "游戏开发"}</h1>
       <p className="page-lead">
         可玩的展示向小游戏。本页不加载任何 WebGL。选择游戏后，再进入对应游玩页。
       </p>
-      <Link className="archive-btn" to="/games/menu">
+      <Link className="archive-btn" to={`/${lexicon.gameDev.key}/${lexicon.gameMenu.key}`}>
         打开游戏选单
         <span aria-hidden="true">→</span>
       </Link>

@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { lexicon } from "../content/lexicon";
 import { findCategoryByPath, findCollectionByPath } from "../content/site";
 import { findPublishedWork, type WorkRecord } from "../content/works";
 import { assetUrl } from "../lib/assets";
@@ -75,7 +76,7 @@ export function WorkDetailPage() {
         ← 返回{backLabel}
       </Link>
       <div className="page-kicker">
-        {work.year} / {collection?.title ?? "ARCHIVE"}
+        {work.year} / {collection?.titleDeco ?? "ARCHIVE"}
       </div>
       <h1>{work.title}</h1>
       <p className="page-lead">{work.summary}</p>
@@ -119,7 +120,7 @@ export function WorkDetailPage() {
           );
         })}
       </div>
-      {work.channel === "construction" ? (
+      {work.channel === lexicon.landscapeCDs.key ? (
         <p className="archive-disclaimer">仅供作品展示，不作为施工依据。</p>
       ) : null}
     </div>

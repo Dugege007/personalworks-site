@@ -1,3 +1,5 @@
+import { lexicon } from "./lexicon";
+
 export type NavItem = {
   id: string;
   label: string;
@@ -20,6 +22,8 @@ export type WorkSection = {
 export type WorkCollection = {
   id: string;
   title: string;
+  titleEn: string;
+  titleDeco: string;
   lead: string;
   theme: string;
   detailBase: string;
@@ -81,104 +85,118 @@ export const profile = {
 
 export const categories: CategoryRecord[] = [
   {
-    id: "twin-sim",
+    id: lexicon.twinAndSim.key,
     index: "02",
-    indexEn: "TWIN & SIM",
-    title: "数字孪生&仿真",
+    indexEn: lexicon.twinAndSim.deco,
+    title: lexicon.twinAndSim.zh,
     lead: "把场地与产线收成可量测的层。先看结构，再看运行。",
-    path: "/twin-sim",
-    theme: "twin",
+    path: `/${lexicon.twinAndSim.key}`,
+    theme: lexicon.twinAndSim.key,
     homeFrames: ["数字孪生", "产线仿真", "测点归档"],
     collections: [
       {
-        id: "twin",
-        title: "数字孪生",
+        id: lexicon.digitalTwin.key,
+        title: lexicon.digitalTwin.zh,
+        titleEn: lexicon.digitalTwin.en,
+        titleDeco: lexicon.digitalTwin.deco,
         lead: "把场地收成可量测的层。先看结构，再看运行。",
-        theme: "twin",
-        detailBase: "/twin-sim/twin",
+        theme: lexicon.digitalTwin.key,
+        detailBase: `/${lexicon.twinAndSim.key}/${lexicon.digitalTwin.key}`,
         frames: ["总图叠合", "运行剖切", "测点归档"],
       },
       {
-        id: "factory",
-        title: "产线仿真",
+        id: lexicon.lineSimulation.key,
+        title: lexicon.lineSimulation.zh,
+        titleEn: lexicon.lineSimulation.en,
+        titleDeco: lexicon.lineSimulation.deco,
         lead: "节拍、工位与物流在同一条导轨上对位。",
-        theme: "factory",
-        detailBase: "/twin-sim/factory",
+        theme: lexicon.lineSimulation.key,
+        detailBase: `/${lexicon.twinAndSim.key}/${lexicon.lineSimulation.key}`,
         frames: ["工位节拍", "物流回路", "瓶颈回放"],
       },
     ],
   },
   {
-    id: "games",
+    id: lexicon.gameDev.key,
     index: "03",
-    indexEn: "GAME DEV",
-    title: "游戏开发",
+    indexEn: lexicon.gameDev.deco,
+    title: lexicon.gameDev.zh,
     lead: "可玩的展示向小游戏。先选单，再加载，不登录、不付费。",
-    path: "/games",
-    theme: "games",
+    path: `/${lexicon.gameDev.key}`,
+    theme: lexicon.gameDev.key,
     homeFrames: ["选单", "关卡切片", "存档提示"],
     collections: [],
   },
   {
-    id: "landscape",
+    id: lexicon.landscapeArch.key,
     index: "04",
-    indexEn: "LANDSCAPE",
-    title: "景观设计",
+    indexEn: lexicon.landscapeArch.deco,
+    title: lexicon.landscapeArch.zh,
     lead: "空间先被框住，再被光慢慢填满。图纸只展示已脱敏的选页。",
-    path: "/landscape",
-    theme: "render",
+    path: `/${lexicon.landscapeArch.key}`,
+    theme: lexicon.landscapeArch.key,
     homeFrames: ["景观效果图", "景观施工图", "庭院断面"],
     collections: [
       {
-        id: "render",
-        title: "景观效果图",
+        id: lexicon.landscapeRendering.key,
+        title: lexicon.landscapeRendering.zh,
+        titleEn: lexicon.landscapeRendering.en,
+        titleDeco: lexicon.landscapeRendering.deco,
         lead: "空间先被框住，再被光慢慢填满。",
-        theme: "render",
-        detailBase: "/landscape/render",
+        theme: lexicon.landscapeRendering.key,
+        detailBase: `/${lexicon.landscapeArch.key}/${lexicon.landscapeRendering.key}`,
         frames: ["主视角", "黄昏庭院", "林缘断面"],
       },
       {
-        id: "construction",
-        title: "景观施工图",
+        id: lexicon.landscapeCDs.key,
+        title: lexicon.landscapeCDs.zh,
+        titleEn: lexicon.landscapeCDs.en,
+        titleDeco: lexicon.landscapeCDs.deco,
         lead: "选页展示图纸能力。正式图均需脱敏后再入库。",
-        theme: "drawing",
-        detailBase: "/landscape/construction",
+        theme: lexicon.landscapeCDs.key,
+        detailBase: `/${lexicon.landscapeArch.key}/${lexicon.landscapeCDs.key}`,
         frames: ["总图选页", "铺装详图", "索引裁切"],
       },
     ],
   },
   {
-    id: "photo",
+    id: lexicon.photography.key,
     index: "05",
-    indexEn: "PHOTO",
-    title: "摄影",
+    indexEn: lexicon.photography.deco,
+    title: lexicon.photography.zh,
     lead: "把观看停在光线刚好够用的那一瞬。人像只放已授权的肖像。",
-    path: "/photo",
-    theme: "landscape",
+    path: `/${lexicon.photography.key}`,
+    theme: lexicon.photography.key,
     homeFrames: ["风光摄影", "人像摄影", "游戏摄影"],
     collections: [
       {
-        id: "landscape-photo",
-        title: "风光摄影",
+        id: lexicon.landscapePhoto.key,
+        title: lexicon.landscapePhoto.zh,
+        titleEn: lexicon.landscapePhoto.en,
+        titleDeco: lexicon.landscapePhoto.deco,
         lead: "把观看停在光线刚好够用的那一瞬。",
-        theme: "landscape",
-        detailBase: "/photo/landscape",
+        theme: lexicon.landscapePhoto.key,
+        detailBase: `/${lexicon.photography.key}/${lexicon.landscapePhoto.key}`,
         frames: ["山脊", "水面", "雾色"],
       },
       {
-        id: "portrait",
-        title: "人像摄影",
+        id: lexicon.portraitPhoto.key,
+        title: lexicon.portraitPhoto.zh,
+        titleEn: lexicon.portraitPhoto.en,
+        titleDeco: lexicon.portraitPhoto.deco,
         lead: "只放已授权的肖像。未授权的照片不会进入生产列表。",
-        theme: "portrait",
-        detailBase: "/photo/portrait",
+        theme: lexicon.portraitPhoto.key,
+        detailBase: `/${lexicon.photography.key}/${lexicon.portraitPhoto.key}`,
         frames: ["留白", "侧光", "静场"],
       },
       {
-        id: "game-photo",
-        title: "游戏摄影",
+        id: lexicon.gamePhoto.key,
+        title: lexicon.gamePhoto.zh,
+        titleEn: lexicon.gamePhoto.en,
+        titleDeco: lexicon.gamePhoto.deco,
         lead: "游戏画面与场景静帧。位置已留，作品待收录。",
-        theme: "games",
-        detailBase: "/photo/game",
+        theme: lexicon.gamePhoto.key,
+        detailBase: `/${lexicon.photography.key}/${lexicon.gamePhoto.key}`,
         frames: ["场景", "角色", "光影"],
         comingSoon: true,
       },
@@ -199,12 +217,48 @@ export const workSections: WorkSection[] = categories.map((item) => ({
 
 export const navItems: NavItem[] = [
   { id: "home", label: "主页", labelEn: "HOME", path: "/", theme: "home" },
-  { id: "twin-sim", label: "数字孪生&仿真", labelEn: "TWIN & SIM", path: "/twin-sim", theme: "twin" },
-  { id: "games", label: "游戏开发", labelEn: "GAMES", path: "/games", theme: "games" },
-  { id: "landscape", label: "景观设计", labelEn: "LANDSCAPE", path: "/landscape", theme: "render" },
-  { id: "photo", label: "摄影", labelEn: "PHOTO", path: "/photo", theme: "landscape" },
-  { id: "notes", label: "心得", labelEn: "NOTES", path: "/notes", theme: "notes" },
-  { id: "about", label: "关于", labelEn: "ABOUT", path: "/about", theme: "about" },
+  {
+    id: lexicon.twinAndSim.key,
+    label: lexicon.twinAndSim.zh,
+    labelEn: lexicon.twinAndSim.deco,
+    path: `/${lexicon.twinAndSim.key}`,
+    theme: lexicon.twinAndSim.key,
+  },
+  {
+    id: lexicon.gameDev.key,
+    label: lexicon.gameDev.zh,
+    labelEn: lexicon.gameDev.deco,
+    path: `/${lexicon.gameDev.key}`,
+    theme: lexicon.gameDev.key,
+  },
+  {
+    id: lexicon.landscapeArch.key,
+    label: lexicon.landscapeArch.zh,
+    labelEn: lexicon.landscapeArch.deco,
+    path: `/${lexicon.landscapeArch.key}`,
+    theme: lexicon.landscapeArch.key,
+  },
+  {
+    id: lexicon.photography.key,
+    label: lexicon.photography.zh,
+    labelEn: lexicon.photography.deco,
+    path: `/${lexicon.photography.key}`,
+    theme: lexicon.photography.key,
+  },
+  {
+    id: lexicon.notes.key,
+    label: lexicon.notes.zh,
+    labelEn: lexicon.notes.deco,
+    path: `/${lexicon.notes.key}`,
+    theme: lexicon.notes.key,
+  },
+  {
+    id: lexicon.about.key,
+    label: lexicon.about.zh,
+    labelEn: lexicon.about.deco,
+    path: `/${lexicon.about.key}`,
+    theme: lexicon.about.key,
+  },
 ];
 
 export const placeholderGames: GameCard[] = [
@@ -251,7 +305,7 @@ export const placeholderNotes: NoteCard[] = [
   },
   {
     slug: "sketches",
-    title: "手绘",
+    title: lexicon.sketching.zh,
     date: "2026.08.20",
     summary: "纸面上的测绘与想象，笔触比渲染更早到达。原「手绘」栏目收进这篇笔记。",
     body: "手绘不再作为独立栏目。速写、空间草图与淡彩作为文章图组收录，最多在列表中预览三张。",
@@ -323,7 +377,7 @@ export const aboutFeatures: AboutFeature[] = [
     points: [
       "SPA 走 Nginx；图片、视频、WebGL 走 COS + CDN。",
       "`VITE_ASSET_BASE` 区分本地占位与线上 CDN。",
-      "构建产物不含作品原片；人像须授权，施工图须脱敏。",
+      "构建产物不含作品原片；人像须授权，景观施工图须脱敏。",
     ],
   },
   {
@@ -359,7 +413,7 @@ export const aboutFeatures: AboutFeature[] = [
 ];
 
 /**
- * 按路径前缀匹配栏目；较长路径优先，避免 /games 误伤其他段。
+ * 按路径前缀匹配栏目；较长路径优先，避免短路径误伤其他段。
  */
 export function findNavByPath(pathname: string): NavItem {
   const ranked = navItems

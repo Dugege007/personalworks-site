@@ -20,16 +20,24 @@
 }
 
 [data-theme="home"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.16); }
-[data-theme="twin"] { --accent: var(--mist); --accent-soft: rgba(123, 163, 168, 0.16); }
-[data-theme="factory"] { --accent: #c9925a; --accent-soft: rgba(201, 146, 90, 0.16); }
-[data-theme="render"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.16); }
-[data-theme="drawing"] { --accent: #8bb8c1; --accent-soft: rgba(139, 184, 193, 0.16); }
-[data-theme="landscape"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.16); }
-[data-theme="portrait"] { --accent: #d4b49a; --accent-soft: rgba(212, 180, 154, 0.18); }
-[data-theme="games"] { --accent: var(--signal); --accent-soft: rgba(224, 138, 76, 0.16); }
-[data-theme="notes"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.12); }
+[data-theme="twin-sim"],
+[data-theme="digital-twin"] { --accent: var(--mist); --accent-soft: rgba(123, 163, 168, 0.16); }
+[data-theme="line-sim"],
+[data-theme="plant-sim"] { --accent: #c9925a; --accent-soft: rgba(201, 146, 90, 0.16); }
+[data-theme="landscape-arch"],
+[data-theme="landscape-rendering"],
+[data-theme="photo"],
+[data-theme="landscape-photo"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.16); }
+[data-theme="landscape-cds"] { --accent: #8bb8c1; --accent-soft: rgba(139, 184, 193, 0.16); }
+[data-theme="portrait-photo"] { --accent: #d4b49a; --accent-soft: rgba(212, 180, 154, 0.18); }
+[data-theme="game-dev"],
+[data-theme="game-design"],
+[data-theme="game-photo"],
+[data-theme="menu"],
+[data-theme="play"] { --accent: var(--signal); --accent-soft: rgba(224, 138, 76, 0.16); }
+[data-theme="notes"],
 [data-theme="about"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.12); }
-[data-theme="sketch"] { --accent: #b08968; --accent-soft: rgba(176, 137, 104, 0.18); }
+[data-theme="sketches"] { --accent: #b08968; --accent-soft: rgba(176, 137, 104, 0.18); }
 
 @media (prefers-reduced-motion: reduce) {
   :root {

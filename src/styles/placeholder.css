@@ -75,6 +75,10 @@
   border-top: 1px solid var(--line);
 }
 
+.category-block > .page-kicker {
+  margin-bottom: 8px;
+}
+
 .category-block > h2 {
   font-family: var(--font-serif);
   font-size: clamp(24px, 3vw, 32px);
@@ -316,17 +320,19 @@
   font-size: 13px;
 }
 
-[data-theme="landscape"] .media-grid,
-[data-theme="portrait"] .media-grid,
-[data-theme="notes"] .media-grid {
+[data-theme="photo"] .media-grid,
+[data-theme="landscape-photo"] .media-grid,
+[data-theme="portrait-photo"] .media-grid,
+[data-theme="notes"] .media-grid,
+[data-theme="sketches"] .media-grid {
   grid-template-columns: 1fr;
 }
 
-[data-theme="portrait"] .media-frame {
+[data-theme="portrait-photo"] .media-frame {
   aspect-ratio: 4 / 5;
 }
 
-[data-theme="portrait"] .page {
+[data-theme="portrait-photo"] .page {
   padding-top: 56px;
 }
 
