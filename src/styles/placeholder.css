@@ -1,0 +1,122 @@
+.page {
+  min-height: calc(100vh - var(--header-h));
+  padding: 48px 56px 80px;
+}
+
+.page-kicker {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-family: var(--font-en);
+  letter-spacing: 0.24em;
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 12px;
+}
+
+.page h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(32px, 5vw, 56px);
+  margin: 0 0 16px;
+  font-weight: 600;
+}
+
+.page-lead {
+  max-width: 38em;
+  color: var(--muted);
+  margin-bottom: 36px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.card {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 18px;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+}
+
+.card small {
+  font-family: var(--font-en);
+  letter-spacing: 0.16em;
+  color: var(--muted);
+}
+
+.card h2 {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  margin: 8px 0;
+  font-weight: 600;
+}
+
+.card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.note {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 28px;
+}
+
+.archive-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border: 1px solid var(--accent);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+  font-size: 14px;
+}
+
+.archive-btn:hover {
+  background: var(--accent-soft);
+}
+
+.back {
+  display: inline-flex;
+  margin-bottom: 24px;
+  color: var(--accent);
+  font-size: 14px;
+}
+
+.play-stage {
+  margin-top: 24px;
+  min-height: 48vh;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.2), transparent),
+    var(--surface);
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 32px;
+  color: var(--muted);
+}
+
+.accent-bar {
+  width: 48px;
+  height: 3px;
+  background: var(--game-accent, var(--accent));
+  margin-bottom: 16px;
+}
+
+@media (max-width: 860px) {
+  .page {
+    padding: 32px 20px 64px;
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+}

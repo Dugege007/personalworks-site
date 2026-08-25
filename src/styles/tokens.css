@@ -1,0 +1,42 @@
+:root {
+  --bg: #0b0d10;
+  --surface: #14181c;
+  --text: #e8e6e1;
+  --muted: #8a8680;
+  --line: rgba(232, 230, 225, 0.12);
+  --gold: #c4a574;
+  --mist: #7ba3a8;
+  --signal: #e08a4c;
+  --ink: #3a322c;
+  --accent: var(--gold);
+  --accent-soft: rgba(196, 165, 116, 0.16);
+  --header-h: 64px;
+  --motion-grain: 1;
+  --motion-spot: 1;
+  --motion-reveal: 1;
+  --motion-ticks: 1;
+  --font-serif: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  --font-sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-en: "Outfit", "Noto Sans SC", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+[data-theme="home"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.16); }
+[data-theme="twin"] { --accent: var(--mist); --accent-soft: rgba(123, 163, 168, 0.16); }
+[data-theme="factory"] { --accent: #c9925a; --accent-soft: rgba(201, 146, 90, 0.16); }
+[data-theme="render"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.16); }
+[data-theme="drawing"] { --accent: #8bb8c1; --accent-soft: rgba(139, 184, 193, 0.16); }
+[data-theme="landscape"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.16); }
+[data-theme="portrait"] { --accent: #d4b49a; --accent-soft: rgba(212, 180, 154, 0.18); }
+[data-theme="games"] { --accent: var(--signal); --accent-soft: rgba(224, 138, 76, 0.16); }
+[data-theme="sketch"] { --accent: #b08968; --accent-soft: rgba(176, 137, 104, 0.18); }
+[data-theme="notes"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.12); }
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-grain: 0;
+    --motion-spot: 0;
+    --motion-reveal: 0;
+    --motion-ticks: 1;
+  }
+}
