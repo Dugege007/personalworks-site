@@ -276,7 +276,7 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, transparent 40%, rgba(11, 13, 16, 0.72)),
+    linear-gradient(180deg, transparent 40%, var(--veil)),
     linear-gradient(135deg, var(--accent-soft), transparent 55%);
 }
 

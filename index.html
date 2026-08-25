@@ -1,7 +1,20 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-skin="strata">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      (function () {
+        var KEY = "strata.prefs";
+        var FALLBACK = "strata";
+        try {
+          var parsed = JSON.parse(localStorage.getItem(KEY) || "null");
+          var skin = parsed && typeof parsed.skin === "string" ? parsed.skin : FALLBACK;
+          document.documentElement.setAttribute("data-skin", skin);
+        } catch (err) {
+          document.documentElement.setAttribute("data-skin", FALLBACK);
+        }
+      })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta

@@ -23,7 +23,7 @@ export function GamePlayPlaceholderPage() {
       <Link className="back" to="/games/menu">
         ← 返回选单
       </Link>
-      <div className="page-kicker">08.2 / PLAY</div>
+      <div className="page-kicker">03.2 / PLAY</div>
       <h1>{game.title}</h1>
       <p className="page-lead">{game.lead}</p>
       <div className="play-stage">

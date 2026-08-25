@@ -8,7 +8,7 @@ export function GamesMenuPage() {
       <Link className="back" to="/games">
         ← 返回游戏开发
       </Link>
-      <div className="page-kicker">08.1 / MENU</div>
+      <div className="page-kicker">03.1 / MENU</div>
       <h1>游戏选单</h1>
       <p className="page-lead">点击卡片进入游玩占位页。真实构建包将放到 COS，进入后再加载。</p>
       <div className="card-grid">

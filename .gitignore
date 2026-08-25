@@ -30,6 +30,7 @@ Desktop.ini
 *.ico
 !**/favicon.ico
 !**/favicon.svg
+!public/skins/*.png
 
 # 视频与音频
 *.mp4

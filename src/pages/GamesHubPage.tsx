@@ -4,7 +4,7 @@ import "../styles/placeholder.css";
 export function GamesHubPage() {
   return (
     <div className="page" data-theme="games">
-      <div className="page-kicker">07 / GAME DEV</div>
+      <div className="page-kicker">03 / GAME DEV</div>
       <h1>游戏开发</h1>
       <p className="page-lead">
         可玩的展示向小游戏。本页不加载任何 WebGL。选择游戏后，再进入对应游玩页。

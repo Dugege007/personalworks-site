@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "shot:cover": "node scripts/shot-cover.mjs"
   },
   "dependencies": {
     "gsap": "^3.13.0",

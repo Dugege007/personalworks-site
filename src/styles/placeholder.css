@@ -69,6 +69,117 @@
   margin-top: 28px;
 }
 
+.category-block {
+  margin: 48px 0 8px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.category-block > h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 3vw, 32px);
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.category-block > p {
+  max-width: 38em;
+  color: var(--muted);
+  margin: 0 0 20px;
+}
+
+.card.is-soon {
+  opacity: 0.72;
+  cursor: default;
+}
+
+.note-list {
+  display: grid;
+  gap: 20px;
+}
+
+.note-card {
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+}
+
+.note-card h2 {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  margin: 0;
+  font-weight: 600;
+}
+
+.note-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.note-previews {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.note-previews-detail {
+  margin-top: 28px;
+}
+
+.note-preview {
+  display: grid;
+  place-items: end start;
+  min-height: 88px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(180deg, transparent 40%, var(--veil)),
+    linear-gradient(135deg, var(--accent-soft), transparent 55%);
+  font-size: 12px;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.about-card {
+  padding: 20px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+}
+
+.about-card h2 {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.about-lead {
+  color: var(--muted);
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+
+.about-card ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.about-card li {
+  margin: 6px 0;
+}
+
 .archive-btn {
   display: inline-flex;
   align-items: center;
@@ -117,6 +228,11 @@
   }
 
   .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .note-previews,
+  .about-grid {
     grid-template-columns: 1fr;
   }
 }

@@ -1,16 +1,13 @@
+@import "./skins/strata.css";
+
 :root {
-  --bg: #0b0d10;
-  --surface: #14181c;
-  --text: #e8e6e1;
-  --muted: #8a8680;
-  --line: rgba(232, 230, 225, 0.12);
-  --gold: #c4a574;
-  --mist: #7ba3a8;
-  --signal: #e08a4c;
-  --ink: #3a322c;
   --accent: var(--gold);
   --accent-soft: rgba(196, 165, 116, 0.16);
   --header-h: 64px;
+  --header-bg: color-mix(in srgb, var(--bg) 72%, transparent);
+  --drawer-bg: color-mix(in srgb, var(--bg) 94%, transparent);
+  --scrim: color-mix(in srgb, var(--bg) 56%, transparent);
+  --veil: color-mix(in srgb, var(--bg) 72%, transparent);
   --motion-grain: 1;
   --motion-spot: 1;
   --motion-reveal: 1;
@@ -29,8 +26,9 @@
 [data-theme="landscape"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.16); }
 [data-theme="portrait"] { --accent: #d4b49a; --accent-soft: rgba(212, 180, 154, 0.18); }
 [data-theme="games"] { --accent: var(--signal); --accent-soft: rgba(224, 138, 76, 0.16); }
-[data-theme="sketch"] { --accent: #b08968; --accent-soft: rgba(176, 137, 104, 0.18); }
 [data-theme="notes"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.12); }
+[data-theme="about"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.12); }
+[data-theme="sketch"] { --accent: #b08968; --accent-soft: rgba(176, 137, 104, 0.18); }
 
 @media (prefers-reduced-motion: reduce) {
   :root {

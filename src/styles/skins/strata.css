@@ -1,0 +1,12 @@
+:root,
+[data-skin="strata"] {
+  --bg: #0b0d10;
+  --surface: #14181c;
+  --text: #e8e6e1;
+  --muted: #8a8680;
+  --line: rgba(232, 230, 225, 0.12);
+  --gold: #c4a574;
+  --mist: #7ba3a8;
+  --signal: #e08a4c;
+  --ink: #3a322c;
+}
