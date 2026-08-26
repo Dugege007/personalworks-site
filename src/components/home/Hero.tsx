@@ -1,7 +1,9 @@
 import { useEffect, useRef } from "react";
 import { profile } from "../../content/site";
 import { lexicon } from "../../content/lexicon";
+import { assetUrl } from "../../lib/assets";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
+import { ContactIcons } from "./ContactIcons";
 import { ScrollHint } from "./ScrollHint";
 
 export function Hero() {
@@ -47,30 +49,35 @@ export function Hero() {
         <span className="corner corner-bl" />
         <span className="corner corner-br" />
         <div className="portrait-frame">
+          {profile.portraitSrc ? (
+            <img
+              className="portrait-photo"
+              src={assetUrl(profile.portraitSrc)}
+              alt={`${profile.name} / ${lexicon.profile.zh}`}
+            />
+          ) : null}
           <div className="portrait-grid" />
           <div className="portrait-spot" ref={spotRef} />
-          <div className="portrait-caption">{lexicon.profile.deco} / 形象占位</div>
+          <div className="portrait-caption">
+            {lexicon.shotIn.deco} · {profile.portraitYear}
+          </div>
         </div>
       </div>
 
       <div className="hero-copy">
         <div className="kicker reveal is-in">
           <i />
-          00 / STRATA
+          00 / {lexicon.homePage.deco}
         </div>
         <h1 className="hero-name reveal is-in">{profile.name}</h1>
         <div className="hero-en">{profile.nameEn}</div>
         <div className="hero-id">{profile.identity}</div>
-        <p className="hero-bio">{profile.bio}</p>
-        <div className="contacts">
-          {profile.contacts.map((item) => (
-            <a key={item.label} className="contact-row" href={item.href}>
-              <span>{item.label}</span>
-              <strong>{item.value}</strong>
-              <em>{item.note}</em>
-            </a>
+        <p className="hero-bio">
+          {profile.bio.map((line) => (
+            <span key={line}>{line}</span>
           ))}
-        </div>
+        </p>
+        <ContactIcons channels={profile.contactChannels} />
       </div>
       <ScrollHint />
     </section>

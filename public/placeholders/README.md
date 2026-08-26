@@ -6,12 +6,14 @@
 
 | 目录 | 中文 |
 |------|------|
+| `home-page/` | 首页 |
 | `profile/` | 形象 |
 | `digital-twin/` | 数字孪生 |
 | `line-sim/` | 产线仿真 |
 | `landscape-rendering/` | 景观效果图 |
 | `landscape-cds/` | 景观施工图 |
 | `landscape-photo/` | 风光摄影 |
+| `humanist-photo/` | 人文摄影 |
 | `portrait-photo/` | 人像摄影 |
 | `game-photo/` | 游戏摄影 |
 | `notes/` | 心得 |

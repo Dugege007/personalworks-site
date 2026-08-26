@@ -13,6 +13,8 @@
   --motion-reveal: 1;
   --motion-hint: 1;
   --motion-ticks: 1;
+  --motion-stage: 1;
+  --stage-play: running;
   --font-serif: "Noto Serif SC", "Songti SC", "SimSun", serif;
   --font-sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
   --font-en: "Outfit", "Noto Sans SC", sans-serif;
@@ -28,6 +30,7 @@
 [data-theme="landscape-rendering"],
 [data-theme="photo"],
 [data-theme="landscape-photo"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.16); }
+[data-theme="humanist-photo"] { --accent: #b89a82; --accent-soft: rgba(184, 154, 130, 0.18); }
 [data-theme="landscape-cds"] { --accent: #8bb8c1; --accent-soft: rgba(139, 184, 193, 0.16); }
 [data-theme="portrait-photo"] { --accent: #d4b49a; --accent-soft: rgba(212, 180, 154, 0.18); }
 [data-theme="game-dev"],
@@ -45,5 +48,7 @@
     --motion-spot: 0;
     --motion-reveal: 0;
     --motion-ticks: 1;
+    --motion-stage: 0;
+    --stage-play: paused;
   }
 }

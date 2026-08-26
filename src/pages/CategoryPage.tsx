@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { lexicon } from "../content/lexicon";
 import { categories } from "../content/site";
 import { listPublishedWorks } from "../content/works";
 import "../styles/placeholder.css";
@@ -8,7 +9,7 @@ type CategoryPageProps = {
 };
 
 /**
- * 分类页：同门类下的两个或三个细目列表，封面进入各自详情。
+ * 分类页：同门类下的细目列表，封面进入各自详情。
  */
 export function CategoryPage({ categoryId }: CategoryPageProps) {
   const category = categories.find((item) => item.id === categoryId);
@@ -29,6 +30,12 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
       </div>
       <h1>{category.title}</h1>
       <p className="page-lead">{category.lead}</p>
+      {category.id === lexicon.photography.key ? (
+        <Link className="archive-btn" to={`/${lexicon.photography.key}/${lexicon.photoCatalog.key}`}>
+          浏览全部作品
+          <span aria-hidden="true">→</span>
+        </Link>
+      ) : null}
       {category.collections.map((collection) => (
         <section key={collection.id} className="category-block" data-theme={collection.theme}>
           <div className="page-kicker">{collection.titleDeco}</div>

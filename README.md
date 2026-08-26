@@ -14,7 +14,7 @@ npm run dev
 
 浏览器打开终端提示的地址（默认 `http://localhost:5173/`）。
 
-更完整的步骤（含宝塔、COS、CDN、备案）见 [`Docs/页面模块/00B-本地开发与部署手册.md`](../Docs/页面模块/00B-本地开发与部署手册.md)。
+更完整的步骤（含宝塔、COS、CDN、备案、一键发布）见 [`Docs/页面模块/00 设计大纲/00B-本地开发与部署手册.md`](../Docs/页面模块/00%20设计大纲/00B-本地开发与部署手册.md)。
 
 ## 常用命令
 
@@ -23,6 +23,8 @@ npm run dev
 | `npm run dev` | 本地开发预览 |
 | `npm run build` | 产出 `dist/`，用于上传服务器 |
 | `npm run preview` | 预览打包结果 |
+| `npm run deploy` | 一键构建并发布到轻量 Nginx；有新媒体时同步 COS。配置见 `.env.deploy` |
+| 双击 `deploy.bat` | 同上，免敲命令；中文窗口，输入 `Y` 确认，结束后停住方便看结果 |
 
 ## 第一批范围
 

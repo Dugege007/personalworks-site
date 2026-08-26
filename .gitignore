@@ -9,6 +9,7 @@ dist-ssr/
 .env
 .env.*
 !.env.example
+!.env.deploy.example
 
 # 系统与编辑器缓存
 .DS_Store

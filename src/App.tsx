@@ -9,6 +9,7 @@ import { GamesMenuPage } from "./pages/GamesMenuPage";
 import { HomePage } from "./pages/HomePage";
 import { NoteDetailPage } from "./pages/NoteDetailPage";
 import { NotesPage } from "./pages/NotesPage";
+import { PhotoCatalogPage } from "./pages/PhotoCatalogPage";
 import { WorkDetailPage } from "./pages/WorkDetailPage";
 
 type RedirectIdProps = {
@@ -28,6 +29,7 @@ const landscapeRendering = `${landscapeArch}/${lexicon.landscapeRendering.key}`;
 const landscapeCDs = `${landscapeArch}/${lexicon.landscapeCDs.key}`;
 const photo = `/${lexicon.photography.key}`;
 const landscapePhoto = `${photo}/${lexicon.landscapePhoto.key}`;
+const humanistPhoto = `${photo}/${lexicon.humanistPhoto.key}`;
 const portraitPhoto = `${photo}/${lexicon.portraitPhoto.key}`;
 const gameDev = `/${lexicon.gameDev.key}`;
 const gameMenu = `${gameDev}/${lexicon.gameMenu.key}`;
@@ -44,7 +46,9 @@ export function App() {
         <Route path={`${landscapeRendering}/:id`} element={<WorkDetailPage />} />
         <Route path={`${landscapeCDs}/:id`} element={<WorkDetailPage />} />
         <Route path={photo} element={<CategoryPage categoryId={lexicon.photography.key} />} />
+        <Route path={`${photo}/${lexicon.photoCatalog.key}`} element={<PhotoCatalogPage />} />
         <Route path={`${landscapePhoto}/:id`} element={<WorkDetailPage />} />
+        <Route path={`${humanistPhoto}/:id`} element={<WorkDetailPage />} />
         <Route path={`${portraitPhoto}/:id`} element={<WorkDetailPage />} />
         <Route path={gameDev} element={<GamesHubPage />} />
         <Route path={gameMenu} element={<GamesMenuPage />} />

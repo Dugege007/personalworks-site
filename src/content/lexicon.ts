@@ -61,6 +61,12 @@ export const lexicon = {
     deco: "L. PHOTO",
     key: "landscape-photo",
   },
+  humanistPhoto: {
+    zh: "人文摄影",
+    en: "Humanist Photography",
+    deco: "HUMANIST",
+    key: "humanist-photo",
+  },
   portraitPhoto: {
     zh: "人像摄影",
     en: "Portrait Photography",
@@ -72,6 +78,12 @@ export const lexicon = {
     en: "Game Photography",
     deco: "GAME PHOTO",
     key: "game-photo",
+  },
+  photoCatalog: {
+    zh: "摄影总览",
+    en: "Photography Catalog",
+    deco: "CATALOG",
+    key: "catalog",
   },
   gameDesign: {
     zh: "游戏设计",
@@ -90,5 +102,13 @@ export const lexicon = {
   notes: { zh: "心得", en: "Notes", deco: "NOTES", key: "notes" },
   sketching: { zh: "手绘", en: "Sketching", deco: "SKETCHES", key: "sketches" },
   about: { zh: "关于", en: "About", deco: "ABOUT", key: "about" },
+  homePage: { zh: "首页", en: "Home Page", deco: "HOME", key: "home-page" },
   profile: { zh: "形象", en: "Profile", deco: "PROFILE", key: "profile" },
+  shotIn: { zh: "拍摄于", en: "Shot in", deco: "SHOT", key: "shot-in" },
+  profileBase: { zh: "现居地", en: "Based in", deco: "BASE", key: "profile-base" },
+  profileMail: { zh: "邮箱", en: "Mail", deco: "MAIL", key: "profile-mail" },
+  profilePhone: { zh: "手机", en: "Phone", deco: "PHONE", key: "profile-phone" },
+  profileWechat: { zh: "微信", en: "WeChat", deco: "WECHAT", key: "profile-wechat" },
+  profileQq: { zh: "QQ", en: "QQ", deco: "QQ", key: "profile-qq" },
+  profileGithub: { zh: "GitHub", en: "GitHub", deco: "GITHUB", key: "profile-github" },
 } as const satisfies Record<string, LexiconEntry>;

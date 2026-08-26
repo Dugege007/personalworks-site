@@ -188,6 +188,7 @@
   display: inline-flex;
   align-items: center;
   gap: 12px;
+  margin-bottom: 8px;
   padding: 12px 18px;
   border: 1px solid var(--accent);
   clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
@@ -196,6 +197,76 @@
 
 .archive-btn:hover {
   background: var(--accent-soft);
+}
+
+.filter-board {
+  margin: 0 0 32px;
+  padding: 20px 0 8px;
+  border-top: 1px solid var(--line);
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  gap: 12px 16px;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.filter-row-label {
+  padding-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-chip,
+.filter-sort,
+.filter-clear {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: inherit;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+}
+
+.filter-chip.is-on,
+.filter-sort:hover,
+.filter-clear:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.filter-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin-top: 16px;
+}
+
+.filter-count {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@media (max-width: 860px) {
+  .filter-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .filter-row-label {
+    padding-top: 0;
+  }
 }
 
 .back {
@@ -307,6 +378,20 @@
   object-fit: cover;
 }
 
+.shell[data-theme="landscape-photo"] .media-frame img,
+.shell[data-theme="humanist-photo"] .media-frame img,
+.shell[data-theme="portrait-photo"] .media-frame img {
+  animation: stage-kenburns 28s ease-in-out infinite;
+  animation-play-state: var(--stage-play);
+}
+
+.shell[data-theme="landscape-photo"] .media-frame:not(:has(img)):not(:has(video)),
+.shell[data-theme="humanist-photo"] .media-frame:not(:has(img)):not(:has(video)),
+.shell[data-theme="portrait-photo"] .media-frame:not(:has(img)):not(:has(video)) {
+  animation: stage-kenburns 28s ease-in-out infinite;
+  animation-play-state: var(--stage-play);
+}
+
 .media-frame span {
   position: relative;
   z-index: 1;
@@ -322,6 +407,7 @@
 
 [data-theme="photo"] .media-grid,
 [data-theme="landscape-photo"] .media-grid,
+[data-theme="humanist-photo"] .media-grid,
 [data-theme="portrait-photo"] .media-grid,
 [data-theme="notes"] .media-grid,
 [data-theme="sketches"] .media-grid {
@@ -349,5 +435,16 @@
   .about-grid,
   .media-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell[data-theme="landscape-photo"] .media-frame img,
+  .shell[data-theme="humanist-photo"] .media-frame img,
+  .shell[data-theme="portrait-photo"] .media-frame img,
+  .shell[data-theme="landscape-photo"] .media-frame:not(:has(img)):not(:has(video)),
+  .shell[data-theme="humanist-photo"] .media-frame:not(:has(img)):not(:has(video)),
+  .shell[data-theme="portrait-photo"] .media-frame:not(:has(img)):not(:has(video)) {
+    animation: none;
   }
 }

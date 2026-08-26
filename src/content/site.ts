@@ -70,17 +70,42 @@ export type AboutFeature = {
   points: string[];
 };
 
+export type ContactChannelId =
+  | "profileBase"
+  | "profileMail"
+  | "profilePhone"
+  | "profileWechat"
+  | "profileQq"
+  | "profileGithub";
+
+export type ContactChannel = {
+  id: ContactChannelId;
+  value?: string;
+  href?: string;
+  copy?: boolean;
+  qrSrc?: string;
+};
+
 export const profile = {
   name: "杜宏博",
   nameEn: "DU HONGBO",
   siteLabel: "层境",
   siteLabelEn: "STRATA",
-  identity: "数字孪生 / 景观 / 摄影",
-  bio: "风景园林出身，做过四年景观设计，现在做数字孪生与产线仿真。用测绘的方式看世界，也用拍照和手绘把看到的留下来。",
-  contacts: [
-    { label: "Mail", value: "hello@duhongbo.com", href: "mailto:hello@duhongbo.com", note: "占位，待替换" },
-    { label: "Site", value: "duhongbo.com", href: "https://duhongbo.com", note: "备案完成后正式开放" },
+  identity: `${lexicon.digitalTwin.zh} / ${lexicon.landscapeArch.zh} / ${lexicon.photography.zh}`,
+  bio: [
+    "现在做数字孪生与产线仿真开发，曾做过四年景观设计，自学游戏开发和摄影。",
+    "“我抓不住时间，于是我按下快门。”",
   ],
+  portraitSrc: "profile/portrait.webp",
+  portraitYear: "2024",
+  contactChannels: [
+    { id: "profileBase", value: "上海市 青浦区" },
+    { id: "profileMail", value: "351080175@qq.com", copy: true },
+    { id: "profilePhone", value: "15139219231", copy: true },
+    { id: "profileWechat", value: "15139219231", copy: true, qrSrc: "home-page/wechat-qr.webp" },
+    { id: "profileQq", value: "351080175", copy: true },
+    { id: "profileGithub", value: "github.com/Dugege007", href: "https://github.com/Dugege007" },
+  ] satisfies ContactChannel[],
 };
 
 export const categories: CategoryRecord[] = [
@@ -167,7 +192,7 @@ export const categories: CategoryRecord[] = [
     lead: "把观看停在光线刚好够用的那一瞬。人像只放已授权的肖像。",
     path: `/${lexicon.photography.key}`,
     theme: lexicon.photography.key,
-    homeFrames: ["风光摄影", "人像摄影", "游戏摄影"],
+    homeFrames: ["风光摄影", "人文摄影", "人像摄影"],
     collections: [
       {
         id: lexicon.landscapePhoto.key,
@@ -178,6 +203,16 @@ export const categories: CategoryRecord[] = [
         theme: lexicon.landscapePhoto.key,
         detailBase: `/${lexicon.photography.key}/${lexicon.landscapePhoto.key}`,
         frames: ["山脊", "水面", "雾色"],
+      },
+      {
+        id: lexicon.humanistPhoto.key,
+        title: lexicon.humanistPhoto.zh,
+        titleEn: lexicon.humanistPhoto.en,
+        titleDeco: lexicon.humanistPhoto.deco,
+        lead: "把人留在还在发生的现场里，不是摆拍肖像。",
+        theme: lexicon.humanistPhoto.key,
+        detailBase: `/${lexicon.photography.key}/${lexicon.humanistPhoto.key}`,
+        frames: ["街巷", "市集", "渡口"],
       },
       {
         id: lexicon.portraitPhoto.key,
@@ -440,6 +475,25 @@ export function findCollectionByPath(pathname: string): WorkCollection | undefin
   return category.collections
     .filter((item) => pathname === item.detailBase || pathname.startsWith(`${item.detailBase}/`))
     .sort((a, b) => b.detailBase.length - a.detailBase.length)[0];
+}
+
+/**
+ * 按路径解析壳层 `data-theme`：细目页用集合 theme，手绘篇用 sketches，其余走栏目导航。
+ */
+export function resolveShellTheme(pathname: string): string {
+  if (pathname === `/${lexicon.notes.key}/${lexicon.sketching.key}`) {
+    return lexicon.sketching.key;
+  }
+  const collection = findCollectionByPath(pathname);
+  if (collection) {
+    return collection.theme;
+  }
+  const gameRoot = `/${lexicon.gameDev.key}`;
+  const gameMenu = `${gameRoot}/${lexicon.gameMenu.key}`;
+  if (pathname.startsWith(`${gameRoot}/`) && pathname !== gameMenu) {
+    return lexicon.gamePlay.key;
+  }
+  return findNavByPath(pathname).theme;
 }
 
 /**

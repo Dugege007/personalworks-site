@@ -30,7 +30,9 @@ function buildMetaItems(work: WorkRecord): MetaItem[] {
   if (work.sheetType) {
     items.push({ label: "图种", value: work.sheetType });
   }
-  if (work.placeAlias) {
+  if (work.place) {
+    items.push({ label: "地点", value: work.place });
+  } else if (work.placeAlias) {
     items.push({ label: "地点", value: work.placeAlias });
   }
   if (work.exifLite) {

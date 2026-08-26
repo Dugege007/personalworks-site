@@ -6,6 +6,7 @@ export type WorkChannel =
   | typeof lexicon.landscapeRendering.key
   | typeof lexicon.landscapeCDs.key
   | typeof lexicon.landscapePhoto.key
+  | typeof lexicon.humanistPhoto.key
   | typeof lexicon.portraitPhoto.key;
 
 export type WorkMedia = {
@@ -31,6 +32,7 @@ export type WorkRecord = {
   clientAlias?: string;
   sheetType?: string;
   placeAlias?: string;
+  place?: string;
   exifLite?: string;
   consent?: WorkConsent;
   displayName?: string;
@@ -173,9 +175,11 @@ export const placeholderWorks: WorkRecord[] = [
     id: "sample-1",
     channel: "landscape-photo",
     title: "山脊",
-    year: "2025",
+    year: "2015",
+    place: "杭州",
     placeAlias: "某山脊（别名）",
     exifLite: "1/250 · f/8 · ISO 100",
+    tags: ["山", "晨雾"],
     summary: "把观看停在光线刚好够用的那一瞬。",
     body: "界面让于画面。地点只用别名；EXIF 已去掉 GPS。",
     media: images("山脊", "云隙"),
@@ -184,9 +188,11 @@ export const placeholderWorks: WorkRecord[] = [
     id: "sample-2",
     channel: "landscape-photo",
     title: "水面",
-    year: "2024",
+    year: "2017",
+    place: "苏州",
     placeAlias: "某湖（别名）",
     exifLite: "1/60 · f/11 · ISO 64",
+    tags: ["水"],
     summary: "水面把天光收成一层。",
     body: "占位正文。系列图控制在数张以内，不塞原片。",
     media: images("水面", "倒影", "岸"),
@@ -196,17 +202,59 @@ export const placeholderWorks: WorkRecord[] = [
     channel: "landscape-photo",
     title: "雾色",
     year: "2024",
+    place: "南京",
     placeAlias: "某谷（别名）",
+    tags: ["晨雾"],
     summary: "雾把层次减到还能走的程度。",
     body: "占位正文。无 EXIF 时不留空行。",
     media: images("雾"),
   },
   {
     id: "sample-1",
+    channel: "humanist-photo",
+    title: "街巷",
+    year: "2016",
+    place: "上海",
+    placeAlias: "某巷（别名）",
+    exifLite: "1/125 · f/5.6 · ISO 400",
+    tags: ["随拍"],
+    summary: "把人留在还在发生的现场里。",
+    body: "占位正文。人文摄影看日常场域，不按摆拍肖像收录。可辨认近景人脸改走授权人像细目。",
+    media: images("街巷", "檐下"),
+  },
+  {
+    id: "sample-2",
+    channel: "humanist-photo",
+    title: "市集",
+    year: "2018",
+    place: "新加坡",
+    placeAlias: "某集（别名）",
+    tags: ["随拍", "市井"],
+    summary: "摊位把一天的光切成一段一段。",
+    body: "占位正文。地点只用别名；无 EXIF 时不留空行。",
+    media: images("市集", "秤"),
+  },
+  {
+    id: "sample-3",
+    channel: "humanist-photo",
+    title: "渡口",
+    year: "2020",
+    place: "长滩岛",
+    placeAlias: "某渡（别名）",
+    exifLite: "1/250 · f/8 · ISO 200",
+    tags: ["水"],
+    summary: "等人的空隙里，河面还在走。",
+    body: "占位正文。系列图控制在数张以内，不塞原片。",
+    media: images("渡口"),
+  },
+  {
+    id: "sample-1",
     channel: "portrait-photo",
     title: "留白",
-    year: "2025",
+    year: "2019",
+    place: "上海",
     consent: "granted",
+    tags: ["室内"],
     summary: "已授权肖像的抽象框景，不展示被摄者真名。",
     body: "占位正文。人像页信息量低于风光；未提供 displayName 时不写姓名。",
     media: images("留白", "侧光"),
@@ -215,8 +263,10 @@ export const placeholderWorks: WorkRecord[] = [
     id: "sample-2",
     channel: "portrait-photo",
     title: "侧光",
-    year: "2024",
+    year: "2021",
+    place: "苏州",
     consent: "granted",
+    tags: ["侧光"],
     summary: "侧光把轮廓留下来，背景尽量空。",
     body: "占位正文。生产列表只收录 consent 为已授权的条目。",
     media: images("侧光"),
@@ -225,8 +275,10 @@ export const placeholderWorks: WorkRecord[] = [
     id: "sample-3",
     channel: "portrait-photo",
     title: "静场",
-    year: "2024",
+    year: "2025",
+    place: "杭州",
     consent: "granted",
+    tags: ["室内"],
     summary: "把人留在刚好够用的光线里。",
     body: "占位正文。下架时更换对象键并刷新 CDN，本轮无真实人脸。",
     media: images("静场", "手", "窗"),
@@ -264,4 +316,92 @@ export function findPublishedWork(channel: string, id: string): WorkRecord | und
     return undefined;
   }
   return work;
+}
+
+export const photoWorkChannels = [
+  lexicon.landscapePhoto.key,
+  lexicon.humanistPhoto.key,
+  lexicon.portraitPhoto.key,
+] as const;
+
+export type PhotoWorkChannel = (typeof photoWorkChannels)[number];
+
+export type PhotoCatalogQuery = {
+  channels: string[];
+  years: string[];
+  places: string[];
+  tags: string[];
+  sort: "asc" | "desc";
+};
+
+/**
+ * 列出访客可见的摄影作品（不含未授权人像、不含游戏摄影留位）。
+ */
+export function listPublishedPhotoWorks(): WorkRecord[] {
+  const allowed = new Set<string>(photoWorkChannels);
+  return placeholderWorks.filter(
+    (item) => allowed.has(item.channel) && (!item.consent || item.consent === "granted"),
+  );
+}
+
+/**
+ * 从摄影作品集提取筛选项；年份升序，其余按中文排序。
+ */
+export function collectPhotoFacets(works: WorkRecord[]): {
+  years: string[];
+  places: string[];
+  tags: string[];
+} {
+  const years = new Set<string>();
+  const places = new Set<string>();
+  const tags = new Set<string>();
+  for (const work of works) {
+    years.add(work.year);
+    if (work.place) {
+      places.add(work.place);
+    }
+    for (const tag of work.tags ?? []) {
+      tags.add(tag);
+    }
+  }
+  return {
+    years: [...years].sort(),
+    places: [...places].sort((a, b) => a.localeCompare(b, "zh-CN")),
+    tags: [...tags].sort((a, b) => a.localeCompare(b, "zh-CN")),
+  };
+}
+
+/**
+ * 按维度过滤摄影作品：维度内并集，维度间交集。
+ */
+export function filterPhotoWorks(works: WorkRecord[], query: PhotoCatalogQuery): WorkRecord[] {
+  return works.filter((work) => {
+    if (query.channels.length > 0 && !query.channels.includes(work.channel)) {
+      return false;
+    }
+    if (query.years.length > 0 && !query.years.includes(work.year)) {
+      return false;
+    }
+    if (query.places.length > 0 && (!work.place || !query.places.includes(work.place))) {
+      return false;
+    }
+    if (query.tags.length > 0 && !query.tags.some((tag) => work.tags?.includes(tag))) {
+      return false;
+    }
+    return true;
+  });
+}
+
+/**
+ * 按年份排序；同年按标题稳定次序。
+ */
+export function sortPhotoWorks(works: WorkRecord[], sort: "asc" | "desc"): WorkRecord[] {
+  const sign = sort === "asc" ? 1 : -1;
+  return [...works].sort((a, b) => {
+    const yearDiff = a.year.localeCompare(b.year) * sign;
+    if (yearDiff !== 0) {
+      return yearDiff;
+    }
+    return a.title.localeCompare(b.title, "zh-CN");
+  });
 }
