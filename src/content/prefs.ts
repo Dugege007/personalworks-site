@@ -9,27 +9,27 @@ import { type SkinRecord } from "../prefs/types";
  */
 export const skinRegistry: SkinRecord[] = [
   {
-    id: "strata",
-    name: { "zh-CN": "层境 STRATA", en: "STRATA" },
-    brand: { zh: "层境", deco: "STRATA" },
-    ia: "strata-archive",
-    order: 0,
-    enabled: true,
-    isDefault: true,
-    preview: {
-      swatches: ["#0B0D10", "#C4A574", "#7BA3A8", "#E8E6E1"],
-    },
-  },
-  {
     id: "develop",
     name: { "zh-CN": "显影 DEVELOP", en: "DEVELOP" },
     brand: { zh: "显影", deco: "DEVELOP" },
     ia: "develop-editorial",
+    order: 0,
+    enabled: true,
+    isDefault: true,
+    preview: {
+      swatches: ["#E8EAED", "#2B4C7E", "#2F5D4A", "#16181C"],
+    },
+  },
+  {
+    id: "strata",
+    name: { "zh-CN": "层境 STRATA", en: "STRATA" },
+    brand: { zh: "层境", deco: "STRATA" },
+    ia: "strata-archive",
     order: 1,
     enabled: true,
     isDefault: false,
     preview: {
-      swatches: ["#E8EAED", "#2B4C7E", "#2F5D4A", "#16181C"],
+      swatches: ["#0B0D10", "#C4A574", "#7BA3A8", "#E8E6E1"],
     },
   },
 ];

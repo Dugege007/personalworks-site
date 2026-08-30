@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { Link } from "react-router-dom";
 import { lexicon } from "../../content/lexicon";
 import { profile } from "../../content/site";
-import { workCoverSrc } from "../../content/stockMedia";
+import { stockPlaceholderSrc, workCoverSrc } from "../../content/stockMedia";
 import { hrefForWork, channelTitleZh } from "../../ia/href";
 import { queryNotes, queryWorks } from "../../ia/query";
 import type { HomeBlock, IaRecord } from "../../ia/types";
@@ -16,7 +16,7 @@ type DevelopHomeProps = {
 };
 
 /**
- * 显影首页：通幅头图、简介、切片、精选、心得、墨底收束。
+ * 显影首页：通幅头图叠简介、切片、精选、心得、墨底收束。
  */
 export function DevelopHome({ ia }: DevelopHomeProps) {
   return (
@@ -38,9 +38,6 @@ function DevelopBlock({ block, ia }: DevelopBlockProps) {
   if (block.type === "hero-bleed") {
     return <HeroBleed block={block} />;
   }
-  if (block.type === "intro-portrait") {
-    return <IntroPortrait />;
-  }
   if (block.type === "waypoint-slices") {
     return <WaypointSlices />;
   }
@@ -60,6 +57,7 @@ function HeroBleed({ block }: { block: HomeBlock }) {
   const [mediaFailed, setMediaFailed] = useState(false);
   const src = block.heroSrc && !mediaFailed ? assetUrl(block.heroSrc) : "";
   const year = block.heroYear ?? profile.portraitYear;
+  const [lead, quote] = profile.bio;
 
   return (
     <section className="develop-hero" id="hero-bleed" data-tone={src ? "dark" : "light"}>
@@ -74,89 +72,69 @@ function HeroBleed({ block }: { block: HomeBlock }) {
         <div className="develop-hero-well" aria-hidden="true" />
       )}
       <div className="develop-hero-veil" aria-hidden="true" />
-      <div className="develop-hero-copy">
-        {src ? (
-          <p className="develop-hero-shot">
-            {lexicon.shotIn.deco} · {year}
-          </p>
-        ) : null}
-        <h1 className="develop-hero-name">{profile.name}</h1>
-        <p className="develop-hero-en">{profile.nameEn}</p>
-        <p className="develop-hero-id">{block.identity}</p>
-        <div className="develop-hero-cta">
-          <Link className="develop-btn is-solid" to={`/${lexicon.profileResume.key}`}>
-            {lexicon.profileResume.zh}
-          </Link>
-          <Link className="develop-btn is-line" to={`/${lexicon.workIndex.key}`}>
-            {lexicon.workIndex.zh}
-          </Link>
+      <div className="develop-hero-band">
+        <div className="develop-hero-copy">
+          {src ? (
+            <p className="develop-hero-shot">
+              {lexicon.shotIn.deco} · {year}
+            </p>
+          ) : null}
+          <h1 className="develop-hero-name">{profile.name}</h1>
+          <p className="develop-hero-en">{profile.nameEn}</p>
+          <p className="develop-hero-id">{block.identity}</p>
+          <div className="develop-hero-cta">
+            <Link className="develop-btn is-solid" to={`/${lexicon.profileResume.key}`}>
+              {lexicon.profileResume.zh}
+            </Link>
+            <Link className="develop-btn is-line" to={`/${lexicon.workIndex.key}`}>
+              {lexicon.workIndex.zh}
+            </Link>
+          </div>
+        </div>
+        <div className="develop-hero-note">
+          {lead ? <p className="develop-hero-lead">{lead}</p> : null}
+          {quote ? <p className="develop-hero-quote">{quote}</p> : null}
         </div>
       </div>
     </section>
   );
 }
 
-function IntroPortrait() {
-  const [failed, setFailed] = useState(false);
-  const src = profile.portraitSrc && !failed ? assetUrl(profile.portraitSrc) : "";
-
-  return (
-    <section className="develop-intro" id="intro-portrait">
-      <div className="develop-intro-figure">
-        {src ? (
-          <img
-            src={src}
-            alt={`${profile.name} / ${lexicon.profile.zh}`}
-            onError={() => setFailed(true)}
-          />
-        ) : (
-          <div className="develop-intro-well" aria-hidden="true" />
-        )}
-        <span className="develop-intro-mark">
-          {lexicon.shotIn.deco} · {profile.portraitYear}
-        </span>
-      </div>
-      <div className="develop-intro-copy">
-        <p className="develop-intro-en">{profile.nameEn}</p>
-        {profile.bio.map((line) => (
-          <p key={line}>{line}</p>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function WaypointSlices() {
-  const frames = queryWorks({ source: "works", featured: true, limit: 1 });
-  const cover = frames[0] ? workCoverSrc(frames[0]) : undefined;
+  const workSrcs = uniqueSrcs(queryWorks({ source: "works" }).map((work) => workCoverSrc(work)));
   const slices = [
     {
       id: lexicon.profileResume.key,
       label: lexicon.profileResume.zh,
       deco: lexicon.profileResume.deco,
       to: `/${lexicon.profileResume.key}`,
-      src: profile.portraitSrc,
+      srcs: uniqueSrcs(profile.portraitSrcs),
     },
     {
       id: lexicon.profileSkills.key,
       label: lexicon.profileSkills.zh,
       deco: lexicon.profileSkills.deco,
       to: `/${lexicon.profileSkills.key}`,
-      src: "home-page/skills.webp",
+      srcs: uniqueSrcs([
+        "home-page/skills.webp",
+        stockPlaceholderSrc("landscape-cds", 1),
+        stockPlaceholderSrc("landscape-cds", 2),
+        stockPlaceholderSrc("landscape-cds", 3),
+      ]),
     },
     {
       id: lexicon.workIndex.key,
       label: lexicon.workIndex.zh,
       deco: lexicon.workIndex.deco,
       to: `/${lexicon.workIndex.key}`,
-      src: cover,
+      srcs: workSrcs,
     },
     {
       id: lexicon.notes.key,
       label: lexicon.notes.zh,
       deco: lexicon.notes.deco,
       to: `/${lexicon.notes.key}`,
-      src: "notes/cover.webp",
+      srcs: uniqueSrcs(["notes/cover.webp"]),
     },
   ];
 
@@ -173,22 +151,133 @@ type SliceCardProps = {
   label: string;
   deco: string;
   to: string;
-  src?: string;
+  srcs: string[];
 };
 
-function SliceCard({ label, deco, to, src }: SliceCardProps) {
-  const [failed, setFailed] = useState(false);
-  const href = src && !failed ? assetUrl(src) : "";
+const SLICE_IDLE_MIN_MS = 5000;
+const SLICE_IDLE_MAX_MS = 10000;
+const SLICE_HOVER_MS = 2000;
+
+/**
+ * 切片图卡：空闲 5–10 秒换一张，悬停改为 2 秒；各卡自计时，最近五张不重复。
+ */
+function SliceCard({ label, deco, to, srcs }: SliceCardProps) {
+  const [failed, setFailed] = useState<Record<string, true>>({});
+  const [current, setCurrent] = useState(srcs[0] ?? "");
+  const recentRef = useRef<string[]>([]);
+  const currentRef = useRef(current);
+  const poolRef = useRef<string[]>([]);
+  const hoverRef = useRef(false);
+  const timerRef = useRef<number>(0);
+
+  const pool = srcs.filter((src) => !failed[src]);
+  const shown = pool.includes(current) ? current : (pool[0] ?? "");
+  poolRef.current = pool;
+  currentRef.current = shown;
+
+  useEffect(() => {
+    scheduleSliceTick();
+    return () => window.clearTimeout(timerRef.current);
+  }, []);
+
+  /**
+   * 按当前是否悬停排下一次换图；空闲随机 5–10 秒。
+   */
+  function scheduleSliceTick() {
+    window.clearTimeout(timerRef.current);
+    timerRef.current = 0;
+    if (poolRef.current.length < 2) {
+      return;
+    }
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+    const delay = hoverRef.current
+      ? SLICE_HOVER_MS
+      : SLICE_IDLE_MIN_MS + Math.random() * (SLICE_IDLE_MAX_MS - SLICE_IDLE_MIN_MS);
+    timerRef.current = window.setTimeout(() => {
+      const next = pickNextSliceSrc(poolRef.current, currentRef.current, recentRef.current);
+      recentRef.current = [...recentRef.current, currentRef.current].slice(-4);
+      setCurrent(next);
+      scheduleSliceTick();
+    }, delay);
+  }
+
+  /**
+   * 细指针悬停加快到两秒；触屏只走空闲节拍。
+   */
+  function handlePointerEnter(event: PointerEvent<HTMLAnchorElement>) {
+    if (event.pointerType !== "mouse" || hoverRef.current) {
+      return;
+    }
+    hoverRef.current = true;
+    scheduleSliceTick();
+  }
+
+  function handlePointerLeave() {
+    if (!hoverRef.current) {
+      return;
+    }
+    hoverRef.current = false;
+    scheduleSliceTick();
+  }
 
   return (
-    <Link className="develop-slice" to={to}>
-      {href ? <img src={href} alt="" onError={() => setFailed(true)} /> : <span className="develop-slice-well" />}
+    <Link
+      className="develop-slice"
+      to={to}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
+    >
+      {pool.length > 0 ? (
+        pool.map((src) => (
+          <img
+            key={src}
+            className={src === shown ? "is-on" : undefined}
+            src={assetUrl(src)}
+            alt=""
+            onError={() => setFailed((prev) => ({ ...prev, [src]: true }))}
+          />
+        ))
+      ) : (
+        <span className="develop-slice-well" />
+      )}
       <span className="develop-slice-copy">
         <strong>{label}</strong>
         <em>{deco}</em>
       </span>
     </Link>
   );
+}
+
+/**
+ * 从图池取下一张：最近四张加当前共五张不重复；池不足时窗口收窄。
+ */
+function pickNextSliceSrc(pool: string[], current: string, recent: string[]): string {
+  if (pool.length < 2) {
+    return current;
+  }
+  const windowSize = Math.min(4, pool.length - 1);
+  const forbidden = new Set([...recent, current].slice(-windowSize));
+  const candidates = pool.filter((src) => !forbidden.has(src));
+  const bag = candidates.length > 0 ? candidates : pool.filter((src) => src !== current);
+  return bag[Math.floor(Math.random() * bag.length)] ?? current;
+}
+
+/**
+ * 去掉空值和重复路径，保持首次出现的顺序。
+ */
+function uniqueSrcs(items: Array<string | undefined>): string[] {
+  const seen = new Set<string>();
+  const list: string[] = [];
+  for (const item of items) {
+    if (!item || seen.has(item)) {
+      continue;
+    }
+    seen.add(item);
+    list.push(item);
+  }
+  return list;
 }
 
 function SelectedFrames({ block, ia }: { block: HomeBlock; ia: IaRecord }) {

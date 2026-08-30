@@ -1,25 +1,10 @@
-@import "./skins/strata.css";
+@import "./skins/develop.css";
 
 :root {
-  --accent: var(--gold);
-  --accent-soft: rgba(196, 165, 116, 0.16);
   --header-h: 64px;
-  --header-bg: color-mix(in srgb, var(--bg) 72%, transparent);
-  --drawer-bg: color-mix(in srgb, var(--bg) 94%, transparent);
-  --scrim: color-mix(in srgb, var(--bg) 56%, transparent);
-  --veil: color-mix(in srgb, var(--bg) 72%, transparent);
-  --motion-grain: 1;
-  --motion-spot: 1;
   --motion-reveal: 1;
   --motion-hint: 1;
   --motion-ticks: 1;
-  --motion-stage: 1;
-  --stage-play: running;
-  --font-serif: "Noto Serif SC", "Songti SC", "SimSun", serif;
-  --font-sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
-  --font-display-en: "Outfit", "Noto Sans SC", sans-serif;
-  --font-en: "Outfit", "Noto Sans SC", sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 
 [data-skin="strata"] [data-theme="home"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.16); }
@@ -40,7 +25,9 @@
 [data-skin="strata"] [data-theme="menu"],
 [data-skin="strata"] [data-theme="play"] { --accent: var(--signal); --accent-soft: rgba(224, 138, 76, 0.16); }
 [data-skin="strata"] [data-theme="notes"],
-[data-skin="strata"] [data-theme="about"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.12); }
+[data-skin="strata"] [data-theme="about"],
+[data-skin="strata"] [data-theme="profile-resume"],
+[data-skin="strata"] [data-theme="profile-skills"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.12); }
 [data-skin="strata"] [data-theme="sketches"] { --accent: #b08968; --accent-soft: rgba(176, 137, 104, 0.18); }
 
 @media (prefers-reduced-motion: reduce) {

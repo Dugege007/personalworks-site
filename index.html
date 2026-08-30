@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="zh-CN" data-skin="strata">
+<html lang="zh-CN" data-skin="develop">
   <head>
     <meta charset="UTF-8" />
     <script>
       (function () {
         var KEY = "strata.prefs";
         // 须与 src/content/prefs.ts 中 isDefault 那条的 id 一致
-        var FALLBACK = "strata";
+        var FALLBACK = "develop";
         try {
           var parsed = JSON.parse(localStorage.getItem(KEY) || "null");
           var skin = parsed && typeof parsed.skin === "string" ? parsed.skin : FALLBACK;
@@ -20,9 +20,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="层境 STRATA — 杜宏博的个人作品场：数字孪生、产线仿真、景观、摄影与游戏。"
+      content="显影 DEVELOP — 杜宏博的个人作品场：数字孪生、产线仿真、景观、摄影与游戏。"
     />
-    <title>层境 STRATA · 杜宏博</title>
+    <title>显影 DEVELOP · 杜宏博</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

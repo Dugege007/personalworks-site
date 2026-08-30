@@ -51,7 +51,6 @@ export const developIa: IaRecord = {
         heroSrc: profile.homeHeroSrc,
         heroYear: profile.homeHeroYear,
       },
-      { type: "intro-portrait", query: { source: "profile" } },
       { type: "waypoint-slices" },
       { type: "selected-frames", query: { source: "works", featured: true, limit: 5 } },
       { type: "notes-tease", query: { source: "notes", limit: 1 } },

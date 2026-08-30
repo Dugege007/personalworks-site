@@ -1,4 +1,5 @@
-/* 显影 DEVELOP：冷石浅底 + 建筑靛。:root 仍回退层境。 */
+/* 显影 DEVELOP：冷石浅底 + 建筑靛。:root 回退本皮，与 isDefault 一致。 */
+:root,
 [data-skin="develop"] {
   --bg: #e8eaed;
   --surface: #f4f5f7;

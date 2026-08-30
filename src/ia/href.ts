@@ -1,8 +1,9 @@
 import { lexicon } from "../content/lexicon";
 import { findCollectionByChannel } from "../content/site";
 import { photoWorkChannels, type WorkRecord } from "../content/works";
+import { strataKindPathDict } from "./strata";
 import type { IaId } from "./types";
-import { hrefForDevelopWork } from "./workTree";
+import { hrefForDevelopKind, hrefForDevelopWork } from "./workTree";
 
 /**
  * 作品在当前 IA 下的详情地址。摄影始终走既有单帧路径。
@@ -19,6 +20,16 @@ export function hrefForWork(work: WorkRecord, iaId: IaId): string {
     return `${collection.detailBase}/${work.id}`;
   }
   return `/${lexicon.workIndex.key}`;
+}
+
+/**
+ * 门类在当前 IA 下的入口：显影走作品墙，层境走分类室。
+ */
+export function hrefForKind(kind: string, iaId: IaId): string {
+  if (iaId === "develop-editorial") {
+    return hrefForDevelopKind(kind);
+  }
+  return strataKindPathDict[kind] ?? `/${kind}`;
 }
 
 /**
