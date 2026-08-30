@@ -1,3 +1,7 @@
+import { useLocation, useNavigate } from "react-router-dom";
+import { findDefaultSkin, findEnabledSkin } from "../content/prefs";
+import { iaOfSkin } from "../ia";
+import { resolvePathForSkin } from "../ia/resolve";
 import { usePrefs } from "../prefs/PrefsProvider";
 
 type SkinPickerProps = {
@@ -10,9 +14,23 @@ type SkinPickerProps = {
  */
 export function SkinPicker({ open, onClose }: SkinPickerProps) {
   const { skin, enabledSkins, setSkin, skinName } = usePrefs();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   if (!open) {
     return null;
+  }
+
+  /**
+   * 先写皮肤，再按目标 IA 映射路径；换 URL 时 replace，不堆历史。
+   */
+  function handlePick(id: string) {
+    setSkin(id);
+    const target = findEnabledSkin(id) ?? findDefaultSkin();
+    const next = resolvePathForSkin(location.pathname, location.search, iaOfSkin(target).id);
+    if (next.pathname !== location.pathname || next.search !== location.search) {
+      navigate({ pathname: next.pathname, search: next.search }, { replace: true });
+    }
   }
 
   return (
@@ -39,7 +57,7 @@ export function SkinPicker({ open, onClose }: SkinPickerProps) {
                   className={`skin-card${current ? " is-current" : ""}`}
                   type="button"
                   aria-pressed={current}
-                  onClick={() => setSkin(record.id)}
+                  onClick={() => handlePick(record.id)}
                 >
                   {record.preview.cover ? (
                     <img className="skin-cover" src={record.preview.cover} alt="" />

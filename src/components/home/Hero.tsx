@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { profile } from "../../content/site";
+import { archiveIndexByNavId, profile } from "../../content/site";
 import { lexicon } from "../../content/lexicon";
 import { assetUrl } from "../../lib/assets";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
@@ -67,7 +67,7 @@ export function Hero() {
       <div className="hero-copy">
         <div className="kicker reveal is-in">
           <i />
-          00 / {lexicon.homePage.deco}
+          {archiveIndexByNavId("home")} / {lexicon.homePage.deco}
         </div>
         <h1 className="hero-name reveal is-in">{profile.name}</h1>
         <div className="hero-en">{profile.nameEn}</div>

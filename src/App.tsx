@@ -10,7 +10,12 @@ import { HomePage } from "./pages/HomePage";
 import { NoteDetailPage } from "./pages/NoteDetailPage";
 import { NotesPage } from "./pages/NotesPage";
 import { PhotoCatalogPage } from "./pages/PhotoCatalogPage";
+import { ResumePage } from "./pages/ResumePage";
+import { SkillsPage } from "./pages/SkillsPage";
+import { WorkChannelPage } from "./pages/WorkChannelPage";
 import { WorkDetailPage } from "./pages/WorkDetailPage";
+import { WorkIndexPage } from "./pages/WorkIndexPage";
+import { WorkIndexSegmentPage } from "./pages/WorkKindPage";
 
 type RedirectIdProps = {
   to: (id: string) => string;
@@ -39,6 +44,12 @@ export function App() {
     <Routes>
       <Route element={<SiteShell />}>
         <Route path="/" element={<HomePage />} />
+        <Route path={`/${lexicon.workIndex.key}`} element={<WorkIndexPage />} />
+        <Route path={`/${lexicon.workIndex.key}/:kind/:channel/:id`} element={<WorkDetailPage />} />
+        <Route path={`/${lexicon.workIndex.key}/:kind/:channel`} element={<WorkChannelPage />} />
+        <Route path={`/${lexicon.workIndex.key}/:kind`} element={<WorkIndexSegmentPage />} />
+        <Route path={`/${lexicon.profileResume.key}`} element={<ResumePage />} />
+        <Route path={`/${lexicon.profileSkills.key}`} element={<SkillsPage />} />
         <Route path={twinSim} element={<CategoryPage categoryId={lexicon.twinAndSim.key} />} />
         <Route path={`${digitalTwin}/:id`} element={<WorkDetailPage />} />
         <Route path={`${lineSim}/:id`} element={<WorkDetailPage />} />

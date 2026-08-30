@@ -1,10 +1,19 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { lexicon } from "../content/lexicon";
 import { categories } from "../content/site";
+import { iaOfSkin } from "../ia";
+import { hrefForDevelopKind } from "../ia/workTree";
+import { usePrefs } from "../prefs/PrefsProvider";
 import "../styles/placeholder.css";
 
 export function GamesHubPage() {
+  const { currentSkin } = usePrefs();
+  const ia = iaOfSkin(currentSkin);
   const category = categories.find((item) => item.id === lexicon.gameDev.key);
+
+  if (ia.id === "develop-editorial") {
+    return <Navigate to={hrefForDevelopKind(lexicon.gameDev.key)} replace />;
+  }
 
   return (
     <div className="page" data-theme={lexicon.gameDev.key}>

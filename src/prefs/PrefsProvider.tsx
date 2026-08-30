@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { listEnabledSkins } from "../content/prefs";
+import { findDefaultSkin, findEnabledSkin, listEnabledSkins } from "../content/prefs";
 import {
   applySkinToDom,
   loadResolvedPrefs,
@@ -22,6 +22,7 @@ type PrefsContextValue = {
   skin: SkinId;
   locale: Locale;
   enabledSkins: SkinRecord[];
+  currentSkin: SkinRecord;
   setSkin: (id: SkinId) => void;
   skinName: (record: SkinRecord) => string;
 };
@@ -77,16 +78,21 @@ export function PrefsProvider({ children }: PrefsProviderProps) {
   }, []);
 
   const enabledSkins = useMemo(() => listEnabledSkins(), []);
+  const currentSkin = useMemo(
+    () => findEnabledSkin(prefs.skin) ?? findDefaultSkin(),
+    [prefs.skin],
+  );
 
   const value = useMemo<PrefsContextValue>(
     () => ({
       skin: prefs.skin,
       locale: prefs.locale,
       enabledSkins,
+      currentSkin,
       setSkin,
       skinName: (record) => tx(record.name, prefs.locale),
     }),
-    [prefs.skin, prefs.locale, enabledSkins, setSkin],
+    [prefs.skin, prefs.locale, enabledSkins, currentSkin, setSkin],
   );
 
   return <PrefsContext.Provider value={value}>{children}</PrefsContext.Provider>;

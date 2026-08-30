@@ -1,13 +1,15 @@
 export type Locale = "zh-CN" | "en";
 export type SkinId = string;
-export type LayoutId = string;
+export type IaId = string;
 
 export type LocalizedString = string | { "zh-CN": string; en?: string };
 
 export type SkinRecord = {
   id: SkinId;
   name: LocalizedString;
-  layout: LayoutId;
+  /** 顶栏中文名与装饰短写，随当前皮肤切换。 */
+  brand: { zh: string; deco: string };
+  ia: IaId;
   order: number;
   enabled: boolean;
   isDefault: boolean;
@@ -25,6 +27,4 @@ export type PrefsV1 = {
 
 export const PREFS_KEY = "strata.prefs";
 export const PREFS_VERSION = 1;
-export const DEFAULT_SKIN_ID: SkinId = "strata";
 export const DEFAULT_LOCALE: Locale = "zh-CN";
-export const DEFAULT_LAYOUT_ID: LayoutId = "strata-scroll";

@@ -1,0 +1,159 @@
+/* 显影 DEVELOP：冷石浅底 + 建筑靛。:root 仍回退层境。 */
+[data-skin="develop"] {
+  --bg: #e8eaed;
+  --surface: #f4f5f7;
+  --text: #16181c;
+  --muted: #5a6169;
+  --line: rgba(22, 24, 28, 0.12);
+  --accent: #2b4c7e;
+  --accent-soft: rgba(43, 76, 126, 0.1);
+  --pine: #2f5d4a;
+  --steel: #3d6a73;
+  --oxide: #c45c3e;
+  --ink-block: #1a1d22;
+  --on-ink: #eef0f2;
+
+  /* 遗留层境色名改走本皮，避免黄昏金/雾青漏出 */
+  --gold: var(--accent);
+  --mist: var(--steel);
+  --signal: var(--oxide);
+  --ink: var(--ink-block);
+
+  --header-bg: var(--surface);
+  --drawer-bg: var(--surface);
+  --scrim: color-mix(in srgb, var(--ink-block) 42%, transparent);
+  --veil: color-mix(in srgb, var(--ink-block) 16%, transparent);
+  --panel-bg: var(--surface);
+  --portrait-base: #d8dce2;
+  --portrait-placeholder:
+    linear-gradient(160deg, var(--accent-soft), transparent 42%),
+    var(--surface);
+  --spot-color: rgba(43, 76, 126, 0.16);
+  --caption-shadow: none;
+
+  --font-serif: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-display-en: "Syne", "Outfit", sans-serif;
+  --font-en: "Outfit", "Noto Sans SC", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --motion-grain: 0;
+  --motion-spot: 0;
+  --motion-stage: 0;
+  --stage-play: paused;
+}
+
+[data-skin="develop"] [data-theme="home"],
+[data-skin="develop"] [data-theme="profile-resume"],
+[data-skin="develop"] [data-theme="profile-skills"],
+[data-skin="develop"] [data-theme="work-index"],
+[data-skin="develop"] [data-theme="about"],
+[data-skin="develop"] [data-theme="notes"],
+[data-skin="develop"] [data-theme="catalog"],
+[data-skin="develop"] [data-theme="photo"],
+[data-skin="develop"] [data-theme="landscape-photo"] {
+  --accent: #2b4c7e;
+  --accent-soft: rgba(43, 76, 126, 0.1);
+}
+
+[data-skin="develop"] [data-theme="twin-sim"],
+[data-skin="develop"] [data-theme="digital-twin"],
+[data-skin="develop"] [data-theme="line-sim"] {
+  --accent: var(--steel);
+  --accent-soft: rgba(61, 106, 115, 0.12);
+}
+
+[data-skin="develop"] [data-theme="landscape-arch"],
+[data-skin="develop"] [data-theme="landscape-rendering"],
+[data-skin="develop"] [data-theme="landscape-cds"] {
+  --accent: var(--pine);
+  --accent-soft: rgba(47, 93, 74, 0.12);
+}
+
+[data-skin="develop"] [data-theme="humanist-photo"] {
+  --accent: #6a5a4e;
+  --accent-soft: rgba(106, 90, 78, 0.12);
+}
+
+[data-skin="develop"] [data-theme="portrait-photo"] {
+  --accent: #7a6558;
+  --accent-soft: rgba(122, 101, 88, 0.12);
+}
+
+[data-skin="develop"] [data-theme="play"],
+[data-skin="develop"] [data-theme="game-dev"],
+[data-skin="develop"] [data-theme="game-design"],
+[data-skin="develop"] [data-theme="game-photo"],
+[data-skin="develop"] [data-theme="menu"] {
+  --accent: var(--oxide);
+  --accent-soft: rgba(196, 92, 62, 0.12);
+}
+
+[data-skin="develop"] [data-theme="sketches"] {
+  --accent: #6b5a4c;
+  --accent-soft: rgba(107, 90, 76, 0.12);
+}
+
+[data-skin="develop"] .header,
+[data-skin="develop"] .drawer,
+[data-skin="develop"] .skin-panel {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+[data-skin="develop"] .brand-en {
+  letter-spacing: 0.08em;
+}
+
+[data-skin="develop"] .hero-en {
+  font-family: var(--font-display-en);
+}
+
+[data-skin="develop"] .grain {
+  opacity: 0.03;
+  animation: none;
+  mix-blend-mode: multiply;
+}
+
+[data-skin="develop"] .stage {
+  display: none;
+}
+
+[data-skin="develop"] .skin-panel,
+[data-skin="develop"] .skin-card,
+[data-skin="develop"] .card,
+[data-skin="develop"] .note-card,
+[data-skin="develop"] .about-card,
+[data-skin="develop"] .archive-btn,
+[data-skin="develop"] .filter-chip,
+[data-skin="develop"] .filter-sort,
+[data-skin="develop"] .filter-clear,
+[data-skin="develop"] .portrait-frame {
+  clip-path: none;
+  border-radius: 0;
+}
+
+[data-skin="develop"] .header.is-over-hero {
+  background: transparent;
+  border-bottom-color: transparent;
+}
+
+[data-skin="develop"] .header.is-over-hero.is-on-dark {
+  color: var(--on-ink);
+}
+
+[data-skin="develop"] .header.is-over-hero.is-on-dark .brand-en,
+[data-skin="develop"] .header.is-over-hero.is-on-dark .header-btn {
+  color: var(--on-ink);
+  border-color: rgb(238 240 242 / 0.28);
+}
+
+[data-skin="develop"] .header.is-over-hero.is-on-dark .skin-mark i {
+  background: rgb(238 240 242 / 0.55);
+}
+
+[data-skin="develop"] .header.is-over-hero.is-on-dark .menu-btn span,
+[data-skin="develop"] .header.is-over-hero.is-on-dark .menu-btn span::before,
+[data-skin="develop"] .header.is-over-hero.is-on-dark .menu-btn span::after {
+  background: var(--on-ink);
+}

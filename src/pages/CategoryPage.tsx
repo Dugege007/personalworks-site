@@ -1,7 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { lexicon } from "../content/lexicon";
 import { categories } from "../content/site";
+import { stockPlaceholderSrc, workCoverSrc } from "../content/stockMedia";
 import { listPublishedWorks } from "../content/works";
+import { iaOfSkin } from "../ia";
+import { hrefForDevelopKind } from "../ia/workTree";
+import { assetUrl } from "../lib/assets";
+import { usePrefs } from "../prefs/PrefsProvider";
 import "../styles/placeholder.css";
 
 type CategoryPageProps = {
@@ -12,7 +17,13 @@ type CategoryPageProps = {
  * 分类页：同门类下的细目列表，封面进入各自详情。
  */
 export function CategoryPage({ categoryId }: CategoryPageProps) {
+  const { currentSkin } = usePrefs();
+  const ia = iaOfSkin(currentSkin);
   const category = categories.find((item) => item.id === categoryId);
+
+  if (ia.id === "develop-editorial") {
+    return <Navigate to={hrefForDevelopKind(categoryId)} replace />;
+  }
 
   if (!category) {
     return (
@@ -48,23 +59,33 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
             {collection.comingSoon
               ? collection.frames.map((label, index) => (
                   <div className="card is-soon" key={label}>
-                    <small>
-                      0{index + 1} / {collection.titleDeco}
-                    </small>
-                    <div>
-                      <h2>{label}</h2>
-                      <p>待收录。</p>
+                    <figure className="card-cover">
+                      <img src={assetUrl(stockPlaceholderSrc(collection.id, index + 1))} alt="" />
+                    </figure>
+                    <div className="card-body">
+                      <small>
+                        0{index + 1} / {collection.titleDeco}
+                      </small>
+                      <div>
+                        <h2>{label}</h2>
+                        <p>待收录。</p>
+                      </div>
                     </div>
                   </div>
                 ))
               : listPublishedWorks(collection.id).map((work, index) => (
                   <Link className="card" key={work.id} to={`${collection.detailBase}/${work.id}`}>
-                    <small>
-                      0{index + 1} / {work.year}
-                    </small>
-                    <div>
-                      <h2>{work.title}</h2>
-                      <p>{work.summary}</p>
+                    <figure className="card-cover">
+                      <img src={assetUrl(workCoverSrc(work, index))} alt="" />
+                    </figure>
+                    <div className="card-body">
+                      <small>
+                        0{index + 1} / {work.year}
+                      </small>
+                      <div>
+                        <h2>{work.title}</h2>
+                        <p>{work.summary}</p>
+                      </div>
                     </div>
                   </Link>
                 ))}

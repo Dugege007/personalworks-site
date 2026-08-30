@@ -36,12 +36,34 @@
 .card {
   border: 1px solid var(--line);
   background: var(--surface);
-  padding: 18px;
+  padding: 0 0 18px;
   min-height: 180px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
+  overflow: hidden;
+}
+
+.card-cover {
+  aspect-ratio: 16 / 10;
+  background: var(--ink-block, var(--surface));
+  overflow: hidden;
+}
+
+.card-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card-body {
+  padding: 14px 18px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+  flex: 1;
 }
 
 .card small {
@@ -277,6 +299,7 @@
 }
 
 .play-stage {
+  position: relative;
   margin-top: 24px;
   min-height: 48vh;
   border: 1px solid var(--line);
@@ -288,6 +311,21 @@
   text-align: center;
   padding: 32px;
   color: var(--muted);
+  overflow: hidden;
+}
+
+.play-stage-cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.38;
+}
+
+.play-stage > div {
+  position: relative;
+  z-index: 1;
 }
 
 .accent-bar {

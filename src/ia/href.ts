@@ -1,0 +1,39 @@
+import { lexicon } from "../content/lexicon";
+import { findCollectionByChannel } from "../content/site";
+import { photoWorkChannels, type WorkRecord } from "../content/works";
+import type { IaId } from "./types";
+import { hrefForDevelopWork } from "./workTree";
+
+/**
+ * 作品在当前 IA 下的详情地址。摄影始终走既有单帧路径。
+ */
+export function hrefForWork(work: WorkRecord, iaId: IaId): string {
+  if ((photoWorkChannels as readonly string[]).includes(work.channel)) {
+    return `/${lexicon.photography.key}/${work.channel}/${work.id}`;
+  }
+  if (iaId === "develop-editorial") {
+    return hrefForDevelopWork(work);
+  }
+  const collection = findCollectionByChannel(work.channel);
+  if (collection) {
+    return `${collection.detailBase}/${work.id}`;
+  }
+  return `/${lexicon.workIndex.key}`;
+}
+
+/**
+ * 作品类型中文名。
+ */
+export function channelTitleZh(channel: string): string {
+  const table: Record<string, string> = {
+    [lexicon.digitalTwin.key]: lexicon.digitalTwin.zh,
+    [lexicon.lineSimulation.key]: lexicon.lineSimulation.zh,
+    [lexicon.landscapeRendering.key]: lexicon.landscapeRendering.zh,
+    [lexicon.landscapeCDs.key]: lexicon.landscapeCDs.zh,
+    [lexicon.landscapePhoto.key]: lexicon.landscapePhoto.zh,
+    [lexicon.humanistPhoto.key]: lexicon.humanistPhoto.zh,
+    [lexicon.portraitPhoto.key]: lexicon.portraitPhoto.zh,
+    [lexicon.gamePhoto.key]: lexicon.gamePhoto.zh,
+  };
+  return table[channel] ?? channel;
+}

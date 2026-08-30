@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, type ReactElement, type ReactNode } from "react";
+import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactElement, type ReactNode } from "react";
 import { lexicon } from "../../content/lexicon";
 import { assetUrl } from "../../lib/assets";
 import type { ContactChannel, ContactChannelId } from "../../content/site";
@@ -117,14 +117,38 @@ type IconItemProps = {
   onCopied: (id: string) => void;
 };
 
+const PANEL_EDGE = 5;
+
 /**
- * 单个联系图标：面板锚在图标正下/正上，不跟随指针。
+ * 按图标中心估算面板左缘，再算出为避开左右屏边所需的水平位移。
+ */
+function clampPanelShiftX(iconBox: DOMRect, panelWidth: number): number {
+  const iconCenter = iconBox.left + iconBox.width / 2;
+  const idealLeft = iconCenter - panelWidth / 2;
+  const minLeft = PANEL_EDGE;
+  const maxLeft = window.innerWidth - PANEL_EDGE - panelWidth;
+  if (maxLeft < minLeft) {
+    return minLeft - idealLeft;
+  }
+  if (idealLeft < minLeft) {
+    return minLeft - idealLeft;
+  }
+  if (idealLeft > maxLeft) {
+    return maxLeft - idealLeft;
+  }
+  return 0;
+}
+
+/**
+ * 单个联系图标：面板锚在图标正下/正上，不跟随指针；左右超出视口则收回。
  */
 function ContactIconItem({ item, copied, open, onOpen, onClose, onCopied }: IconItemProps) {
   const wrapRef = useRef<HTMLLIElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const [place, setPlace] = useState<"below" | "above">("below");
+  const [shiftX, setShiftX] = useState(0);
   const [qrBroken, setQrBroken] = useState(false);
+  const [qrReady, setQrReady] = useState(false);
 
   const entry = lexicon[item.id];
   const Icon = iconDict[item.id];
@@ -135,15 +159,33 @@ function ContactIconItem({ item, copied, open, onOpen, onClose, onCopied }: Icon
   const qrSrc = item.qrSrc && !qrBroken ? assetUrl(item.qrSrc) : "";
 
   useLayoutEffect(() => {
+    if (!open) {
+      setQrReady(false);
+      setShiftX(0);
+    }
+  }, [open]);
+
+  useLayoutEffect(() => {
     if (!open || !wrapRef.current || !panelRef.current) {
       return;
     }
-    const iconBox = wrapRef.current.getBoundingClientRect();
-    const panelH = panelRef.current.offsetHeight;
-    const gap = 8;
-    const spaceBelow = window.innerHeight - iconBox.bottom - gap;
-    setPlace(spaceBelow < panelH + 12 ? "above" : "below");
-  }, [open, qrSrc, copied]);
+    const placePanel = () => {
+      const wrap = wrapRef.current;
+      const panel = panelRef.current;
+      if (!wrap || !panel) {
+        return;
+      }
+      const iconBox = wrap.getBoundingClientRect();
+      const panelH = panel.offsetHeight;
+      const gap = 8;
+      const spaceBelow = window.innerHeight - iconBox.bottom - gap;
+      setPlace(spaceBelow < panelH + 12 ? "above" : "below");
+      setShiftX(clampPanelShiftX(iconBox, panel.offsetWidth));
+    };
+    placePanel();
+    window.addEventListener("resize", placePanel);
+    return () => window.removeEventListener("resize", placePanel);
+  }, [open, qrSrc, copied, qrReady]);
 
   const copyValue = async () => {
     if (!value) {
@@ -159,7 +201,12 @@ function ContactIconItem({ item, copied, open, onOpen, onClose, onCopied }: Icon
 
   const panel: ReactNode =
     open && value ? (
-      <div ref={panelRef} className={`contact-panel is-${place}`} role="tooltip">
+      <div
+        ref={panelRef}
+        className={`contact-panel is-${place}`}
+        style={{ ["--panel-shift-x"]: `${shiftX}px` } as CSSProperties}
+        role="tooltip"
+      >
         <div className="contact-panel-card">
           <div className="contact-panel-kicker">{entry.deco}</div>
           <div className="contact-panel-value">{copied ? "已复制" : value}</div>
@@ -168,6 +215,7 @@ function ContactIconItem({ item, copied, open, onOpen, onClose, onCopied }: Icon
               className="contact-qr"
               src={qrSrc}
               alt={`${entry.zh}二维码`}
+              onLoad={() => setQrReady(true)}
               onError={() => setQrBroken(true)}
             />
           ) : null}

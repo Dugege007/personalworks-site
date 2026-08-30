@@ -33,6 +33,7 @@ export type WorkCollection = {
 
 export type CategoryRecord = {
   id: string;
+  /** 网页档案号，由顶栏顺序生成，不与文档文件夹绑定。 */
   index: string;
   indexEn: string;
   title: string;
@@ -52,6 +53,7 @@ export type GameCard = {
   sizeHint: string;
   input: string;
   saveMode: string;
+  coverSrc: string;
 };
 
 export type NoteCard = {
@@ -98,20 +100,91 @@ export const profile = {
   ],
   portraitSrc: "profile/portrait.webp",
   portraitYear: "2024",
+  homeHeroSrc: "home-page/hero.webp",
+  homeHeroYear: "2017",
   contactChannels: [
     { id: "profileBase", value: "上海市 青浦区" },
     { id: "profileMail", value: "351080175@qq.com", copy: true },
     { id: "profilePhone", value: "15139219231", copy: true },
     { id: "profileWechat", value: "15139219231", copy: true, qrSrc: "home-page/wechat-qr.webp" },
-    { id: "profileQq", value: "351080175", copy: true },
+    { id: "profileQq", value: "351080175", copy: true, qrSrc: "home-page/qq-qr.webp" },
     { id: "profileGithub", value: "github.com/Dugege007", href: "https://github.com/Dugege007" },
   ] satisfies ContactChannel[],
 };
 
+export const navItems: NavItem[] = [
+  { id: "home", label: "主页", labelEn: "HOME", path: "/", theme: "home" },
+  {
+    id: lexicon.twinAndSim.key,
+    label: lexicon.twinAndSim.zh,
+    labelEn: lexicon.twinAndSim.deco,
+    path: `/${lexicon.twinAndSim.key}`,
+    theme: lexicon.twinAndSim.key,
+  },
+  {
+    id: lexicon.gameDev.key,
+    label: lexicon.gameDev.zh,
+    labelEn: lexicon.gameDev.deco,
+    path: `/${lexicon.gameDev.key}`,
+    theme: lexicon.gameDev.key,
+  },
+  {
+    id: lexicon.landscapeArch.key,
+    label: lexicon.landscapeArch.zh,
+    labelEn: lexicon.landscapeArch.deco,
+    path: `/${lexicon.landscapeArch.key}`,
+    theme: lexicon.landscapeArch.key,
+  },
+  {
+    id: lexicon.photography.key,
+    label: lexicon.photography.zh,
+    labelEn: lexicon.photography.deco,
+    path: `/${lexicon.photography.key}`,
+    theme: lexicon.photography.key,
+  },
+  {
+    id: lexicon.notes.key,
+    label: lexicon.notes.zh,
+    labelEn: lexicon.notes.deco,
+    path: `/${lexicon.notes.key}`,
+    theme: lexicon.notes.key,
+  },
+  {
+    id: lexicon.about.key,
+    label: lexicon.about.zh,
+    labelEn: lexicon.about.deco,
+    path: `/${lexicon.about.key}`,
+    theme: lexicon.about.key,
+  },
+];
+
+/**
+ * 将顶栏顺序格式化为两位档案号，仅用于页面展示。
+ */
+export function padArchiveIndex(order: number): string {
+  return String(order).padStart(2, "0");
+}
+
+/**
+ * 按顶栏当前顺序生成栏目档案号。主页为 00，与文档文件夹无关。
+ */
+export function archiveIndexByNavId(id: string): string {
+  const order = navItems.findIndex((item) => item.id === id);
+  return padArchiveIndex(Math.max(0, order));
+}
+
+/**
+ * 在栏目档案号下生成细目号，例如游戏选单为当前栏目号加 `.1`。
+ */
+export function archiveSubIndex(parentId: string, subOrder: number): string {
+  return `${archiveIndexByNavId(parentId)}.${subOrder}`;
+}
+
+/** 作品类栏目。数组顺序须与顶栏对应项一致；档案号由 navItems 生成。 */
 export const categories: CategoryRecord[] = [
   {
     id: lexicon.twinAndSim.key,
-    index: "02",
+    index: archiveIndexByNavId(lexicon.twinAndSim.key),
     indexEn: lexicon.twinAndSim.deco,
     title: lexicon.twinAndSim.zh,
     lead: "把场地与产线收成可量测的层。先看结构，再看运行。",
@@ -143,7 +216,7 @@ export const categories: CategoryRecord[] = [
   },
   {
     id: lexicon.gameDev.key,
-    index: "03",
+    index: archiveIndexByNavId(lexicon.gameDev.key),
     indexEn: lexicon.gameDev.deco,
     title: lexicon.gameDev.zh,
     lead: "可玩的展示向小游戏。先选单，再加载，不登录、不付费。",
@@ -154,7 +227,7 @@ export const categories: CategoryRecord[] = [
   },
   {
     id: lexicon.landscapeArch.key,
-    index: "04",
+    index: archiveIndexByNavId(lexicon.landscapeArch.key),
     indexEn: lexicon.landscapeArch.deco,
     title: lexicon.landscapeArch.zh,
     lead: "空间先被框住，再被光慢慢填满。图纸只展示已脱敏的选页。",
@@ -186,7 +259,7 @@ export const categories: CategoryRecord[] = [
   },
   {
     id: lexicon.photography.key,
-    index: "05",
+    index: archiveIndexByNavId(lexicon.photography.key),
     indexEn: lexicon.photography.deco,
     title: lexicon.photography.zh,
     lead: "把观看停在光线刚好够用的那一瞬。人像只放已授权的肖像。",
@@ -250,52 +323,6 @@ export const workSections: WorkSection[] = categories.map((item) => ({
   frames: item.homeFrames,
 }));
 
-export const navItems: NavItem[] = [
-  { id: "home", label: "主页", labelEn: "HOME", path: "/", theme: "home" },
-  {
-    id: lexicon.twinAndSim.key,
-    label: lexicon.twinAndSim.zh,
-    labelEn: lexicon.twinAndSim.deco,
-    path: `/${lexicon.twinAndSim.key}`,
-    theme: lexicon.twinAndSim.key,
-  },
-  {
-    id: lexicon.gameDev.key,
-    label: lexicon.gameDev.zh,
-    labelEn: lexicon.gameDev.deco,
-    path: `/${lexicon.gameDev.key}`,
-    theme: lexicon.gameDev.key,
-  },
-  {
-    id: lexicon.landscapeArch.key,
-    label: lexicon.landscapeArch.zh,
-    labelEn: lexicon.landscapeArch.deco,
-    path: `/${lexicon.landscapeArch.key}`,
-    theme: lexicon.landscapeArch.key,
-  },
-  {
-    id: lexicon.photography.key,
-    label: lexicon.photography.zh,
-    labelEn: lexicon.photography.deco,
-    path: `/${lexicon.photography.key}`,
-    theme: lexicon.photography.key,
-  },
-  {
-    id: lexicon.notes.key,
-    label: lexicon.notes.zh,
-    labelEn: lexicon.notes.deco,
-    path: `/${lexicon.notes.key}`,
-    theme: lexicon.notes.key,
-  },
-  {
-    id: lexicon.about.key,
-    label: lexicon.about.zh,
-    labelEn: lexicon.about.deco,
-    path: `/${lexicon.about.key}`,
-    theme: lexicon.about.key,
-  },
-];
-
 export const placeholderGames: GameCard[] = [
   {
     id: "sample-ridge",
@@ -306,6 +333,7 @@ export const placeholderGames: GameCard[] = [
     sizeHint: "约 40MB，首次加载较慢",
     input: "键盘 / 触屏",
     saveMode: "仅保存在本机浏览器",
+    coverSrc: "game-dev/sample-ridge/01.webp",
   },
   {
     id: "sample-line",
@@ -316,6 +344,7 @@ export const placeholderGames: GameCard[] = [
     sizeHint: "约 28MB，首次加载较慢",
     input: "鼠标 / 触屏",
     saveMode: "仅保存在本机浏览器",
+    coverSrc: "game-dev/sample-line/01.webp",
   },
   {
     id: "sample-garden",
@@ -326,6 +355,7 @@ export const placeholderGames: GameCard[] = [
     sizeHint: "约 35MB，首次加载较慢",
     input: "键盘 / 触屏",
     saveMode: "仅保存在本机浏览器",
+    coverSrc: "game-dev/sample-garden/01.webp",
   },
 ];
 
@@ -478,9 +508,35 @@ export function findCollectionByPath(pathname: string): WorkCollection | undefin
 }
 
 /**
+ * 按细目 channel 查找集合，供作品墙与切肤映射回链。
+ */
+export function findCollectionByChannel(channel: string): WorkCollection | undefined {
+  for (const category of categories) {
+    const found = category.collections.find((item) => item.id === channel);
+    if (found) {
+      return found;
+    }
+  }
+  return undefined;
+}
+
+/**
  * 按路径解析壳层 `data-theme`：细目页用集合 theme，手绘篇用 sketches，其余走栏目导航。
  */
 export function resolveShellTheme(pathname: string): string {
+  if (pathname === `/${lexicon.profileResume.key}` || pathname.startsWith(`/${lexicon.profileResume.key}/`)) {
+    return lexicon.profileResume.key;
+  }
+  if (pathname === `/${lexicon.profileSkills.key}` || pathname.startsWith(`/${lexicon.profileSkills.key}/`)) {
+    return lexicon.profileSkills.key;
+  }
+  if (pathname === `/${lexicon.workIndex.key}` || pathname.startsWith(`/${lexicon.workIndex.key}/`)) {
+    return lexicon.workIndex.key;
+  }
+  const catalogPath = `/${lexicon.photography.key}/${lexicon.photoCatalog.key}`;
+  if (pathname === catalogPath || pathname.startsWith(`${catalogPath}/`)) {
+    return lexicon.photoCatalog.key;
+  }
   if (pathname === `/${lexicon.notes.key}/${lexicon.sketching.key}`) {
     return lexicon.sketching.key;
   }

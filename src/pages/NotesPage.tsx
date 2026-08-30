@@ -1,12 +1,14 @@
 import { Link } from "react-router-dom";
 import { lexicon } from "../content/lexicon";
-import { notePreviewImages, placeholderNotes } from "../content/site";
+import { archiveIndexByNavId, notePreviewImages, placeholderNotes } from "../content/site";
 import "../styles/placeholder.css";
 
 export function NotesPage() {
   return (
     <div className="page" data-theme={lexicon.notes.key}>
-      <div className="page-kicker">06 / {lexicon.notes.deco}</div>
+      <div className="page-kicker">
+        {archiveIndexByNavId(lexicon.notes.key)} / {lexicon.notes.deco}
+      </div>
       <h1>{lexicon.notes.zh}</h1>
       <p className="page-lead">
         阅读向栏目，不进入主页滚动。列表从文章图组中最多取出三张作预览。手绘作为其中一篇收录。

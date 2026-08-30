@@ -20,9 +20,7 @@
   position: relative;
   height: 100%;
   clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
-  background:
-    linear-gradient(160deg, rgba(196, 165, 116, 0.16), transparent 42%),
-    linear-gradient(20deg, #1a2228, #101318 55%, #1c1814);
+  background: var(--portrait-placeholder);
   border: 1px solid var(--line);
   overflow: hidden;
 }
@@ -38,7 +36,7 @@
 }
 
 .portrait-frame:has(.portrait-photo) {
-  background: #101318;
+  background: var(--portrait-base);
 }
 
 .portrait-frame:has(.portrait-photo) .portrait-grid {
@@ -64,7 +62,7 @@
   height: 240px;
   border-radius: 50%;
   pointer-events: none;
-  background: radial-gradient(circle, rgba(196, 165, 116, 0.28), transparent 68%);
+  background: radial-gradient(circle, var(--spot-color), transparent 68%);
   mix-blend-mode: screen;
   opacity: calc(1 * var(--motion-spot));
   transform: translate(-50%, -50%);
@@ -79,7 +77,7 @@
   font-size: 11px;
   letter-spacing: 0.22em;
   color: var(--muted);
-  text-shadow: 0 1px 8px rgba(8, 10, 12, 0.7);
+  text-shadow: var(--caption-shadow);
 }
 
 .corner {
@@ -220,7 +218,7 @@ button.contact-icon:hover,
   position: absolute;
   left: 50%;
   z-index: 24;
-  transform: translateX(-50%);
+  transform: translateX(calc(-50% + var(--panel-shift-x, 0px)));
   pointer-events: none;
 }
 
@@ -238,7 +236,7 @@ button.contact-icon:hover,
   width: max-content;
   padding: 10px 12px;
   border: 1px solid var(--line);
-  background: #12161b;
+  background: var(--panel-bg);
   color: var(--text);
 }
 
@@ -258,8 +256,8 @@ button.contact-icon:hover,
 
 .contact-qr {
   display: block;
-  width: 120px;
-  height: 120px;
+  width: 180px;
+  height: auto;
   margin-top: 8px;
   object-fit: contain;
   background: #fff;
@@ -386,10 +384,19 @@ button.contact-icon:hover,
   background: var(--surface);
 }
 
+.frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .frame::before {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 1;
   background:
     linear-gradient(180deg, transparent 40%, var(--veil)),
     linear-gradient(135deg, var(--accent-soft), transparent 55%);
@@ -400,7 +407,7 @@ button.contact-icon:hover,
   left: 12px;
   bottom: 12px;
   font-size: 13px;
-  z-index: 1;
+  z-index: 2;
 }
 
 .frame em {
@@ -412,7 +419,7 @@ button.contact-icon:hover,
   font-size: 10px;
   letter-spacing: 0.16em;
   color: var(--muted);
-  z-index: 1;
+  z-index: 2;
 }
 
 .archive-btn {

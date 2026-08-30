@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { lexicon } from "../content/lexicon";
-import { categories } from "../content/site";
+import { archiveIndexByNavId, categories } from "../content/site";
 import {
   collectPhotoFacets,
   filterPhotoWorks,
@@ -9,6 +9,8 @@ import {
   sortPhotoWorks,
   type PhotoCatalogQuery,
 } from "../content/works";
+import { workCoverSrc } from "../content/stockMedia";
+import { assetUrl } from "../lib/assets";
 import "../styles/placeholder.css";
 
 const photoRoot = `/${lexicon.photography.key}`;
@@ -149,7 +151,7 @@ export function PhotoCatalogPage() {
         ← 返回{category?.title ?? lexicon.photography.zh}
       </Link>
       <div className="page-kicker">
-        {category?.index ?? "05"} / {lexicon.photoCatalog.deco}
+        {category?.index ?? archiveIndexByNavId(lexicon.photography.key)} / {lexicon.photoCatalog.deco}
       </div>
       <h1>{lexicon.photoCatalog.zh}</h1>
       <p className="page-lead">按类型、年份、地点与标签筛选。未选某维即不限制。时间默认从前到后。</p>
@@ -202,13 +204,18 @@ export function PhotoCatalogPage() {
               to={`${photoRoot}/${work.channel}/${work.id}`}
               state={{ from: `${catalogPath}${params.toString() ? `?${params.toString()}` : ""}` }}
             >
-              <small>
-                {work.year}
-                {work.place ? ` / ${work.place}` : ""} / {channelTitle(work.channel)}
-              </small>
-              <div>
-                <h2>{work.title}</h2>
-                <p>{work.summary}</p>
+              <figure className="card-cover">
+                <img src={assetUrl(workCoverSrc(work))} alt="" />
+              </figure>
+              <div className="card-body">
+                <small>
+                  {work.year}
+                  {work.place ? ` / ${work.place}` : ""} / {channelTitle(work.channel)}
+                </small>
+                <div>
+                  <h2>{work.title}</h2>
+                  <p>{work.summary}</p>
+                </div>
               </div>
             </Link>
           ))}

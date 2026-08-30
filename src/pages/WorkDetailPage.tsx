@@ -1,8 +1,13 @@
 import { Link, useLocation } from "react-router-dom";
 import { lexicon } from "../content/lexicon";
-import { findCategoryByPath, findCollectionByPath } from "../content/site";
-import { findPublishedWork, type WorkRecord } from "../content/works";
+import { findCategoryByPath, findCollectionByChannel, findCollectionByPath } from "../content/site";
+import { findPublishedWork, findPublishedWorksById, type WorkRecord } from "../content/works";
+import { channelTitleZh } from "../ia/href";
+import { iaOfSkin } from "../ia";
+import { kindOfChannel } from "../ia/query";
+import { hrefForDevelopChannel, parseWorkIndexPath, workIndexRoot } from "../ia/workTree";
 import { assetUrl } from "../lib/assets";
+import { usePrefs } from "../prefs/PrefsProvider";
 import "../styles/placeholder.css";
 
 type MetaItem = {
@@ -45,24 +50,77 @@ function buildMetaItems(work: WorkRecord): MetaItem[] {
 }
 
 /**
+ * 显影详情回到细目列表；层境详情回到分类室。
+ */
+function resolveDetailBack(
+  parsed: ReturnType<typeof parseWorkIndexPath>,
+  work: WorkRecord | undefined,
+  category: ReturnType<typeof findCategoryByPath>,
+  iaId: string,
+): { path: string; label: string } {
+  if (parsed?.layer === "detail") {
+    return {
+      path: hrefForDevelopChannel(parsed.kind, parsed.channel),
+      label: channelTitleZh(parsed.channel),
+    };
+  }
+  if (parsed) {
+    const kind = work ? kindOfChannel(work.channel) : undefined;
+    if (kind && work) {
+      return {
+        path: hrefForDevelopChannel(kind, work.channel),
+        label: channelTitleZh(work.channel),
+      };
+    }
+    return { path: workIndexRoot(), label: lexicon.workIndex.zh };
+  }
+  if (iaId === "develop-editorial" && work) {
+    const kind = kindOfChannel(work.channel);
+    if (kind) {
+      return {
+        path: hrefForDevelopChannel(kind, work.channel),
+        label: channelTitleZh(work.channel),
+      };
+    }
+  }
+  return { path: category?.path ?? "/", label: category?.title ?? "分类" };
+}
+
+/**
  * 共用作品详情骨架：返回、标题、元信息、正文、图组；栏目差异仅字段显隐。
  */
 export function WorkDetailPage() {
   const location = useLocation();
+  const { currentSkin } = usePrefs();
+  const ia = iaOfSkin(currentSkin);
+  const parsed = parseWorkIndexPath(location.pathname);
   const segments = location.pathname.split("/").filter(Boolean);
   const id = segments[segments.length - 1] ?? "";
   const category = findCategoryByPath(location.pathname);
-  const collection = findCollectionByPath(location.pathname);
-  const backPath = category?.path ?? "/";
-  const backLabel = category?.title ?? "分类";
-  const work = collection ? findPublishedWork(collection.id, id) : undefined;
-  const theme = collection?.theme ?? category?.theme ?? "home";
+  const collectionFromPath = findCollectionByPath(location.pathname);
+  const workFromTree =
+    parsed?.layer === "detail"
+      ? findPublishedWork(parsed.channel, parsed.id)
+      : parsed?.layer === "legacy-id"
+        ? findPublishedWorksById(parsed.id)[0]
+        : undefined;
+  const collection =
+    collectionFromPath ??
+    (workFromTree ? findCollectionByChannel(workFromTree.channel) : undefined) ??
+    (parsed?.layer === "detail" ? findCollectionByChannel(parsed.channel) : undefined);
+  const work = parsed
+    ? workFromTree
+    : collection
+      ? findPublishedWork(collection.id, id)
+      : undefined;
+  const back = resolveDetailBack(parsed, work, category, ia.id);
+  const theme = collection?.theme ?? category?.theme ?? (parsed ? lexicon.workIndex.key : "home");
 
   if (!work) {
     return (
       <div className="page" data-theme={theme}>
-        <Link className="back" to={backPath}>
-          ← 返回{backLabel}
+        <Link className="back" to={back.path}>
+          ← 返回{back.label}
         </Link>
         <h1>档案不存在</h1>
         <p className="page-lead">这条档案未开放，或不在当前分类中。</p>
@@ -74,12 +132,14 @@ export function WorkDetailPage() {
 
   return (
     <div className="page" data-theme={theme}>
-      <Link className="back" to={backPath}>
-        ← 返回{backLabel}
+      <Link className="back" to={back.path}>
+        ← 返回{back.label}
       </Link>
-      <div className="page-kicker">
-        {work.year} / {collection?.titleDeco ?? "ARCHIVE"}
-      </div>
+      {parsed ? null : (
+        <div className="page-kicker">
+          {work.year} / {collection?.titleDeco ?? "ARCHIVE"}
+        </div>
+      )}
       <h1>{work.title}</h1>
       <p className="page-lead">{work.summary}</p>
       {work.tags && work.tags.length > 0 ? (

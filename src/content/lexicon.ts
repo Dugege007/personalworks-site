@@ -2,6 +2,7 @@
  * 中英术语冻结表。
  * `en`：正文与语言切换；`deco`：顶栏副标与档案编号。
  * `key`：路由段、COS 前缀、`public/placeholders` 目录名、中转站括号内键。
+ * 中转站文件夹为「中文（key）」，不加文档序号；网页档案号按顶栏顺序生成。
  * `key` 为小写短横线简写，须带领域前缀，禁止占用通用词（如 render、construction、games）。
  */
 export type LexiconEntry = {
@@ -102,6 +103,9 @@ export const lexicon = {
   notes: { zh: "心得", en: "Notes", deco: "NOTES", key: "notes" },
   sketching: { zh: "手绘", en: "Sketching", deco: "SKETCHES", key: "sketches" },
   about: { zh: "关于", en: "About", deco: "ABOUT", key: "about" },
+  workIndex: { zh: "作品", en: "Work", deco: "WORK", key: "work-index" },
+  profileResume: { zh: "简历", en: "Resume", deco: "RESUME", key: "profile-resume" },
+  profileSkills: { zh: "技能", en: "Skills", deco: "SKILLS", key: "profile-skills" },
   homePage: { zh: "首页", en: "Home Page", deco: "HOME", key: "home-page" },
   profile: { zh: "形象", en: "Profile", deco: "PROFILE", key: "profile" },
   shotIn: { zh: "拍摄于", en: "Shot in", deco: "SHOT", key: "shot-in" },

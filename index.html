@@ -5,6 +5,7 @@
     <script>
       (function () {
         var KEY = "strata.prefs";
+        // 须与 src/content/prefs.ts 中 isDefault 那条的 id 一致
         var FALLBACK = "strata";
         try {
           var parsed = JSON.parse(localStorage.getItem(KEY) || "null");
@@ -25,7 +26,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@500;600;700&family=Outfit:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700;900&family=Noto+Serif+SC:wght@500;600;700&family=Outfit:wght@400;500;600&family=Syne:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
   </head>

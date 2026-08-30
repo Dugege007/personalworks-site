@@ -1,4 +1,4 @@
-import { aboutFeatures } from "../content/site";
+import { aboutFeatures, archiveIndexByNavId } from "../content/site";
 import { lexicon } from "../content/lexicon";
 import "../styles/placeholder.css";
 
@@ -8,7 +8,9 @@ import "../styles/placeholder.css";
 export function AboutPage() {
   return (
     <div className="page" data-theme={lexicon.about.key}>
-      <div className="page-kicker">07 / {lexicon.about.deco}</div>
+      <div className="page-kicker">
+        {archiveIndexByNavId(lexicon.about.key)} / {lexicon.about.deco}
+      </div>
       <h1>{lexicon.about.zh}</h1>
       <p className="page-lead">
         层境 STRATA 是个人作品场。下面按搭建时真正卡住过的问题拆成若干功能，便于看清站点是怎么一层层收口的。

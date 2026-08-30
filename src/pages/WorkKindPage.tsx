@@ -1,0 +1,79 @@
+import { Link, useParams } from "react-router-dom";
+import { CoverTile } from "../components/work/CoverTile";
+import { lexicon } from "../content/lexicon";
+import { categories } from "../content/site";
+import { stockPlaceholderSrc } from "../content/stockMedia";
+import {
+  isDevelopWorkKind,
+  kindEn,
+  listDevelopChannelDoors,
+  workIndexRoot,
+} from "../ia/workTree";
+import { WorkDetailPage } from "./WorkDetailPage";
+import "../styles/develop-work.css";
+
+type WorkKindViewProps = {
+  kind: string;
+};
+
+/**
+ * `/work-index/:kind`：四门键进分类页，其余当作旧作品 id。
+ */
+export function WorkIndexSegmentPage() {
+  const { kind } = useParams();
+  if (kind && isDevelopWorkKind(kind)) {
+    return <WorkKindPage kind={kind} />;
+  }
+  return <WorkDetailPage />;
+}
+
+/**
+ * 显影作品第二层：大类分类页，只给细目入口，不摊开全部条目。
+ */
+export function WorkKindPage({ kind }: WorkKindViewProps) {
+  const category = categories.find((item) => item.id === kind);
+  const doors = listDevelopChannelDoors(kind);
+  const title = category?.title ?? kind;
+  const lead = category?.lead ?? "";
+  const photoKind = kind === lexicon.photography.key;
+  const doorCount = doors.length;
+
+  return (
+    <div className="develop-kind" data-theme={kind}>
+      <div className="develop-kind-head">
+        <Link className="develop-work-back" to={workIndexRoot()}>
+          {lexicon.workIndex.zh}
+        </Link>
+        <p className="develop-kind-en">{kindEn(kind)}</p>
+        <h1>{title}</h1>
+        <p className="develop-kind-lead">{lead}</p>
+        {photoKind ? (
+          <Link className="develop-work-textlink" to={`/${lexicon.photography.key}/${lexicon.photoCatalog.key}`}>
+            {lexicon.photoCatalog.zh}
+          </Link>
+        ) : null}
+      </div>
+      <div className="develop-kind-doors" data-count={doorCount}>
+        {doors.map((door) => (
+          <CoverTile
+            key={door.channel}
+            className="develop-kind-door"
+            wellClass={`develop-work-well is-channel-${door.channel}`}
+            to={door.comingSoon ? undefined : door.href}
+            src={door.coverSrc}
+            fallbackSrc={
+              door.channel === lexicon.gameMenu.key
+                ? stockPlaceholderSrc(lexicon.gameDev.key, 1)
+                : stockPlaceholderSrc(door.channel, 1)
+            }
+            disabled={door.comingSoon}
+          >
+            <strong>{door.zh}</strong>
+            <em>{door.deco}</em>
+            {door.comingSoon ? <span>待收录</span> : null}
+          </CoverTile>
+        ))}
+      </div>
+    </div>
+  );
+}

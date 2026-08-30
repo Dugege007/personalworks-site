@@ -1,15 +1,24 @@
 import { useEffect, useState } from "react";
-import { NavLink, Link } from "react-router-dom";
-import { navItems, profile } from "../content/site";
+import { NavLink, Link, useLocation } from "react-router-dom";
+import { iaOfSkin } from "../ia";
+import { usePrefs } from "../prefs/PrefsProvider";
 import { SkinPicker } from "./SkinPicker";
 
 type SiteHeaderProps = {
   onNavigate?: () => void;
 };
 
+/**
+ * 顶栏标识与抽屉均读当前 IA，不按皮肤 id 散落分支。
+ */
 export function SiteHeader({ onNavigate }: SiteHeaderProps) {
+  const { currentSkin } = usePrefs();
+  const location = useLocation();
+  const ia = iaOfSkin(currentSkin);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [skinOpen, setSkinOpen] = useState(false);
+  const [overHero, setOverHero] = useState(false);
+  const [heroDark, setHeroDark] = useState(false);
 
   const closeAll = () => {
     setDrawerOpen(false);
@@ -47,9 +56,67 @@ export function SiteHeader({ onNavigate }: SiteHeaderProps) {
     return () => window.removeEventListener("keydown", onKey);
   }, [skinOpen, drawerOpen]);
 
+  useEffect(() => {
+    let io: IntersectionObserver | undefined;
+    let mutation: MutationObserver | undefined;
+    let raf = 0;
+    let tries = 0;
+
+    const detach = () => {
+      io?.disconnect();
+      mutation?.disconnect();
+      io = undefined;
+      mutation = undefined;
+    };
+
+    const attach = () => {
+      const hero = document.getElementById("hero-bleed");
+      if (!hero) {
+        setOverHero(false);
+        setHeroDark(false);
+        return false;
+      }
+      const syncTone = () => setHeroDark(hero.dataset.tone === "dark");
+      syncTone();
+      io = new IntersectionObserver(
+        ([entry]) => {
+          setOverHero(Boolean(entry?.isIntersecting));
+          syncTone();
+        },
+        { threshold: 0.28 },
+      );
+      io.observe(hero);
+      mutation = new MutationObserver(syncTone);
+      mutation.observe(hero, { attributes: true, attributeFilter: ["data-tone"] });
+      return true;
+    };
+
+    const tick = () => {
+      if (attach() || tries > 12) {
+        return;
+      }
+      tries += 1;
+      raf = requestAnimationFrame(tick);
+    };
+    tick();
+
+    return () => {
+      cancelAnimationFrame(raf);
+      detach();
+    };
+  }, [location.pathname, ia.id]);
+
+  const headerClass = [
+    "header",
+    overHero ? "is-over-hero" : "",
+    overHero && heroDark ? "is-on-dark" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <>
-      <header className="header">
+      <header className={headerClass}>
         <div className="header-start">
           <button
             className="header-btn menu-btn"
@@ -61,8 +128,8 @@ export function SiteHeader({ onNavigate }: SiteHeaderProps) {
             <span />
           </button>
           <Link to="/" className="brand" onClick={closeAll}>
-            <span className="brand-cn">{profile.siteLabel}</span>
-            <span className="brand-en">{profile.siteLabelEn}</span>
+            <span className="brand-cn">{currentSkin.brand.zh}</span>
+            <span className="brand-en">{currentSkin.brand.deco}</span>
           </Link>
         </div>
 
@@ -95,7 +162,7 @@ export function SiteHeader({ onNavigate }: SiteHeaderProps) {
         hidden={!drawerOpen}
         aria-hidden={!drawerOpen}
       >
-        {navItems.map((item) => (
+        {ia.nav.map((item) => (
           <NavLink
             key={item.id}
             to={item.path}

@@ -1,4 +1,5 @@
 import { findDefaultSkin, findEnabledSkin } from "../content/prefs";
+import { iaOfSkin } from "../ia";
 import {
   DEFAULT_LOCALE,
   PREFS_KEY,
@@ -14,7 +15,9 @@ const LOCALES: Locale[] = ["zh-CN", "en"];
  * 将皮肤 id 写到 html[data-skin]，供 CSS 选择器立即生效。
  */
 export function applySkinToDom(skin: SkinId): void {
-  document.documentElement.dataset.skin = skin;
+  const record = findEnabledSkin(skin) ?? findDefaultSkin();
+  document.documentElement.dataset.skin = record.id;
+  document.documentElement.dataset.ia = iaOfSkin(record).id;
 }
 
 /**

@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { WorkSection as WorkSectionData } from "../../content/site";
+import { homeFrameSrcs } from "../../content/stockMedia";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
+import { assetUrl } from "../../lib/assets";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -60,12 +62,16 @@ export function WorkSection({ data, flip }: WorkSectionProps) {
         </Link>
       </div>
       <div className="frames">
-        {data.frames.map((label, index) => (
-          <div className="frame" key={label}>
-            <em>0{index + 1}</em>
-            <strong>{label}</strong>
-          </div>
-        ))}
+        {data.frames.map((label, index) => {
+          const src = homeFrameSrcs[data.id]?.[index];
+          return (
+            <div className="frame" key={label}>
+              {src ? <img src={assetUrl(src)} alt="" /> : null}
+              <em>0{index + 1}</em>
+              <strong>{label}</strong>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
