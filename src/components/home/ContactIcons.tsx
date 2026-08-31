@@ -154,9 +154,10 @@ function ContactIconItem({ item, copied, open, onOpen, onClose, onCopied }: Icon
   const Icon = iconDict[item.id];
   const value = item.value?.trim() ?? "";
   const href = item.href;
+  const qrSrc = item.qrSrc && !qrBroken ? assetUrl(item.qrSrc) : "";
+  const hasPanel = Boolean(value || qrSrc);
   const label = value ? `${entry.zh}：${value}` : entry.zh;
   const icon = <Icon className="contact-icon-svg" />;
-  const qrSrc = item.qrSrc && !qrBroken ? assetUrl(item.qrSrc) : "";
 
   useLayoutEffect(() => {
     if (!open) {
@@ -200,7 +201,7 @@ function ContactIconItem({ item, copied, open, onOpen, onClose, onCopied }: Icon
   };
 
   const panel: ReactNode =
-    open && value ? (
+    open && hasPanel ? (
       <div
         ref={panelRef}
         className={`contact-panel is-${place}`}
@@ -209,7 +210,7 @@ function ContactIconItem({ item, copied, open, onOpen, onClose, onCopied }: Icon
       >
         <div className="contact-panel-card">
           <div className="contact-panel-kicker">{entry.deco}</div>
-          <div className="contact-panel-value">{copied ? "已复制" : value}</div>
+          {value ? <div className="contact-panel-value">{copied ? "已复制" : value}</div> : null}
           {qrSrc ? (
             <img
               className="contact-qr"
@@ -223,7 +224,7 @@ function ContactIconItem({ item, copied, open, onOpen, onClose, onCopied }: Icon
       </div>
     ) : null;
 
-  const triggerClass = `contact-icon${value ? "" : " is-empty"}`;
+  const triggerClass = `contact-icon${hasPanel || href ? "" : " is-empty"}`;
 
   let trigger: ReactNode;
   if (href && value) {
@@ -241,6 +242,12 @@ function ContactIconItem({ item, copied, open, onOpen, onClose, onCopied }: Icon
   } else if (item.copy && value) {
     trigger = (
       <button type="button" className={triggerClass} aria-label={label} onClick={() => void copyValue()}>
+        {icon}
+      </button>
+    );
+  } else if (qrSrc) {
+    trigger = (
+      <button type="button" className={triggerClass} aria-label={label}>
         {icon}
       </button>
     );
@@ -272,7 +279,7 @@ function ContactIconItem({ item, copied, open, onOpen, onClose, onCopied }: Icon
 }
 
 /**
- * 首屏与页脚共用的联系通道图标：现居地、邮箱、手机、微信、QQ、GitHub。
+ * 首屏与页脚共用的联系通道图标：现居地、邮箱、微信、QQ、GitHub。手机不展示；微信与 QQ 仅出二维码。
  */
 export function ContactIcons({ channels }: ContactIconsProps) {
   const [copiedId, setCopiedId] = useState("");

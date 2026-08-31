@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "records": [
+    {
+      "object": "home-page/wechat-qr.webp",
+      "stageRel": "首页（home-page）/微信二维码.jpg",
+      "status": "published"
+    },
+    {
+      "object": "home-page/qq-qr.webp",
+      "stageRel": "首页（home-page）/QQ二维码.jpg",
+      "status": "published"
+    }
+  ]
+}

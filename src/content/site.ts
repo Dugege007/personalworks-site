@@ -110,14 +110,13 @@ export const profile = {
     "profile/R0008304.webp",
   ],
   portraitYear: "2024",
-  homeHeroSrc: "home-page/hero.webp",
-  homeHeroYear: "2017",
+  homeHeroSrc: "landscape-photo/sample-1/01.webp",
+  homeHeroYear: "2015",
   contactChannels: [
     { id: "profileBase", value: "上海市 青浦区" },
     { id: "profileMail", value: "351080175@qq.com", copy: true },
-    { id: "profilePhone", value: "15139219231", copy: true },
-    { id: "profileWechat", value: "15139219231", copy: true, qrSrc: "home-page/wechat-qr.webp" },
-    { id: "profileQq", value: "351080175", copy: true, qrSrc: "home-page/qq-qr.webp" },
+    { id: "profileWechat", qrSrc: "home-page/wechat-qr.webp" },
+    { id: "profileQq", qrSrc: "home-page/qq-qr.webp" },
     { id: "profileGithub", value: "github.com/Dugege007", href: "https://github.com/Dugege007" },
   ] satisfies ContactChannel[],
 };

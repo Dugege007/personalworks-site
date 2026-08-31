@@ -116,7 +116,7 @@ function WaypointSlices() {
       deco: lexicon.profileSkills.deco,
       to: `/${lexicon.profileSkills.key}`,
       srcs: uniqueSrcs([
-        "home-page/skills.webp",
+        "profile-skills/skills.webp",
         stockPlaceholderSrc("landscape-cds", 1),
         stockPlaceholderSrc("landscape-cds", 2),
         stockPlaceholderSrc("landscape-cds", 3),

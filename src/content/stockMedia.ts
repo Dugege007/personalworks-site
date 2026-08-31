@@ -3,7 +3,7 @@
  * 正式作品入库后覆盖 `{key}/{id}/01.webp`，不改动 stock。
  * 缺图或加载失败时回退到本表。
  *
- * 本轮来源：Unsplash、Pexels、Wikimedia Commons、0 A.D. 官网截图。详见 `00A` 3.8。
+ * 本轮来源：Unsplash、Pexels、Wikimedia Commons、0 A.D. 官网截图。站名单见 `00A` 3.8；单张页面 URL 见 `Docs/参考资料/来路登记.md`。
  */
 export function stockPlaceholderSrc(channel: string, slot: number): string {
   const index = ((Math.max(1, slot) - 1) % 3) + 1;
