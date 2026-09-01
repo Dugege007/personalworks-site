@@ -1,156 +1,336 @@
-import { lexicon } from "./lexicon";
-import type { LocalizedString } from "../prefs/types";
+import skillsMd from "./skills.md?raw";
+import { parseResumeMarks } from "./resume";
+import type { Locale, LocalizedString } from "../prefs/types";
+import { tx } from "../prefs/tx";
 
-export type SkillItem = {
+export type SkillTool = {
   id: string;
   name: LocalizedString;
-  proof: LocalizedString;
-  tools?: string[];
+  icon: string;
+  href?: string;
+  blurb?: LocalizedString;
+};
+
+export type SkillDomainEntry = {
+  toolId: string;
+  score: number;
 };
 
 export type SkillDomain = {
   id: string;
   name: LocalizedString;
   deco: string;
-  items: SkillItem[];
-  tools: string[];
-  workKind?: string;
-  workLabel?: LocalizedString;
-  workHrefFallback?: string;
+  defaultOpen: boolean;
+  entries: SkillDomainEntry[];
+};
+
+export type SkillLevel = {
+  id: string;
+  min: number;
+  color: string;
+  name: LocalizedString;
+  deco: string;
+  bullets: LocalizedString[];
+};
+
+export type SkillPageRecord = {
+  title: LocalizedString;
+  lead: LocalizedString;
+  resumeLabel: LocalizedString;
+  levels: SkillLevel[];
+  tools: SkillTool[];
+  domains: SkillDomain[];
+};
+
+const SECTION = /^##\s+(.+?)\s*$/;
+const ENTRY = /^###\s+(.+?)\s*$/;
+const FIELD = /^(页题|英文页题|导语|简历链|下限|英文|短写|条色|说明|英文说明|id|图标|官网|描述|英文描述|展开)[：:]\s*(.*)$/;
+const SCORE_LINE = /^[-*]\s+(.+?)\s+(\d+)\s*$/;
+
+const COLOR_ALIAS: Record<string, string> = {
+  蓝: "#3d7ab8",
+  绿: "#3d8a62",
+  黄: "#c4a24a",
+  橙: "#d07a3a",
+  红: "#c45c4a",
+};
+
+type MdBlock = {
+  title: string;
+  body: string;
 };
 
 /**
- * 技能正本。按领域分组，证明句写做过的事，不用百分比和星级。
+ * 把技能 Markdown 收成页面记录。缺字段不写入。
  */
-export const skillDomains: SkillDomain[] = [
-  {
-    id: "skill-twin-sim",
-    name: `${lexicon.digitalTwin.zh}与仿真`,
-    deco: lexicon.twinAndSim.deco,
-    workKind: lexicon.twinAndSim.key,
-    workLabel: lexicon.twinAndSim.zh,
-    items: [
-      {
-        id: "twin-line",
-        name: lexicon.lineSimulation.zh,
-        proof: "产线里对过工位节拍、物流回路和等待。",
-      },
-      {
-        id: "twin-site",
-        name: lexicon.digitalTwin.zh,
-        proof: "把场地收成可量测的层，先看结构再看运行。",
-      },
-      {
-        id: "twin-script",
-        name: "工程脚本",
-        proof: "用 C# 把运行关系收成可复用模块，不堆一次性脚本。",
-      },
-    ],
-    tools: ["C#", "Git", "Unity"],
-  },
-  {
-    id: "skill-landscape",
-    name: lexicon.landscapeArch.zh,
-    deco: lexicon.landscapeArch.deco,
-    workKind: lexicon.landscapeArch.key,
-    workLabel: lexicon.landscapeArch.zh,
-    items: [
-      {
-        id: "land-cds",
-        name: lexicon.landscapeCDs.zh,
-        proof: "四年里画详图和通图，也参与过公司图纸规范。",
-      },
-      {
-        id: "land-render",
-        name: lexicon.landscapeRendering.zh,
-        proof: "后期用 SketchUp 建模、Lumion 出图，做过方案深化。",
-      },
-      {
-        id: "land-cad",
-        name: "AutoCAD",
-        proof: "市政与住区施工图都在 CAD 里收口。",
-      },
-    ],
-    tools: ["AutoCAD", "SketchUp", "Lumion", "Photoshop", "Rhino", "Grasshopper"],
-  },
-  {
-    id: "skill-game",
-    name: lexicon.gameDev.zh,
-    deco: lexicon.gameDev.deco,
-    workKind: lexicon.gameDev.key,
-    workLabel: lexicon.gameDev.zh,
-    items: [
-      {
-        id: "game-unity",
-        name: "Unity 客户端",
-        proof: "自学。做过 UGUI、动画状态机、对象池和编辑器扩展。",
-      },
-      {
-        id: "game-csharp",
-        name: "C#",
-        proof: "常用单例、命令、观察者、策略；用 ScriptableObject 配波次和升级。",
-      },
-      {
-        id: "game-jam",
-        name: "独立作品",
-        proof: "GameJam 拿过奖。联机斗地主用 Socket 和 MySQL 做过 Demo。",
-      },
-    ],
-    tools: ["Unity", "C#", "QFramework", "Odin", "DOTween", "FairyGUI", "Aseprite", "MySQL"],
-  },
-  {
-    id: "skill-photo",
-    name: lexicon.photography.zh,
-    deco: lexicon.photography.deco,
-    workKind: lexicon.photography.key,
-    workLabel: lexicon.photography.zh,
-    items: [
-      {
-        id: "photo-land",
-        name: lexicon.landscapePhoto.zh,
-        proof: "拍场地和光线，不当成景观方案图。",
-      },
-      {
-        id: "photo-human",
-        name: lexicon.humanistPhoto.zh,
-        proof: "拍人在场里的样子，不作街头或纪实栏目。",
-      },
-      {
-        id: "photo-portrait",
-        name: lexicon.portraitPhoto.zh,
-        proof: "形象照自己拍过，后期走 Lightroom。",
-      },
-    ],
-    tools: ["Lightroom", "Photoshop"],
-  },
-  {
-    id: "skill-craft",
-    name: "工程与表达",
-    deco: "CRAFT",
-    workLabel: lexicon.sketching.zh,
-    workHrefFallback: `/${lexicon.notes.key}/${lexicon.sketching.key}`,
-    items: [
-      {
-        id: "craft-doc",
-        name: "文档",
-        proof: "技术笔记和站点文案都自己写，少口号。",
-      },
-      {
-        id: "craft-en",
-        name: "英文阅读",
-        proof: "开发时直接读英文文档，不靠机翻硬顶。",
-      },
-      {
-        id: "craft-sketch",
-        name: lexicon.sketching.zh,
-        proof: "景观训练留下的手绘底子，现在收在心得里。",
-      },
-      {
-        id: "craft-edit",
-        name: "剪辑",
-        proof: "用 Premiere 剪过短片，服务出图和记录，不是成片工种。",
-      },
-    ],
-    tools: ["Git", "Premiere", "Markdown"],
-  },
-];
+export function parseSkillsMd(source: string): SkillPageRecord {
+  const sections = splitByHeading(source, SECTION);
+  const header = parseFields(sectionBody(sections, "页眉"));
+  const tools = splitByHeading(sectionBody(sections, "工具"), ENTRY).map((entry, index) => parseTool(entry, index));
+  const levels = splitByHeading(sectionBody(sections, "等级"), ENTRY)
+    .map((entry, index) => parseLevel(entry, index))
+    .sort((left, right) => right.min - left.min);
+  const domains = splitByHeading(sectionBody(sections, "领域"), ENTRY).map((entry, index) =>
+    parseDomain(entry, index, tools),
+  );
+
+  return {
+    title: localized(header.fields["页题"] || "技能", header.fields["英文页题"]),
+    lead: header.fields["导语"] ?? "",
+    resumeLabel: header.fields["简历链"] ?? "",
+    levels,
+    tools,
+    domains,
+  };
+}
+
+/**
+ * 技能正本。改 `skills.md` 后保存即可更新页面。
+ */
+export const skillsPage: SkillPageRecord = parseSkillsMd(skillsMd);
+
+export const skillLevels = skillsPage.levels;
+export const skillTools = skillsPage.tools;
+export const skillDomains = skillsPage.domains;
+
+const toolDict = Object.fromEntries(skillTools.map((tool) => [tool.id, tool]));
+
+/**
+ * 按 id 取工具；缺项时返回空，调用方跳过渲染。
+ */
+export function findSkillTool(toolId: string): SkillTool | undefined {
+  return toolDict[toolId];
+}
+
+/**
+ * 由分值取档；低于最低档返回空。
+ */
+export function levelForScore(score: number): SkillLevel | undefined {
+  return skillLevels.find((level) => score >= level.min);
+}
+
+/**
+ * 默认展开的领域 id。
+ */
+export function defaultOpenSkillIds(): string[] {
+  return skillDomains.filter((domain) => domain.defaultOpen).map((domain) => domain.id);
+}
+
+/**
+ * 领域内可渲染的工具（跳过缺表项）。
+ */
+export function toolsOfDomain(domain: SkillDomain): { tool: SkillTool; score: number }[] {
+  const rows: { tool: SkillTool; score: number }[] = [];
+  for (const entry of domain.entries) {
+    const tool = findSkillTool(entry.toolId);
+    if (tool) {
+      rows.push({ tool, score: entry.score });
+    }
+  }
+  return rows;
+}
+
+/**
+ * 工具显示名。
+ */
+export function skillToolName(tool: SkillTool, locale: Locale): string {
+  return tx(tool.name, locale);
+}
+
+/**
+ * 工具用途说明；缺描述则空串。
+ */
+export function skillToolBlurb(tool: SkillTool, locale: Locale): string {
+  return tool.blurb ? tx(tool.blurb, locale) : "";
+}
+
+/**
+ * 等级显示名。
+ */
+export function skillLevelName(level: SkillLevel, locale: Locale): string {
+  return tx(level.name, locale);
+}
+
+/**
+ * 当前语言下的一条说明（可含 `**加粗**`）。
+ */
+export function txSkillBullet(bullet: LocalizedString, locale: Locale): string {
+  return tx(bullet, locale);
+}
+
+export { parseResumeMarks as parseSkillMarks };
+
+function parseTool(entry: MdBlock, index: number): SkillTool {
+  const fields = parseFields(entry.body);
+  const id = fields.fields.id || slugify(entry.title) || `tool-${index + 1}`;
+  const blurbZh = emptyToUndef(fields.fields["描述"]);
+  return {
+    id,
+    name: localized(entry.title, fields.fields["英文"]),
+    icon: resolveIcon(fields.fields["图标"], id),
+    href: emptyToUndef(fields.fields["官网"]),
+    blurb: blurbZh ? localized(blurbZh, fields.fields["英文描述"]) : undefined,
+  };
+}
+
+function parseLevel(entry: MdBlock, index: number): SkillLevel {
+  const parsed = parseFields(entry.body);
+  const min = Number.parseInt(parsed.fields["下限"] ?? "", 10);
+  const zhBullets = parseList(parsed.rest);
+  const enBullets = parseList(parsed.fields["英文说明"] ?? "");
+  const bullets: LocalizedString[] = zhBullets.map((line, bulletIndex) => {
+    const en = enBullets[bulletIndex];
+    return en ? { "zh-CN": line, en } : line;
+  });
+
+  return {
+    id: parsed.fields.id || slugify(parsed.fields["英文"] || entry.title) || `level-${index + 1}`,
+    min: Number.isFinite(min) ? min : 0,
+    color: resolveColor(parsed.fields["条色"]),
+    name: localized(entry.title, parsed.fields["英文"]),
+    deco: parsed.fields["短写"] ?? "",
+    bullets,
+  };
+}
+
+function parseDomain(entry: MdBlock, index: number, tools: SkillTool[]): SkillDomain {
+  const parsed = parseFields(entry.body);
+  const entries: SkillDomainEntry[] = [];
+  for (const line of parsed.rest.split(/\r?\n/)) {
+    const match = line.trim().match(SCORE_LINE);
+    if (!match) {
+      continue;
+    }
+    const tool = matchTool(tools, match[1] ?? "");
+    const score = Number.parseInt(match[2] ?? "", 10);
+    if (!tool || !Number.isFinite(score)) {
+      continue;
+    }
+    entries.push({ toolId: tool.id, score });
+  }
+
+  return {
+    id: parsed.fields.id || `skill-${slugify(entry.title) || index + 1}`,
+    name: localized(entry.title, parsed.fields["英文"]),
+    deco: parsed.fields["短写"] ?? "",
+    defaultOpen: parseOpenFlag(parsed.fields["展开"]),
+    entries,
+  };
+}
+
+function matchTool(tools: SkillTool[], token: string): SkillTool | undefined {
+  const key = token.trim();
+  const lower = key.toLowerCase();
+  return tools.find((tool) => {
+    if (tool.id === key || tool.id === lower) {
+      return true;
+    }
+    const zh = typeof tool.name === "string" ? tool.name : tool.name["zh-CN"];
+    const en = typeof tool.name === "string" ? "" : (tool.name.en ?? "");
+    return zh === key || zh.toLowerCase() === lower || en.toLowerCase() === lower;
+  });
+}
+
+function resolveIcon(raw: string | undefined, id: string): string {
+  const value = (raw ?? "").trim() || `${id}.svg`;
+  if (value.startsWith("/") || /^https?:/i.test(value)) {
+    return value;
+  }
+  return `/skill-icons/${value.replace(/^skill-icons\//, "")}`;
+}
+
+function resolveColor(raw: string | undefined): string {
+  const value = (raw ?? "").trim();
+  if (!value) {
+    return COLOR_ALIAS["绿"] ?? "#3d8a62";
+  }
+  if (value.startsWith("#")) {
+    return value;
+  }
+  return COLOR_ALIAS[value] ?? value;
+}
+
+function localized(zh: string, en?: string): LocalizedString {
+  const english = en?.trim();
+  return english ? { "zh-CN": zh, en: english } : zh;
+}
+
+function slugify(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .replace(/[#._]+/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
+}
+
+function parseOpenFlag(value: string | undefined): boolean {
+  const normalized = value?.trim();
+  return normalized === "是" || normalized === "true" || normalized === "1";
+}
+
+function emptyToUndef(value: string | undefined): string | undefined {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : undefined;
+}
+
+function splitByHeading(source: string, pattern: RegExp): MdBlock[] {
+  const list: MdBlock[] = [];
+  let title = "";
+  const lines: string[] = [];
+
+  const flush = () => {
+    if (!title) {
+      lines.length = 0;
+      return;
+    }
+    list.push({ title, body: lines.join("\n").trim() });
+    lines.length = 0;
+  };
+
+  for (const line of source.replace(/^\uFEFF/, "").split(/\r?\n/)) {
+    const match = line.match(pattern);
+    if (match?.[1]) {
+      flush();
+      title = match[1].trim();
+      continue;
+    }
+    lines.push(line);
+  }
+  flush();
+  return list;
+}
+
+function sectionBody(sections: MdBlock[], title: string): string {
+  return sections.find((item) => item.title === title)?.body ?? "";
+}
+
+function parseFields(body: string): { fields: Record<string, string>; rest: string } {
+  const fields: Record<string, string> = {};
+  const rest: string[] = [];
+  let lastKey = "";
+  for (const line of body.split(/\r?\n/)) {
+    const match = line.match(FIELD);
+    if (match?.[1]) {
+      lastKey = match[1];
+      fields[lastKey] = (match[2] ?? "").trim();
+      continue;
+    }
+    if (lastKey === "说明" || lastKey === "英文说明" || lastKey === "描述" || lastKey === "英文描述") {
+      const next = line.trim();
+      if (next) {
+        fields[lastKey] = [fields[lastKey], next].filter(Boolean).join("\n");
+      }
+      continue;
+    }
+    rest.push(line);
+  }
+  return { fields, rest: rest.join("\n").trim() };
+}
+
+function parseList(body: string): string[] {
+  return body
+    .split(/\r?\n/)
+    .map((line) => line.replace(/^[-*]\s+/, "").trim())
+    .filter(Boolean);
+}
