@@ -4,7 +4,7 @@
   grid-template-columns: minmax(280px, 0.9fr) minmax(320px, 1.1fr);
   gap: 48px;
   align-items: center;
-  padding: 48px 56px 88px;
+  padding: 48px var(--page-inset) 88px;
   position: relative;
 }
 
@@ -345,7 +345,7 @@ button.contact-icon:hover,
   grid-template-columns: 0.9fr 1.1fr;
   gap: 40px;
   align-items: center;
-  padding: 72px 56px;
+  padding: 72px var(--page-inset);
   border-top: 1px solid var(--line);
 }
 
@@ -477,7 +477,7 @@ button.contact-icon:hover,
 }
 
 .site-footer {
-  padding: 64px 56px 48px;
+  padding: 64px var(--page-inset) 48px;
   border-top: 1px solid var(--line);
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -494,8 +494,8 @@ button.contact-icon:hover,
   .hero,
   .work,
   .site-footer {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: var(--page-inset);
+    padding-right: var(--page-inset);
   }
 
   .hero {
@@ -558,8 +558,8 @@ button.contact-icon:hover,
   .hero,
   .work,
   .site-footer {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: var(--page-inset);
+    padding-right: var(--page-inset);
   }
 
   .hero-name {

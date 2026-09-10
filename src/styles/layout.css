@@ -1,5 +1,6 @@
 .shell {
   min-height: 100vh;
+  --page-inset: max(var(--page-gutter), calc((100% - var(--page-max)) / 2));
 }
 
 .header {

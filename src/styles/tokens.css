@@ -5,6 +5,21 @@
   --motion-reveal: 1;
   --motion-hint: 1;
   --motion-ticks: 1;
+  /* 横屏内容栏：宽于此时只加左右留白，窄于此时才开始压缩与重排 */
+  --page-max: 1200px;
+  --page-gutter: 56px;
+}
+
+@media (max-width: 860px) {
+  :root {
+    --page-gutter: 20px;
+  }
+}
+
+@media (max-width: 390px) {
+  :root {
+    --page-gutter: 16px;
+  }
 }
 
 [data-skin="strata"] [data-theme="home"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.16); }

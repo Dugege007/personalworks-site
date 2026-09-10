@@ -161,10 +161,10 @@
     var(--ink-block);
 }
 
-/* 第一层：四门非对称画册 */
+/* 第一层：四门非对称画册。横屏跟内容栏留白，竖屏铺满。 */
 .develop-work-gate {
-  margin-top: calc(var(--header-h) * -1);
-  min-height: 100dvh;
+  min-height: calc(100dvh - var(--header-h));
+  margin-inline: var(--page-inset);
   display: grid;
   grid-template-columns: 1.35fr 0.9fr 1.2fr;
   grid-template-rows: 1.18fr 0.82fr;
@@ -227,16 +227,7 @@
 }
 
 .develop-kind-head {
-  padding: 36px 56px 28px;
-  max-width: 42em;
-}
-
-.develop-kind-en {
-  margin: 0 0 8px;
-  font-family: var(--font-display-en);
-  font-size: 13px;
-  letter-spacing: 0.16em;
-  color: var(--muted);
+  padding: 36px var(--page-inset) 28px;
 }
 
 .develop-kind h1,
@@ -258,6 +249,7 @@
 .develop-kind-doors {
   display: flex;
   min-height: 58vh;
+  margin-inline: var(--page-inset);
   border-top: 1px solid var(--line);
 }
 
@@ -290,8 +282,18 @@
 
 /* 第三层：细目条目 */
 .develop-channel {
-  padding: 36px 56px 72px;
+  padding: 0 0 72px;
   min-height: calc(100dvh - var(--header-h));
+}
+
+.develop-channel-grid,
+.develop-channel-empty,
+.develop-channel .lrb {
+  padding-inline: var(--page-inset);
+}
+
+.develop-channel .lrb {
+  margin-top: 0;
 }
 
 .develop-channel-empty {
@@ -378,6 +380,7 @@
 
 @media (max-width: 860px) {
   .develop-work-gate {
+    margin-inline: 0;
     grid-template-columns: 1fr;
     grid-template-rows: none;
     grid-template-areas:
@@ -393,12 +396,6 @@
   .develop-work-gate-cell.is-4 {
     min-height: 42vh;
     border-right: 0;
-  }
-
-  .develop-kind-head,
-  .develop-channel {
-    padding-left: 20px;
-    padding-right: 20px;
   }
 
   .develop-kind-doors {
@@ -452,12 +449,6 @@
   .develop-kind h1,
   .develop-channel h1 {
     font-size: 32px;
-  }
-
-  .develop-kind-head,
-  .develop-channel {
-    padding-left: 16px;
-    padding-right: 16px;
   }
 }
 

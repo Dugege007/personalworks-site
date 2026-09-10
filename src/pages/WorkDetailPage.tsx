@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { lexicon } from "../content/lexicon";
 import { findCategoryByPath, findCollectionByChannel, findCollectionByPath } from "../content/site";
-import { findPublishedWork, findPublishedWorksById, type WorkRecord } from "../content/works";
+import { findPublishedWork, findPublishedWorksById, formatStartedOn, type WorkRecord } from "../content/works";
 import { channelTitleZh } from "../ia/href";
 import { iaOfSkin } from "../ia";
 import { kindOfChannel } from "../ia/query";
@@ -20,6 +20,12 @@ type MetaItem = {
  */
 function buildMetaItems(work: WorkRecord): MetaItem[] {
   const items: MetaItem[] = [{ label: "年份", value: work.year }];
+  if (work.startedOn) {
+    items.push({ label: "开始", value: formatStartedOn(work.startedOn) });
+  }
+  if (work.siteType) {
+    items.push({ label: "类型", value: work.siteType });
+  }
   if (work.role) {
     items.push({ label: "职责", value: work.role });
   }

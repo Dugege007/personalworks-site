@@ -77,8 +77,8 @@
 
 .develop-hero-band {
   position: absolute;
-  left: 48px;
-  right: 56px;
+  left: var(--page-inset);
+  right: var(--page-inset);
   bottom: 10%;
   z-index: 1;
   display: flex;
@@ -88,7 +88,7 @@
 }
 
 .develop-hero-copy {
-  max-width: 42%;
+  max-width: 28em;
   min-width: 0;
 }
 
@@ -196,6 +196,7 @@
 .develop-slices {
   display: flex;
   min-height: 52vh;
+  margin-inline: var(--page-inset);
   border-top: 1px solid var(--line);
 }
 
@@ -289,7 +290,7 @@
     "a a b c"
     "a a d e";
   gap: 12px;
-  padding: 28px 28px 48px;
+  padding: 28px var(--page-inset) 48px;
   min-height: 78vh;
 }
 
@@ -348,7 +349,7 @@
 }
 
 .develop-notes {
-  padding: 72px 56px 80px;
+  padding: 72px var(--page-inset) 80px;
   border-top: 1px solid var(--line);
 }
 
@@ -381,7 +382,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 32px;
-  padding: 72px 56px 64px;
+  padding: 72px var(--page-inset) 64px;
   background: var(--ink-block);
   color: var(--on-ink);
 }
@@ -471,8 +472,6 @@
 
 @media (max-width: 860px) {
   .develop-hero-band {
-    left: 20px;
-    right: 20px;
     bottom: 8%;
     flex-direction: column;
     align-items: flex-start;
@@ -482,12 +481,6 @@
   .develop-hero-copy,
   .develop-hero-note {
     max-width: none;
-  }
-
-  .develop-notes,
-  .develop-close {
-    padding-left: 20px;
-    padding-right: 20px;
   }
 
   .develop-slices {
@@ -516,7 +509,8 @@
       "d"
       "e";
     min-height: 0;
-    padding: 20px 16px 40px;
+    padding-top: 20px;
+    padding-bottom: 40px;
   }
 
   .develop-close {
@@ -537,12 +531,6 @@
   .develop-hero-cta .develop-btn {
     padding: 0 16px;
     font-size: 14px;
-  }
-
-  .develop-notes,
-  .develop-close {
-    padding-left: 16px;
-    padding-right: 16px;
   }
 }
 

@@ -5,7 +5,7 @@
   --skill-used: #d07a3a;
   --skill-aware: #c45c4a;
   min-height: calc(100dvh - var(--header-h));
-  padding: 48px 56px 88px;
+  padding: 48px var(--page-inset) 88px;
   background: var(--bg);
 }
 
@@ -307,7 +307,7 @@ a.skill-mark:focus-visible {
 
 @media (max-width: 860px) {
   .skills {
-    padding: 32px 20px 64px;
+    padding: 32px var(--page-inset) 64px;
   }
 
   .skills-domain-preview {

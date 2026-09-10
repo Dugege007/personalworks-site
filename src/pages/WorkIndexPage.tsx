@@ -23,7 +23,7 @@ export function WorkIndexPage() {
   const doors = listDevelopKindDoors();
 
   return (
-    <div className="develop-work-gate" data-theme={lexicon.workIndex.key} id="hero-bleed" data-tone="dark">
+    <div className="develop-work-gate" data-theme={lexicon.workIndex.key}>
       <h1 className="develop-work-visually-hidden">{lexicon.workIndex.zh}</h1>
       {doors.map((door, index) => (
         <CoverTile

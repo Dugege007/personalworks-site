@@ -1,7 +1,18 @@
-import skillsMd from "./skills.md?raw";
-import { parseResumeMarks } from "./resume";
+import skillsMd from "../../文稿/skills.md?raw";
 import type { Locale, LocalizedString } from "../prefs/types";
 import { tx } from "../prefs/tx";
+import {
+  MD_ENTRY,
+  MD_SECTION,
+  emptyToUndef,
+  parseFields,
+  parseInlineMarks,
+  parseList,
+  parseYesFlag,
+  sectionBody,
+  splitByHeading,
+  type MdBlock,
+} from "./pageMd";
 
 export type SkillTool = {
   id: string;
@@ -42,9 +53,6 @@ export type SkillPageRecord = {
   domains: SkillDomain[];
 };
 
-const SECTION = /^##\s+(.+?)\s*$/;
-const ENTRY = /^###\s+(.+?)\s*$/;
-const FIELD = /^(页题|英文页题|导语|简历链|下限|英文|短写|条色|说明|英文说明|id|图标|官网|描述|英文描述|展开)[：:]\s*(.*)$/;
 const SCORE_LINE = /^[-*]\s+(.+?)\s+(\d+)\s*$/;
 
 const COLOR_ALIAS: Record<string, string> = {
@@ -55,22 +63,17 @@ const COLOR_ALIAS: Record<string, string> = {
   红: "#c45c4a",
 };
 
-type MdBlock = {
-  title: string;
-  body: string;
-};
-
 /**
  * 把技能 Markdown 收成页面记录。缺字段不写入。
  */
 export function parseSkillsMd(source: string): SkillPageRecord {
-  const sections = splitByHeading(source, SECTION);
+  const sections = splitByHeading(source, MD_SECTION);
   const header = parseFields(sectionBody(sections, "页眉"));
-  const tools = splitByHeading(sectionBody(sections, "工具"), ENTRY).map((entry, index) => parseTool(entry, index));
-  const levels = splitByHeading(sectionBody(sections, "等级"), ENTRY)
+  const tools = splitByHeading(sectionBody(sections, "工具"), MD_ENTRY).map((entry, index) => parseTool(entry, index));
+  const levels = splitByHeading(sectionBody(sections, "等级"), MD_ENTRY)
     .map((entry, index) => parseLevel(entry, index))
     .sort((left, right) => right.min - left.min);
-  const domains = splitByHeading(sectionBody(sections, "领域"), ENTRY).map((entry, index) =>
+  const domains = splitByHeading(sectionBody(sections, "领域"), MD_ENTRY).map((entry, index) =>
     parseDomain(entry, index, tools),
   );
 
@@ -85,7 +88,7 @@ export function parseSkillsMd(source: string): SkillPageRecord {
 }
 
 /**
- * 技能正本。改 `skills.md` 后保存即可更新页面。
+ * 技能正本。改 `文稿/skills.md` 后保存即可更新页面。
  */
 export const skillsPage: SkillPageRecord = parseSkillsMd(skillsMd);
 
@@ -158,7 +161,7 @@ export function txSkillBullet(bullet: LocalizedString, locale: Locale): string {
   return tx(bullet, locale);
 }
 
-export { parseResumeMarks as parseSkillMarks };
+export { parseInlineMarks as parseSkillMarks };
 
 function parseTool(entry: MdBlock, index: number): SkillTool {
   const fields = parseFields(entry.body);
@@ -213,7 +216,7 @@ function parseDomain(entry: MdBlock, index: number, tools: SkillTool[]): SkillDo
     id: parsed.fields.id || `skill-${slugify(entry.title) || index + 1}`,
     name: localized(entry.title, parsed.fields["英文"]),
     deco: parsed.fields["短写"] ?? "",
-    defaultOpen: parseOpenFlag(parsed.fields["展开"]),
+    defaultOpen: parseYesFlag(parsed.fields["展开"]),
     entries,
   };
 }
@@ -264,73 +267,3 @@ function slugify(value: string): string {
     .replace(/[^a-z0-9-]/g, "");
 }
 
-function parseOpenFlag(value: string | undefined): boolean {
-  const normalized = value?.trim();
-  return normalized === "是" || normalized === "true" || normalized === "1";
-}
-
-function emptyToUndef(value: string | undefined): string | undefined {
-  const trimmed = value?.trim();
-  return trimmed ? trimmed : undefined;
-}
-
-function splitByHeading(source: string, pattern: RegExp): MdBlock[] {
-  const list: MdBlock[] = [];
-  let title = "";
-  const lines: string[] = [];
-
-  const flush = () => {
-    if (!title) {
-      lines.length = 0;
-      return;
-    }
-    list.push({ title, body: lines.join("\n").trim() });
-    lines.length = 0;
-  };
-
-  for (const line of source.replace(/^\uFEFF/, "").split(/\r?\n/)) {
-    const match = line.match(pattern);
-    if (match?.[1]) {
-      flush();
-      title = match[1].trim();
-      continue;
-    }
-    lines.push(line);
-  }
-  flush();
-  return list;
-}
-
-function sectionBody(sections: MdBlock[], title: string): string {
-  return sections.find((item) => item.title === title)?.body ?? "";
-}
-
-function parseFields(body: string): { fields: Record<string, string>; rest: string } {
-  const fields: Record<string, string> = {};
-  const rest: string[] = [];
-  let lastKey = "";
-  for (const line of body.split(/\r?\n/)) {
-    const match = line.match(FIELD);
-    if (match?.[1]) {
-      lastKey = match[1];
-      fields[lastKey] = (match[2] ?? "").trim();
-      continue;
-    }
-    if (lastKey === "说明" || lastKey === "英文说明" || lastKey === "描述" || lastKey === "英文描述") {
-      const next = line.trim();
-      if (next) {
-        fields[lastKey] = [fields[lastKey], next].filter(Boolean).join("\n");
-      }
-      continue;
-    }
-    rest.push(line);
-  }
-  return { fields, rest: rest.join("\n").trim() };
-}
-
-function parseList(body: string): string[] {
-  return body
-    .split(/\r?\n/)
-    .map((line) => line.replace(/^[-*]\s+/, "").trim())
-    .filter(Boolean);
-}

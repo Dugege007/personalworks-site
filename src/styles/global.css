@@ -17,6 +17,19 @@ body,
 html {
   background: var(--bg);
   color: var(--text);
+  /* 经典滚动条占位固定，避免 overflow 切换时版心左右跳 */
+  scrollbar-gutter: stable;
+}
+
+/* Lenis.stop() 默认 overflow:clip，会藏掉滚动条并挤动中间内容。
+   图条悬停只需停平滑滚动，滚动条仍显示；灯箱才锁溢流。 */
+html.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: auto;
+}
+
+html[data-lightbox="open"],
+html[data-lightbox="open"].lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: hidden;
 }
 
 body {

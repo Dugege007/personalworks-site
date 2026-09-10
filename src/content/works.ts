@@ -33,6 +33,10 @@ export type WorkRecord = {
   sheetType?: string;
   placeAlias?: string;
   place?: string;
+  /** 项目开工年月，格式 `YYYY-MM`，页面显示为「YYYY年MM月」。 */
+  startedOn?: string;
+  /** 项目尺度，如大区、示范区。 */
+  siteType?: string;
   exifLite?: string;
   consent?: WorkConsent;
   displayName?: string;
@@ -53,6 +57,52 @@ function covered(channel: WorkChannel, id: string, labels: string[]): WorkMedia[
     label,
     ...(index === 0 ? { src: `${channel}/${id}/01.webp` } : {}),
   }));
+}
+
+/**
+ * 连续编号的效果图组，扩展名与正式位对象一致。
+ */
+function album(channel: WorkChannel, id: string, count: number, ext = "jpg"): WorkMedia[] {
+  return Array.from({ length: count }, (_, index) => {
+    const slot = String(index + 1).padStart(2, "0");
+    return {
+      kind: "image" as const,
+      label: `效果图 ${slot}`,
+      src: `${channel}/${id}/${slot}.${ext}`,
+    };
+  });
+}
+
+/**
+ * 跨前缀拼一组效果图，保持给定顺序。
+ */
+function listed(entries: Array<[src: string, label: string]>): WorkMedia[] {
+  return entries.map(([src, label]) => ({ kind: "image" as const, src, label }));
+}
+
+/**
+ * 灯箱与焦点图条共用的「(当前/总数) 图名」。
+ */
+export function formatShotCaption(index: number, total: number, label: string): string {
+  return `(${index + 1}/${total}) ${label}`;
+}
+
+/**
+ * 把 `YYYY-MM` 写成「YYYY年MM月」；无法解析则原样返回。
+ */
+export function formatStartedOn(value: string): string {
+  const match = /^(\d{4})-(\d{2})$/.exec(value);
+  if (!match) {
+    return value;
+  }
+  return `${match[1]}年${match[2]}月`;
+}
+
+/**
+ * 已入库的效果图，按 media 原序。
+ */
+export function listWorkImages(work: WorkRecord): WorkMedia[] {
+  return work.media.filter((item) => item.kind === "image" && item.src);
 }
 
 export const placeholderWorks: WorkRecord[] = [
@@ -125,37 +175,100 @@ export const placeholderWorks: WorkRecord[] = [
     media: covered("line-sim", "sample-3", ["堵塞前", "堵塞中"]),
   },
   {
-    id: "sample-1",
+    id: "xiaowayao",
     channel: "landscape-rendering",
-    title: "主视角",
+    title: "丰台小瓦窑",
     featured: true,
-    year: "2022",
-    role: "方案与空间叙事",
-    clientAlias: "某庭院（别名）",
-    summary: "空间先被框住，再被光慢慢填满。",
-    body: "占位正文。效果图序列说明空间层次；客户真名默认不展示。",
-    media: [cover("landscape-rendering", "sample-1", "主视角"), ...images("近景", "林缘")],
+    year: "2018",
+    startedOn: "2018-04",
+    place: "北京",
+    siteType: "示范区",
+    tags: ["日式禅意", "现代东方"],
+    role: "方案与效果图",
+    summary:
+      "叠拼样板庭院分南北两院，南院下叠、北院上叠，看房分精装与清水两路。按六口之家的生活场景，用日式禅意和现代东方做去繁从简的庭园。",
+    body: "北京世茂丰台小瓦窑样板庭院。南院为下叠花园，北院为上叠花园。方案按六口之家模拟业主日常：手工、观天、书画与儿童活动。空间语言先走日式禅意，再落到现代东方的聚会与收藏。",
+    media: album("landscape-rendering", "xiaowayao", 8),
   },
   {
-    id: "sample-2",
+    id: "huaian-fukang-15",
     channel: "landscape-rendering",
-    title: "黄昏庭院",
-    year: "2021",
-    role: "效果图",
-    clientAlias: "某宅院（别名）",
-    summary: "用黄昏金把庭院的一层光留下来。",
-    body: "占位正文。宽画幅在手机上改为纵向堆叠，避免横向撑破视口。",
-    media: covered("landscape-rendering", "sample-2", ["黄昏", "水面", "廊"]),
+    title: "淮安富康城15#",
+    year: "2020",
+    startedOn: "2020-03",
+    place: "淮安",
+    siteType: "大区",
+    tags: ["简约艺术", "诗意栖居"],
+    role: "方案与效果图",
+    summary:
+      "淮阴区安置商住地块 15# 组团。周边以教育和居住为主，竞品多为新古典。以月相组织一环一带四花园，用简约艺术做全龄共享的大区。",
+    body: "淮自然（阴）挂2019第6号地块商住安置项目 15# 组团。基地在长江西路以南、西安路以东。规划以高层安置为主，中心留出共享中庭。景观用晓月、满月、弦月等月相落位入口水景、林下活动和宅间花园。",
+    media: listed([
+      ["landscape-rendering/huaian-fukang/01.jpg", "效果图 01"],
+      ["landscape-rendering/huaian-fukang/02.jpg", "效果图 02"],
+      ["landscape-rendering/huaian-fukang/03.jpg", "效果图 03"],
+      ["landscape-rendering/huaian-fukang/04.jpg", "效果图 04"],
+      ["landscape-rendering/huaian-fukang/05.jpg", "效果图 05"],
+      ["landscape-rendering/huaian-fukang/06.jpg", "效果图 06"],
+      ["landscape-rendering/huaian-fukang-15/01.jpg", "效果图 07"],
+      ["landscape-rendering/huaian-fukang-15/02.jpg", "效果图 08"],
+    ]),
   },
   {
-    id: "sample-3",
+    id: "huaian-fukang-3",
     channel: "landscape-rendering",
-    title: "林缘断面",
-    year: "2021",
-    role: "断面叙事",
-    summary: "用断面说明林缘如何把园子托住。",
-    body: "占位正文。断面用于说明，不是施工依据。",
-    media: covered("landscape-rendering", "sample-3", ["断面", "层次"]),
+    title: "淮安富康城3#",
+    year: "2020",
+    startedOn: "2020-08",
+    place: "淮安",
+    siteType: "大区",
+    tags: ["简约艺术", "诗意栖居"],
+    role: "方案与效果图",
+    summary:
+      "淮阴区安置商住地块 3# 组团。周边以教育和居住为主，竞品多为新古典。以月相组织一环一带四花园，用简约艺术做全龄共享的大区。",
+    body: "淮自然（阴）挂2019第6号地块商住安置项目 3# 组团。基地在长江西路以南、西安路以东。规划以高层安置为主，中心留出共享中庭。景观用晓月、满月、弦月等月相落位入口水景、林下活动和宅间花园。",
+    media: listed([
+      ["landscape-rendering/huaian-fukang/07.jpg", "效果图 01"],
+      ["landscape-rendering/huaian-fukang/08.jpg", "效果图 02"],
+      ["landscape-rendering/huaian-fukang/09.jpg", "效果图 03"],
+      ["landscape-rendering/huaian-fukang/10.jpg", "效果图 04"],
+      ["landscape-rendering/huaian-fukang-3/01.jpg", "效果图 05"],
+      ["landscape-rendering/huaian-fukang-3/02.jpg", "效果图 06"],
+      ["landscape-rendering/huaian-fukang-3/03.jpg", "效果图 07"],
+      ["landscape-rendering/huaian-fukang-3/04.jpg", "效果图 08"],
+      ["landscape-rendering/huaian-fukang-3/05.jpg", "效果图 09"],
+      ["landscape-rendering/huaian-fukang-3/06.jpg", "效果图 10"],
+    ]),
+  },
+  {
+    id: "wuxi-north-station",
+    channel: "landscape-rendering",
+    title: "无锡汽车北站",
+    year: "2019",
+    startedOn: "2019-06",
+    place: "无锡",
+    siteType: "大区",
+    tags: ["现代简洁", "森活"],
+    role: "方案与效果图",
+    summary:
+      "梁溪区原汽车北站西侧，东侧紧邻火车站轨道，绿地偏紧、高层遮阴。延续建筑的现代线条，以乌桕林下氧吧和全龄活动做成森活社区。",
+    body: "世茂无锡原汽车北站西侧。基地在兴源北路与惠勤路交叉口西北，东侧火车站轨道带来噪声与震动，绿地率紧张。景观策略是酒店式入口、九棵乌桕的林下氧吧、儿童活动与宅间秘境，把房子放进森林里。",
+    media: album("landscape-rendering", "wuxi-north-station", 9),
+  },
+  {
+    id: "xingyi-78",
+    channel: "landscape-rendering",
+    title: "富康城兴义7#8#",
+    year: "2019",
+    startedOn: "2019-09",
+    place: "兴义",
+    siteType: "示范区",
+    tags: ["片石水景", "林荫道"],
+    role: "方案与效果图",
+    summary:
+      "麓榕岛7#8#样板庭院与宅间。用入户汀步、片石水景和对景景墙组织两套庭院，林荫道把归家界面连起来。",
+    body: "富康城兴义麓榕岛样板庭院。庭院A以汀步、片石水景、对景景墙和茶室为主；庭院B补户外餐桌、廊架与吧台。同期效果图也收录林荫道与幼儿园示范界面。",
+    media: album("landscape-rendering", "xingyi-78", 8),
   },
   {
     id: "sample-1",

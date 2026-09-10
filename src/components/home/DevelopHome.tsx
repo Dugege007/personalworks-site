@@ -9,6 +9,7 @@ import type { HomeBlock, IaRecord } from "../../ia/types";
 import { assetUrl } from "../../lib/assets";
 import { usePrefs } from "../../prefs/PrefsProvider";
 import { ContactIcons } from "./ContactIcons";
+import { HomeBeian } from "./HomeBeian";
 import "../../styles/develop-home.css";
 
 type DevelopHomeProps = {
@@ -356,6 +357,7 @@ function ContactClose() {
         <p className="develop-close-lead">写信或到场都可以。作品在墙里，照片在册里。</p>
       </div>
       <ContactIcons channels={profile.contactChannels} />
+      <HomeBeian />
     </section>
   );
 }

@@ -1,5 +1,6 @@
 import { profile } from "../../content/site";
 import { ContactIcons } from "./ContactIcons";
+import { HomeBeian } from "./HomeBeian";
 
 export function FooterContact() {
   return (
@@ -11,6 +12,7 @@ export function FooterContact() {
         <p className="work-lead">继续往下的内容，在顶栏各档案里。本页只负责把路打开。</p>
       </div>
       <ContactIcons channels={profile.contactChannels} />
+      <HomeBeian />
     </footer>
   );
 }

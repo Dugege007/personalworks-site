@@ -1,6 +1,7 @@
 .resume {
   display: grid;
   min-height: calc(100dvh - var(--header-h));
+  padding-inline: var(--page-inset);
   background: var(--bg);
 }
 
@@ -330,7 +331,7 @@
 
   .resume-id,
   .resume-main {
-    padding: 28px 20px 48px;
+    padding: 28px 0 48px;
   }
 
   .resume-job-head {

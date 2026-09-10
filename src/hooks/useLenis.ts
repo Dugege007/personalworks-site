@@ -5,6 +5,19 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
+let pageLenis: Lenis | null = null;
+
+/**
+ * 指针停在需接管滚轮的区域时暂停整页 Lenis；离开后恢复。
+ */
+export function pausePageLenis() {
+  pageLenis?.stop();
+}
+
+export function resumePageLenis() {
+  pageLenis?.start();
+}
+
 export function useLenis() {
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -16,6 +29,7 @@ export function useLenis() {
       autoRaf: false,
       lerp: 0.08,
     });
+    pageLenis = lenis;
 
     const onScroll = () => {
       ScrollTrigger.update();
@@ -32,6 +46,9 @@ export function useLenis() {
       gsap.ticker.remove(ticker);
       lenis.off("scroll", onScroll);
       lenis.destroy();
+      if (pageLenis === lenis) {
+        pageLenis = null;
+      }
     };
   }, []);
 }

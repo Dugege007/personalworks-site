@@ -9,6 +9,8 @@ import {
   listDevelopChannelDoors,
   workIndexRoot,
 } from "../ia/workTree";
+import { tx } from "../prefs/tx";
+import { usePrefs } from "../prefs/PrefsProvider";
 import { WorkDetailPage } from "./WorkDetailPage";
 import "../styles/develop-work.css";
 
@@ -31,9 +33,10 @@ export function WorkIndexSegmentPage() {
  * 显影作品第二层：大类分类页，只给细目入口，不摊开全部条目。
  */
 export function WorkKindPage({ kind }: WorkKindViewProps) {
+  const { locale } = usePrefs();
   const category = categories.find((item) => item.id === kind);
   const doors = listDevelopChannelDoors(kind);
-  const title = category?.title ?? kind;
+  const title = tx({ "zh-CN": category?.title ?? kind, en: kindEn(kind) }, locale);
   const lead = category?.lead ?? "";
   const photoKind = kind === lexicon.photography.key;
   const doorCount = doors.length;
@@ -44,7 +47,6 @@ export function WorkKindPage({ kind }: WorkKindViewProps) {
         <Link className="develop-work-back" to={workIndexRoot()}>
           {lexicon.workIndex.zh}
         </Link>
-        <p className="develop-kind-en">{kindEn(kind)}</p>
         <h1>{title}</h1>
         <p className="develop-kind-lead">{lead}</p>
         {photoKind ? (

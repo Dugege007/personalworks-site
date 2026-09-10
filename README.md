@@ -33,3 +33,7 @@ npm run dev
 - 动效：颗粒底、首屏光斑、文字揭示、滚动引导、进度刻度（可用 `--motion-*` 令牌关闭）
 
 真实照片、联系方式与作品图待替换。资源前缀使用环境变量 `VITE_ASSET_BASE`，见 `.env.example`。
+
+## 改简历与技能
+
+页面可读的 Markdown 正本在 [`文稿/`](文稿/)。改 `resume.md` 或 `skills.md` 后保存即可热更新。书写与共用读取规则见 [`文稿/README.md`](文稿/README.md)。

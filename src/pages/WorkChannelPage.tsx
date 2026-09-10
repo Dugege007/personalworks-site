@@ -13,14 +13,35 @@ import {
 import { listPublishedWorks } from "../content/works";
 import { stockPlaceholderSrc, workCoverSrc } from "../content/stockMedia";
 import { findCollectionByChannel, placeholderGames } from "../content/site";
+import { LandscapeProjectBoard } from "../components/work/LandscapeProjectBoard";
+import { tx } from "../prefs/tx";
 import { usePrefs } from "../prefs/PrefsProvider";
 import "../styles/develop-work.css";
+
+type ChannelHeadProps = {
+  backTo: string;
+  backLabel: string;
+  title: string;
+  lead?: string;
+};
+
+function ChannelHead({ backTo, backLabel, title, lead }: ChannelHeadProps) {
+  return (
+    <div className="develop-kind-head">
+      <Link className="develop-work-back" to={backTo}>
+        {backLabel}
+      </Link>
+      <h1>{title}</h1>
+      {lead ? <p className="develop-kind-lead">{lead}</p> : null}
+    </div>
+  );
+}
 
 /**
  * 显影作品第三层：细目条目页。游戏选单列出可玩项。
  */
 export function WorkChannelPage() {
-  const { currentSkin } = usePrefs();
+  const { currentSkin, locale } = usePrefs();
   const ia = iaOfSkin(currentSkin);
   const { kind, channel } = useParams();
 
@@ -35,12 +56,12 @@ export function WorkChannelPage() {
   if (door?.comingSoon) {
     return (
       <div className="develop-channel" data-theme={channelKey}>
-        <Link className="develop-work-back" to={hrefForDevelopKind(kind)}>
-          {kindTitle(kind)}
-        </Link>
-        <p className="develop-kind-en">{door.deco}</p>
-        <h1>{door.zh}</h1>
-        <p className="develop-kind-lead">位置已留，作品待收录。</p>
+        <ChannelHead
+          backTo={hrefForDevelopKind(kind)}
+          backLabel={kindTitle(kind)}
+          title={tx({ "zh-CN": door.zh, en: door.en }, locale)}
+          lead="位置已留，作品待收录。"
+        />
         <div className="develop-channel-grid" data-count={3}>
           {(findCollectionByChannel(channelKey)?.frames ?? ["场景", "角色", "光影"]).map((label, index) => (
             <CoverTile
@@ -62,12 +83,12 @@ export function WorkChannelPage() {
   if (isGameMenu) {
     return (
       <div className="develop-channel" data-theme={lexicon.gameMenu.key}>
-        <Link className="develop-work-back" to={hrefForDevelopKind(kind)}>
-          {kindTitle(kind)}
-        </Link>
-        <p className="develop-kind-en">{lexicon.gameMenu.en}</p>
-        <h1>{lexicon.gameMenu.zh}</h1>
-        <p className="develop-kind-lead">点击进入游玩页后再加载。不登录、不付费。</p>
+        <ChannelHead
+          backTo={hrefForDevelopKind(kind)}
+          backLabel={kindTitle(kind)}
+          title={tx({ "zh-CN": lexicon.gameMenu.zh, en: lexicon.gameMenu.en }, locale)}
+          lead="点击进入游玩页后再加载。不登录、不付费。"
+        />
         <div className="develop-channel-grid" data-count={placeholderGames.length}>
           {placeholderGames.map((game, index) => (
             <CoverTile
@@ -89,16 +110,24 @@ export function WorkChannelPage() {
   }
 
   const works = listPublishedWorks(channelKey);
+  const isLandscapeBoard = channelKey === lexicon.landscapeRendering.key;
 
   return (
-    <div className="develop-channel" data-theme={channelKey}>
-      <Link className="develop-work-back" to={hrefForDevelopKind(kind)}>
-        {kindTitle(kind)}
-      </Link>
-      <p className="develop-kind-en">{door?.deco ?? channelTitleZh(channelKey)}</p>
-      <h1>{door?.zh ?? channelTitleZh(channelKey)}</h1>
-      {door?.lead ? <p className="develop-kind-lead">{door.lead}</p> : null}
-      {works.length === 0 ? (
+    <div
+      className={`develop-channel${isLandscapeBoard ? " is-landscape-board" : ""}`}
+      data-theme={channelKey}
+    >
+      <ChannelHead
+        backTo={hrefForDevelopKind(kind)}
+        backLabel={kindTitle(kind)}
+        title={tx({ "zh-CN": door?.zh ?? channelTitleZh(channelKey), en: door?.en }, locale)}
+        lead={door?.lead}
+      />
+      {isLandscapeBoard && works.length === 0 ? (
+        <p className="develop-channel-empty">这一细目还没有可展示的作品。</p>
+      ) : null}
+      {isLandscapeBoard && works.length > 0 ? <LandscapeProjectBoard works={works} /> : null}
+      {isLandscapeBoard ? null : works.length === 0 ? (
         <p className="develop-channel-empty">这一细目还没有可展示的作品。</p>
       ) : (
         <div className="develop-channel-grid" data-count={works.length}>
