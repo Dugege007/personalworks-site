@@ -66,6 +66,14 @@
   );
   position: relative;
   margin-top: 8px;
+  touch-action: pan-y;
+  user-select: none;
+  cursor: grab;
+}
+
+.lrb-strip-wrap.is-dragging,
+.lrb-strip-wrap.is-dragging .lrb-shot {
+  cursor: grabbing;
 }
 
 .lrb-strip {
@@ -76,10 +84,12 @@
   gap: 0;
   height: calc(var(--strip-h) + 29px);
   padding: 3px 3px 22px;
-  overflow-x: auto;
+  overflow-x: hidden;
   overflow-y: hidden;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  overflow-anchor: none;
 }
 
 .lrb-strip::-webkit-scrollbar {
@@ -182,6 +192,8 @@
   object-fit: cover;
   filter: saturate(var(--rank-sat, 0.48));
   transform: translateZ(0);
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 .lrb-shot.is-focus img {
@@ -214,6 +226,30 @@
 
   .lrb-shot img {
     transition: filter 0.54s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .lrb-shot:not(.is-focus):hover {
+    transform: scale(calc(var(--rank-scale, 0.78) * 1.08));
+    box-shadow:
+      0 0 0 3px #fff,
+      0 12px 24px color-mix(in srgb, var(--ink-block) 34%, transparent);
+  }
+
+  .lrb-shot:not(.is-focus):hover img {
+    filter: saturate(0.86);
+  }
+
+  .lrb-strip.is-paging .lrb-shot:not(.is-focus):hover,
+  .lrb-strip-wrap.is-dragging .lrb-shot:not(.is-focus):hover {
+    transform: scale(var(--rank-scale, 0.78));
+    box-shadow:
+      0 0 0 3px #fff,
+      0 6px 14px color-mix(in srgb, var(--ink-block) 22%, transparent);
+  }
+
+  .lrb-strip.is-paging .lrb-shot:not(.is-focus):hover img,
+  .lrb-strip-wrap.is-dragging .lrb-shot:not(.is-focus):hover img {
+    filter: saturate(var(--rank-sat, 0.48));
   }
 
   .lrb-shot:active {
@@ -470,6 +506,17 @@ html[data-lightbox="open"] .drawer {
 
   .lrb-shot:active {
     transform: scale(var(--rank-scale, 1));
+  }
+
+  .lrb-shot:not(.is-focus):hover {
+    transform: scale(var(--rank-scale, 0.78));
+    box-shadow:
+      0 0 0 3px #fff,
+      0 6px 14px color-mix(in srgb, var(--ink-block) 22%, transparent);
+  }
+
+  .lrb-shot:not(.is-focus):hover img {
+    filter: saturate(var(--rank-sat, 0.48));
   }
 
   .lrb-strip-step:active,

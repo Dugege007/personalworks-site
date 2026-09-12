@@ -14,8 +14,8 @@
 
 .resume-portrait {
   position: relative;
-  aspect-ratio: 4 / 5;
-  max-height: 46vh;
+  flex: 1 1 auto;
+  min-height: 22rem;
   overflow: hidden;
   background: var(--portrait-base, var(--surface));
 }
@@ -25,6 +25,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: var(--portrait-focus);
   display: block;
 }
 
@@ -38,9 +39,9 @@
 
 .resume-id {
   display: grid;
+  flex: 0 0 auto;
   gap: 8px;
   padding: 28px 32px 40px;
-  margin-top: auto;
 }
 
 .resume-deco {
@@ -321,12 +322,18 @@
     height: calc(100dvh - var(--header-h));
     overflow: hidden;
   }
+
+  .resume-portrait {
+    min-height: 0;
+  }
 }
 
 @media (max-width: 860px) {
   .resume-portrait {
-    max-height: 38vh;
-    aspect-ratio: 5 / 4;
+    flex: 0 0 auto;
+    aspect-ratio: 3 / 4;
+    max-height: 58vh;
+    min-height: 18rem;
   }
 
   .resume-id,
@@ -345,6 +352,28 @@
   }
 }
 
+@media (max-width: 860px) and (orientation: landscape) {
+  .resume-aside {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .resume-portrait {
+    flex: 0 0 auto;
+    width: min(42vw, 280px);
+    max-height: none;
+    min-height: calc(100dvh - var(--header-h) - 24px);
+    aspect-ratio: 3 / 4;
+  }
+
+  .resume-id {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 24px 28px;
+    align-content: end;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .resume-job,
   .resume-schools li {
@@ -357,6 +386,12 @@
   .resume-aside {
     position: static;
     height: auto;
+  }
+
+  .resume-portrait {
+    flex: none;
+    aspect-ratio: 3 / 4;
+    max-height: 70vh;
   }
 
   .resume-portrait img {

@@ -226,7 +226,12 @@
 
 .develop-slice img {
   opacity: 0;
+  object-position: center center;
   transition: opacity 0.55s ease;
+}
+
+.develop-slice[data-slice="profile-resume"] img {
+  object-position: var(--portrait-focus);
 }
 
 .develop-slice img.is-on {
@@ -486,6 +491,9 @@
   .develop-slices {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "resume work"
+      "skills notes";
     min-height: 0;
   }
 
@@ -498,6 +506,33 @@
     min-height: 42vw;
     border-right: 0;
     border-bottom: 1px solid rgb(238 240 242 / 0.12);
+  }
+
+  .develop-slice[data-slice="profile-resume"] {
+    grid-area: resume;
+  }
+
+  .develop-slice[data-slice="work-index"] {
+    grid-area: work;
+  }
+
+  .develop-slice[data-slice="profile-skills"] {
+    grid-area: skills;
+  }
+
+  .develop-slice[data-slice="notes"] {
+    grid-area: notes;
+  }
+
+  .develop-slice[data-slice="profile-resume"],
+  .develop-slice[data-slice="work-index"] {
+    aspect-ratio: 3 / 4;
+    min-height: 0;
+  }
+
+  .develop-slice[data-slice="profile-resume"],
+  .develop-slice[data-slice="profile-skills"] {
+    border-right: 1px solid rgb(238 240 242 / 0.12);
   }
 
   .develop-frames {
@@ -515,6 +550,14 @@
 
   .develop-close {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 860px) and (orientation: landscape) {
+  .develop-slice[data-slice="profile-resume"],
+  .develop-slice[data-slice="work-index"] {
+    aspect-ratio: auto;
+    min-height: 48vh;
   }
 }
 

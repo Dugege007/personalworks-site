@@ -18,8 +18,21 @@ export function resumePageLenis() {
   pageLenis?.start();
 }
 
+/**
+ * 换页时回到文档顶部。不记忆上一页滚动位置。
+ */
+export function scrollPageToTop() {
+  if (pageLenis) {
+    pageLenis.scrollTo(0, { immediate: true, force: true });
+  }
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+}
+
 export function useLenis() {
   useEffect(() => {
+    history.scrollRestoration = "manual";
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduced) {
       return;

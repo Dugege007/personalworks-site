@@ -149,6 +149,7 @@ function WaypointSlices() {
 }
 
 type SliceCardProps = {
+  id: string;
   label: string;
   deco: string;
   to: string;
@@ -162,7 +163,7 @@ const SLICE_HOVER_MS = 2000;
 /**
  * 切片图卡：空闲 5–10 秒换一张，悬停改为 2 秒；各卡自计时，最近五张不重复。
  */
-function SliceCard({ label, deco, to, srcs }: SliceCardProps) {
+function SliceCard({ id, label, deco, to, srcs }: SliceCardProps) {
   const [failed, setFailed] = useState<Record<string, true>>({});
   const [current, setCurrent] = useState(srcs[0] ?? "");
   const recentRef = useRef<string[]>([]);
@@ -227,6 +228,7 @@ function SliceCard({ label, deco, to, srcs }: SliceCardProps) {
     <Link
       className="develop-slice"
       to={to}
+      data-slice={id}
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
     >

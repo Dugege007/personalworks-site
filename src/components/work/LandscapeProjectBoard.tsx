@@ -33,18 +33,12 @@ const SCALE_SPAN = 3;
 const SAT_SPAN = 3;
 const PAGE_MS = 540;
 const PAGE_MS_RAPID = 180;
-const SETTLE_GAP = 8;
 const WHEEL_NOTCH = 100;
-const POINTER_MOVE_PX = 4;
+const POINTER_MOVE_PX = 8;
+const DRAG_STEP_PX = 72;
 
 function rankT(distance: number, span: number) {
   return Math.min(distance / span, 1);
-}
-
-function pointerMoved(from: { x: number; y: number }, to: { x: number; y: number }) {
-  const dx = to.x - from.x;
-  const dy = to.y - from.y;
-  return dx * dx + dy * dy > POINTER_MOVE_PX * POINTER_MOVE_PX;
 }
 
 function isMousePointer(event: PointerEvent | globalThis.PointerEvent) {
@@ -52,10 +46,10 @@ function isMousePointer(event: PointerEvent | globalThis.PointerEvent) {
 }
 
 /**
- * 景观效果图细目：按项目分块。图条是双侧叠层焦点条（2D overlapping focus strip）：
- * 悬停抢焦，距离越远越小、饱和度越低，重叠约半幅，焦点永远在最前。
- * 对照 React Bits Depth Carousel 的重叠、后退变暗与 transform 缩放，收成平铺双侧，不引入其库或 3D 扇叠。
- * 循环是三份首尾相接：从尾张再往后是下一段的首张，动画结束后无缝回到中间份。
+ * 景观效果图细目：按项目分块。图条是居中焦点条：
+ * 焦点永远在图条水平中线；点两侧图滑到中间成焦；点焦点图开灯箱；
+ * 滚轮与左右拖拽按张换焦；悬停两侧只强调、不抢焦。
+ * 循环仍是三份首尾相接，动画结束后无缝回到中间份。
  */
 export function LandscapeProjectBoard({ works }: LandscapeProjectBoardProps) {
   const [open, setOpen] = useState<OpenShot | null>(null);
@@ -139,18 +133,6 @@ function logicalIndex(slot: number, count: number) {
   return ((slot % count) + count) % count;
 }
 
-function stripOrigin(strip: HTMLElement) {
-  const box = strip.getBoundingClientRect();
-  const style = getComputedStyle(strip);
-  return box.left + Number.parseFloat(style.paddingLeft || "0");
-}
-
-function stripEnd(strip: HTMLElement) {
-  const box = strip.getBoundingClientRect();
-  const style = getComputedStyle(strip);
-  return box.right - Number.parseFloat(style.paddingRight || "0");
-}
-
 function wheelDelta(event: WheelEvent) {
   const raw = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
   if (event.deltaMode === 1) {
@@ -171,21 +153,22 @@ function ProjectModule({ work, syncIndex, onOpen }: ProjectModuleProps) {
   const stripRef = useRef<HTMLDivElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const focusRef = useRef<HTMLButtonElement>(null);
-  const pinXRef = useRef<number | null>(null);
-  const navDurationRef = useRef(PAGE_MS);
+  const navDurationRef = useRef(0);
   const lastNavAtRef = useRef(0);
   const scrollAnimRef = useRef(0);
   const animGenRef = useRef(0);
   const wheelCarryRef = useRef(0);
   const mouseOnStripRef = useRef(false);
-  const homeAlignRef = useRef(true);
   const focusIndexRef = useRef(focusIndex);
-  const recenterTimerRef = useRef(0);
-  const easeLockUntilRef = useRef(0);
   const navTargetRef = useRef<number | null>(null);
-  const originPinXRef = useRef<number | null>(null);
-  const pointerPosRef = useRef({ x: 0, y: 0 });
-  const lockPointerPosRef = useRef({ x: 0, y: 0 });
+  const suppressClickRef = useRef(false);
+  const dragRef = useRef({
+    pointerId: -1,
+    startX: 0,
+    lastX: 0,
+    acc: 0,
+    moved: false,
+  });
   focusIndexRef.current = focusIndex;
   const loopedShots = useMemo(() => {
     if (!looping) {
@@ -246,19 +229,6 @@ function ProjectModule({ work, syncIndex, onOpen }: ProjectModuleProps) {
     scrollAnimRef.current = window.requestAnimationFrame(tick);
   }, []);
 
-  const alignHome = useCallback(() => {
-    if (!homeAlignRef.current) {
-      return;
-    }
-    const strip = stripRef.current;
-    const nodes = strip ? [...strip.querySelectorAll<HTMLElement>(".lrb-shot")] : [];
-    const home = looping ? nodes[count] : nodes[0];
-    if (!strip || !home) {
-      return;
-    }
-    strip.scrollLeft += home.getBoundingClientRect().left - stripOrigin(strip);
-  }, [count, looping]);
-
   const applyOverlap = useCallback(() => {
     const strip = stripRef.current;
     if (!strip) {
@@ -268,92 +238,67 @@ function ProjectModule({ work, syncIndex, onOpen }: ProjectModuleProps) {
     buttons.forEach((btn, index) => {
       btn.style.marginLeft = index === 0 ? "0px" : `${-btn.offsetWidth * 0.5}px`;
     });
-    alignHome();
-  }, [alignHome]);
+  }, []);
+
+  const centerFocus = useCallback(
+    (duration: number, onDone?: () => void) => {
+      const strip = stripRef.current;
+      const focus = focusRef.current;
+      if (!strip || !focus) {
+        onDone?.();
+        return;
+      }
+      const stripBox = strip.getBoundingClientRect();
+      const focusBox = focus.getBoundingClientRect();
+      const stripMid = stripBox.left + strip.clientWidth / 2;
+      const focusMid = focusBox.left + focusBox.width / 2;
+      animateScrollTo(strip.scrollLeft + (focusMid - stripMid), duration, onDone);
+    },
+    [animateScrollTo],
+  );
 
   const releasePaging = useCallback(() => {
     stripRef.current?.classList.remove("is-paging");
     navTargetRef.current = null;
-    originPinXRef.current = null;
   }, []);
-
-  const stealFocusByHover = useCallback(
-    (slot: number) => {
-      if (slot < 0 || slot === focusIndexRef.current) {
-        return;
-      }
-      homeAlignRef.current = false;
-      pinXRef.current = null;
-      animGenRef.current += 1;
-      window.clearTimeout(recenterTimerRef.current);
-      releasePaging();
-      lockPointerPosRef.current = { ...pointerPosRef.current };
-      easeLockUntilRef.current = performance.now() + PAGE_MS;
-      setFocusIndex(slot);
-    },
-    [releasePaging],
-  );
-
-  const settleEnds = useCallback(() => {
-    const strip = stripRef.current;
-    const focus = focusRef.current;
-    if (!strip || !focus) {
-      return;
-    }
-    const origin = stripOrigin(strip);
-    const end = stripEnd(strip);
-    const focusBox = focus.getBoundingClientRect();
-    const logical = logicalIndex(focusIndexRef.current, count);
-    if (logical === 0 && focusBox.left > origin + SETTLE_GAP) {
-      animateScrollTo(strip.scrollLeft + (focusBox.left - origin), PAGE_MS);
-      return;
-    }
-    if (count > 1 && logical === count - 1 && focusBox.right < end - SETTLE_GAP) {
-      animateScrollTo(strip.scrollLeft + (focusBox.right - end), PAGE_MS);
-    }
-  }, [animateScrollTo, count]);
 
   const recenterLoop = useCallback(() => {
     if (!looping) {
       releasePaging();
+      centerFocus(0);
       return;
     }
     const slot = focusIndexRef.current;
     if (slot >= count && slot < count * 2) {
       releasePaging();
+      centerFocus(0);
       return;
     }
     navTargetRef.current = null;
-    originPinXRef.current = null;
     const dest = count + logicalIndex(slot, count);
-    const strip = stripRef.current;
-    const nodes = strip ? [...strip.querySelectorAll<HTMLElement>(".lrb-shot")] : [];
-    const from = nodes[slot];
-    pinXRef.current = from?.getBoundingClientRect().left ?? null;
     navDurationRef.current = 0;
     setFocusIndex(dest);
-  }, [count, looping, releasePaging]);
+  }, [centerFocus, count, looping, releasePaging]);
 
-  const pinFocus = useCallback(() => {
-    const pinX = pinXRef.current;
-    const strip = stripRef.current;
-    if (pinX == null || !strip) {
-      return;
-    }
-    const nodes = [...strip.querySelectorAll<HTMLElement>(".lrb-shot")];
-    const focus = nodes[focusIndex] ?? focusRef.current;
-    if (!focus) {
-      pinXRef.current = null;
-      return;
-    }
-    const duration = navDurationRef.current;
-    pinXRef.current = null;
-    animateScrollTo(
-      strip.scrollLeft + (focus.getBoundingClientRect().left - pinX),
-      duration,
-      recenterLoop,
-    );
-  }, [animateScrollTo, focusIndex, recenterLoop]);
+  const goToSlot = useCallback(
+    (slot: number, duration?: number) => {
+      if (count < 1) {
+        return;
+      }
+      const maxSlot = looping ? count * 3 - 1 : count - 1;
+      const nextIndex = Math.max(0, Math.min(maxSlot, slot));
+      if (nextIndex === focusIndexRef.current && navTargetRef.current == null) {
+        return;
+      }
+      const now = performance.now();
+      navDurationRef.current = duration ?? PAGE_MS;
+      lastNavAtRef.current = now;
+      navTargetRef.current = nextIndex;
+      stripRef.current?.classList.add("is-paging");
+      setFocusIndex(nextIndex);
+    },
+    [count, looping],
+  );
 
   const navigate = useCallback(
     (delta: number) => {
@@ -362,34 +307,11 @@ function ProjectModule({ work, syncIndex, onOpen }: ProjectModuleProps) {
       }
       const now = performance.now();
       const inFlight = navTargetRef.current != null;
-      navDurationRef.current =
-        !inFlight && now - lastNavAtRef.current < 280 ? PAGE_MS_RAPID : PAGE_MS;
-      lastNavAtRef.current = now;
-      easeLockUntilRef.current = now + navDurationRef.current;
-      lockPointerPosRef.current = { ...pointerPosRef.current };
-      homeAlignRef.current = false;
-      const strip = stripRef.current;
-      const nodes = strip ? [...strip.querySelectorAll<HTMLElement>(".lrb-shot")] : [];
-      const maxSlot = count * 3 - 1;
-      if (!inFlight) {
-        navTargetRef.current = focusIndexRef.current;
-        originPinXRef.current = nodes[focusIndexRef.current]?.getBoundingClientRect().left ?? null;
-      }
+      const duration = inFlight || now - lastNavAtRef.current < 280 ? PAGE_MS_RAPID : PAGE_MS;
       const fromSlot = navTargetRef.current ?? focusIndexRef.current;
-      const nextIndex = Math.max(0, Math.min(maxSlot, fromSlot + delta));
-      navTargetRef.current = nextIndex;
-      strip?.classList.add("is-paging");
-      pinXRef.current = originPinXRef.current;
-      setFocusIndex(nextIndex);
-      const duration = navDurationRef.current;
-      window.clearTimeout(recenterTimerRef.current);
-      recenterTimerRef.current = window.setTimeout(() => {
-        if (focusIndexRef.current === nextIndex) {
-          recenterLoop();
-        }
-      }, duration + 48);
+      goToSlot(fromSlot + delta, duration);
     },
-    [count, recenterLoop],
+    [count, goToSlot],
   );
 
   const holdPrev = useHoldStep(() => navigate(-1));
@@ -399,8 +321,10 @@ function ProjectModule({ work, syncIndex, onOpen }: ProjectModuleProps) {
     if (syncIndex == null) {
       return;
     }
-    pinXRef.current = null;
-    setFocusIndex(looping ? count + logicalIndex(syncIndex, count) : syncIndex);
+    const dest = looping ? count + logicalIndex(syncIndex, count) : syncIndex;
+    navDurationRef.current = PAGE_MS;
+    stripRef.current?.classList.add("is-paging");
+    setFocusIndex(dest);
   }, [count, looping, syncIndex]);
 
   useLayoutEffect(() => {
@@ -416,12 +340,8 @@ function ProjectModule({ work, syncIndex, onOpen }: ProjectModuleProps) {
   }, [looping]);
 
   useLayoutEffect(() => {
-    alignHome();
-  }, [alignHome, endPad]);
-
-  useLayoutEffect(() => {
-    pinFocus();
-  }, [focusIndex, pinFocus]);
+    centerFocus(navDurationRef.current, recenterLoop);
+  }, [centerFocus, endPad, focusIndex, recenterLoop]);
 
   useLayoutEffect(() => {
     const strip = stripRef.current;
@@ -430,19 +350,26 @@ function ProjectModule({ work, syncIndex, onOpen }: ProjectModuleProps) {
     }
 
     const images = [...strip.querySelectorAll("img")];
-    const observer = new ResizeObserver(applyOverlap);
+    const onResize = () => {
+      applyOverlap();
+      if (!strip.classList.contains("is-paging")) {
+        navDurationRef.current = 0;
+        centerFocus(0);
+      }
+    };
+    const observer = new ResizeObserver(onResize);
     observer.observe(strip);
     images.forEach((img) => {
       if (!img.complete) {
-        img.addEventListener("load", applyOverlap);
+        img.addEventListener("load", onResize);
       }
     });
-    applyOverlap();
+    onResize();
     return () => {
       observer.disconnect();
-      images.forEach((img) => img.removeEventListener("load", applyOverlap));
+      images.forEach((img) => img.removeEventListener("load", onResize));
     };
-  }, [applyOverlap, loopedShots.length]);
+  }, [applyOverlap, centerFocus, loopedShots.length]);
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -474,22 +401,9 @@ function ProjectModule({ work, syncIndex, onOpen }: ProjectModuleProps) {
       }
     };
 
-    const onPointerLeave = (event: globalThis.PointerEvent) => {
-      if (event.pointerType && event.pointerType !== "mouse") {
-        return;
-      }
-      mouseOnStripRef.current = false;
-      wheelCarryRef.current = 0;
-      resumePageLenis();
-      settleEnds();
-    };
-
     wrap.addEventListener("wheel", onWheel, { passive: false });
-    wrap.addEventListener("pointerleave", onPointerLeave);
     return () => {
       wrap.removeEventListener("wheel", onWheel);
-      wrap.removeEventListener("pointerleave", onPointerLeave);
-      window.clearTimeout(recenterTimerRef.current);
       window.cancelAnimationFrame(scrollAnimRef.current);
       animGenRef.current += 1;
       if (mouseOnStripRef.current) {
@@ -497,38 +411,14 @@ function ProjectModule({ work, syncIndex, onOpen }: ProjectModuleProps) {
         resumePageLenis();
       }
     };
-  }, [count, navigate, settleEnds]);
-
-  const hoverEaseLocked = () =>
-    performance.now() < easeLockUntilRef.current ||
-    Boolean(stripRef.current?.classList.contains("is-paging"));
+  }, [count, navigate]);
 
   const onStripPointerEnter = (event: PointerEvent<HTMLDivElement>) => {
     if (!isMousePointer(event)) {
       return;
     }
     mouseOnStripRef.current = true;
-    pointerPosRef.current = { x: event.clientX, y: event.clientY };
     pausePageLenis();
-  };
-
-  const onStripPointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    if (!isMousePointer(event)) {
-      return;
-    }
-    pointerPosRef.current = { x: event.clientX, y: event.clientY };
-    if (!hoverEaseLocked() || !pointerMoved(lockPointerPosRef.current, pointerPosRef.current)) {
-      return;
-    }
-    const strip = stripRef.current;
-    if (!strip) {
-      return;
-    }
-    const hit = document.elementFromPoint(event.clientX, event.clientY)?.closest(".lrb-shot");
-    if (!(hit instanceof HTMLElement) || !strip.contains(hit)) {
-      return;
-    }
-    stealFocusByHover([...strip.querySelectorAll(".lrb-shot")].indexOf(hit));
   };
 
   const onStripPointerLeave = (event: PointerEvent<HTMLDivElement>) => {
@@ -537,6 +427,103 @@ function ProjectModule({ work, syncIndex, onOpen }: ProjectModuleProps) {
     }
     mouseOnStripRef.current = false;
     resumePageLenis();
+  };
+
+  const onStripPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0 || count < 2) {
+      return;
+    }
+    const target = event.target;
+    if (
+      target instanceof Element &&
+      target.closest(".lrb-strip-step, .lrb-strip-rail")
+    ) {
+      return;
+    }
+    suppressClickRef.current = false;
+    dragRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      lastX: event.clientX,
+      acc: 0,
+      moved: false,
+    };
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const onStripPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    const drag = dragRef.current;
+    if (drag.pointerId !== event.pointerId) {
+      return;
+    }
+    const dx = event.clientX - drag.lastX;
+    drag.lastX = event.clientX;
+    if (!drag.moved && Math.abs(event.clientX - drag.startX) > POINTER_MOVE_PX) {
+      drag.moved = true;
+      wrapRef.current?.classList.add("is-dragging");
+    }
+    if (!drag.moved) {
+      return;
+    }
+    event.preventDefault();
+    drag.acc += dx;
+    let steps = 0;
+    while (drag.acc <= -DRAG_STEP_PX) {
+      drag.acc += DRAG_STEP_PX;
+      steps += 1;
+    }
+    while (drag.acc >= DRAG_STEP_PX) {
+      drag.acc -= DRAG_STEP_PX;
+      steps -= 1;
+    }
+    if (steps !== 0) {
+      suppressClickRef.current = true;
+      const fromSlot = navTargetRef.current ?? focusIndexRef.current;
+      goToSlot(fromSlot + steps, PAGE_MS_RAPID);
+    }
+  };
+
+  const activateShot = (slot: number, logical: number) => {
+    if (slot === focusIndexRef.current) {
+      onOpen(logical);
+      return;
+    }
+    goToSlot(slot);
+  };
+
+  const endDrag = (event: PointerEvent<HTMLDivElement>) => {
+    if (dragRef.current.pointerId !== event.pointerId) {
+      return;
+    }
+    const didPage = suppressClickRef.current;
+    dragRef.current.pointerId = -1;
+    wrapRef.current?.classList.remove("is-dragging");
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    if (didPage) {
+      return;
+    }
+    const hit = document.elementFromPoint(event.clientX, event.clientY);
+    const btn = hit instanceof Element ? hit.closest<HTMLElement>(".lrb-shot") : null;
+    if (!btn || !event.currentTarget.contains(btn)) {
+      return;
+    }
+    const slot = Number(btn.dataset.slot);
+    const logical = Number(btn.dataset.logical);
+    if (!Number.isFinite(slot) || !Number.isFinite(logical)) {
+      return;
+    }
+    suppressClickRef.current = true;
+    activateShot(slot, logical);
+  };
+
+  const onShotClick = (slot: number, logical: number) => {
+    if (suppressClickRef.current) {
+      suppressClickRef.current = false;
+      return;
+    }
+    activateShot(slot, logical);
   };
 
   const logicalFocus = logicalIndex(focusIndex, count);
@@ -562,8 +549,11 @@ function ProjectModule({ work, syncIndex, onOpen }: ProjectModuleProps) {
           ref={wrapRef}
           data-lenis-prevent
           onPointerEnter={onStripPointerEnter}
-          onPointerMove={onStripPointerMove}
           onPointerLeave={onStripPointerLeave}
+          onPointerDown={onStripPointerDown}
+          onPointerMove={onStripPointerMove}
+          onPointerUp={endDrag}
+          onPointerCancel={endDrag}
         >
           <div className="lrb-strip" ref={stripRef}>
             <div className="lrb-strip-pad" style={{ width: endPad }} aria-hidden="true" />
@@ -578,32 +568,18 @@ function ProjectModule({ work, syncIndex, onOpen }: ProjectModuleProps) {
                   ref={focused ? focusRef : undefined}
                   className={focused ? "lrb-shot is-focus" : "lrb-shot"}
                   type="button"
+                  data-slot={slot}
+                  data-logical={logical}
                   aria-current={focused ? "true" : undefined}
-                  aria-label={`查看${work.title} ${shot.label}`}
+                  aria-label={focused ? `放大${work.title} ${shot.label}` : `聚焦${work.title} ${shot.label}`}
                   style={{
                     ["--rank-scale" as string]: String(1 - scaleT * (1 - SCALE_FLOOR)),
                     ["--rank-sat" as string]: String(1 - satT * (1 - SAT_FLOOR)),
                     ["--rank-z" as string]: String(loopedShots.length - distance),
                   }}
-                  onPointerEnter={(event) => {
-                    if (!isMousePointer(event)) {
-                      return;
-                    }
-                    pointerPosRef.current = { x: event.clientX, y: event.clientY };
-                    if (slot === focusIndexRef.current) {
-                      return;
-                    }
-                    if (
-                      hoverEaseLocked() &&
-                      !pointerMoved(lockPointerPosRef.current, pointerPosRef.current)
-                    ) {
-                      return;
-                    }
-                    stealFocusByHover(slot);
-                  }}
-                  onClick={() => onOpen(logical)}
+                  onClick={() => onShotClick(slot, logical)}
                 >
-                  <img src={shot.src ? assetUrl(shot.src) : ""} alt="" />
+                  <img src={shot.src ? assetUrl(shot.src) : ""} alt="" draggable={false} />
                   {focused ? (
                     <span className="lrb-shot-cap">
                       {formatShotCaption(logical, count, shot.label)}

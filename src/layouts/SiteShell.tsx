@@ -1,6 +1,7 @@
+import { useLayoutEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { resolveShellTheme } from "../content/site";
-import { useLenis } from "../hooks/useLenis";
+import { scrollPageToTop, useLenis } from "../hooks/useLenis";
 import { SiteHeader } from "./SiteHeader";
 import "../styles/layout.css";
 import "../styles/stage.css";
@@ -9,6 +10,10 @@ export function SiteShell() {
   useLenis();
   const location = useLocation();
   const theme = resolveShellTheme(location.pathname);
+
+  useLayoutEffect(() => {
+    scrollPageToTop();
+  }, [location.pathname]);
 
   return (
     <div className="shell" data-theme={theme}>
