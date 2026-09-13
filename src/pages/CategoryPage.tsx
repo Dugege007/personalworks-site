@@ -92,7 +92,7 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
           </div>
         </section>
       ))}
-      <p className="note">详情为占位正文与框景；媒体地址走 VITE_ASSET_BASE，本轮不加载原片。</p>
+      <p className="note">媒体地址走 VITE_ASSET_BASE；只展示已列入内容池的对象键。</p>
     </div>
   );
 }

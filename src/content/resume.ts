@@ -37,8 +37,7 @@ export type ResumeRecord = {
   jobs: ResumeJob[];
   schools: ResumeSchool[];
   languages: LocalizedString[];
-  tools: string[];
-  notes?: LocalizedString[];
+  skills: string[];
   blogHref?: string;
   blogLabel?: LocalizedString;
 };
@@ -49,7 +48,6 @@ export type ResumeRecord = {
 export function parseResumeMd(source: string): ResumeRecord {
   const sections = splitByHeading(source, MD_SECTION);
   const extras = parseFields(sectionBody(sections, "补充"));
-  const notes = extras.fields["笔记"] ? [extras.fields["笔记"]] : undefined;
 
   return {
     summary: firstParagraph(sectionBody(sections, "简介")),
@@ -77,8 +75,7 @@ export function parseResumeMd(source: string): ResumeRecord {
       };
     }),
     languages: parseResumeList(sectionBody(sections, "语言")),
-    tools: parseTools(sectionBody(sections, "工具")),
-    notes,
+    skills: parseSkillNames(sectionBody(sections, "技能") || sectionBody(sections, "工具")),
     blogHref: emptyToUndef(extras.fields["博客"]),
     blogLabel: emptyToUndef(extras.fields["博客名"]),
   };
@@ -120,9 +117,9 @@ function parseResumeList(body: string): string[] {
 }
 
 /**
- * 工具名：顿号、逗号或换行均可。
+ * 技能短名：顿号、逗号或换行均可。
  */
-function parseTools(body: string): string[] {
+function parseSkillNames(body: string): string[] {
   return body
     .split(/[、,，\n]/)
     .map((item) => item.replace(/^[-*]\s+/, "").trim())

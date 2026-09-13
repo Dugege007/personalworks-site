@@ -1,7 +1,8 @@
 import { Link, useParams } from "react-router-dom";
 import { CoverTile } from "../components/work/CoverTile";
+import { ProjectGallery } from "../components/work/ProjectGallery";
 import { lexicon } from "../content/lexicon";
-import { categories } from "../content/site";
+import { categories, gameProjects, playableGames } from "../content/site";
 import { stockPlaceholderSrc } from "../content/stockMedia";
 import {
   isDevelopWorkKind,
@@ -39,6 +40,7 @@ export function WorkKindPage({ kind }: WorkKindViewProps) {
   const title = tx({ "zh-CN": category?.title ?? kind, en: kindEn(kind) }, locale);
   const lead = category?.lead ?? "";
   const photoKind = kind === lexicon.photography.key;
+  const gameKind = kind === lexicon.gameDev.key;
   const doorCount = doors.length;
 
   return (
@@ -54,28 +56,55 @@ export function WorkKindPage({ kind }: WorkKindViewProps) {
             {lexicon.photoCatalog.zh}
           </Link>
         ) : null}
-      </div>
-      <div className="develop-kind-doors" data-count={doorCount}>
-        {doors.map((door) => (
-          <CoverTile
-            key={door.channel}
-            className="develop-kind-door"
-            wellClass={`develop-work-well is-channel-${door.channel}`}
-            to={door.comingSoon ? undefined : door.href}
-            src={door.coverSrc}
-            fallbackSrc={
-              door.channel === lexicon.gameMenu.key
-                ? stockPlaceholderSrc(lexicon.gameDev.key, 1)
-                : stockPlaceholderSrc(door.channel, 1)
-            }
-            disabled={door.comingSoon}
+        {gameKind && playableGames.length > 0 ? (
+          <Link
+            className="develop-work-textlink"
+            to={`${workIndexRoot()}/${lexicon.gameDev.key}/${lexicon.gameMenu.key}`}
           >
-            <strong>{door.zh}</strong>
-            <em>{door.deco}</em>
-            {door.comingSoon ? <span>待收录</span> : null}
-          </CoverTile>
-        ))}
+            {lexicon.gameMenu.zh}
+          </Link>
+        ) : null}
       </div>
+      {gameKind ? (
+        <div className="develop-game-projects">
+          {playableGames.length === 0 ? (
+            <p className="develop-channel-empty">当前没有已登记 WebGL 发布包，项目不会进入游玩路径。</p>
+          ) : null}
+          <ProjectGallery
+            variant="game"
+            projects={gameProjects.map((game) => ({
+              id: game.id,
+              title: game.title,
+              date: game.capturedOn,
+              place: game.place,
+              summary: game.lead,
+              images: game.screenshots,
+            }))}
+          />
+        </div>
+      ) : (
+        <div className="develop-kind-doors" data-count={doorCount}>
+          {doors.map((door) => (
+            <CoverTile
+              key={door.channel}
+              className="develop-kind-door"
+              wellClass={`develop-work-well is-channel-${door.channel}`}
+              to={door.comingSoon ? undefined : door.href}
+              src={door.coverSrc}
+              fallbackSrc={
+                door.channel === lexicon.gameMenu.key
+                  ? stockPlaceholderSrc(lexicon.gameDev.key, 1)
+                  : stockPlaceholderSrc(door.channel, 1)
+              }
+              disabled={door.comingSoon}
+            >
+              <strong>{door.zh}</strong>
+              <em>{door.deco}</em>
+              {door.comingSoon ? <span>待收录</span> : null}
+            </CoverTile>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

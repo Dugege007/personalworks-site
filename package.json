@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "test": "node --test --experimental-strip-types tests/*.test.*",
     "preview": "vite preview",
     "deploy": "node scripts/deploy.mjs",
     "shot:cover": "node scripts/shot-cover.mjs"

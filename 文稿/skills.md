@@ -163,6 +163,14 @@ id：python
 描述：通用脚本语言，用于仿真数据处理与小工具。
 英文描述：General-purpose scripting for sim data and small tools.
 
+### three.js
+
+id：threejs
+图标：threejs.svg
+官网：https://threejs.org
+描述：浏览器三维库，用于数字孪生场景与 Web 交互。
+英文描述：Browser 3D library for digital-twin scenes and web interaction.
+
 ### SimPy
 
 id：simpy
@@ -316,6 +324,7 @@ id：skill-digital-twin
 - C# 80
 - Blender 80
 - Substance 3D Painter 60
+- three.js 40
 
 ### 产线仿真
 

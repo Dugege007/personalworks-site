@@ -1,7 +1,15 @@
 import { Link, useLocation } from "react-router-dom";
+import { LandscapeProjectBoard } from "../components/work/LandscapeProjectBoard";
+import { ProjectGallery } from "../components/work/ProjectGallery";
 import { lexicon } from "../content/lexicon";
 import { findCategoryByPath, findCollectionByChannel, findCollectionByPath } from "../content/site";
-import { findPublishedWork, findPublishedWorksById, formatStartedOn, type WorkRecord } from "../content/works";
+import {
+  findPublishedWork,
+  findPublishedWorksById,
+  formatStartedOn,
+  listWorkImages,
+  type WorkRecord,
+} from "../content/works";
 import { channelTitleZh } from "../ia/href";
 import { iaOfSkin } from "../ia";
 import { kindOfChannel } from "../ia/query";
@@ -20,6 +28,9 @@ type MetaItem = {
  */
 function buildMetaItems(work: WorkRecord): MetaItem[] {
   const items: MetaItem[] = [{ label: "年份", value: work.year }];
+  if (work.capturedOn) {
+    items.push({ label: "拍摄", value: formatStartedOn(work.capturedOn) });
+  }
   if (work.startedOn) {
     items.push({ label: "开始", value: formatStartedOn(work.startedOn) });
   }
@@ -135,6 +146,22 @@ export function WorkDetailPage() {
   }
 
   const metaItems = buildMetaItems(work);
+  const photoChannel =
+    work.channel === lexicon.landscapePhoto.key ||
+    work.channel === lexicon.humanistPhoto.key ||
+    work.channel === lexicon.portraitPhoto.key;
+  const galleryVariant =
+    work.channel === lexicon.digitalTwin.key ? "twin" : photoChannel ? "photo" : undefined;
+  const galleryProject = {
+    id: work.id,
+    title: work.title,
+    date: work.capturedOn ?? work.startedOn ?? work.year,
+    place: work.place,
+    summary: work.summary,
+    images: listWorkImages(work).flatMap((image) =>
+      image.src ? [{ src: image.src, label: image.label }] : [],
+    ),
+  };
 
   return (
     <div className="page" data-theme={theme}>
@@ -166,6 +193,11 @@ export function WorkDetailPage() {
         ))}
       </dl>
       <p className="archive-body">{work.body}</p>
+      {work.channel === lexicon.landscapeRendering.key ? (
+        <LandscapeProjectBoard works={[work]} />
+      ) : galleryVariant ? (
+        <ProjectGallery projects={[galleryProject]} variant={galleryVariant} />
+      ) : (
       <div className="media-grid">
         {work.media.map((item) => {
           const href = item.src ? assetUrl(item.src) : "";
@@ -188,6 +220,7 @@ export function WorkDetailPage() {
           );
         })}
       </div>
+      )}
       {work.channel === lexicon.landscapeCDs.key ? (
         <p className="archive-disclaimer">仅供作品展示，不作为施工依据。</p>
       ) : null}

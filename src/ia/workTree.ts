@@ -1,5 +1,5 @@
 import { lexicon } from "../content/lexicon";
-import { categories, placeholderGames } from "../content/site";
+import { categories, gameProjects, playableGames } from "../content/site";
 import { stockPlaceholderSrc } from "../content/stockMedia";
 import { listPublishedWorks, type WorkRecord } from "../content/works";
 import { channelsOfKind, kindOfChannel, kindTitle, queryWorks } from "./query";
@@ -157,7 +157,7 @@ export function listDevelopKindDoors(): DevelopKindDoor[] {
 }
 
 /**
- * 某门下的细目入口。游戏开发只有选单一扇门。
+ * 某门下的细目入口。游戏项目在门类页浏览，选单只统计可玩项目。
  */
 export function listDevelopChannelDoors(kind: string): DevelopChannelDoor[] {
   if (kind === lexicon.gameDev.key) {
@@ -169,8 +169,8 @@ export function listDevelopChannelDoors(kind: string): DevelopChannelDoor[] {
         deco: lexicon.gameMenu.deco,
         lead: "先选单，再加载。不登录、不付费。",
         href: hrefForDevelopChannel(kind, lexicon.gameMenu.key),
-        coverSrc: placeholderGames[0]?.coverSrc ?? "game-dev/stock/01.webp",
-        count: placeholderGames.length,
+        coverSrc: playableGames[0]?.coverSrc ?? gameProjects[0]?.coverSrc ?? "game-dev/stock/01.webp",
+        count: playableGames.length,
       },
     ];
   }
@@ -213,7 +213,7 @@ export function isChannelOfKind(kind: string, channel: string | undefined): bool
 
 function coverOfKind(kind: string): string | undefined {
   if (kind === lexicon.gameDev.key) {
-    return placeholderGames[0]?.coverSrc ?? stockPlaceholderSrc(lexicon.gameDev.key, 1);
+    return gameProjects[0]?.coverSrc ?? stockPlaceholderSrc(lexicon.gameDev.key, 1);
   }
   const featured = queryWorks({ source: "works", kind, featured: true, limit: 1 });
   const rest = queryWorks({ source: "works", kind, limit: 8 });

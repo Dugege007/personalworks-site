@@ -253,6 +253,10 @@
   border-top: 1px solid var(--line);
 }
 
+.develop-game-projects {
+  padding: 0 var(--page-inset) 72px;
+}
+
 .develop-kind-door {
   position: relative;
   flex: 1.05 1 0;
@@ -288,7 +292,8 @@
 
 .develop-channel-grid,
 .develop-channel-empty,
-.develop-channel .lrb {
+.develop-channel .lrb,
+.develop-project-gallery {
   padding-inline: var(--page-inset);
 }
 

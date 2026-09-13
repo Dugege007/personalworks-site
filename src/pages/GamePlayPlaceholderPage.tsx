@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { lexicon } from "../content/lexicon";
-import { archiveSubIndex, placeholderGames } from "../content/site";
+import { archiveSubIndex, playableGames } from "../content/site";
 import { iaOfSkin } from "../ia";
 import { hrefForDevelopChannel } from "../ia/workTree";
 import { assetUrl } from "../lib/assets";
@@ -11,7 +11,7 @@ export function GamePlayPlaceholderPage() {
   const { id } = useParams();
   const { currentSkin } = usePrefs();
   const ia = iaOfSkin(currentSkin);
-  const game = placeholderGames.find((item) => item.id === id);
+  const game = playableGames.find((item) => item.id === id);
   const menuPath =
     ia.id === "develop-editorial"
       ? hrefForDevelopChannel(lexicon.gameDev.key, lexicon.gameMenu.key)
@@ -24,7 +24,7 @@ export function GamePlayPlaceholderPage() {
           ← 返回选单
         </Link>
         <h1>该游戏未开放</h1>
-        <p className="page-lead">编号 `{id}` 不在当前选单中。</p>
+        <p className="page-lead">编号 `{id}` 没有已登记的 WebGL 发布包。</p>
       </div>
     );
   }
@@ -44,13 +44,13 @@ export function GamePlayPlaceholderPage() {
         <div>
           <div className="accent-bar" />
           <p>WebGL 画布占位 · {game.titleEn}</p>
-          <p>操作：{game.input}</p>
-          <p>{game.sizeHint}</p>
-          <p>存档：{game.saveMode}</p>
+          {game.input ? <p>操作：{game.input}</p> : null}
+          {game.sizeHint ? <p>{game.sizeHint}</p> : null}
+          {game.saveMode ? <p>存档：{game.saveMode}</p> : null}
         </div>
       </div>
       <p className="note">
-        存档将写入浏览器 IndexedDB（Unity PlayerPrefs）。清除站点数据即丢失。本页第一批不加载真实构建。
+        游戏运行时仅在当前页面加载；返回选单后不继续保留多个运行实例。
       </p>
     </div>
   );

@@ -46,7 +46,7 @@ export const developIa: IaRecord = {
     blocks: [
       {
         type: "hero-bleed",
-        query: { source: "profile" },
+        query: { source: "works", channel: lexicon.landscapePhoto.key },
         identity: `${lexicon.digitalTwin.zh} · ${lexicon.landscapeArch.zh} · ${lexicon.photography.zh}`,
         heroSrc: profile.homeHeroSrc,
         heroYear: profile.homeHeroYear,

@@ -6,8 +6,8 @@
 
 ## 简介
 
-现在做数字孪生与产线仿真开发。
-此前做过四年做景观设计，施工图与效果图都画过。
+现在做数字孪生与产线仿真开发，负责多个项目。
+此前做过四年做景观设计，前期后期都做过，有丰富的深化设计经验。
 转行期间自学Unity开发。
 喜欢摄影、游戏，热爱探索。
 
@@ -68,21 +68,19 @@
 年份：2014.09-2018.06
 说明：
 
+## 技能
+
+C#、Unity、FlexSim、Python、three.js
+AutoCAD、SketchUp、Lumion
+Photoshop、Lightroom
+
 ## 语言
 
 - 中文（普通话/河南话）
 - 阅读英文技术文档
 - 英文日常交流
 
-## 工具
-
-C#、Unity、Git、Python
-AutoCAD、SketchUp、Lumion
-Photoshop、Lightroom
-Premiere
-
 ## 补充
 
-笔记：技术笔记写过背包、概率与路径预测，见 CSDN。
 博客名：CSDN 笔记
 博客：https://blog.csdn.net/Dugege007

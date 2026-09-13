@@ -25,23 +25,23 @@ export function workCoverSrc(
  */
 export const homeFrameSrcs: Record<string, string[]> = {
   "twin-sim": [
-    stockPlaceholderSrc("digital-twin", 1),
+    "digital-twin/akzonobel-shanghai-songjiang/01.webp",
     stockPlaceholderSrc("line-sim", 1),
-    stockPlaceholderSrc("digital-twin", 3),
+    "digital-twin/weichai-spark-plug/01.webp",
   ],
   "game-dev": [
-    stockPlaceholderSrc("game-dev", 1),
-    stockPlaceholderSrc("game-dev", 2),
-    stockPlaceholderSrc("game-dev", 3),
+    "game-dev/antigravity/01.webp",
+    "game-dev/3d-rpg/01.webp",
+    "game-dev/classic-games/01.webp",
   ],
   "landscape-arch": [
-    stockPlaceholderSrc("landscape-rendering", 1),
+    "landscape-rendering/harbin-jiangyufu/01.webp",
     stockPlaceholderSrc("landscape-cds", 1),
-    stockPlaceholderSrc("landscape-rendering", 3),
+    "landscape-rendering/maoming/01.webp",
   ],
   photo: [
-    stockPlaceholderSrc("landscape-photo", 1),
-    stockPlaceholderSrc("humanist-photo", 1),
+    "landscape-photo/zhoushan-miaozihu/01.webp",
+    "humanist-photo/chongqing-baiheliang/01.webp",
     stockPlaceholderSrc("portrait-photo", 1),
   ],
 };

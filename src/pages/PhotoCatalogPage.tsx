@@ -42,10 +42,10 @@ function toggleValue(params: URLSearchParams, key: FilterKey, value: string): UR
 }
 
 /**
- * 解析总览查询；缺省时间为从前到后。
+ * 解析总览查询；缺省时间为最新优先。
  */
 function parseQuery(params: URLSearchParams): PhotoCatalogQuery {
-  const sort = params.get("sort") === "desc" ? "desc" : "asc";
+  const sort = params.get("sort") === "asc" ? "asc" : "desc";
   return {
     channels: readList(params, "channel"),
     years: readList(params, "year"),
@@ -139,8 +139,8 @@ export function PhotoCatalogPage() {
    */
   function handleClear() {
     const next = new URLSearchParams();
-    if (query.sort === "desc") {
-      next.set("sort", "desc");
+    if (query.sort === "asc") {
+      next.set("sort", "asc");
     }
     setParams(next, { replace: true });
   }
@@ -154,7 +154,7 @@ export function PhotoCatalogPage() {
         {category?.index ?? archiveIndexByNavId(lexicon.photography.key)} / {lexicon.photoCatalog.deco}
       </div>
       <h1>{lexicon.photoCatalog.zh}</h1>
-      <p className="page-lead">按类型、年份、地点与标签筛选。未选某维即不限制。时间默认从前到后。</p>
+      <p className="page-lead">按类型、年份、地点与标签筛选。未选某维即不限制。时间默认最新优先。</p>
       <div className="filter-board">
         <FilterRow
           label="类型"

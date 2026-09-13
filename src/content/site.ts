@@ -1,4 +1,6 @@
 import { lexicon } from "./lexicon";
+import { initialGameProjects } from "./initialGameProjects";
+import { sortByEffectiveDateDescending } from "./workDates";
 
 export type NavItem = {
   id: string;
@@ -49,11 +51,16 @@ export type GameCard = {
   title: string;
   titleEn: string;
   lead: string;
-  accent: string;
-  sizeHint: string;
-  input: string;
-  saveMode: string;
-  coverSrc: string;
+  capturedOn?: string;
+  place?: string;
+  screenshots: Array<{ src: string; label: string }>;
+  playable: boolean;
+  buildPath?: string;
+  accent?: string;
+  sizeHint?: string;
+  input?: string;
+  saveMode?: string;
+  coverSrc?: string;
 };
 
 export type NoteCard = {
@@ -63,6 +70,8 @@ export type NoteCard = {
   summary: string;
   body: string;
   previewImages: string[];
+  /** 占位稿不进简历笔记栏；心得页仍可列出。 */
+  draft?: boolean;
 };
 
 export type AboutFeature = {
@@ -110,8 +119,8 @@ export const profile = {
     "profile/R0008304.webp",
   ],
   portraitYear: "2024",
-  homeHeroSrc: "landscape-photo/sample-1/01.webp",
-  homeHeroYear: "2015",
+  homeHeroSrc: "landscape-photo/zhoushan-miaozihu/01.webp",
+  homeHeroYear: "2026",
   contactChannels: [
     { id: "profileBase", value: "上海市 青浦区" },
     { id: "profileMail", value: "351080175@qq.com", copy: true },
@@ -199,7 +208,7 @@ export const categories: CategoryRecord[] = [
     lead: "把场地与产线收成可量测的层。先看结构，再看运行。",
     path: `/${lexicon.twinAndSim.key}`,
     theme: lexicon.twinAndSim.key,
-    homeFrames: ["数字孪生", "产线仿真", "测点归档"],
+    homeFrames: ["阿克苏诺贝尔漆油·上海松江", "数字孪生", "产线仿真"],
     collections: [
       {
         id: lexicon.digitalTwin.key,
@@ -209,7 +218,7 @@ export const categories: CategoryRecord[] = [
         lead: "把场地收成可量测的层。先看结构，再看运行。",
         theme: lexicon.digitalTwin.key,
         detailBase: `/${lexicon.twinAndSim.key}/${lexicon.digitalTwin.key}`,
-        frames: ["总图叠合", "运行剖切", "测点归档"],
+        frames: ["阿克苏诺贝尔漆油·上海松江", "潍柴火炬", "宁波四维尔"],
       },
       {
         id: lexicon.lineSimulation.key,
@@ -228,10 +237,10 @@ export const categories: CategoryRecord[] = [
     index: archiveIndexByNavId(lexicon.gameDev.key),
     indexEn: lexicon.gameDev.deco,
     title: lexicon.gameDev.zh,
-    lead: "可玩的展示向小游戏。先选单，再加载，不登录、不付费。",
+    lead: "按项目浏览游戏截图；只有具备 WebGL 发布包的项目进入游戏选单。",
     path: `/${lexicon.gameDev.key}`,
     theme: lexicon.gameDev.key,
-    homeFrames: ["选单", "关卡切片", "存档提示"],
+    homeFrames: ["反重力", "3DRPG", "经典游戏"],
     collections: [],
   },
   {
@@ -252,7 +261,7 @@ export const categories: CategoryRecord[] = [
         lead: "空间先被框住，再被光慢慢填满。",
         theme: lexicon.landscapeRendering.key,
         detailBase: `/${lexicon.landscapeArch.key}/${lexicon.landscapeRendering.key}`,
-        frames: ["主视角", "黄昏庭院", "林缘断面"],
+        frames: ["哈尔滨江御府", "世茂茂名", "世茂潍坊商业"],
       },
       {
         id: lexicon.landscapeCDs.key,
@@ -284,7 +293,7 @@ export const categories: CategoryRecord[] = [
         lead: "把观看停在光线刚好够用的那一瞬。",
         theme: lexicon.landscapePhoto.key,
         detailBase: `/${lexicon.photography.key}/${lexicon.landscapePhoto.key}`,
-        frames: ["山脊", "水面", "雾色"],
+        frames: ["舟山 东极岛 庙子湖", "舟山 东极岛 东福山", "上海 萤火虫基地"],
       },
       {
         id: lexicon.humanistPhoto.key,
@@ -294,7 +303,7 @@ export const categories: CategoryRecord[] = [
         lead: "把人留在还在发生的现场里，不是摆拍肖像。",
         theme: lexicon.humanistPhoto.key,
         detailBase: `/${lexicon.photography.key}/${lexicon.humanistPhoto.key}`,
-        frames: ["街巷", "市集", "渡口"],
+        frames: ["重庆 涪陵 白鹤梁", "重庆 涪陵 816核工程遗址", "杭州黑神话展"],
       },
       {
         id: lexicon.portraitPhoto.key,
@@ -332,41 +341,24 @@ export const workSections: WorkSection[] = categories.map((item) => ({
   frames: item.homeFrames,
 }));
 
-export const placeholderGames: GameCard[] = [
-  {
-    id: "sample-ridge",
-    title: "脊线",
-    titleEn: "RIDGE",
-    lead: "在简化地形上走一条还没铺完的路。",
-    accent: "var(--gold)",
-    sizeHint: "约 40MB，首次加载较慢",
-    input: "键盘 / 触屏",
-    saveMode: "仅保存在本机浏览器",
-    coverSrc: "game-dev/sample-ridge/01.webp",
-  },
-  {
-    id: "sample-line",
-    title: "节拍",
-    titleEn: "LINE",
-    lead: "一条被放慢的产线，用来看堵塞如何形成。",
-    accent: "var(--signal)",
-    sizeHint: "约 28MB，首次加载较慢",
-    input: "鼠标 / 触屏",
-    saveMode: "仅保存在本机浏览器",
-    coverSrc: "game-dev/sample-line/01.webp",
-  },
-  {
-    id: "sample-garden",
-    title: "借景",
-    titleEn: "BORROWED",
-    lead: "把窗口外的一层山，框进庭院。",
-    accent: "var(--mist)",
-    sizeHint: "约 35MB，首次加载较慢",
-    input: "键盘 / 触屏",
-    saveMode: "仅保存在本机浏览器",
-    coverSrc: "game-dev/sample-garden/01.webp",
-  },
-];
+export const gameProjects: GameCard[] = sortByEffectiveDateDescending(
+  initialGameProjects.map((item) => ({
+    id: item.id,
+    title: item.title,
+    titleEn: item.titleEn,
+    lead: item.lead,
+    playable: item.playable,
+    screenshots: item.screenshots.map(([src, label]) => ({ src, label })),
+    coverSrc: item.screenshots[0]?.[0],
+  })),
+);
+
+/**
+ * 游戏选单只接收已有 WebGL 发布包的项目。
+ */
+export const playableGames: GameCard[] = gameProjects.filter(
+  (item) => item.playable && Boolean(item.buildPath),
+);
 
 export const placeholderNotes: NoteCard[] = [
   {
@@ -376,6 +368,7 @@ export const placeholderNotes: NoteCard[] = [
     summary: "园林里的层、孪生里的层、照片里的层，其实是同一种观看。",
     body: "占位正文。园林、孪生与照片里的层，是同一种观看方式。后续用 Markdown 替换。",
     previewImages: ["园中一层", "剖切一层", "底片一层"],
+    draft: true,
   },
   {
     slug: "sketches",
@@ -384,6 +377,7 @@ export const placeholderNotes: NoteCard[] = [
     summary: "纸面上的测绘与想象，笔触比渲染更早到达。原「手绘」栏目收进这篇笔记。",
     body: "手绘不再作为独立栏目。速写、空间草图与淡彩作为文章图组收录，最多在列表中预览三张。",
     previewImages: ["速写", "空间草图", "水墨淡彩"],
+    draft: true,
   },
   {
     slug: "measure",
@@ -392,6 +386,7 @@ export const placeholderNotes: NoteCard[] = [
     summary: "占位文章。后续替换为真实心得。",
     body: "占位正文。先量场地，再写说明。",
     previewImages: ["尺", "笔记"],
+    draft: true,
   },
   {
     slug: "quiet-tools",
@@ -400,6 +395,7 @@ export const placeholderNotes: NoteCard[] = [
     summary: "占位文章。仿真软件若一直抢视线，模型就看不见了。",
     body: "占位正文。工具应当安静，把视线留给模型。",
     previewImages: ["界面留白", "模型前景", "日志收起"],
+    draft: true,
   },
 ];
 

@@ -11,10 +11,14 @@ import {
 } from "../content/resume";
 import type { Locale } from "../prefs/types";
 import { profile } from "../content/site";
+import { queryNotes } from "../ia/query";
 import { assetUrl } from "../lib/assets";
 import { tx } from "../prefs/tx";
 import { usePrefs } from "../prefs/PrefsProvider";
 import "../styles/resume.css";
+
+const RESUME_NOTE_LIMIT = 3;
+const skillsHref = `/${lexicon.profileSkills.key}`;
 
 /**
  * 简历单页：左栏钉住身份，右栏时间线。缺字段不渲染。
@@ -23,6 +27,12 @@ export function ResumePage() {
   const { locale } = usePrefs();
   const [failed, setFailed] = useState(false);
   const portrait = !failed && profile.portraitSrc ? assetUrl(profile.portraitSrc) : "";
+  const noteCards = queryNotes({ source: "notes" })
+    .filter((note) => !note.draft)
+    .slice(0, RESUME_NOTE_LIMIT);
+  const blogLabel = resume.blogLabel ? tx(resume.blogLabel, locale) : "CSDN 笔记";
+  const hasNotesCol = noteCards.length > 0 || Boolean(resume.blogHref);
+  const hasExtras = resume.languages.length > 0 || resume.skills.length > 0 || hasNotesCol;
 
   return (
     <div className="resume" data-theme={lexicon.profileResume.key}>
@@ -84,42 +94,59 @@ export function ResumePage() {
           </section>
         ) : null}
 
-        {resume.languages.length > 0 || resume.tools.length > 0 ? (
+        {hasExtras ? (
           <section className="resume-block resume-extras">
-            {resume.languages.length > 0 ? (
+            {resume.skills.length > 0 ? (
               <div>
-                <h2>语言</h2>
-                <ul className="resume-langs">
-                  {resume.languages.map((item) => (
-                    <li key={tx(item, locale)}>{tx(item, locale)}</li>
+                <h2>
+                  <Link className="resume-heading-link" to={skillsHref}>
+                    {lexicon.profileSkills.zh}
+                  </Link>
+                </h2>
+                <ul className="resume-tools">
+                  {resume.skills.map((skill) => (
+                    <li key={skill}>
+                      <Link to={skillsHref}>{skill}</Link>
+                    </li>
                   ))}
                 </ul>
               </div>
             ) : null}
-            {resume.tools.length > 0 ? (
-              <div>
-                <h2>工具</h2>
-                <ul className="resume-tools">
-                  {resume.tools.map((tool) => (
-                    <li key={tool}>{tool}</li>
-                  ))}
-                </ul>
+            {resume.languages.length > 0 || hasNotesCol ? (
+              <div className="resume-side">
+                {resume.languages.length > 0 ? (
+                  <div>
+                    <h2>语言</h2>
+                    <ul className="resume-langs">
+                      {resume.languages.map((item) => (
+                        <li key={tx(item, locale)}>{tx(item, locale)}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+                {hasNotesCol ? (
+                  <div>
+                    <h2>笔记</h2>
+                    <ul className="resume-notes">
+                      {noteCards.map((note) => (
+                        <li key={note.slug}>
+                          <Link to={`/${lexicon.notes.key}/${note.slug}`}>{note.title}</Link>
+                        </li>
+                      ))}
+                      {resume.blogHref ? (
+                        <li>
+                          <a href={resume.blogHref} target="_blank" rel="noreferrer noopener">
+                            {blogLabel}
+                          </a>
+                        </li>
+                      ) : null}
+                    </ul>
+                  </div>
+                ) : null}
               </div>
             ) : null}
           </section>
         ) : null}
-
-        <p className="resume-foot">
-          {resume.blogHref ? (
-            <a href={resume.blogHref} target="_blank" rel="noreferrer noopener">
-              {resume.blogLabel ? tx(resume.blogLabel, locale) : resume.blogHref}
-            </a>
-          ) : null}
-          {resume.notes?.map((note) => (
-            <span key={tx(note, locale)}>{tx(note, locale)}</span>
-          ))}
-          <Link to={`/${lexicon.profileSkills.key}`}>{lexicon.profileSkills.zh}</Link>
-        </p>
       </div>
     </div>
   );

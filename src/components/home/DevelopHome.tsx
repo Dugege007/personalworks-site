@@ -1,16 +1,30 @@
-import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { Link } from "react-router-dom";
 import { lexicon } from "../../content/lexicon";
-import { profile } from "../../content/site";
+import { gameProjects, profile } from "../../content/site";
 import { stockPlaceholderSrc, workCoverSrc } from "../../content/stockMedia";
-import { hrefForWork, channelTitleZh } from "../../ia/href";
+import {
+  listLandscapeHeroFrames,
+  listPublishedWorks,
+  listWorkImages,
+  type HomeHeroFrame,
+} from "../../content/works";
+import { hrefForWork } from "../../ia/href";
 import { queryNotes, queryWorks } from "../../ia/query";
 import type { HomeBlock, IaRecord } from "../../ia/types";
 import { assetUrl } from "../../lib/assets";
+import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { usePrefs } from "../../prefs/PrefsProvider";
 import { ContactIcons } from "./ContactIcons";
 import { HomeBeian } from "./HomeBeian";
 import "../../styles/develop-home.css";
+
+const HERO_INTERVAL_MS = 5000;
+const HERO_NOREPEAT = 10;
+const FRAME_NOREPEAT = 10;
+const FRAME_IDLE_MIN_MS = 5000;
+const FRAME_IDLE_MAX_MS = 10000;
+const FRAME_FXS = ["fade", "rise", "zoom", "wipe"] as const;
 
 type DevelopHomeProps = {
   ia: IaRecord;
@@ -55,20 +69,84 @@ function DevelopBlock({ block, ia }: DevelopBlockProps) {
 }
 
 function HeroBleed({ block }: { block: HomeBlock }) {
-  const [mediaFailed, setMediaFailed] = useState(false);
-  const src = block.heroSrc && !mediaFailed ? assetUrl(block.heroSrc) : "";
-  const year = block.heroYear ?? profile.portraitYear;
+  const reduced = usePrefersReducedMotion();
+  const frames = useMemo(() => collectHeroFrames(block), [block]);
+  const startRef = useRef<{ current: string; upcoming: string } | null>(null);
+  if (!startRef.current && frames.length > 0) {
+    const srcs = frames.map((frame) => frame.src);
+    const current = pickFreshSrc(srcs, []);
+    startRef.current = { current, upcoming: pickFreshSrc(srcs, [current]) };
+  }
+  const [failed, setFailed] = useState<Record<string, true>>({});
+  const [currentSrc, setCurrentSrc] = useState(startRef.current?.current ?? "");
+  const [upcomingSrc, setUpcomingSrc] = useState(startRef.current?.upcoming ?? "");
+  const [lastSrc, setLastSrc] = useState("");
+  const recentRef = useRef<string[]>([]);
+  const currentRef = useRef(currentSrc);
+  const upcomingRef = useRef(upcomingSrc);
+  const failedRef = useRef(failed);
+  failedRef.current = failed;
+  upcomingRef.current = upcomingSrc;
+
+  const pool = frames.filter((frame) => !failed[frame.src]);
+  const poolSrcs = pool.map((frame) => frame.src);
+  const current = pool.find((frame) => frame.src === currentSrc) ?? pool[0] ?? null;
+  const src = current?.src ?? "";
+  currentRef.current = src;
+  const shownSrcs = [lastSrc, src, upcomingSrc].filter(
+    (item, index, list): item is string => Boolean(item) && !failed[item] && list.indexOf(item) === index,
+  );
+  const year = current?.year ?? block.heroYear ?? profile.portraitYear;
   const [lead, quote] = profile.bio;
+
+  useEffect(() => {
+    if (!currentSrc || !failed[currentSrc] || poolSrcs.length === 0) {
+      return;
+    }
+    const next = pickFreshSrc(poolSrcs, [currentSrc, ...recentRef.current]);
+    setCurrentSrc(next);
+    const upcoming = pickFreshSrc(poolSrcs, [next, ...recentRef.current]);
+    upcomingRef.current = upcoming;
+    setUpcomingSrc(upcoming);
+  }, [currentSrc, failed, poolSrcs]);
+
+  useEffect(() => {
+    if (reduced || poolSrcs.length < 2) {
+      return;
+    }
+    const timer = window.setInterval(() => {
+      const available = frames
+        .filter((frame) => !failedRef.current[frame.src])
+        .map((frame) => frame.src);
+      const cur = currentRef.current;
+      const reserved = upcomingRef.current;
+      const next =
+        reserved && reserved !== cur && available.includes(reserved)
+          ? reserved
+          : pickFreshSrc(available, [cur, ...recentRef.current]);
+      recentRef.current = [...recentRef.current, cur].slice(-(HERO_NOREPEAT - 1));
+      setLastSrc(cur);
+      setCurrentSrc(next);
+      currentRef.current = next;
+      const upcoming = pickFreshSrc(available, [next, ...recentRef.current]);
+      upcomingRef.current = upcoming;
+      setUpcomingSrc(upcoming);
+    }, HERO_INTERVAL_MS);
+    return () => window.clearInterval(timer);
+  }, [frames, poolSrcs.length, reduced]);
 
   return (
     <section className="develop-hero" id="hero-bleed" data-tone={src ? "dark" : "light"}>
       {src ? (
-        <img
-          className="develop-hero-media"
-          src={src}
-          alt=""
-          onError={() => setMediaFailed(true)}
-        />
+        shownSrcs.map((item) => (
+          <img
+            key={item}
+            className={`develop-hero-media${item === src ? " is-on" : ""}`}
+            src={assetUrl(item)}
+            alt=""
+            onError={() => setFailed((prevFailed) => ({ ...prevFailed, [item]: true }))}
+          />
+        ))
       ) : (
         <div className="develop-hero-well" aria-hidden="true" />
       )}
@@ -99,6 +177,39 @@ function HeroBleed({ block }: { block: HomeBlock }) {
       </div>
     </section>
   );
+}
+
+/**
+ * 头图优先用已发布风光摄影；缺图时回退到块上钉死的一张。
+ */
+function collectHeroFrames(block: HomeBlock): HomeHeroFrame[] {
+  const fromWorks =
+    block.query?.source === "works" ? listLandscapeHeroFrames() : [];
+  if (fromWorks.length > 0) {
+    return fromWorks;
+  }
+  if (block.heroSrc) {
+    return [{ src: block.heroSrc, year: block.heroYear ?? profile.portraitYear }];
+  }
+  return [];
+}
+
+/**
+ * 从图池随机取一张；最近若干张（含当前）不重复，图池不足时窗口收窄。
+ */
+function pickFreshSrc(pool: string[], recent: string[], windowSize = HERO_NOREPEAT): string {
+  if (pool.length === 0) {
+    return "";
+  }
+  if (pool.length === 1) {
+    return pool[0] ?? "";
+  }
+  const limit = Math.min(windowSize, pool.length - 1);
+  const forbidden = new Set(recent.filter(Boolean).slice(-limit));
+  const candidates = pool.filter((src) => !forbidden.has(src));
+  const last = recent[recent.length - 1];
+  const bag = candidates.length > 0 ? candidates : pool.filter((src) => src !== last);
+  return bag[Math.floor(Math.random() * bag.length)] ?? pool[0] ?? "";
 }
 
 function WaypointSlices() {
@@ -283,46 +394,176 @@ function uniqueSrcs(items: Array<string | undefined>): string[] {
   return list;
 }
 
-function SelectedFrames({ block, ia }: { block: HomeBlock; ia: IaRecord }) {
-  const works = block.query ? queryWorks(block.query) : [];
+type FrameShot = {
+  src: string;
+  title: string;
+  href: string;
+};
+
+type FrameLane = {
+  id: string;
+  caption: string;
+  featured: boolean;
+  shots: FrameShot[];
+};
+
+function SelectedFrames({ ia }: { block: HomeBlock; ia: IaRecord }) {
+  const lanes = useMemo(() => collectHomeFrameLanes(ia.id), [ia.id]);
 
   return (
     <section className="develop-frames" id="selected-frames">
-      {works.map((work, index) => {
-        const src = workCoverSrc(work, index);
-        return (
-          <FrameCard
-            key={`${work.channel}-${work.id}`}
-            title={work.title}
-            caption={channelTitleZh(work.channel)}
-            href={hrefForWork(work, ia.id)}
-            src={src}
-            featured={index === 0}
-          />
-        );
-      })}
+      {lanes.map((lane) => (
+        <FrameLaneCard key={lane.id} lane={lane} />
+      ))}
     </section>
   );
 }
 
-type FrameCardProps = {
-  title: string;
-  caption: string;
-  href: string;
-  src?: string;
-  featured: boolean;
-};
+/**
+ * 精选五格：风光、人文、数字孪生、景观效果图、游戏开发，各从本类图池抽。
+ */
+function collectHomeFrameLanes(iaId: string): FrameLane[] {
+  return [
+    {
+      id: lexicon.landscapePhoto.key,
+      caption: lexicon.landscapePhoto.zh,
+      featured: true,
+      shots: shotsOfChannel(lexicon.landscapePhoto.key, iaId),
+    },
+    {
+      id: lexicon.humanistPhoto.key,
+      caption: lexicon.humanistPhoto.zh,
+      featured: false,
+      shots: shotsOfChannel(lexicon.humanistPhoto.key, iaId),
+    },
+    {
+      id: lexicon.digitalTwin.key,
+      caption: lexicon.digitalTwin.zh,
+      featured: false,
+      shots: shotsOfChannel(lexicon.digitalTwin.key, iaId),
+    },
+    {
+      id: lexicon.landscapeRendering.key,
+      caption: lexicon.landscapeRendering.zh,
+      featured: false,
+      shots: shotsOfChannel(lexicon.landscapeRendering.key, iaId),
+    },
+    {
+      id: lexicon.gameDev.key,
+      caption: lexicon.gameDev.zh,
+      featured: false,
+      shots: shotsOfGames(),
+    },
+  ];
+}
 
-function FrameCard({ title, caption, href, src, featured }: FrameCardProps) {
-  const [failed, setFailed] = useState(false);
-  const media = src && !failed ? assetUrl(src) : "";
+function shotsOfChannel(channel: string, iaId: string): FrameShot[] {
+  const shots: FrameShot[] = [];
+  for (const work of listPublishedWorks(channel)) {
+    const href = hrefForWork(work, iaId);
+    for (const media of listWorkImages(work)) {
+      if (!media.src) {
+        continue;
+      }
+      shots.push({ src: media.src, title: work.title, href });
+    }
+  }
+  return shots;
+}
+
+function shotsOfGames(): FrameShot[] {
+  const shots: FrameShot[] = [];
+  for (const game of gameProjects) {
+    const href = `/${lexicon.gameDev.key}/${game.id}`;
+    for (const shot of game.screenshots) {
+      if (!shot.src) {
+        continue;
+      }
+      shots.push({ src: shot.src, title: game.title, href });
+    }
+  }
+  return shots;
+}
+
+function FrameLaneCard({ lane }: { lane: FrameLane }) {
+  const reduced = usePrefersReducedMotion();
+  const srcs = lane.shots.map((shot) => shot.src);
+  const startRef = useRef("");
+  if (!startRef.current && srcs.length > 0) {
+    startRef.current = pickFreshSrc(srcs, [], FRAME_NOREPEAT);
+  }
+  const [failed, setFailed] = useState<Record<string, true>>({});
+  const [currentSrc, setCurrentSrc] = useState(startRef.current);
+  const [lastSrc, setLastSrc] = useState("");
+  const [fx, setFx] = useState<(typeof FRAME_FXS)[number]>("fade");
+  const recentRef = useRef<string[]>([]);
+  const currentRef = useRef(currentSrc);
+  const srcsRef = useRef(srcs);
+  const failedRef = useRef(failed);
+  srcsRef.current = srcs;
+  failedRef.current = failed;
+  const pool = srcs.filter((src) => !failed[src]);
+  const shown = pool.includes(currentSrc) ? currentSrc : (pool[0] ?? "");
+  currentRef.current = shown;
+  const shot = lane.shots.find((item) => item.src === shown);
+  const shownSrcs = [lastSrc, shown].filter(
+    (item, index, list): item is string => Boolean(item) && !failed[item] && list.indexOf(item) === index,
+  );
+
+  useEffect(() => {
+    if (reduced || pool.length < 2) {
+      return;
+    }
+    let timer = 0;
+    const tick = () => {
+      const available = srcsRef.current.filter((src) => !failedRef.current[src]);
+      const cur = currentRef.current;
+      const next = pickFreshSrc(available, [cur, ...recentRef.current], FRAME_NOREPEAT);
+      recentRef.current = [...recentRef.current, cur].slice(-(FRAME_NOREPEAT - 1));
+      setLastSrc(cur);
+      setFx(FRAME_FXS[Math.floor(Math.random() * FRAME_FXS.length)] ?? "fade");
+      setCurrentSrc(next);
+      currentRef.current = next;
+      timer = window.setTimeout(
+        tick,
+        FRAME_IDLE_MIN_MS + Math.random() * (FRAME_IDLE_MAX_MS - FRAME_IDLE_MIN_MS),
+      );
+    };
+    timer = window.setTimeout(
+      tick,
+      FRAME_IDLE_MIN_MS + Math.random() * (FRAME_IDLE_MAX_MS - FRAME_IDLE_MIN_MS),
+    );
+    return () => window.clearTimeout(timer);
+  }, [lane.id, pool.length, reduced]);
+
+  if (!shown || !shot) {
+    return (
+      <div className={`develop-frame${lane.featured ? " is-featured" : ""}`}>
+        <span className="develop-frame-copy">
+          <strong>{lane.caption}</strong>
+        </span>
+      </div>
+    );
+  }
 
   return (
-    <Link className={`develop-frame${featured ? " is-featured" : ""}`} to={href}>
-      {media ? <img src={media} alt="" onError={() => setFailed(true)} /> : null}
+    <Link
+      className={`develop-frame${lane.featured ? " is-featured" : ""}`}
+      to={shot.href}
+      data-fx={fx}
+    >
+      {shownSrcs.map((item) => (
+        <img
+          key={item}
+          className={item === shown ? "is-on" : undefined}
+          src={assetUrl(item)}
+          alt=""
+          onError={() => setFailed((prev) => ({ ...prev, [item]: true }))}
+        />
+      ))}
       <span className="develop-frame-copy">
-        <strong>{title}</strong>
-        <em>{caption}</em>
+        <strong>{shot.title}</strong>
+        <em>{lane.caption}</em>
       </span>
     </Link>
   );

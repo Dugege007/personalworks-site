@@ -51,6 +51,16 @@
   object-fit: cover;
 }
 
+.develop-hero-media {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.develop-hero-media.is-on {
+  opacity: 1;
+  z-index: 1;
+}
+
 .develop-hero-well {
   background:
     radial-gradient(120% 80% at 70% 20%, var(--accent-soft), transparent 46%),
@@ -92,6 +102,13 @@
   min-width: 0;
 }
 
+.develop-hero[data-tone="dark"] .develop-hero-copy,
+.develop-hero[data-tone="dark"] .develop-hero-note {
+  text-shadow:
+    0 1px 3px rgb(26 29 34 / 0.55),
+    0 8px 28px rgb(26 29 34 / 0.66);
+}
+
 .develop-hero-shot {
   margin: 0 0 16px;
   font-family: var(--font-en);
@@ -130,7 +147,6 @@
 .develop-hero-note {
   max-width: 22em;
   min-width: 0;
-  text-shadow: 0 1px 12px rgb(26 29 34 / 0.45);
 }
 
 .develop-hero-lead {
@@ -187,6 +203,16 @@
 .develop-hero[data-tone="light"] .develop-btn.is-line {
   color: var(--text);
   border-color: var(--text);
+}
+
+.develop-hero[data-tone="dark"] .develop-btn {
+  box-shadow:
+    0 1px 3px rgb(26 29 34 / 0.42),
+    0 8px 22px rgb(26 29 34 / 0.4);
+}
+
+.develop-hero[data-tone="dark"] .develop-btn.is-line {
+  background: rgb(26 29 34 / 0.22);
 }
 
 .develop-btn:active {
@@ -320,6 +346,63 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  opacity: 0;
+}
+
+.develop-frame img.is-on {
+  opacity: 1;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .develop-frame img {
+    transition: opacity 0.85s ease;
+  }
+
+  .develop-frame[data-fx="rise"] img.is-on {
+    animation: develop-frame-rise 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .develop-frame[data-fx="zoom"] img.is-on {
+    animation: develop-frame-zoom 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .develop-frame[data-fx="wipe"] img.is-on {
+    animation: develop-frame-wipe 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
+@keyframes develop-frame-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes develop-frame-zoom {
+  from {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes develop-frame-wipe {
+  from {
+    opacity: 1;
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0);
+  }
 }
 
 .develop-frame-copy {
@@ -449,7 +532,7 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .develop-hero-media {
+  .develop-hero-media.is-on {
     animation: develop-hero-zoom 28s ease-in-out infinite alternate;
     transform-origin: center;
   }
@@ -581,6 +664,7 @@
   .develop-hero-media,
   .develop-hero-name,
   .develop-frame,
+  .develop-frame img,
   .develop-notes-link,
   .develop-progress {
     animation: none;
