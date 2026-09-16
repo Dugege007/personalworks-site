@@ -1,5 +1,6 @@
 import { initialWorkProjects } from "./initialWorkProjects";
 import { lexicon } from "./lexicon";
+import { photoSizes } from "./photoSizes";
 import { effectiveDate, sortByEffectiveDateDescending } from "./workDates";
 
 export type WorkChannel =
@@ -84,6 +85,8 @@ export function listWorkImages(work: WorkRecord): WorkMedia[] {
 export type HomeHeroFrame = {
   src: string;
   year: string;
+  width?: number;
+  height?: number;
 };
 
 /**
@@ -98,7 +101,13 @@ export function listLandscapeHeroFrames(): HomeHeroFrame[] {
         continue;
       }
       seen.add(media.src);
-      frames.push({ src: media.src, year: work.year });
+      const size = photoSizes[media.src];
+      frames.push({
+        src: media.src,
+        year: work.year,
+        width: size?.width,
+        height: size?.height,
+      });
     }
   }
   return frames;

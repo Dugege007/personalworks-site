@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { lexicon } from "../../content/lexicon";
 import { gameProjects, profile } from "../../content/site";
 import { stockPlaceholderSrc, workCoverSrc } from "../../content/stockMedia";
+import { heroFrameFitsViewport } from "../../content/photoOrientation";
+import { photoSizes } from "../../content/photoSizes";
 import {
   listLandscapeHeroFrames,
   listPublishedWorks,
@@ -14,6 +16,7 @@ import { queryNotes, queryWorks } from "../../ia/query";
 import type { HomeBlock, IaRecord } from "../../ia/types";
 import { assetUrl } from "../../lib/assets";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
+import { useViewportOrientation } from "../../hooks/useViewportOrientation";
 import { usePrefs } from "../../prefs/PrefsProvider";
 import { ContactIcons } from "./ContactIcons";
 import { HomeBeian } from "./HomeBeian";
@@ -22,7 +25,7 @@ import "../../styles/develop-home.css";
 const HERO_INTERVAL_MS = 5000;
 const HERO_NOREPEAT = 10;
 const FRAME_NOREPEAT = 10;
-const FRAME_IDLE_MIN_MS = 5000;
+const FRAME_IDLE_MIN_MS = 3000;
 const FRAME_IDLE_MAX_MS = 10000;
 const FRAME_FXS = ["fade", "rise", "zoom", "wipe"] as const;
 
@@ -70,16 +73,12 @@ function DevelopBlock({ block, ia }: DevelopBlockProps) {
 
 function HeroBleed({ block }: { block: HomeBlock }) {
   const reduced = usePrefersReducedMotion();
+  const viewport = useViewportOrientation();
   const frames = useMemo(() => collectHeroFrames(block), [block]);
-  const startRef = useRef<{ current: string; upcoming: string } | null>(null);
-  if (!startRef.current && frames.length > 0) {
-    const srcs = frames.map((frame) => frame.src);
-    const current = pickFreshSrc(srcs, []);
-    startRef.current = { current, upcoming: pickFreshSrc(srcs, [current]) };
-  }
+  const [measured, setMeasured] = useState<Record<string, { width: number; height: number }>>({});
   const [failed, setFailed] = useState<Record<string, true>>({});
-  const [currentSrc, setCurrentSrc] = useState(startRef.current?.current ?? "");
-  const [upcomingSrc, setUpcomingSrc] = useState(startRef.current?.upcoming ?? "");
+  const [currentSrc, setCurrentSrc] = useState("");
+  const [upcomingSrc, setUpcomingSrc] = useState("");
   const [lastSrc, setLastSrc] = useState("");
   const recentRef = useRef<string[]>([]);
   const currentRef = useRef(currentSrc);
@@ -88,9 +87,26 @@ function HeroBleed({ block }: { block: HomeBlock }) {
   failedRef.current = failed;
   upcomingRef.current = upcomingSrc;
 
-  const pool = frames.filter((frame) => !failed[frame.src]);
-  const poolSrcs = pool.map((frame) => frame.src);
-  const current = pool.find((frame) => frame.src === currentSrc) ?? pool[0] ?? null;
+  const sizedFrames = useMemo(
+    () =>
+      frames.map((frame) => {
+        const size = measured[frame.src];
+        if (size) {
+          return { ...frame, width: size.width, height: size.height };
+        }
+        return frame;
+      }),
+    [frames, measured],
+  );
+  const eligibleSrcs = useMemo(
+    () =>
+      sizedFrames
+        .filter((frame) => !failed[frame.src] && heroFrameFitsViewport(frame, viewport))
+        .map((frame) => frame.src),
+    [failed, sizedFrames, viewport],
+  );
+  const pool = sizedFrames.filter((frame) => !failed[frame.src]);
+  const current = pool.find((frame) => frame.src === currentSrc) ?? pool.find((frame) => frame.src === eligibleSrcs[0]) ?? null;
   const src = current?.src ?? "";
   currentRef.current = src;
   const shownSrcs = [lastSrc, src, upcomingSrc].filter(
@@ -100,24 +116,60 @@ function HeroBleed({ block }: { block: HomeBlock }) {
   const [lead, quote] = profile.bio;
 
   useEffect(() => {
-    if (!currentSrc || !failed[currentSrc] || poolSrcs.length === 0) {
-      return;
+    let cancelled = false;
+    for (const frame of frames) {
+      if (frame.width && frame.height) {
+        continue;
+      }
+      const img = new Image();
+      img.onload = () => {
+        if (cancelled || !img.naturalWidth || !img.naturalHeight) {
+          return;
+        }
+        setMeasured((prev) => {
+          if (prev[frame.src]) {
+            return prev;
+          }
+          return { ...prev, [frame.src]: { width: img.naturalWidth, height: img.naturalHeight } };
+        });
+      };
+      img.src = assetUrl(frame.src);
     }
-    const next = pickFreshSrc(poolSrcs, [currentSrc, ...recentRef.current]);
-    setCurrentSrc(next);
-    const upcoming = pickFreshSrc(poolSrcs, [next, ...recentRef.current]);
-    upcomingRef.current = upcoming;
-    setUpcomingSrc(upcoming);
-  }, [currentSrc, failed, poolSrcs]);
+    return () => {
+      cancelled = true;
+    };
+  }, [frames]);
 
   useEffect(() => {
-    if (reduced || poolSrcs.length < 2) {
+    if (eligibleSrcs.length === 0) {
+      return;
+    }
+    const cur = currentRef.current;
+    if (cur && eligibleSrcs.includes(cur)) {
+      if (upcomingRef.current && !eligibleSrcs.includes(upcomingRef.current)) {
+        const upcoming = pickFreshSrc(eligibleSrcs, [cur, ...recentRef.current]);
+        upcomingRef.current = upcoming;
+        setUpcomingSrc(upcoming);
+      }
+      return;
+    }
+    const next = pickFreshSrc(eligibleSrcs, [cur, ...recentRef.current]);
+    if (cur) {
+      setLastSrc(cur);
+    }
+    setCurrentSrc(next);
+    currentRef.current = next;
+    const upcoming = pickFreshSrc(eligibleSrcs, [next, ...recentRef.current]);
+    upcomingRef.current = upcoming;
+    setUpcomingSrc(upcoming);
+  }, [eligibleSrcs]);
+
+  useEffect(() => {
+    if (reduced || eligibleSrcs.length < 2) {
       return;
     }
     const timer = window.setInterval(() => {
-      const available = frames
-        .filter((frame) => !failedRef.current[frame.src])
-        .map((frame) => frame.src);
+      const available = eligibleSrcs.filter((item) => !failedRef.current[item]);
       const cur = currentRef.current;
       const reserved = upcomingRef.current;
       const next =
@@ -133,7 +185,7 @@ function HeroBleed({ block }: { block: HomeBlock }) {
       setUpcomingSrc(upcoming);
     }, HERO_INTERVAL_MS);
     return () => window.clearInterval(timer);
-  }, [frames, poolSrcs.length, reduced]);
+  }, [eligibleSrcs, reduced]);
 
   return (
     <section className="develop-hero" id="hero-bleed" data-tone={src ? "dark" : "light"}>
@@ -189,7 +241,15 @@ function collectHeroFrames(block: HomeBlock): HomeHeroFrame[] {
     return fromWorks;
   }
   if (block.heroSrc) {
-    return [{ src: block.heroSrc, year: block.heroYear ?? profile.portraitYear }];
+    const size = photoSizes[block.heroSrc];
+    return [
+      {
+        src: block.heroSrc,
+        year: block.heroYear ?? profile.portraitYear,
+        width: size?.width,
+        height: size?.height,
+      },
+    ];
   }
   return [];
 }
@@ -213,6 +273,7 @@ function pickFreshSrc(pool: string[], recent: string[], windowSize = HERO_NOREPE
 }
 
 function WaypointSlices() {
+  const reduced = usePrefersReducedMotion();
   const workSrcs = uniqueSrcs(queryWorks({ source: "works" }).map((work) => workCoverSrc(work)));
   const slices = [
     {
@@ -249,11 +310,63 @@ function WaypointSlices() {
       srcs: uniqueSrcs(["notes/cover.webp"]),
     },
   ];
+  const [advance, setAdvance] = useState(() => slices.map(() => 0));
+  const turnRef = useRef(0);
+  const hoverRef = useRef(false);
+  const timerRef = useRef(0);
+
+  useEffect(() => {
+    scheduleSliceTurn();
+    return () => window.clearTimeout(timerRef.current);
+  }, [reduced]);
+
+  /**
+   * 共用一个 3–10 秒倒计时；到点只切当前栏，再轮到下一栏。
+   */
+  function scheduleSliceTurn() {
+    window.clearTimeout(timerRef.current);
+    timerRef.current = 0;
+    if (reduced || hoverRef.current) {
+      return;
+    }
+    const delay = SLICE_IDLE_MIN_MS + Math.random() * (SLICE_IDLE_MAX_MS - SLICE_IDLE_MIN_MS);
+    timerRef.current = window.setTimeout(() => {
+      const index = turnRef.current;
+      turnRef.current = (index + 1) % slices.length;
+      setAdvance((prev) => prev.map((value, itemIndex) => (itemIndex === index ? value + 1 : value)));
+      scheduleSliceTurn();
+    }, delay);
+  }
+
+  /**
+   * 鼠标停在任一切片上时停表；离开后重新倒计时。
+   */
+  function handlePointerEnter(event: PointerEvent<HTMLElement>) {
+    if (event.pointerType !== "mouse" || hoverRef.current) {
+      return;
+    }
+    hoverRef.current = true;
+    window.clearTimeout(timerRef.current);
+    timerRef.current = 0;
+  }
+
+  function handlePointerLeave() {
+    if (!hoverRef.current) {
+      return;
+    }
+    hoverRef.current = false;
+    scheduleSliceTurn();
+  }
 
   return (
-    <section className="develop-slices" id="waypoint-slices">
-      {slices.map((item) => (
-        <SliceCard key={item.id} {...item} />
+    <section
+      className="develop-slices"
+      id="waypoint-slices"
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
+    >
+      {slices.map((item, index) => (
+        <SliceCard key={item.id} {...item} advance={advance[index] ?? 0} />
       ))}
     </section>
   );
@@ -265,23 +378,21 @@ type SliceCardProps = {
   deco: string;
   to: string;
   srcs: string[];
+  advance: number;
 };
 
-const SLICE_IDLE_MIN_MS = 5000;
+const SLICE_IDLE_MIN_MS = 3000;
 const SLICE_IDLE_MAX_MS = 10000;
-const SLICE_HOVER_MS = 2000;
 
 /**
- * 切片图卡：空闲 5–10 秒换一张，悬停改为 2 秒；各卡自计时，最近五张不重复。
+ * 切片图卡：由四栏共用计时器点名换图；本栏最近五张不重复。
  */
-function SliceCard({ id, label, deco, to, srcs }: SliceCardProps) {
+function SliceCard({ id, label, deco, to, srcs, advance }: SliceCardProps) {
   const [failed, setFailed] = useState<Record<string, true>>({});
   const [current, setCurrent] = useState(srcs[0] ?? "");
   const recentRef = useRef<string[]>([]);
   const currentRef = useRef(current);
   const poolRef = useRef<string[]>([]);
-  const hoverRef = useRef(false);
-  const timerRef = useRef<number>(0);
 
   const pool = srcs.filter((src) => !failed[src]);
   const shown = pool.includes(current) ? current : (pool[0] ?? "");
@@ -289,59 +400,22 @@ function SliceCard({ id, label, deco, to, srcs }: SliceCardProps) {
   currentRef.current = shown;
 
   useEffect(() => {
-    scheduleSliceTick();
-    return () => window.clearTimeout(timerRef.current);
-  }, []);
-
-  /**
-   * 按当前是否悬停排下一次换图；空闲随机 5–10 秒。
-   */
-  function scheduleSliceTick() {
-    window.clearTimeout(timerRef.current);
-    timerRef.current = 0;
-    if (poolRef.current.length < 2) {
+    if (advance < 1) {
       return;
     }
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const next = pickNextSliceSrc(poolRef.current, currentRef.current, recentRef.current);
+    if (!next || next === currentRef.current) {
       return;
     }
-    const delay = hoverRef.current
-      ? SLICE_HOVER_MS
-      : SLICE_IDLE_MIN_MS + Math.random() * (SLICE_IDLE_MAX_MS - SLICE_IDLE_MIN_MS);
-    timerRef.current = window.setTimeout(() => {
-      const next = pickNextSliceSrc(poolRef.current, currentRef.current, recentRef.current);
-      recentRef.current = [...recentRef.current, currentRef.current].slice(-4);
-      setCurrent(next);
-      scheduleSliceTick();
-    }, delay);
-  }
-
-  /**
-   * 细指针悬停加快到两秒；触屏只走空闲节拍。
-   */
-  function handlePointerEnter(event: PointerEvent<HTMLAnchorElement>) {
-    if (event.pointerType !== "mouse" || hoverRef.current) {
-      return;
-    }
-    hoverRef.current = true;
-    scheduleSliceTick();
-  }
-
-  function handlePointerLeave() {
-    if (!hoverRef.current) {
-      return;
-    }
-    hoverRef.current = false;
-    scheduleSliceTick();
-  }
+    recentRef.current = [...recentRef.current, currentRef.current].slice(-4);
+    setCurrent(next);
+  }, [advance]);
 
   return (
     <Link
       className="develop-slice"
       to={to}
       data-slice={id}
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
     >
       {pool.length > 0 ? (
         pool.map((src) => (
@@ -408,12 +482,65 @@ type FrameLane = {
 };
 
 function SelectedFrames({ ia }: { block: HomeBlock; ia: IaRecord }) {
+  const reduced = usePrefersReducedMotion();
   const lanes = useMemo(() => collectHomeFrameLanes(ia.id), [ia.id]);
+  const [advance, setAdvance] = useState(() => lanes.map(() => 0));
+  const turnRef = useRef(0);
+  const hoverRef = useRef(false);
+  const timerRef = useRef(0);
+
+  useEffect(() => {
+    scheduleFrameTurn();
+    return () => window.clearTimeout(timerRef.current);
+  }, [reduced]);
+
+  /**
+   * 共用一个 3–10 秒倒计时；到点只切当前格，再按左到右轮到下一格。
+   */
+  function scheduleFrameTurn() {
+    window.clearTimeout(timerRef.current);
+    timerRef.current = 0;
+    if (reduced || hoverRef.current) {
+      return;
+    }
+    const delay = FRAME_IDLE_MIN_MS + Math.random() * (FRAME_IDLE_MAX_MS - FRAME_IDLE_MIN_MS);
+    timerRef.current = window.setTimeout(() => {
+      const index = turnRef.current;
+      turnRef.current = (index + 1) % lanes.length;
+      setAdvance((prev) => prev.map((value, itemIndex) => (itemIndex === index ? value + 1 : value)));
+      scheduleFrameTurn();
+    }, delay);
+  }
+
+  /**
+   * 鼠标停在任一预览格上时停表；离开后重新倒计时。
+   */
+  function handlePointerEnter(event: PointerEvent<HTMLElement>) {
+    if (event.pointerType !== "mouse" || hoverRef.current) {
+      return;
+    }
+    hoverRef.current = true;
+    window.clearTimeout(timerRef.current);
+    timerRef.current = 0;
+  }
+
+  function handlePointerLeave() {
+    if (!hoverRef.current) {
+      return;
+    }
+    hoverRef.current = false;
+    scheduleFrameTurn();
+  }
 
   return (
-    <section className="develop-frames" id="selected-frames">
-      {lanes.map((lane) => (
-        <FrameLaneCard key={lane.id} lane={lane} />
+    <section
+      className="develop-frames"
+      id="selected-frames"
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
+    >
+      {lanes.map((lane, index) => (
+        <FrameLaneCard key={lane.id} lane={lane} advance={advance[index] ?? 0} />
       ))}
     </section>
   );
@@ -485,8 +612,7 @@ function shotsOfGames(): FrameShot[] {
   return shots;
 }
 
-function FrameLaneCard({ lane }: { lane: FrameLane }) {
-  const reduced = usePrefersReducedMotion();
+function FrameLaneCard({ lane, advance }: { lane: FrameLane; advance: number }) {
   const srcs = lane.shots.map((shot) => shot.src);
   const startRef = useRef("");
   if (!startRef.current && srcs.length > 0) {
@@ -511,30 +637,24 @@ function FrameLaneCard({ lane }: { lane: FrameLane }) {
   );
 
   useEffect(() => {
-    if (reduced || pool.length < 2) {
+    if (advance < 1) {
       return;
     }
-    let timer = 0;
-    const tick = () => {
-      const available = srcsRef.current.filter((src) => !failedRef.current[src]);
-      const cur = currentRef.current;
-      const next = pickFreshSrc(available, [cur, ...recentRef.current], FRAME_NOREPEAT);
-      recentRef.current = [...recentRef.current, cur].slice(-(FRAME_NOREPEAT - 1));
-      setLastSrc(cur);
-      setFx(FRAME_FXS[Math.floor(Math.random() * FRAME_FXS.length)] ?? "fade");
-      setCurrentSrc(next);
-      currentRef.current = next;
-      timer = window.setTimeout(
-        tick,
-        FRAME_IDLE_MIN_MS + Math.random() * (FRAME_IDLE_MAX_MS - FRAME_IDLE_MIN_MS),
-      );
-    };
-    timer = window.setTimeout(
-      tick,
-      FRAME_IDLE_MIN_MS + Math.random() * (FRAME_IDLE_MAX_MS - FRAME_IDLE_MIN_MS),
-    );
-    return () => window.clearTimeout(timer);
-  }, [lane.id, pool.length, reduced]);
+    const available = srcsRef.current.filter((src) => !failedRef.current[src]);
+    if (available.length < 2) {
+      return;
+    }
+    const cur = currentRef.current;
+    const next = pickFreshSrc(available, [cur, ...recentRef.current], FRAME_NOREPEAT);
+    if (!next || next === cur) {
+      return;
+    }
+    recentRef.current = [...recentRef.current, cur].slice(-(FRAME_NOREPEAT - 1));
+    setLastSrc(cur);
+    setFx(FRAME_FXS[Math.floor(Math.random() * FRAME_FXS.length)] ?? "fade");
+    setCurrentSrc(next);
+    currentRef.current = next;
+  }, [advance]);
 
   if (!shown || !shot) {
     return (
@@ -597,7 +717,7 @@ function ContactClose() {
           <span>{currentSkin.brand.zh}</span>
           <span>{currentSkin.brand.deco}</span>
         </p>
-        <p className="develop-close-lead">写信或到场都可以。作品在墙里，照片在册里。</p>
+        <p className="develop-close-lead">待填写描述</p>
       </div>
       <ContactIcons channels={profile.contactChannels} />
       <HomeBeian />

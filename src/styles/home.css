@@ -477,17 +477,28 @@ button.contact-icon:hover,
 }
 
 .site-footer {
-  padding: 64px var(--page-inset) 48px;
+  padding: 28px var(--page-inset) 20px;
   border-top: 1px solid var(--line);
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px 24px;
 }
 
 .site-footer h3 {
   font-family: var(--font-serif);
   font-weight: 500;
-  margin: 0 0 16px;
+  margin: 0 0 6px;
+}
+
+.site-footer .work-lead {
+  margin-bottom: 0;
+  font-size: 14px;
+}
+
+.site-footer .contact-icons {
+  margin-top: 0;
+  justify-content: flex-end;
 }
 
 @media (max-width: 860px) {
@@ -539,6 +550,10 @@ button.contact-icon:hover,
 
   .site-footer {
     grid-template-columns: 1fr;
+  }
+
+  .site-footer .contact-icons {
+    justify-content: flex-start;
   }
 
   .scroll-hint {

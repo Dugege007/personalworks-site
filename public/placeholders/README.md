@@ -6,7 +6,7 @@
 
 | 目录 | 中文 |
 |------|------|
-| `home-page/` | 首页 |
+| `home-page/` | 首页（二维码、公安备案徽章） |
 | `profile/` | 形象 |
 | `profile-resume/` | 简历 |
 | `profile-skills/` | 技能 |

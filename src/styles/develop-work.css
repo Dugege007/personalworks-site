@@ -49,6 +49,13 @@
   text-shadow: 0 1px 16px rgb(26 29 34 / 0.4);
 }
 
+.develop-work-gate-cell .develop-work-copy {
+  z-index: 3;
+  text-shadow:
+    0 1px 3px rgb(26 29 34 / 0.7),
+    0 6px 22px rgb(26 29 34 / 0.78);
+}
+
 .develop-work-copy strong {
   font-size: clamp(22px, 3.2vw, 36px);
   font-weight: 700;
@@ -202,6 +209,16 @@
   object-fit: cover;
 }
 
+.develop-work-gate-cell img {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.develop-work-gate-cell img.is-on {
+  opacity: 1;
+  z-index: 1;
+}
+
 .develop-work-gate-cell::after,
 .develop-kind-door::after,
 .develop-channel-cell::after {
@@ -210,6 +227,10 @@
   inset: 0;
   background: linear-gradient(180deg, transparent 38%, rgb(26 29 34 / 0.78));
   pointer-events: none;
+}
+
+.develop-work-gate-cell::after {
+  z-index: 2;
 }
 
 .develop-work-gate-cell.is-soon,
@@ -363,11 +384,15 @@
 }
 
 @media (pointer: fine) {
-  .develop-work-gate-cell img,
+  .develop-work-gate-cell img {
+    transform: scale(1);
+    transition: opacity 0.9s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
   .develop-kind-door img,
   .develop-channel-cell img {
     transform: scale(1);
-    transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.55s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .develop-work-gate-cell:hover img,

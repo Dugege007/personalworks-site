@@ -222,6 +222,7 @@
 .develop-slices {
   display: flex;
   min-height: 52vh;
+  margin-top: 28px;
   margin-inline: var(--page-inset);
   border-top: 1px solid var(--line);
 }
@@ -354,6 +355,19 @@
   z-index: 1;
 }
 
+.develop-frame:has(img)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent calc(100% - 7.5em),
+    rgb(26 29 34 / 0.78)
+  );
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .develop-frame img {
     transition: opacity 0.85s ease;
@@ -409,14 +423,16 @@
   position: absolute;
   left: 16px;
   bottom: 16px;
-  z-index: 1;
+  z-index: 2;
   display: grid;
   gap: 4px;
 }
 
 .develop-frame:has(img) .develop-frame-copy {
   color: var(--on-ink);
-  text-shadow: 0 1px 12px rgb(26 29 34 / 0.45);
+  text-shadow:
+    0 1px 3px rgb(26 29 34 / 0.7),
+    0 6px 22px rgb(26 29 34 / 0.78);
 }
 
 .develop-frame-copy strong {
@@ -468,23 +484,24 @@
 
 .develop-close {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
-  padding: 72px var(--page-inset) 64px;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px 32px;
+  padding: 28px var(--page-inset) 38px;
   background: var(--ink-block);
   color: var(--on-ink);
 }
 
 .develop-close-brand {
   display: grid;
-  margin: 0 0 16px;
+  margin: 0 0 6px;
   line-height: 1.15;
 }
 
 .develop-close-brand span:first-child {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
 }
 
 .develop-close-brand span:last-child {
@@ -497,7 +514,13 @@
 .develop-close-lead {
   margin: 0;
   max-width: 28em;
+  font-size: 14px;
   color: rgb(238 240 242 / 0.78);
+}
+
+.develop-close .contact-icons {
+  margin-top: 0;
+  justify-content: flex-end;
 }
 
 .develop-close .contact-icon {
@@ -578,6 +601,7 @@
       "resume work"
       "skills notes";
     min-height: 0;
+    margin-top: 20px;
   }
 
   .develop-slice,
@@ -633,6 +657,10 @@
 
   .develop-close {
     grid-template-columns: 1fr;
+  }
+
+  .develop-close .contact-icons {
+    justify-content: flex-start;
   }
 }
 

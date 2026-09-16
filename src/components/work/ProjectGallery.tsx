@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { assetUrl } from "../../lib/assets";
 import { ImageLightbox } from "./ImageLightbox";
+import "../../styles/photo-masonry.css";
 import "../../styles/project-gallery.css";
 
 export type ProjectGalleryItem = {
@@ -101,7 +102,10 @@ export function ProjectGallery({ projects, variant }: ProjectGalleryProps) {
               </small>
             ) : null}
           </header>
-          <div className="project-gallery-images">
+          <div
+            className={variant === "photo" ? "photo-masonry" : "project-gallery-images"}
+            data-count={variant === "photo" ? project.images.length : undefined}
+          >
             {project.images.map((image, index) => (
               <button
                 className={`project-gallery-shot${variant === "twin" && index === 0 ? " is-main" : ""}`}

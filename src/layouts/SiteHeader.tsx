@@ -76,18 +76,42 @@ export function SiteHeader({ onNavigate }: SiteHeaderProps) {
         setHeroDark(false);
         return false;
       }
+      const mark =
+        hero.querySelector(".develop-hero-shot") ?? hero.querySelector(".develop-hero-name");
+      if (!mark) {
+        return false;
+      }
       const syncTone = () => setHeroDark(hero.dataset.tone === "dark");
       syncTone();
+      const headerPx =
+        Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 64;
+      // 实心线对齐 SHOT（或姓名）刚要进入顶栏下方，而不是等整张头图几乎滚完。
       io = new IntersectionObserver(
         ([entry]) => {
           setOverHero(Boolean(entry?.isIntersecting));
           syncTone();
         },
-        { threshold: 0.28 },
+        {
+          rootMargin: `-${headerPx + 40}px 0px 0px 0px`,
+          threshold: 0,
+        },
       );
-      io.observe(hero);
-      mutation = new MutationObserver(syncTone);
-      mutation.observe(hero, { attributes: true, attributeFilter: ["data-tone"] });
+      io.observe(mark);
+      mutation = new MutationObserver(() => {
+        syncTone();
+        const next =
+          hero.querySelector(".develop-hero-shot") ?? hero.querySelector(".develop-hero-name");
+        if (next && next !== mark) {
+          detach();
+          attach();
+        }
+      });
+      mutation.observe(hero, {
+        attributes: true,
+        attributeFilter: ["data-tone"],
+        childList: true,
+        subtree: true,
+      });
       return true;
     };
 

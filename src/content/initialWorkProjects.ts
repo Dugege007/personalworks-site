@@ -67,27 +67,23 @@ export const initialWorkProjects = [
     "summary": "潍柴火炬项目静帧，共收录 5 张图片。",
     "body": "潍柴火炬项目静帧，共收录 5 张图片。",
     "media": [
-      [
-        "digital-twin/weichai-spark-plug/01.webp",
-        "01 车间总览"
-      ],
-      [
-        "digital-twin/weichai-spark-plug/02.webp",
-        "02 区域"
-      ],
-      [
-        "digital-twin/weichai-spark-plug/03.webp",
-        "03 设备"
-      ],
-      [
-        "digital-twin/weichai-spark-plug/04.webp",
-        "潍柴火炬AGV数据处理_以坐标移动_向量版_简"
-      ],
-      [
-        "digital-twin/weichai-spark-plug/05.webp",
-        "潍柴火炬LOGO_OutLine"
-      ]
+    [
+      "digital-twin/weichai-spark-plug/01.webp",
+      "01 车间总览 01"
+    ],
+    [
+      "digital-twin/weichai-spark-plug/02.webp",
+      "01 车间总览 02"
+    ],
+    [
+      "digital-twin/weichai-spark-plug/03.webp",
+      "01 车间总览 03"
+    ],
+    [
+      "digital-twin/weichai-spark-plug/04.webp",
+      "01 车间总览 04"
     ]
+  ]
   },
   {
     "id": "akzonobel-shanghai-songjiang",
@@ -901,12 +897,12 @@ export const initialWorkProjects = [
   {
     "id": "hebi-stars-20220912",
     "channel": "landscape-photo",
-    "title": "鹤壁星空",
+    "title": "鹤壁 星空",
     "year": "2022",
     "capturedOn": "2022-09-12",
     "place": "鹤壁",
-    "summary": "鹤壁星空拍摄批次，共收录 1 张图片。",
-    "body": "鹤壁星空拍摄批次，共收录 1 张图片。",
+    "summary": "鹤壁 星空拍摄批次，共收录 1 张图片。",
+    "body": "鹤壁 星空拍摄批次，共收录 1 张图片。",
     "media": [
       [
         "landscape-photo/hebi-stars-20220912/01.webp",
@@ -969,12 +965,12 @@ export const initialWorkProjects = [
   {
     "id": "hebi-stars-20241002",
     "channel": "landscape-photo",
-    "title": "鹤壁星空",
+    "title": "鹤壁 星空",
     "year": "2024",
     "capturedOn": "2024-10-02",
     "place": "鹤壁",
-    "summary": "鹤壁星空拍摄批次，共收录 1 张图片。",
-    "body": "鹤壁星空拍摄批次，共收录 1 张图片。",
+    "summary": "鹤壁 星空拍摄批次，共收录 1 张图片。",
+    "body": "鹤壁 星空拍摄批次，共收录 1 张图片。",
     "media": [
       [
         "landscape-photo/hebi-stars-20241002/01.webp",
@@ -1138,11 +1134,12 @@ export const initialWorkProjects = [
   {
     "id": "maling-ancient-trail",
     "channel": "landscape-photo",
-    "title": "马岭古道",
+    "title": "兴义 马岭古道",
     "year": "2026",
     "capturedOn": "2026-05-17",
-    "summary": "马岭古道拍摄批次，共收录 7 张图片。",
-    "body": "马岭古道拍摄批次，共收录 7 张图片。",
+    "place": "兴义",
+    "summary": "兴义 马岭古道拍摄批次，共收录 7 张图片。",
+    "body": "兴义 马岭古道拍摄批次，共收录 7 张图片。",
     "media": [
       [
         "landscape-photo/maling-ancient-trail/01.webp",
@@ -1346,12 +1343,12 @@ export const initialWorkProjects = [
   {
     "id": "hangzhou-black-myth-exhibition",
     "channel": "humanist-photo",
-    "title": "杭州黑神话展",
+    "title": "杭州 黑神话展",
     "year": "2025",
     "capturedOn": "2025-07-13",
     "place": "杭州",
-    "summary": "杭州黑神话展拍摄批次，共收录 8 张图片。",
-    "body": "杭州黑神话展拍摄批次，共收录 8 张图片。",
+    "summary": "杭州 黑神话展拍摄批次，共收录 8 张图片。",
+    "body": "杭州 黑神话展拍摄批次，共收录 8 张图片。",
     "media": [
       [
         "humanist-photo/hangzhou-black-myth-exhibition/01.webp",

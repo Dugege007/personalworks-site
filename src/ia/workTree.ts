@@ -1,7 +1,7 @@
 import { lexicon } from "../content/lexicon";
 import { categories, gameProjects, playableGames } from "../content/site";
 import { stockPlaceholderSrc } from "../content/stockMedia";
-import { listPublishedWorks, type WorkRecord } from "../content/works";
+import { listPublishedWorks, listWorkImages, type WorkRecord } from "../content/works";
 import { channelsOfKind, kindOfChannel, kindTitle, queryWorks } from "./query";
 
 export const developWorkKinds = [
@@ -28,6 +28,7 @@ export type DevelopKindDoor = {
   lead: string;
   href: string;
   coverSrc?: string;
+  srcs: string[];
 };
 
 export type DevelopChannelDoor = {
@@ -152,6 +153,7 @@ export function listDevelopKindDoors(): DevelopKindDoor[] {
       lead: category?.lead ?? "",
       href: hrefForDevelopKind(kind),
       coverSrc: coverOfKind(kind),
+      srcs: shotsOfKind(kind),
     };
   });
 }
@@ -209,6 +211,36 @@ export function isChannelOfKind(kind: string, channel: string | undefined): bool
     return true;
   }
   return channelsOfKind(kind).includes(channel);
+}
+
+/**
+ * 某门全部可轮换画面：已发布作品图；游戏含封面与截图。
+ */
+export function shotsOfKind(kind: string): string[] {
+  const seen = new Set<string>();
+  const list: string[] = [];
+  const add = (src?: string) => {
+    if (!src || seen.has(src)) {
+      return;
+    }
+    seen.add(src);
+    list.push(src);
+  };
+  if (kind === lexicon.gameDev.key) {
+    for (const game of gameProjects) {
+      add(game.coverSrc);
+      for (const shot of game.screenshots) {
+        add(shot.src);
+      }
+    }
+    return list;
+  }
+  for (const work of queryWorks({ source: "works", kind })) {
+    for (const media of listWorkImages(work)) {
+      add(media.src);
+    }
+  }
+  return list;
 }
 
 function coverOfKind(kind: string): string | undefined {

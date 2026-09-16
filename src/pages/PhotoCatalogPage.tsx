@@ -12,6 +12,7 @@ import {
 import { workCoverSrc } from "../content/stockMedia";
 import { assetUrl } from "../lib/assets";
 import "../styles/placeholder.css";
+import "../styles/photo-masonry.css";
 
 const photoRoot = `/${lexicon.photography.key}`;
 const catalogPath = `${photoRoot}/${lexicon.photoCatalog.key}`;
@@ -196,7 +197,7 @@ export function PhotoCatalogPage() {
       {visible.length === 0 ? (
         <p className="note">当前筛选没有作品。</p>
       ) : (
-        <div className="card-grid">
+        <div className="photo-masonry" data-count={visible.length}>
           {visible.map((work) => (
             <Link
               className="card"

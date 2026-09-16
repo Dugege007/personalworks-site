@@ -9,7 +9,7 @@ export function FooterContact() {
         <h3>
           {profile.siteLabel} / {profile.siteLabelEn}
         </h3>
-        <p className="work-lead">继续往下的内容，在顶栏各档案里。本页只负责把路打开。</p>
+        <p className="work-lead">待填写描述</p>
       </div>
       <ContactIcons channels={profile.contactChannels} />
       <HomeBeian />

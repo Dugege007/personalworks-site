@@ -8,6 +8,7 @@ import { hrefForDevelopKind } from "../ia/workTree";
 import { assetUrl } from "../lib/assets";
 import { usePrefs } from "../prefs/PrefsProvider";
 import "../styles/placeholder.css";
+import "../styles/photo-masonry.css";
 
 type CategoryPageProps = {
   categoryId: string;
@@ -55,7 +56,16 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
           {collection.comingSoon ? (
             <p className="note">位置已留，作品待收录。不进入详情占位。</p>
           ) : null}
-          <div className="card-grid">
+          <div
+            className={category.id === lexicon.photography.key ? "photo-masonry" : "card-grid"}
+            data-count={
+              category.id === lexicon.photography.key
+                ? collection.comingSoon
+                  ? collection.frames.length
+                  : listPublishedWorks(collection.id).length
+                : undefined
+            }
+          >
             {collection.comingSoon
               ? collection.frames.map((label, index) => (
                   <div className="card is-soon" key={label}>
