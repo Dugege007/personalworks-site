@@ -228,1207 +228,1440 @@
     },
     {
       "object": "profile/portrait.webp",
-      "stageRel": "形象（profile）/462A2635.jpg",
+      "stageRel": "形象照（profile）/20240824 仪摄影写真/462A2635.jpg",
       "status": "published"
     },
     {
       "object": "profile/462A2697.webp",
-      "stageRel": "形象（profile）/462A2697.jpg",
+      "stageRel": "形象照（profile）/20240824 仪摄影写真/462A2697.jpg",
       "status": "published"
     },
     {
       "object": "profile/462A2700.webp",
-      "stageRel": "形象（profile）/462A2700.jpg",
+      "stageRel": "形象照（profile）/20240824 仪摄影写真/462A2700.jpg",
       "status": "published"
     },
     {
       "object": "profile/462A2703.webp",
-      "stageRel": "形象（profile）/462A2703.jpg",
+      "stageRel": "形象照（profile）/20240824 仪摄影写真/462A2703.jpg",
       "status": "published"
     },
     {
       "object": "profile/462A2707.webp",
-      "stageRel": "形象（profile）/462A2707.jpg",
+      "stageRel": "形象照（profile）/20240824 仪摄影写真/462A2707.jpg",
       "status": "published"
     },
     {
       "object": "profile/462A2714.webp",
-      "stageRel": "形象（profile）/462A2714.jpg",
+      "stageRel": "形象照（profile）/20240824 仪摄影写真/462A2714.jpg",
       "status": "published"
     },
     {
       "object": "profile/462A2817.webp",
-      "stageRel": "形象（profile）/462A2817.jpg",
+      "stageRel": "形象照（profile）/20240824 仪摄影写真/462A2817.jpg",
       "status": "published"
     },
     {
       "object": "profile/R0008304.webp",
-      "stageRel": "形象（profile）/R0008304.jpg",
+      "stageRel": "形象照（profile）/20240824 仪摄影写真/R0008304.jpg",
       "status": "published"
     },
     {
       "object": "digital-twin/shanghai-mansheng-packaging/01.webp",
       "stageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/.site-ready/shanghai-mansheng-packaging/01.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/01.png",
       "status": "published"
     },
     {
       "object": "digital-twin/shanghai-mansheng-packaging/02.webp",
       "stageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/.site-ready/shanghai-mansheng-packaging/02.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/02.png",
       "status": "published"
     },
     {
       "object": "digital-twin/shanghai-mansheng-packaging/03.webp",
       "stageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/.site-ready/shanghai-mansheng-packaging/03.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/03.png",
       "status": "published"
     },
     {
       "object": "digital-twin/shanghai-mansheng-packaging/04.webp",
       "stageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/.site-ready/shanghai-mansheng-packaging/04.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/04_1.png",
       "status": "published"
     },
     {
       "object": "digital-twin/shanghai-mansheng-packaging/05.webp",
       "stageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/.site-ready/shanghai-mansheng-packaging/05.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/04_2.png",
       "status": "published"
     },
     {
       "object": "digital-twin/shanghai-mansheng-packaging/06.webp",
       "stageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/.site-ready/shanghai-mansheng-packaging/06.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/05.png",
       "status": "published"
     },
     {
       "object": "digital-twin/shanghai-mansheng-packaging/07.webp",
       "stageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/.site-ready/shanghai-mansheng-packaging/07.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/06.png",
       "status": "published"
     },
     {
       "object": "digital-twin/ningbo-siweier/01.webp",
       "stageRel": "数字孪生（digital-twin）/20240530_宁波四维尔/.site-ready/ningbo-siweier/01.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20240530_宁波四维尔/微信截图_20250530110624.png",
       "status": "published"
     },
     {
       "object": "digital-twin/weichai-spark-plug/01.webp",
       "stageRel": "数字孪生（digital-twin）/20240926 潍柴火炬/.site-ready/weichai-spark-plug/01.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20240926 潍柴火炬/01 车间总览.png",
       "status": "published"
     },
     {
       "object": "digital-twin/weichai-spark-plug/02.webp",
       "stageRel": "数字孪生（digital-twin）/20240926 潍柴火炬/.site-ready/weichai-spark-plug/02.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20240926 潍柴火炬/02 区域.png",
       "status": "published"
     },
     {
       "object": "digital-twin/weichai-spark-plug/03.webp",
       "stageRel": "数字孪生（digital-twin）/20240926 潍柴火炬/.site-ready/weichai-spark-plug/03.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20240926 潍柴火炬/03 设备.png",
       "status": "published"
     },
     {
       "object": "digital-twin/weichai-spark-plug/04.webp",
       "stageRel": "数字孪生（digital-twin）/20240926 潍柴火炬/.site-ready/weichai-spark-plug/04.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20240926 潍柴火炬/潍柴火炬AGV数据处理_以坐标移动_向量版_简.jpg",
       "status": "published"
     },
     {
       "object": "digital-twin/weichai-spark-plug/05.webp",
       "stageRel": "数字孪生（digital-twin）/20240926 潍柴火炬/.site-ready/weichai-spark-plug/05.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20240926 潍柴火炬/潍柴火炬LOGO_OutLine.png",
       "status": "withdrawn"
     },
     {
       "object": "digital-twin/akzonobel-shanghai-songjiang/01.webp",
       "stageRel": "数字孪生（digital-twin）/20250410 阿克苏诺贝尔漆油_上海松江/.site-ready/akzonobel-shanghai-songjiang/01.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20250410 阿克苏诺贝尔漆油_上海松江/01 工厂总览.png",
       "status": "published"
     },
     {
       "object": "digital-twin/akzonobel-shanghai-songjiang/02.webp",
       "stageRel": "数字孪生（digital-twin）/20250410 阿克苏诺贝尔漆油_上海松江/.site-ready/akzonobel-shanghai-songjiang/02.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20250410 阿克苏诺贝尔漆油_上海松江/02 原料管理.png",
       "status": "published"
     },
     {
       "object": "digital-twin/akzonobel-shanghai-songjiang/03.webp",
       "stageRel": "数字孪生（digital-twin）/20250410 阿克苏诺贝尔漆油_上海松江/.site-ready/akzonobel-shanghai-songjiang/03.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20250410 阿克苏诺贝尔漆油_上海松江/03 产线管理.png",
       "status": "published"
     },
     {
       "object": "digital-twin/akzonobel-shanghai-songjiang/04.webp",
       "stageRel": "数字孪生（digital-twin）/20250410 阿克苏诺贝尔漆油_上海松江/.site-ready/akzonobel-shanghai-songjiang/04.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20250410 阿克苏诺贝尔漆油_上海松江/04 设备管理.png",
       "status": "published"
     },
     {
       "object": "digital-twin/akzonobel-shanghai-songjiang/05.webp",
       "stageRel": "数字孪生（digital-twin）/20250410 阿克苏诺贝尔漆油_上海松江/.site-ready/akzonobel-shanghai-songjiang/05.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20250410 阿克苏诺贝尔漆油_上海松江/05 仓储管理.png",
       "status": "published"
     },
     {
       "object": "digital-twin/akzonobel-shanghai-songjiang/06.webp",
       "stageRel": "数字孪生（digital-twin）/20250410 阿克苏诺贝尔漆油_上海松江/.site-ready/akzonobel-shanghai-songjiang/06.webp",
+      "sourceStageRel": "数字孪生（digital-twin）/20250410 阿克苏诺贝尔漆油_上海松江/06 现场部署 1.jpg",
       "status": "published"
     },
     {
       "object": "game-dev/antigravity/01.webp",
       "stageRel": "游戏开发（game-dev）/参赛作品/反重力 AntiGravity/.site-ready/antigravity/01.webp",
+      "sourceStageRel": "游戏开发（game-dev）/参赛作品/反重力 AntiGravity/反重力_帮助界面 02.jpg",
       "status": "published"
     },
     {
       "object": "game-dev/antigravity/02.webp",
       "stageRel": "游戏开发（game-dev）/参赛作品/反重力 AntiGravity/.site-ready/antigravity/02.webp",
+      "sourceStageRel": "游戏开发（game-dev）/参赛作品/反重力 AntiGravity/反重力_开始界面 01.jpg",
       "status": "published"
     },
     {
       "object": "game-dev/antigravity/03.webp",
       "stageRel": "游戏开发（game-dev）/参赛作品/反重力 AntiGravity/.site-ready/antigravity/03.webp",
+      "sourceStageRel": "游戏开发（game-dev）/参赛作品/反重力 AntiGravity/反重力_排行榜界面 01.jpg",
       "status": "published"
     },
     {
       "object": "game-dev/antigravity/04.webp",
       "stageRel": "游戏开发（game-dev）/参赛作品/反重力 AntiGravity/.site-ready/antigravity/04.webp",
+      "sourceStageRel": "游戏开发（game-dev）/参赛作品/反重力 AntiGravity/反重力_设置界面.jpg",
       "status": "published"
     },
     {
       "object": "game-dev/antigravity/05.webp",
       "stageRel": "游戏开发（game-dev）/参赛作品/反重力 AntiGravity/.site-ready/antigravity/05.webp",
+      "sourceStageRel": "游戏开发（game-dev）/参赛作品/反重力 AntiGravity/反重力_升级界面 01.jpg",
       "status": "published"
     },
     {
       "object": "game-dev/antigravity/06.webp",
       "stageRel": "游戏开发（game-dev）/参赛作品/反重力 AntiGravity/.site-ready/antigravity/06.webp",
+      "sourceStageRel": "游戏开发（game-dev）/参赛作品/反重力 AntiGravity/反重力_通关界面 01.jpg",
       "status": "published"
     },
     {
       "object": "game-dev/antigravity/07.webp",
       "stageRel": "游戏开发（game-dev）/参赛作品/反重力 AntiGravity/.site-ready/antigravity/07.webp",
+      "sourceStageRel": "游戏开发（game-dev）/参赛作品/反重力 AntiGravity/反重力_游戏结束 01.jpg",
       "status": "published"
     },
     {
       "object": "game-dev/antigravity/08.webp",
       "stageRel": "游戏开发（game-dev）/参赛作品/反重力 AntiGravity/.site-ready/antigravity/08.webp",
+      "sourceStageRel": "游戏开发（game-dev）/参赛作品/反重力 AntiGravity/反重力_游戏中 02.jpg",
       "status": "published"
     },
     {
       "object": "game-dev/unity-basics/01.webp",
       "stageRel": "游戏开发（game-dev）/技术文章/Unity基础教程/.site-ready/unity-basics/01.webp",
+      "sourceStageRel": "游戏开发（game-dev）/技术文章/Unity基础教程/Unity基础教程 1.png",
       "status": "published"
     },
     {
       "object": "game-dev/unity-basics/02.webp",
       "stageRel": "游戏开发（game-dev）/技术文章/Unity基础教程/.site-ready/unity-basics/02.webp",
+      "sourceStageRel": "游戏开发（game-dev）/技术文章/Unity基础教程/Unity基础教程 2.png",
       "status": "published"
     },
     {
       "object": "game-dev/unity-basics/03.webp",
       "stageRel": "游戏开发（game-dev）/技术文章/Unity基础教程/.site-ready/unity-basics/03.webp",
+      "sourceStageRel": "游戏开发（game-dev）/技术文章/Unity基础教程/Unity基础教程 3.png",
       "status": "published"
     },
     {
       "object": "game-dev/3d-rpg/01.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/3DRPG/.site-ready/3d-rpg/01.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/3DRPG/3DRPG_练习 0.png",
       "status": "published"
     },
     {
       "object": "game-dev/3d-rpg/02.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/3DRPG/.site-ready/3d-rpg/02.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/3DRPG/3DRPG_练习 1.png",
       "status": "published"
     },
     {
       "object": "game-dev/3d-rpg/03.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/3DRPG/.site-ready/3d-rpg/03.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/3DRPG/3DRPG_练习 2.png",
       "status": "published"
     },
     {
       "object": "game-dev/3d-rpg/04.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/3DRPG/.site-ready/3d-rpg/04.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/3DRPG/3DRPG_练习 3.png",
       "status": "published"
     },
     {
       "object": "game-dev/3d-rpg/05.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/3DRPG/.site-ready/3d-rpg/05.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/3DRPG/3DRPG_练习 4.png",
       "status": "published"
     },
     {
       "object": "game-dev/3d-rpg/06.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/3DRPG/.site-ready/3d-rpg/06.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/3DRPG/3DRPG_练习 5.png",
       "status": "published"
     },
     {
       "object": "game-dev/3d-rpg/07.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/3DRPG/.site-ready/3d-rpg/07.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/3DRPG/3DRPG_练习 6.png",
       "status": "published"
     },
     {
       "object": "game-dev/3d-rpg/08.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/3DRPG/.site-ready/3d-rpg/08.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/3DRPG/3DRPG_游戏架构图 1.png",
       "status": "published"
     },
     {
       "object": "game-dev/dark-queen-3d-action/01.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/暗黑女王 3D动作/.site-ready/dark-queen-3d-action/01.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/暗黑女王 3D动作/暗黑女王_练习 1.png",
       "status": "published"
     },
     {
       "object": "game-dev/dark-queen-3d-action/02.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/暗黑女王 3D动作/.site-ready/dark-queen-3d-action/02.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/暗黑女王 3D动作/暗黑女王_练习 2.png",
       "status": "published"
     },
     {
       "object": "game-dev/dark-queen-3d-action/03.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/暗黑女王 3D动作/.site-ready/dark-queen-3d-action/03.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/暗黑女王 3D动作/暗黑女王_练习 3.png",
       "status": "published"
     },
     {
       "object": "game-dev/classic-games/01.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/经典游戏/.site-ready/classic-games/01.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/经典游戏/捕鱼达人_练习 1.png",
       "status": "published"
     },
     {
       "object": "game-dev/classic-games/02.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/经典游戏/.site-ready/classic-games/02.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/经典游戏/俄罗斯方块_练习 1.png",
       "status": "published"
     },
     {
       "object": "game-dev/classic-games/03.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/经典游戏/.site-ready/classic-games/03.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/经典游戏/愤怒的小鸟_练习 1.png",
       "status": "published"
     },
     {
       "object": "game-dev/classic-games/04.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/经典游戏/.site-ready/classic-games/04.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/经典游戏/贪吃蛇_练习 1.png",
       "status": "published"
     },
     {
       "object": "game-dev/classic-games/05.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/经典游戏/.site-ready/classic-games/05.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/经典游戏/坦克大战_练习 1.png",
       "status": "published"
     },
     {
       "object": "game-dev/classic-games/06.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/经典游戏/.site-ready/classic-games/06.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/经典游戏/小跳蛙_练习 1.png",
       "status": "published"
     },
     {
       "object": "game-dev/p-grade-position-tower-defense/01.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/P级阵地 塔防/.site-ready/p-grade-position-tower-defense/01.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/P级阵地 塔防/P级阵地_练习 1.png",
       "status": "published"
     },
     {
       "object": "game-dev/p-grade-position-tower-defense/02.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/P级阵地 塔防/.site-ready/p-grade-position-tower-defense/02.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/P级阵地 塔防/P级阵地_练习 2.png",
       "status": "published"
     },
     {
       "object": "game-dev/qframework/01.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/QFramework 框架/.site-ready/qframework/01.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/QFramework 框架/背包制作_练习 1.gif",
       "status": "published"
     },
     {
       "object": "game-dev/qframework/02.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/QFramework 框架/.site-ready/qframework/02.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/QFramework 框架/点点点_游戏架构图 1.png",
       "status": "published"
     },
     {
       "object": "game-dev/unity-official-tutorial/01.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/Unity官方教程/.site-ready/unity-official-tutorial/01.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/Unity官方教程/官方教程_练习 1.png",
       "status": "published"
     },
     {
       "object": "game-dev/unity-official-tutorial/02.webp",
       "stageRel": "游戏开发（game-dev）/练习作品/Unity官方教程/.site-ready/unity-official-tutorial/02.webp",
+      "sourceStageRel": "游戏开发（game-dev）/练习作品/Unity官方教程/官方教程_练习 2.png",
       "status": "published"
     },
     {
       "object": "landscape-rendering/henan-tech-landscape-graduation/01.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/20180601 河南科技大学 风景园林毕业设计/.site-ready/henan-tech-landscape-graduation/01.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/20180601 河南科技大学 风景园林毕业设计/1.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/henan-tech-landscape-graduation/02.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/20180601 河南科技大学 风景园林毕业设计/.site-ready/henan-tech-landscape-graduation/02.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/20180601 河南科技大学 风景园林毕业设计/3.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/henan-tech-landscape-graduation/03.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/20180601 河南科技大学 风景园林毕业设计/.site-ready/henan-tech-landscape-graduation/03.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/20180601 河南科技大学 风景园林毕业设计/6.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/henan-tech-landscape-graduation/04.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/20180601 河南科技大学 风景园林毕业设计/.site-ready/henan-tech-landscape-graduation/04.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/20180601 河南科技大学 风景园林毕业设计/7.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/henan-tech-landscape-graduation/05.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/20180601 河南科技大学 风景园林毕业设计/.site-ready/henan-tech-landscape-graduation/05.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/20180601 河南科技大学 风景园林毕业设计/14.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/henan-tech-landscape-graduation/06.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/20180601 河南科技大学 风景园林毕业设计/.site-ready/henan-tech-landscape-graduation/06.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/20180601 河南科技大学 风景园林毕业设计/21.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/henan-tech-landscape-graduation/07.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/20180601 河南科技大学 风景园林毕业设计/.site-ready/henan-tech-landscape-graduation/07.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/20180601 河南科技大学 风景园林毕业设计/23.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/henan-tech-landscape-graduation/08.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/20180601 河南科技大学 风景园林毕业设计/.site-ready/henan-tech-landscape-graduation/08.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/20180601 河南科技大学 风景园林毕业设计/25.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/hailunbao-yangzhou/01.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/201912 海伦堡扬州/20200527-HLB-D-DU/.site-ready/hailunbao-yangzhou/01.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/201912 海伦堡扬州/20200527-HLB-D-DU/__01.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/hailunbao-yangzhou/02.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/201912 海伦堡扬州/20200527-HLB-D-DU/.site-ready/hailunbao-yangzhou/02.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/201912 海伦堡扬州/20200527-HLB-D-DU/__02.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/hailunbao-yangzhou/03.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/201912 海伦堡扬州/20200527-HLB-D-DU/.site-ready/hailunbao-yangzhou/03.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/201912 海伦堡扬州/20200527-HLB-D-DU/__03.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/hailunbao-yangzhou/04.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/201912 海伦堡扬州/20200527-HLB-D-DU/.site-ready/hailunbao-yangzhou/04.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/201912 海伦堡扬州/20200527-HLB-D-DU/__04.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/hailunbao-yangzhou/05.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/201912 海伦堡扬州/20200527-HLB-D-DU/.site-ready/hailunbao-yangzhou/05.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/201912 海伦堡扬州/20200527-HLB-D-DU/__05.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/hailunbao-yangzhou/06.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/201912 海伦堡扬州/20200527-HLB-D-DU/.site-ready/hailunbao-yangzhou/06.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/201912 海伦堡扬州/20200527-HLB-D-DU/__06.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/hailunbao-yangzhou/07.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/201912 海伦堡扬州/20200527-HLB-D-DU/.site-ready/hailunbao-yangzhou/07.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/201912 海伦堡扬州/20200527-HLB-D-DU/__08.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/hailunbao-yangzhou/08.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/201912 海伦堡扬州/20200527-HLB-D-DU/.site-ready/hailunbao-yangzhou/08.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/201912 海伦堡扬州/20200527-HLB-D-DU/__10.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/jincheng-huzhou/01.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202002 金成湖州/20200428-JCHZ-3#-DU/.site-ready/jincheng-huzhou/01.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202002 金成湖州/20200428-JCHZ-3#-DU/20200428-JCHZ-3#-DU_01.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/jincheng-huzhou/02.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202002 金成湖州/20200428-JCHZ-3#-DU/.site-ready/jincheng-huzhou/02.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202002 金成湖州/20200428-JCHZ-3#-DU/20200428-JCHZ-3#-DU_02.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/jincheng-huzhou/03.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202002 金成湖州/20200428-JCHZ-3#-DU/.site-ready/jincheng-huzhou/03.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202002 金成湖州/20200428-JCHZ-3#-DU/20200428-JCHZ-3#-DU_03.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/jincheng-huzhou/04.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202002 金成湖州/20200428-JCHZ-3#-DU/.site-ready/jincheng-huzhou/04.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202002 金成湖州/20200428-JCHZ-3#-DU/20200428-JCHZ-3#-DU_04.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/jincheng-huzhou/05.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202002 金成湖州/20200428-JCHZ-3#-DU/.site-ready/jincheng-huzhou/05.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202002 金成湖州/20200428-JCHZ-3#-DU/20200428-JCHZ-3#-DU_05.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/jincheng-huzhou/06.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202002 金成湖州/20200428-JCHZ-3#-DU/.site-ready/jincheng-huzhou/06.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202002 金成湖州/20200428-JCHZ-3#-DU/20200428-JCHZ-3#-DU_07.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/jincheng-huzhou/07.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202002 金成湖州/20200428-JCHZ-3#-DU/.site-ready/jincheng-huzhou/07.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202002 金成湖州/20200428-JCHZ-3#-DU/20200428-JCHZ-3#-DU_08.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/jincheng-huzhou/08.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202002 金成湖州/20200428-JCHZ-3#-DU/.site-ready/jincheng-huzhou/08.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202002 金成湖州/20200428-JCHZ-3#-DU/20200428-JCHZ-3#-DU_09.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/zhengzhou-mengzhuang/01.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202003 郑州孟庄/20200518SMZZ-DU/.site-ready/zhengzhou-mengzhuang/01.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202003 郑州孟庄/20200518SMZZ-DU/20200518SMZZ-DU_01.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/zhengzhou-mengzhuang/02.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202003 郑州孟庄/20200518SMZZ-DU/.site-ready/zhengzhou-mengzhuang/02.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202003 郑州孟庄/20200518SMZZ-DU/20200518SMZZ-DU_05.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/zhengzhou-mengzhuang/03.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202003 郑州孟庄/20200518SMZZ-DU/.site-ready/zhengzhou-mengzhuang/03.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202003 郑州孟庄/20200518SMZZ-DU/20200518SMZZ-DU_28.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/beijing-shouchuang-rental-apartment/01.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202004 北京首创长租公寓/20200606_BJSCCZGY_01zhaijian02_DU/.site-ready/beijing-shouchuang-rental-apartment/01.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202004 北京首创长租公寓/20200606_BJSCCZGY_01zhaijian02_DU/0604_15.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/beijing-shouchuang-rental-apartment/02.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202004 北京首创长租公寓/20200606_BJSCCZGY_01zhaijian02_DU/.site-ready/beijing-shouchuang-rental-apartment/02.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202004 北京首创长租公寓/20200606_BJSCCZGY_01zhaijian02_DU/0606_01.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/beijing-shouchuang-rental-apartment/03.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202004 北京首创长租公寓/20200606_BJSCCZGY_01zhaijian02_DU/.site-ready/beijing-shouchuang-rental-apartment/03.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202004 北京首创长租公寓/20200606_BJSCCZGY_01zhaijian02_DU/0606_02.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/beijing-shouchuang-rental-apartment/04.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202004 北京首创长租公寓/20200606_BJSCCZGY_01zhaijian02_DU/.site-ready/beijing-shouchuang-rental-apartment/04.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202004 北京首创长租公寓/20200606_BJSCCZGY_01zhaijian02_DU/0606_03.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/beijing-shouchuang-rental-apartment/05.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202004 北京首创长租公寓/20200606_BJSCCZGY_01zhaijian02_DU/.site-ready/beijing-shouchuang-rental-apartment/05.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202004 北京首创长租公寓/20200606_BJSCCZGY_01zhaijian02_DU/0606_04.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/beijing-shouchuang-rental-apartment/06.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202004 北京首创长租公寓/20200606_BJSCCZGY_01zhaijian02_DU/.site-ready/beijing-shouchuang-rental-apartment/06.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202004 北京首创长租公寓/20200606_BJSCCZGY_01zhaijian02_DU/0606_05.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/beijing-shouchuang-rental-apartment/07.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202004 北京首创长租公寓/20200606_BJSCCZGY_01zhaijian02_DU/.site-ready/beijing-shouchuang-rental-apartment/07.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202004 北京首创长租公寓/20200606_BJSCCZGY_01zhaijian02_DU/0606_06.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/beijing-shouchuang-rental-apartment/08.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202004 北京首创长租公寓/20200606_BJSCCZGY_01zhaijian02_DU/.site-ready/beijing-shouchuang-rental-apartment/08.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202004 北京首创长租公寓/20200606_BJSCCZGY_01zhaijian02_DU/0606_07.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/zhengzhou-changxihu/01.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202005 世茂郑州常西湖/20200703-CXH-DU/.site-ready/zhengzhou-changxihu/01.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202005 世茂郑州常西湖/20200703-CXH-DU/0703_18.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/zhengzhou-changxihu/02.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202005 世茂郑州常西湖/20200703-CXH-DU/.site-ready/zhengzhou-changxihu/02.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202005 世茂郑州常西湖/20200703-CXH-DU/0703_31.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/zhengzhou-changxihu/03.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202005 世茂郑州常西湖/20200703-CXH-DU/.site-ready/zhengzhou-changxihu/03.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202005 世茂郑州常西湖/20200703-CXH-DU/0703_32.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/zhengzhou-changxihu/04.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202005 世茂郑州常西湖/20200703-CXH-DU/.site-ready/zhengzhou-changxihu/04.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202005 世茂郑州常西湖/20200703-CXH-DU/0703_33.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/zhengzhou-changxihu/05.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202005 世茂郑州常西湖/20200703-CXH-DU/.site-ready/zhengzhou-changxihu/05.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202005 世茂郑州常西湖/20200703-CXH-DU/0703_34.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/zhengzhou-changxihu/06.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202005 世茂郑州常西湖/20200703-CXH-DU/.site-ready/zhengzhou-changxihu/06.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202005 世茂郑州常西湖/20200703-CXH-DU/0703_36.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/zhengzhou-changxihu/07.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202005 世茂郑州常西湖/20200703-CXH-DU/.site-ready/zhengzhou-changxihu/07.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202005 世茂郑州常西湖/20200703-CXH-DU/0703_37.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/zhengzhou-changxihu/08.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202005 世茂郑州常西湖/20200703-CXH-DU/.site-ready/zhengzhou-changxihu/08.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202005 世茂郑州常西湖/20200703-CXH-DU/0703_38.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/beijing-fenzhongsi-residence/01.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 北京分钟寺豪宅/20200617_BJFZS-SFQ_DU/.site-ready/beijing-fenzhongsi-residence/01.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 北京分钟寺豪宅/20200617_BJFZS-SFQ_DU/0617_01.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/beijing-fenzhongsi-residence/02.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 北京分钟寺豪宅/20200617_BJFZS-SFQ_DU/.site-ready/beijing-fenzhongsi-residence/02.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 北京分钟寺豪宅/20200617_BJFZS-SFQ_DU/0617_02.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/beijing-fenzhongsi-residence/03.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 北京分钟寺豪宅/20200617_BJFZS-SFQ_DU/.site-ready/beijing-fenzhongsi-residence/03.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 北京分钟寺豪宅/20200617_BJFZS-SFQ_DU/0617_03.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/beijing-fenzhongsi-residence/04.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 北京分钟寺豪宅/20200617_BJFZS-SFQ_DU/.site-ready/beijing-fenzhongsi-residence/04.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 北京分钟寺豪宅/20200617_BJFZS-SFQ_DU/0617_06.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/beijing-fenzhongsi-residence/05.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 北京分钟寺豪宅/20200617_BJFZS-SFQ_DU/.site-ready/beijing-fenzhongsi-residence/05.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 北京分钟寺豪宅/20200617_BJFZS-SFQ_DU/0617_07.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/beijing-fenzhongsi-residence/06.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 北京分钟寺豪宅/20200617_BJFZS-SFQ_DU/.site-ready/beijing-fenzhongsi-residence/06.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 北京分钟寺豪宅/20200617_BJFZS-SFQ_DU/0617_11.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/beijing-fenzhongsi-residence/07.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 北京分钟寺豪宅/20200617_BJFZS-SFQ_DU/.site-ready/beijing-fenzhongsi-residence/07.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 北京分钟寺豪宅/20200617_BJFZS-SFQ_DU/0617_13.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/beijing-fenzhongsi-residence/08.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 北京分钟寺豪宅/20200617_BJFZS-SFQ_DU/.site-ready/beijing-fenzhongsi-residence/08.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 北京分钟寺豪宅/20200617_BJFZS-SFQ_DU/0617_14.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/kunming-jinzeyuan/01.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 富康城昆明金泽园/20200710_FKCKMJZY_DU/.site-ready/kunming-jinzeyuan/01.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 富康城昆明金泽园/20200710_FKCKMJZY_DU/0710_01.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/kunming-jinzeyuan/02.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 富康城昆明金泽园/20200710_FKCKMJZY_DU/.site-ready/kunming-jinzeyuan/02.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 富康城昆明金泽园/20200710_FKCKMJZY_DU/0710_02.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/kunming-jinzeyuan/03.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 富康城昆明金泽园/20200710_FKCKMJZY_DU/.site-ready/kunming-jinzeyuan/03.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 富康城昆明金泽园/20200710_FKCKMJZY_DU/0710_03.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/kunming-jinzeyuan/04.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 富康城昆明金泽园/20200710_FKCKMJZY_DU/.site-ready/kunming-jinzeyuan/04.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 富康城昆明金泽园/20200710_FKCKMJZY_DU/0710_04.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/kunming-jinzeyuan/05.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 富康城昆明金泽园/20200710_FKCKMJZY_DU/.site-ready/kunming-jinzeyuan/05.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 富康城昆明金泽园/20200710_FKCKMJZY_DU/0710_05.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/kunming-jinzeyuan/06.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 富康城昆明金泽园/20200710_FKCKMJZY_DU/.site-ready/kunming-jinzeyuan/06.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 富康城昆明金泽园/20200710_FKCKMJZY_DU/0710_07.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/kunming-jinzeyuan/07.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 富康城昆明金泽园/20200710_FKCKMJZY_DU/.site-ready/kunming-jinzeyuan/07.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 富康城昆明金泽园/20200710_FKCKMJZY_DU/0710_08.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/kunming-jinzeyuan/08.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 富康城昆明金泽园/20200710_FKCKMJZY_DU/.site-ready/kunming-jinzeyuan/08.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 富康城昆明金泽园/20200710_FKCKMJZY_DU/0710_09.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/shaoguan/01.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂韶关/20200628_SMSG-SFQ02_DU/.site-ready/shaoguan/01.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂韶关/20200628_SMSG-SFQ02_DU/0628_01.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/shaoguan/02.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂韶关/20200628_SMSG-SFQ02_DU/.site-ready/shaoguan/02.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂韶关/20200628_SMSG-SFQ02_DU/0628_03.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/shaoguan/03.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂韶关/20200628_SMSG-SFQ02_DU/.site-ready/shaoguan/03.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂韶关/20200628_SMSG-SFQ02_DU/0628_04.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/shaoguan/04.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂韶关/20200628_SMSG-SFQ02_DU/.site-ready/shaoguan/04.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂韶关/20200628_SMSG-SFQ02_DU/0628_06.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/shaoguan/05.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂韶关/20200628_SMSG-SFQ02_DU/.site-ready/shaoguan/05.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂韶关/20200628_SMSG-SFQ02_DU/0628_08.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/shaoguan/06.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂韶关/20200628_SMSG-SFQ02_DU/.site-ready/shaoguan/06.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂韶关/20200628_SMSG-SFQ02_DU/0628_09.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/shaoguan/07.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂韶关/20200628_SMSG-SFQ02_DU/.site-ready/shaoguan/07.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂韶关/20200628_SMSG-SFQ02_DU/0628_11.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/shaoguan/08.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂韶关/20200628_SMSG-SFQ02_DU/.site-ready/shaoguan/08.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂韶关/20200628_SMSG-SFQ02_DU/0628_12.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/weifang-commercial/01.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂潍坊商业/20200803_SMWFSY-01_DU/.site-ready/weifang-commercial/01.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂潍坊商业/20200803_SMWFSY-01_DU/0803_01.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/weifang-commercial/02.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂潍坊商业/20200803_SMWFSY-01_DU/.site-ready/weifang-commercial/02.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂潍坊商业/20200803_SMWFSY-01_DU/0803_02.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/weifang-commercial/03.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂潍坊商业/20200803_SMWFSY-01_DU/.site-ready/weifang-commercial/03.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂潍坊商业/20200803_SMWFSY-01_DU/0803_04.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/weifang-commercial/04.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂潍坊商业/20200803_SMWFSY-01_DU/.site-ready/weifang-commercial/04.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂潍坊商业/20200803_SMWFSY-01_DU/0803_06.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/weifang-commercial/05.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂潍坊商业/20200803_SMWFSY-01_DU/.site-ready/weifang-commercial/05.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂潍坊商业/20200803_SMWFSY-01_DU/0803_09.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/weifang-commercial/06.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂潍坊商业/20200803_SMWFSY-01_DU/.site-ready/weifang-commercial/06.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂潍坊商业/20200803_SMWFSY-01_DU/0803_10.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/weifang-commercial/07.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂潍坊商业/20200803_SMWFSY-01_DU/.site-ready/weifang-commercial/07.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂潍坊商业/20200803_SMWFSY-01_DU/0803_11.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/weifang-commercial/08.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂潍坊商业/20200803_SMWFSY-01_DU/.site-ready/weifang-commercial/08.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202006 世茂潍坊商业/20200803_SMWFSY-01_DU/0803_14.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/maoming/01.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202007 世茂茂名/20200723_SMMM_DU/.site-ready/maoming/01.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202007 世茂茂名/20200723_SMMM_DU/0724_11.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/maoming/02.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202007 世茂茂名/20200723_SMMM_DU/.site-ready/maoming/02.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202007 世茂茂名/20200723_SMMM_DU/0724_12.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/maoming/03.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202007 世茂茂名/20200723_SMMM_DU/.site-ready/maoming/03.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202007 世茂茂名/20200723_SMMM_DU/0724_13.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/maoming/04.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202007 世茂茂名/20200723_SMMM_DU/.site-ready/maoming/04.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202007 世茂茂名/20200723_SMMM_DU/0724_14.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/maoming/05.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202007 世茂茂名/20200723_SMMM_DU/.site-ready/maoming/05.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202007 世茂茂名/20200723_SMMM_DU/0724_15.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/maoming/06.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202007 世茂茂名/20200723_SMMM_DU/.site-ready/maoming/06.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202007 世茂茂名/20200723_SMMM_DU/0724_16.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/maoming/07.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202007 世茂茂名/20200723_SMMM_DU/.site-ready/maoming/07.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202007 世茂茂名/20200723_SMMM_DU/0724_17.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/maoming/08.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202007 世茂茂名/20200723_SMMM_DU/.site-ready/maoming/08.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202007 世茂茂名/20200723_SMMM_DU/0724_18.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/harbin-jiangyufu/01.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202008 哈尔滨江御府/20200813_HEBZSQ_DU/.site-ready/harbin-jiangyufu/01.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202008 哈尔滨江御府/20200813_HEBZSQ_DU/0813_01.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/harbin-jiangyufu/02.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202008 哈尔滨江御府/20200813_HEBZSQ_DU/.site-ready/harbin-jiangyufu/02.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202008 哈尔滨江御府/20200813_HEBZSQ_DU/0813_05.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/harbin-jiangyufu/03.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202008 哈尔滨江御府/20200813_HEBZSQ_DU/.site-ready/harbin-jiangyufu/03.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202008 哈尔滨江御府/20200813_HEBZSQ_DU/0813_06.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/harbin-jiangyufu/04.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202008 哈尔滨江御府/20200813_HEBZSQ_DU/.site-ready/harbin-jiangyufu/04.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202008 哈尔滨江御府/20200813_HEBZSQ_DU/0813_07.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/harbin-jiangyufu/05.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202008 哈尔滨江御府/20200813_HEBZSQ_DU/.site-ready/harbin-jiangyufu/05.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202008 哈尔滨江御府/20200813_HEBZSQ_DU/0813_08.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/harbin-jiangyufu/06.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202008 哈尔滨江御府/20200813_HEBZSQ_DU/.site-ready/harbin-jiangyufu/06.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202008 哈尔滨江御府/20200813_HEBZSQ_DU/0813_09.jpg",
       "status": "published"
     },
     {
       "object": "landscape-rendering/harbin-jiangyufu/07.webp",
       "stageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202008 哈尔滨江御府/20200813_HEBZSQ_DU/.site-ready/harbin-jiangyufu/07.webp",
+      "sourceStageRel": "景观效果图（landscape-rendering）/上海道田景观工程咨询有限公司/202008 哈尔滨江御府/20200813_HEBZSQ_DU/0813_10.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/singapore-20191125/01.webp",
       "stageRel": "风光摄影（landscape-photo）/20191125 新加坡/.site-ready/singapore-20191125/01.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20191125 新加坡/P1330899-3.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/singapore-20191125/02.webp",
       "stageRel": "风光摄影（landscape-photo）/20191125 新加坡/.site-ready/singapore-20191125/02.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20191125 新加坡/P1340964.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/singapore-20191125/03.webp",
       "stageRel": "风光摄影（landscape-photo）/20191125 新加坡/.site-ready/singapore-20191125/03.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20191125 新加坡/P1350049-3.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/singapore-20191125/04.webp",
       "stageRel": "风光摄影（landscape-photo）/20191125 新加坡/.site-ready/singapore-20191125/04.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20191125 新加坡/P1350052-Enhanced-4.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/nanjing-20211119/01.webp",
       "stageRel": "风光摄影（landscape-photo）/20211119 南京/.site-ready/nanjing-20211119/01.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20211119 南京/P1588490.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/nanjing-20211119/02.webp",
       "stageRel": "风光摄影（landscape-photo）/20211119 南京/.site-ready/nanjing-20211119/02.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20211119 南京/P1599032.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/hebi-stars-20220912/01.webp",
       "stageRel": "风光摄影（landscape-photo）/20220912 鹤壁 星空/.site-ready/hebi-stars-20220912/01.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20220912 鹤壁 星空/20220912-106.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/suzhou-dayangshan/01.webp",
       "stageRel": "风光摄影（landscape-photo）/20230903 苏州 大阳山/.site-ready/suzhou-dayangshan/01.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20230903 苏州 大阳山/P1360849.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/suzhou-dayangshan/02.webp",
       "stageRel": "风光摄影（landscape-photo）/20230903 苏州 大阳山/.site-ready/suzhou-dayangshan/02.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20230903 苏州 大阳山/P1360934.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/suzhou-dayangshan/03.webp",
       "stageRel": "风光摄影（landscape-photo）/20230903 苏州 大阳山/.site-ready/suzhou-dayangshan/03.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20230903 苏州 大阳山/P1370007.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/suzhou-dayangshan/04.webp",
       "stageRel": "风光摄影（landscape-photo）/20230903 苏州 大阳山/.site-ready/suzhou-dayangshan/04.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20230903 苏州 大阳山/P1370159.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/nanchang-tengwang-pavilion/01.webp",
       "stageRel": "风光摄影（landscape-photo）/20231115 南昌 滕王阁/.site-ready/nanchang-tengwang-pavilion/01.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20231115 南昌 滕王阁/P1370776.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/nanchang-tengwang-pavilion/02.webp",
       "stageRel": "风光摄影（landscape-photo）/20231115 南昌 滕王阁/.site-ready/nanchang-tengwang-pavilion/02.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20231115 南昌 滕王阁/P1370939.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/nanchang-tengwang-pavilion/03.webp",
       "stageRel": "风光摄影（landscape-photo）/20231115 南昌 滕王阁/.site-ready/nanchang-tengwang-pavilion/03.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20231115 南昌 滕王阁/P1370967.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/hebi-stars-20241002/01.webp",
       "stageRel": "风光摄影（landscape-photo）/20241002 鹤壁 星空/.site-ready/hebi-stars-20241002/01.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20241002 鹤壁 星空/DSC00768.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/shanghai-jingan-temple/01.webp",
       "stageRel": "风光摄影（landscape-photo）/20250413 上海 静安寺/.site-ready/shanghai-jingan-temple/01.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20250413 上海 静安寺/DSC04068.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/shanghai-jingan-temple/02.webp",
       "stageRel": "风光摄影（landscape-photo）/20250413 上海 静安寺/.site-ready/shanghai-jingan-temple/02.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20250413 上海 静安寺/DSC04069.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/shanghai-jingan-temple/03.webp",
       "stageRel": "风光摄影（landscape-photo）/20250413 上海 静安寺/.site-ready/shanghai-jingan-temple/03.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20250413 上海 静安寺/DSC04073.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/shanghai-jingan-temple/04.webp",
       "stageRel": "风光摄影（landscape-photo）/20250413 上海 静安寺/.site-ready/shanghai-jingan-temple/04.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20250413 上海 静安寺/DSC04081.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/hangzhou-jiuxi/01.webp",
       "stageRel": "风光摄影（landscape-photo）/20251004 杭州 九溪十八涧/.site-ready/hangzhou-jiuxi/01.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20251004 杭州 九溪十八涧/DSC08058.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/hangzhou-jiuxi/02.webp",
       "stageRel": "风光摄影（landscape-photo）/20251004 杭州 九溪十八涧/.site-ready/hangzhou-jiuxi/02.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20251004 杭州 九溪十八涧/DSC08154.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/hangzhou-jiuxi/03.webp",
       "stageRel": "风光摄影（landscape-photo）/20251004 杭州 九溪十八涧/.site-ready/hangzhou-jiuxi/03.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20251004 杭州 九溪十八涧/DSC08194.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/chongqing-yuzhong/01.webp",
       "stageRel": "风光摄影（landscape-photo）/20251008 重庆 渝中区/.site-ready/chongqing-yuzhong/01.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20251008 重庆 渝中区/DSC09551-已增强-降噪.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/chongqing-yuzhong/02.webp",
       "stageRel": "风光摄影（landscape-photo）/20251008 重庆 渝中区/.site-ready/chongqing-yuzhong/02.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20251008 重庆 渝中区/DSC09558-已增强-降噪.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/chongqing-yuzhong/03.webp",
       "stageRel": "风光摄影（landscape-photo）/20251008 重庆 渝中区/.site-ready/chongqing-yuzhong/03.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20251008 重庆 渝中区/DSC09632-已增强-降噪.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/chongqing-yuzhong/04.webp",
       "stageRel": "风光摄影（landscape-photo）/20251008 重庆 渝中区/.site-ready/chongqing-yuzhong/04.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20251008 重庆 渝中区/DSC09668-已增强-降噪.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/chongqing-yuzhong/05.webp",
       "stageRel": "风光摄影（landscape-photo）/20251008 重庆 渝中区/.site-ready/chongqing-yuzhong/05.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20251008 重庆 渝中区/DSC09674-已增强-降噪.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/chongqing-nanan/01.webp",
       "stageRel": "风光摄影（landscape-photo）/20251009 重庆 南岸区/.site-ready/chongqing-nanan/01.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20251009 重庆 南岸区/DSC00543.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/chongqing-nanan/02.webp",
       "stageRel": "风光摄影（landscape-photo）/20251009 重庆 南岸区/.site-ready/chongqing-nanan/02.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20251009 重庆 南岸区/DSC00552.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/chongqing-nanan/03.webp",
       "stageRel": "风光摄影（landscape-photo）/20251009 重庆 南岸区/.site-ready/chongqing-nanan/03.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20251009 重庆 南岸区/DSC00826.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-putuoshan/01.webp",
       "stageRel": "风光摄影（landscape-photo）/20260504 舟山 普陀山/.site-ready/zhoushan-putuoshan/01.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260504 舟山 普陀山/DSC01544.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-putuoshan/02.webp",
       "stageRel": "风光摄影（landscape-photo）/20260504 舟山 普陀山/.site-ready/zhoushan-putuoshan/02.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260504 舟山 普陀山/DSC01648.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-putuoshan/03.webp",
       "stageRel": "风光摄影（landscape-photo）/20260504 舟山 普陀山/.site-ready/zhoushan-putuoshan/03.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260504 舟山 普陀山/DSC01746.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-putuoshan/04.webp",
       "stageRel": "风光摄影（landscape-photo）/20260504 舟山 普陀山/.site-ready/zhoushan-putuoshan/04.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260504 舟山 普陀山/DSC01767.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-putuoshan/05.webp",
       "stageRel": "风光摄影（landscape-photo）/20260504 舟山 普陀山/.site-ready/zhoushan-putuoshan/05.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260504 舟山 普陀山/DSC01828.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-putuoshan/06.webp",
       "stageRel": "风光摄影（landscape-photo）/20260504 舟山 普陀山/.site-ready/zhoushan-putuoshan/06.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260504 舟山 普陀山/DSC01868.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-putuoshan/07.webp",
       "stageRel": "风光摄影（landscape-photo）/20260504 舟山 普陀山/.site-ready/zhoushan-putuoshan/07.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260504 舟山 普陀山/DSC01880.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-putuoshan/08.webp",
       "stageRel": "风光摄影（landscape-photo）/20260504 舟山 普陀山/.site-ready/zhoushan-putuoshan/08.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260504 舟山 普陀山/DSC01953.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/maling-ancient-trail/01.webp",
       "stageRel": "风光摄影（landscape-photo）/20260517 兴义 马岭古道/.site-ready/maling-ancient-trail/01.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260517 兴义 马岭古道/DSC02092.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/maling-ancient-trail/02.webp",
       "stageRel": "风光摄影（landscape-photo）/20260517 兴义 马岭古道/.site-ready/maling-ancient-trail/02.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260517 兴义 马岭古道/DSC02128.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/maling-ancient-trail/03.webp",
       "stageRel": "风光摄影（landscape-photo）/20260517 兴义 马岭古道/.site-ready/maling-ancient-trail/03.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260517 兴义 马岭古道/DSC02165.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/maling-ancient-trail/04.webp",
       "stageRel": "风光摄影（landscape-photo）/20260517 兴义 马岭古道/.site-ready/maling-ancient-trail/04.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260517 兴义 马岭古道/DSC02263.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/maling-ancient-trail/05.webp",
       "stageRel": "风光摄影（landscape-photo）/20260517 兴义 马岭古道/.site-ready/maling-ancient-trail/05.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260517 兴义 马岭古道/DSC02301.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/maling-ancient-trail/06.webp",
       "stageRel": "风光摄影（landscape-photo）/20260517 兴义 马岭古道/.site-ready/maling-ancient-trail/06.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260517 兴义 马岭古道/DSC02515.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/maling-ancient-trail/07.webp",
       "stageRel": "风光摄影（landscape-photo）/20260517 兴义 马岭古道/.site-ready/maling-ancient-trail/07.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260517 兴义 马岭古道/DSC02520.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/shanghai-firefly-base/01.webp",
       "stageRel": "风光摄影（landscape-photo）/20260618 上海 萤火虫基地/.site-ready/shanghai-firefly-base/01.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260618 上海 萤火虫基地/DSC02760-已增强-降噪.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/shanghai-firefly-base/02.webp",
       "stageRel": "风光摄影（landscape-photo）/20260618 上海 萤火虫基地/.site-ready/shanghai-firefly-base/02.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260618 上海 萤火虫基地/DSC02762-已增强-降噪.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/shanghai-firefly-base/03.webp",
       "stageRel": "风光摄影（landscape-photo）/20260618 上海 萤火虫基地/.site-ready/shanghai-firefly-base/03.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260618 上海 萤火虫基地/DSC02770-已增强-降噪.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/shanghai-firefly-base/04.webp",
       "stageRel": "风光摄影（landscape-photo）/20260618 上海 萤火虫基地/.site-ready/shanghai-firefly-base/04.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260618 上海 萤火虫基地/DSC02776-已增强-降噪.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-dongfushan/01.webp",
       "stageRel": "风光摄影（landscape-photo）/20260814 舟山 东极岛 东福山/.site-ready/zhoushan-dongfushan/01.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260814 舟山 东极岛 东福山/DSC04248.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-dongfushan/02.webp",
       "stageRel": "风光摄影（landscape-photo）/20260814 舟山 东极岛 东福山/.site-ready/zhoushan-dongfushan/02.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260814 舟山 东极岛 东福山/DSC04329.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-dongfushan/03.webp",
       "stageRel": "风光摄影（landscape-photo）/20260814 舟山 东极岛 东福山/.site-ready/zhoushan-dongfushan/03.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260814 舟山 东极岛 东福山/DSC04338.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-dongfushan/04.webp",
       "stageRel": "风光摄影（landscape-photo）/20260814 舟山 东极岛 东福山/.site-ready/zhoushan-dongfushan/04.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260814 舟山 东极岛 东福山/DSC04347.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-dongfushan/05.webp",
       "stageRel": "风光摄影（landscape-photo）/20260814 舟山 东极岛 东福山/.site-ready/zhoushan-dongfushan/05.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260814 舟山 东极岛 东福山/DSC04395.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-dongfushan/06.webp",
       "stageRel": "风光摄影（landscape-photo）/20260814 舟山 东极岛 东福山/.site-ready/zhoushan-dongfushan/06.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260814 舟山 东极岛 东福山/DSC04457.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-dongfushan/07.webp",
       "stageRel": "风光摄影（landscape-photo）/20260814 舟山 东极岛 东福山/.site-ready/zhoushan-dongfushan/07.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260814 舟山 东极岛 东福山/DSC04484.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-dongfushan/08.webp",
       "stageRel": "风光摄影（landscape-photo）/20260814 舟山 东极岛 东福山/.site-ready/zhoushan-dongfushan/08.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260814 舟山 东极岛 东福山/DSC04506.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-miaozihu/01.webp",
       "stageRel": "风光摄影（landscape-photo）/20260815 舟山 东极岛 庙子湖/.site-ready/zhoushan-miaozihu/01.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260815 舟山 东极岛 庙子湖/DSC04707.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-miaozihu/02.webp",
       "stageRel": "风光摄影（landscape-photo）/20260815 舟山 东极岛 庙子湖/.site-ready/zhoushan-miaozihu/02.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260815 舟山 东极岛 庙子湖/DSC04725.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-miaozihu/03.webp",
       "stageRel": "风光摄影（landscape-photo）/20260815 舟山 东极岛 庙子湖/.site-ready/zhoushan-miaozihu/03.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260815 舟山 东极岛 庙子湖/DSC04728.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-miaozihu/04.webp",
       "stageRel": "风光摄影（landscape-photo）/20260815 舟山 东极岛 庙子湖/.site-ready/zhoushan-miaozihu/04.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260815 舟山 东极岛 庙子湖/DSC04731.jpg",
       "status": "published"
     },
     {
       "object": "landscape-photo/zhoushan-miaozihu/05.webp",
       "stageRel": "风光摄影（landscape-photo）/20260815 舟山 东极岛 庙子湖/.site-ready/zhoushan-miaozihu/05.webp",
+      "sourceStageRel": "风光摄影（landscape-photo）/20260815 舟山 东极岛 庙子湖/DSC04749.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/anyang-yinxu-museum/01.webp",
       "stageRel": "人文摄影（humanist-photo）/20250519 安阳 殷墟博物馆/.site-ready/anyang-yinxu-museum/01.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20250519 安阳 殷墟博物馆/DSC05712.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/anyang-yinxu-museum/02.webp",
       "stageRel": "人文摄影（humanist-photo）/20250519 安阳 殷墟博物馆/.site-ready/anyang-yinxu-museum/02.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20250519 安阳 殷墟博物馆/DSC05716.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/anyang-yinxu-museum/03.webp",
       "stageRel": "人文摄影（humanist-photo）/20250519 安阳 殷墟博物馆/.site-ready/anyang-yinxu-museum/03.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20250519 安阳 殷墟博物馆/DSC05717.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/anyang-yinxu-museum/04.webp",
       "stageRel": "人文摄影（humanist-photo）/20250519 安阳 殷墟博物馆/.site-ready/anyang-yinxu-museum/04.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20250519 安阳 殷墟博物馆/DSC05724.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/anyang-yinxu-museum/05.webp",
       "stageRel": "人文摄影（humanist-photo）/20250519 安阳 殷墟博物馆/.site-ready/anyang-yinxu-museum/05.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20250519 安阳 殷墟博物馆/DSC05730.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/anyang-yinxu-museum/06.webp",
       "stageRel": "人文摄影（humanist-photo）/20250519 安阳 殷墟博物馆/.site-ready/anyang-yinxu-museum/06.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20250519 安阳 殷墟博物馆/DSC05732.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/anyang-yinxu-museum/07.webp",
       "stageRel": "人文摄影（humanist-photo）/20250519 安阳 殷墟博物馆/.site-ready/anyang-yinxu-museum/07.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20250519 安阳 殷墟博物馆/DSC05747.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/anyang-yinxu-museum/08.webp",
       "stageRel": "人文摄影（humanist-photo）/20250519 安阳 殷墟博物馆/.site-ready/anyang-yinxu-museum/08.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20250519 安阳 殷墟博物馆/DSC05771.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/shanghai-long-museum/01.webp",
       "stageRel": "人文摄影（humanist-photo）/20250531 上海 龙美术馆/.site-ready/shanghai-long-museum/01.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20250531 上海 龙美术馆/DSC06877.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/shanghai-long-museum/02.webp",
       "stageRel": "人文摄影（humanist-photo）/20250531 上海 龙美术馆/.site-ready/shanghai-long-museum/02.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20250531 上海 龙美术馆/DSC06881.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/hangzhou-black-myth-exhibition/01.webp",
       "stageRel": "人文摄影（humanist-photo）/20250713 杭州 黑神话展/.site-ready/hangzhou-black-myth-exhibition/01.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20250713 杭州 黑神话展/DSC07631.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/hangzhou-black-myth-exhibition/02.webp",
       "stageRel": "人文摄影（humanist-photo）/20250713 杭州 黑神话展/.site-ready/hangzhou-black-myth-exhibition/02.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20250713 杭州 黑神话展/DSC07707.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/hangzhou-black-myth-exhibition/03.webp",
       "stageRel": "人文摄影（humanist-photo）/20250713 杭州 黑神话展/.site-ready/hangzhou-black-myth-exhibition/03.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20250713 杭州 黑神话展/DSC07718.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/hangzhou-black-myth-exhibition/04.webp",
       "stageRel": "人文摄影（humanist-photo）/20250713 杭州 黑神话展/.site-ready/hangzhou-black-myth-exhibition/04.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20250713 杭州 黑神话展/DSC07791.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/hangzhou-black-myth-exhibition/05.webp",
       "stageRel": "人文摄影（humanist-photo）/20250713 杭州 黑神话展/.site-ready/hangzhou-black-myth-exhibition/05.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20250713 杭州 黑神话展/DSC07825.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/hangzhou-black-myth-exhibition/06.webp",
       "stageRel": "人文摄影（humanist-photo）/20250713 杭州 黑神话展/.site-ready/hangzhou-black-myth-exhibition/06.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20250713 杭州 黑神话展/DSC07845.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/hangzhou-black-myth-exhibition/07.webp",
       "stageRel": "人文摄影（humanist-photo）/20250713 杭州 黑神话展/.site-ready/hangzhou-black-myth-exhibition/07.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20250713 杭州 黑神话展/DSC07887.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/hangzhou-black-myth-exhibition/08.webp",
       "stageRel": "人文摄影（humanist-photo）/20250713 杭州 黑神话展/.site-ready/hangzhou-black-myth-exhibition/08.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20250713 杭州 黑神话展/DSC07889.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/chongqing-816-project-site/01.webp",
       "stageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 816核工程遗址/.site-ready/chongqing-816-project-site/01.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 816核工程遗址/DSC01033.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/chongqing-816-project-site/02.webp",
       "stageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 816核工程遗址/.site-ready/chongqing-816-project-site/02.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 816核工程遗址/DSC01043.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/chongqing-816-project-site/03.webp",
       "stageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 816核工程遗址/.site-ready/chongqing-816-project-site/03.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 816核工程遗址/DSC01051.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/chongqing-816-project-site/04.webp",
       "stageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 816核工程遗址/.site-ready/chongqing-816-project-site/04.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 816核工程遗址/DSC01075.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/chongqing-816-project-site/05.webp",
       "stageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 816核工程遗址/.site-ready/chongqing-816-project-site/05.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 816核工程遗址/DSC01127.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/chongqing-816-project-site/06.webp",
       "stageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 816核工程遗址/.site-ready/chongqing-816-project-site/06.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 816核工程遗址/DSC01142.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/chongqing-816-project-site/07.webp",
       "stageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 816核工程遗址/.site-ready/chongqing-816-project-site/07.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 816核工程遗址/DSC01158.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/chongqing-baiheliang/01.webp",
       "stageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 白鹤梁/.site-ready/chongqing-baiheliang/01.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 白鹤梁/DSC01284.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/chongqing-baiheliang/02.webp",
       "stageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 白鹤梁/.site-ready/chongqing-baiheliang/02.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 白鹤梁/DSC01312.jpg",
       "status": "published"
     },
     {
       "object": "humanist-photo/chongqing-baiheliang/03.webp",
       "stageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 白鹤梁/.site-ready/chongqing-baiheliang/03.webp",
+      "sourceStageRel": "人文摄影（humanist-photo）/20251010 重庆 涪陵 白鹤梁/DSC01319.jpg",
       "status": "published"
     },
     {

@@ -1,4 +1,4 @@
-/* 显影景观效果图：项目模块 + 焦点图条 + 灯箱。z 80 为灯箱层，高于顶栏 34。 */
+/* 显影景观效果图：项目模块 + 焦点图条。灯箱样式见 image-lightbox.css。 */
 
 .lrb {
   display: flex;
@@ -117,8 +117,6 @@
   border-radius: 50%;
   background: rgb(22 24 28 / 0.4);
   color: var(--on-ink);
-  font-size: 22px;
-  line-height: 1;
   cursor: pointer;
 }
 
@@ -132,9 +130,14 @@
 
 .lrb-strip-step-mark {
   display: block;
-  line-height: 1;
-  /* ‹ › 字形视觉重心偏低，上移到圆钮几何中心 */
-  transform: translateY(-0.1em);
+  width: 16px;
+  height: 16px;
+}
+
+.lrb-strip-step-mark svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .lrb-strip-step:hover {
@@ -261,198 +264,6 @@
   }
 }
 
-html[data-lightbox="open"] .header,
-html[data-lightbox="open"] .drawer {
-  visibility: hidden;
-}
-
-.lrb-lightbox {
-  position: fixed;
-  inset: 0;
-  z-index: 80;
-  display: grid;
-  place-items: center;
-  padding: 24px 16px;
-  overscroll-behavior: none;
-}
-
-.lrb-lightbox-scrim {
-  position: absolute;
-  inset: 0;
-  border: 0;
-  background: color-mix(in srgb, var(--ink-block) 94%, transparent);
-  cursor: pointer;
-}
-
-.lrb-lightbox-stage {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  width: min(92vw, 1120px);
-  max-height: calc(100dvh - 32px);
-  background: var(--bg);
-}
-
-.lrb-lightbox-picture {
-  position: relative;
-  width: fit-content;
-  max-width: 100%;
-  margin-inline: auto;
-}
-
-.lrb-lightbox-frame {
-  position: relative;
-  margin: 0;
-  overflow: hidden;
-  background: var(--ink-block);
-}
-
-.lrb-lightbox-photo {
-  display: block;
-  max-width: 100%;
-  max-height: calc(100dvh - 220px);
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  transform-origin: center center;
-  user-select: none;
-  cursor: zoom-in;
-  touch-action: none;
-}
-
-.lrb-lightbox-frame.is-zoomed .lrb-lightbox-photo {
-  cursor: grab;
-}
-
-.lrb-lightbox-frame.is-panning .lrb-lightbox-photo {
-  cursor: grabbing;
-}
-
-.lrb-lightbox-photo.is-motion {
-  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.lrb-lightbox-orb {
-  position: absolute;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: rgb(22 24 28 / 0.4);
-  color: var(--on-ink);
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.lrb-lightbox-orb.is-prev,
-.lrb-lightbox-orb.is-next {
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.lrb-lightbox-orb.is-prev {
-  left: 8px;
-}
-
-.lrb-lightbox-orb.is-next {
-  right: 8px;
-}
-
-.lrb-lightbox-orb.is-close {
-  top: 8px;
-  right: 8px;
-}
-
-.lrb-lightbox-orb-mark {
-  display: block;
-  line-height: 1;
-  transform: translateY(-0.1em);
-}
-
-.lrb-lightbox-orb-x {
-  display: block;
-  width: 14px;
-  height: 14px;
-}
-
-.lrb-lightbox-orb:hover {
-  background: rgb(22 24 28 / 0.62);
-}
-
-.lrb-lightbox-orb.is-prev:active,
-.lrb-lightbox-orb.is-next:active {
-  transform: translateY(-50%) scale(0.96);
-}
-
-.lrb-lightbox-orb.is-close:active {
-  transform: scale(0.96);
-}
-
-.lrb-lightbox-map {
-  position: absolute;
-  right: 8px;
-  bottom: 8px;
-  z-index: 1;
-  width: min(128px, 28%);
-  overflow: hidden;
-  pointer-events: none;
-  opacity: 0.72;
-  background: rgb(22 24 28 / 0.42);
-  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.28);
-}
-
-.lrb-lightbox-map img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.lrb-lightbox-map-view {
-  position: absolute;
-  box-sizing: border-box;
-  border: 1px solid rgb(255 255 255 / 0.92);
-  background: rgb(255 255 255 / 0.18);
-  box-shadow: 0 0 0 200px rgb(0 0 0 / 0.4);
-}
-
-.lrb-lightbox-dock {
-  flex: 0 0 auto;
-  padding: 12px 14px 14px;
-  border-top: 1px solid var(--line);
-  background: var(--bg);
-}
-
-.lrb-lightbox-shot {
-  margin: 0;
-  color: var(--text);
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.3;
-}
-
-.lrb-lightbox-title {
-  margin: 10px 0 0;
-  color: var(--text);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-.lrb-lightbox-lead {
-  margin: 4px 0 0;
-  max-width: 72ch;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.55;
-}
-
 @media (orientation: landscape) {
   .lrb {
     margin-top: 4px;
@@ -478,26 +289,7 @@ html[data-lightbox="open"] .drawer {
   }
 }
 
-@media (max-width: 860px) {
-  .lrb-lightbox {
-    padding: 12px 8px;
-    align-items: end;
-  }
-
-  .lrb-lightbox-stage {
-    width: 100%;
-  }
-
-  .lrb-lightbox-photo {
-    max-height: calc(100dvh - 240px);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .lrb-lightbox-photo.is-motion {
-    transition: none;
-  }
-
   .lrb-shot,
   .lrb-shot img,
   .lrb-strip-rail-thumb {
@@ -519,13 +311,7 @@ html[data-lightbox="open"] .drawer {
     filter: saturate(var(--rank-sat, 0.48));
   }
 
-  .lrb-strip-step:active,
-  .lrb-lightbox-orb.is-prev:active,
-  .lrb-lightbox-orb.is-next:active {
+  .lrb-strip-step:active {
     transform: translateY(-50%);
-  }
-
-  .lrb-lightbox-orb.is-close:active {
-    transform: none;
   }
 }

@@ -9,6 +9,11 @@
   border-top: 1px solid var(--line);
 }
 
+.project-gallery-item.is-bare {
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .project-gallery-item {
     opacity: 0.01;

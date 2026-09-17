@@ -155,7 +155,7 @@ export const lexicon = {
     key: "skill-aware",
   },
   homePage: { zh: "首页", en: "Home Page", deco: "HOME", key: "home-page" },
-  profile: { zh: "形象", en: "Profile", deco: "PROFILE", key: "profile" },
+  profile: { zh: "形象照", en: "Profile", deco: "PROFILE", key: "profile" },
   shotIn: { zh: "拍摄于", en: "Shot in", deco: "SHOT", key: "shot-in" },
   profileBase: { zh: "现居地", en: "Based in", deco: "BASE", key: "profile-base" },
   profileMail: { zh: "邮箱", en: "Mail", deco: "MAIL", key: "profile-mail" },

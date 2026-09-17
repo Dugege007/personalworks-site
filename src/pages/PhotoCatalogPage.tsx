@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { ChannelHead } from "../components/work/ChannelHead";
 import { lexicon } from "../content/lexicon";
-import { archiveIndexByNavId, categories } from "../content/site";
+import { categories } from "../content/site";
 import {
   collectPhotoFacets,
   filterPhotoWorks,
@@ -10,7 +11,11 @@ import {
   type PhotoCatalogQuery,
 } from "../content/works";
 import { workCoverSrc } from "../content/stockMedia";
+import { hrefForKind } from "../ia/href";
+import { iaOfSkin } from "../ia";
 import { assetUrl } from "../lib/assets";
+import { usePrefs } from "../prefs/PrefsProvider";
+import "../styles/develop-work.css";
 import "../styles/placeholder.css";
 import "../styles/photo-masonry.css";
 
@@ -105,6 +110,8 @@ function FilterRow({ label, values, selected, captions, onToggle }: FilterRowPro
  * 摄影总览：四维筛选 + 时间正倒序，卡片进入既有详情。
  */
 export function PhotoCatalogPage() {
+  const { currentSkin } = usePrefs();
+  const ia = iaOfSkin(currentSkin);
   const category = categories.find((item) => item.id === lexicon.photography.key);
   const [params, setParams] = useSearchParams();
   const query = parseQuery(params);
@@ -147,15 +154,14 @@ export function PhotoCatalogPage() {
   }
 
   return (
-    <div className="page" data-theme={lexicon.photography.key}>
-      <Link className="back" to={photoRoot}>
-        ← 返回{category?.title ?? lexicon.photography.zh}
-      </Link>
-      <div className="page-kicker">
-        {category?.index ?? archiveIndexByNavId(lexicon.photography.key)} / {lexicon.photoCatalog.deco}
-      </div>
-      <h1>{lexicon.photoCatalog.zh}</h1>
-      <p className="page-lead">按类型、年份、地点与标签筛选。未选某维即不限制。时间默认最新优先。</p>
+    <div className="develop-channel" data-theme={lexicon.photography.key}>
+      <ChannelHead
+        backTo={hrefForKind(lexicon.photography.key, ia.id)}
+        backLabel={category?.title ?? lexicon.photography.zh}
+        title={lexicon.photoCatalog.zh}
+        lead="按类型、年份、地点与标签筛选。未选某维即不限制。时间默认最新优先。"
+      />
+      <div className="develop-project-gallery">
       <div className="filter-board">
         <FilterRow
           label="类型"
@@ -197,7 +203,7 @@ export function PhotoCatalogPage() {
       {visible.length === 0 ? (
         <p className="note">当前筛选没有作品。</p>
       ) : (
-        <div className="photo-masonry" data-count={visible.length}>
+        <div className="photo-masonry is-catalog" data-count={visible.length}>
           {visible.map((work) => (
             <Link
               className="card"
@@ -222,6 +228,7 @@ export function PhotoCatalogPage() {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

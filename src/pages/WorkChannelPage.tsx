@@ -1,4 +1,5 @@
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
+import { ChannelHead } from "../components/work/ChannelHead";
 import { CoverTile } from "../components/work/CoverTile";
 import { lexicon } from "../content/lexicon";
 import { ProjectGallery } from "../components/work/ProjectGallery";
@@ -18,25 +19,6 @@ import { LandscapeProjectBoard } from "../components/work/LandscapeProjectBoard"
 import { tx } from "../prefs/tx";
 import { usePrefs } from "../prefs/PrefsProvider";
 import "../styles/develop-work.css";
-
-type ChannelHeadProps = {
-  backTo: string;
-  backLabel: string;
-  title: string;
-  lead?: string;
-};
-
-function ChannelHead({ backTo, backLabel, title, lead }: ChannelHeadProps) {
-  return (
-    <div className="develop-kind-head">
-      <Link className="develop-work-back" to={backTo}>
-        {backLabel}
-      </Link>
-      <h1>{title}</h1>
-      {lead ? <p className="develop-kind-lead">{lead}</p> : null}
-    </div>
-  );
-}
 
 /**
  * 显影作品第三层：细目条目页。游戏选单列出可玩项。

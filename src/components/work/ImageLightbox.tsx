@@ -7,14 +7,18 @@ import {
   type TransitionEvent,
 } from "react";
 import { createPortal } from "react-dom";
-import { formatShotCaption } from "../../content/works";
+import type { PhotoExif } from "../../content/photoExif";
 import { pausePageLenis, resumePageLenis } from "../../hooks/useLenis";
 import { assetUrl } from "../../lib/assets";
+import { PhotoExifStrip } from "./ExifMarks";
+import { NavMark } from "./NavMarks";
+import "../../styles/image-lightbox.css";
 
 type LightboxImage = {
   src: string;
   alt: string;
   label: string;
+  exif?: PhotoExif;
 };
 
 type ImageLightboxProps = {
@@ -34,7 +38,12 @@ type Pan = {
 
 const WHEEL_NOTCH = 100;
 const POINTER_MOVE_PX = 4;
-const ZOOM = 1.5;
+const ZOOM_MIN = 1.5;
+const ZOOM_MAX = 3;
+const ZOOM_PER_PX = 0.003;
+/** 小地图按图框宽高比缩放：相对图框长边，不锁死宽度。 */
+const MAP_SCALE = 0.28;
+const MAP_LONG_MAX = 160;
 const ZERO_PAN: Pan = { x: 0, y: 0 };
 
 function wheelDelta(event: WheelEvent) {
@@ -48,43 +57,70 @@ function wheelDelta(event: WheelEvent) {
   return raw;
 }
 
-function clampPan(pan: Pan, el: HTMLElement): Pan {
-  const maxX = ((ZOOM - 1) / 2) * el.offsetWidth;
-  const maxY = ((ZOOM - 1) / 2) * el.offsetHeight;
+function clampZoom(value: number) {
+  return Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, value));
+}
+
+function clampPan(pan: Pan, el: HTMLElement, zoom: number): Pan {
+  const maxX = ((zoom - 1) / 2) * el.offsetWidth;
+  const maxY = ((zoom - 1) / 2) * el.offsetHeight;
   return {
     x: Math.max(-maxX, Math.min(maxX, pan.x)),
     y: Math.max(-maxY, Math.min(maxY, pan.y)),
   };
 }
 
-function mapViewStyle(pan: Pan, el: HTMLElement | null) {
-  const width = el?.offsetWidth || 1;
-  const height = el?.offsetHeight || 1;
-  return {
-    left: `${(0.5 - (0.5 + pan.x / width) / ZOOM) * 100}%`,
-    top: `${(0.5 - (0.5 + pan.y / height) / ZOOM) * 100}%`,
-    width: `${100 / ZOOM}%`,
-    height: `${100 / ZOOM}%`,
-  };
-}
-
-function CloseMark() {
-  return (
-    <svg className="lrb-lightbox-orb-x" viewBox="0 0 20 20" aria-hidden="true">
-      <path
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        d="M5.5 5.5 14.5 14.5M14.5 5.5 5.5 14.5"
-      />
-    </svg>
+function zoomPanAt(
+  el: HTMLElement,
+  pan: Pan,
+  fromZoom: number,
+  toZoom: number,
+  clientX: number,
+  clientY: number,
+): Pan {
+  const frame = el.closest(".lrb-lightbox-frame");
+  const rect = (frame ?? el).getBoundingClientRect();
+  const sx = clientX - (rect.left + rect.width / 2);
+  const sy = clientY - (rect.top + rect.height / 2);
+  const k = toZoom / fromZoom;
+  return clampPan(
+    {
+      x: sx - (sx - pan.x) * k,
+      y: sy - (sy - pan.y) * k,
+    },
+    el,
+    toZoom,
   );
 }
 
+function mapViewStyle(pan: Pan, el: HTMLElement | null, zoom: number) {
+  const width = el?.offsetWidth || 1;
+  const height = el?.offsetHeight || 1;
+  return {
+    left: `${(0.5 - (0.5 + pan.x / width) / zoom) * 100}%`,
+    top: `${(0.5 - (0.5 + pan.y / height) / zoom) * 100}%`,
+    width: `${100 / zoom}%`,
+    height: `${100 / zoom}%`,
+  };
+}
+
+function mapBoxStyle(size: { w: number; h: number }) {
+  if (size.w < 1 || size.h < 1) {
+    return undefined;
+  }
+  const long = Math.max(size.w, size.h);
+  const scale = Math.min(MAP_SCALE, MAP_LONG_MAX / long);
+  return {
+    width: size.w * scale,
+    height: size.h * scale,
+  };
+}
+
 /**
- * 效果图全屏查看：图左右圆钮翻页，右上角圆钮关闭，滚轮换张；
- * 点击图框内放大至 150%，可拖拽查看，再单击还原。
+ * 全站共用大图灯箱：图框与说明栏随画心宽度收束；
+ * 翻页与关闭钮锚在视口边缘，不随横幅/纵幅切换位移；
+ * 张次编号锚在图框下方外侧；未缩放时滚轮换张；
+ * 单击进入缩放态（150%），滚轮在 150%～300% 变焦，再单击退出。
  */
 export function ImageLightbox({
   images,
@@ -100,6 +136,7 @@ export function ImageLightbox({
   const photoRef = useRef<HTMLImageElement>(null);
   const wheelCarryRef = useRef(0);
   const zoomedRef = useRef(false);
+  const zoomScaleRef = useRef(ZOOM_MIN);
   const panRef = useRef<Pan>(ZERO_PAN);
   const dragRef = useRef<{
     pointerId: number;
@@ -110,9 +147,11 @@ export function ImageLightbox({
     moved: boolean;
   } | null>(null);
   const [zoomed, setZoomed] = useState(false);
+  const [zoomScale, setZoomScale] = useState(ZOOM_MIN);
   const [pan, setPan] = useState<Pan>(ZERO_PAN);
   const [panning, setPanning] = useState(false);
   const [zoomMotion, setZoomMotion] = useState(false);
+  const [frameBox, setFrameBox] = useState({ w: 0, h: 0 });
   const current = images[index];
 
   useEffect(() => {
@@ -131,12 +170,15 @@ export function ImageLightbox({
   useEffect(() => {
     wheelCarryRef.current = 0;
     zoomedRef.current = false;
+    zoomScaleRef.current = ZOOM_MIN;
     panRef.current = ZERO_PAN;
     dragRef.current = null;
     setZoomed(false);
+    setZoomScale(ZOOM_MIN);
     setPan(ZERO_PAN);
     setPanning(false);
     setZoomMotion(false);
+    setFrameBox({ w: 0, h: 0 });
   }, [index]);
 
   useEffect(() => {
@@ -166,6 +208,23 @@ export function ImageLightbox({
     const onWheel = (event: WheelEvent) => {
       event.preventDefault();
       event.stopPropagation();
+      if (zoomedRef.current) {
+        const el = photoRef.current;
+        if (!el) {
+          return;
+        }
+        const from = zoomScaleRef.current;
+        const to = clampZoom(from - wheelDelta(event) * ZOOM_PER_PX);
+        if (to === from) {
+          return;
+        }
+        const nextPan = zoomPanAt(el, panRef.current, from, to, event.clientX, event.clientY);
+        zoomScaleRef.current = to;
+        panRef.current = nextPan;
+        setZoomScale(to);
+        setPan(nextPan);
+        return;
+      }
       if (images.length < 2) {
         return;
       }
@@ -192,11 +251,14 @@ export function ImageLightbox({
     if (!el) {
       return;
     }
-    const observer = new ResizeObserver(() => {
-      const next = clampPan(panRef.current, el);
+    const sync = () => {
+      const next = clampPan(panRef.current, el, zoomScaleRef.current);
       panRef.current = next;
       setPan(next);
-    });
+      setFrameBox({ w: el.offsetWidth, h: el.offsetHeight });
+    };
+    sync();
+    const observer = new ResizeObserver(sync);
     observer.observe(el);
     return () => observer.disconnect();
   }, [zoomed, current?.src]);
@@ -248,7 +310,7 @@ export function ImageLightbox({
     if (!el) {
       return;
     }
-    const next = clampPan({ x: drag.panX + dx, y: drag.panY + dy }, el);
+    const next = clampPan({ x: drag.panX + dx, y: drag.panY + dy }, el, zoomScaleRef.current);
     panRef.current = next;
     setPan(next);
   };
@@ -268,15 +330,25 @@ export function ImageLightbox({
     }
     if (!zoomedRef.current) {
       zoomedRef.current = true;
+      zoomScaleRef.current = ZOOM_MIN;
       panRef.current = ZERO_PAN;
+      wheelCarryRef.current = 0;
       setPan(ZERO_PAN);
+      setZoomScale(ZOOM_MIN);
       setZoomed(true);
       setZoomMotion(true);
+      const photo = photoRef.current;
+      if (photo) {
+        setFrameBox({ w: photo.offsetWidth, h: photo.offsetHeight });
+      }
       return;
     }
     zoomedRef.current = false;
+    zoomScaleRef.current = ZOOM_MIN;
     panRef.current = ZERO_PAN;
+    wheelCarryRef.current = 0;
     setZoomed(false);
+    setZoomScale(ZOOM_MIN);
     setPan(ZERO_PAN);
     setZoomMotion(true);
   };
@@ -287,7 +359,7 @@ export function ImageLightbox({
     }
   };
 
-  const shotLine = formatShotCaption(index, images.length, current.label);
+  const shotIndex = `(${index + 1}/${images.length})`;
   const photoSrc = assetUrl(current.src);
   const frameClass = [
     "lrb-lightbox-frame",
@@ -300,7 +372,7 @@ export function ImageLightbox({
     .filter(Boolean)
     .join(" ");
   const photoStyle = zoomed
-    ? { transform: `translate(${pan.x}px, ${pan.y}px) scale(${ZOOM})` }
+    ? { transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoomScale})` }
     : undefined;
 
   return createPortal(
@@ -312,72 +384,84 @@ export function ImageLightbox({
       aria-label={title}
     >
       <button className="lrb-lightbox-scrim" type="button" aria-label="关闭预览" onClick={onClose} />
-      <div className="lrb-lightbox-stage" onClick={stop}>
-        <div className="lrb-lightbox-picture">
-          <figure className={frameClass}>
-            <img
-              ref={photoRef}
-              className={photoClass}
-              src={photoSrc}
-              alt={current.alt}
-              draggable={false}
-              style={photoStyle}
-              onDragStart={(event) => event.preventDefault()}
-              onPointerDown={onPhotoPointerDown}
-              onPointerMove={onPhotoPointerMove}
-              onPointerUp={(event) => endPhotoPointer(event, true)}
-              onPointerCancel={(event) => endPhotoPointer(event, false)}
-              onTransitionEnd={onPhotoTransitionEnd}
-            />
-            {zoomed ? (
-              <div className="lrb-lightbox-map" aria-hidden="true">
-                <img src={photoSrc} alt="" draggable={false} />
-                <span className="lrb-lightbox-map-view" style={mapViewStyle(pan, photoRef.current)} />
-              </div>
-            ) : null}
-          </figure>
-          {images.length > 1 ? (
-            <>
-              <button
-                className="lrb-lightbox-orb is-prev"
-                type="button"
-                aria-label="上一张"
-                onClick={onPrev}
-              >
-                <span className="lrb-lightbox-orb-mark" aria-hidden="true">
-                  ‹
-                </span>
-              </button>
-              <button
-                className="lrb-lightbox-orb is-next"
-                type="button"
-                aria-label="下一张"
-                onClick={onNext}
-              >
-                <span className="lrb-lightbox-orb-mark" aria-hidden="true">
-                  ›
-                </span>
-              </button>
-            </>
-          ) : null}
-          <button
-            ref={closeRef}
-            className="lrb-lightbox-orb is-close"
-            type="button"
-            aria-label="关闭"
-            onClick={onClose}
-          >
-            <CloseMark />
-          </button>
+      <div className="lrb-lightbox-board" onClick={stop}>
+        <div className="lrb-lightbox-stage">
+          <div className="lrb-lightbox-picture">
+            <figure className={frameClass}>
+              <img
+                ref={photoRef}
+                className={photoClass}
+                src={photoSrc}
+                alt={current.alt}
+                draggable={false}
+                style={photoStyle}
+                onDragStart={(event) => event.preventDefault()}
+                onPointerDown={onPhotoPointerDown}
+                onPointerMove={onPhotoPointerMove}
+                onPointerUp={(event) => endPhotoPointer(event, true)}
+                onPointerCancel={(event) => endPhotoPointer(event, false)}
+                onTransitionEnd={onPhotoTransitionEnd}
+              />
+              {zoomed ? (
+                <div className="lrb-lightbox-map" style={mapBoxStyle(frameBox)} aria-hidden="true">
+                  <img src={photoSrc} alt="" draggable={false} />
+                  <span className="lrb-lightbox-map-view" style={mapViewStyle(pan, photoRef.current, zoomScale)} />
+                </div>
+              ) : null}
+            </figure>
+          </div>
+          <div className={`lrb-lightbox-dock${current.exif ? " has-exif" : ""}`}>
+            <PhotoExifStrip exif={current.exif} />
+            <div className="lrb-lightbox-copy">
+              {current.label || (title && title !== current.label) ? (
+                <div className="lrb-lightbox-names">
+                  {current.label ? <p className="lrb-lightbox-shot">{current.label}</p> : null}
+                  {title && title !== current.label ? <p className="lrb-lightbox-title">{title}</p> : null}
+                </div>
+              ) : null}
+              {summary ? <p className="lrb-lightbox-lead">{summary}</p> : null}
+            </div>
+          </div>
         </div>
-        <div className="lrb-lightbox-dock">
-          <p className="lrb-lightbox-shot" aria-live="polite">
-            {shotLine}
-          </p>
-          <p className="lrb-lightbox-title">{title}</p>
-          {summary ? <p className="lrb-lightbox-lead">{summary}</p> : null}
-        </div>
+        <p className="lrb-lightbox-index" aria-live="polite">
+          {shotIndex}
+        </p>
       </div>
+      {images.length > 1 ? (
+        <>
+          <button
+            className="lrb-lightbox-orb is-prev"
+            type="button"
+            aria-label="上一张"
+            onClick={onPrev}
+          >
+            <span className="lrb-lightbox-orb-mark" aria-hidden="true">
+              <NavMark name="prev" />
+            </span>
+          </button>
+          <button
+            className="lrb-lightbox-orb is-next"
+            type="button"
+            aria-label="下一张"
+            onClick={onNext}
+          >
+            <span className="lrb-lightbox-orb-mark" aria-hidden="true">
+              <NavMark name="next" />
+            </span>
+          </button>
+        </>
+      ) : null}
+      <button
+        ref={closeRef}
+        className="lrb-lightbox-orb is-close"
+        type="button"
+        aria-label="关闭"
+        onClick={onClose}
+      >
+        <span className="lrb-lightbox-orb-mark" aria-hidden="true">
+          <NavMark name="close" />
+        </span>
+      </button>
     </div>,
     document.body,
   );

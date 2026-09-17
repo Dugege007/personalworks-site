@@ -44,6 +44,8 @@ export type WorkRecord = {
   siteType?: string;
   exifLite?: string;
   consent?: WorkConsent;
+  /** 投放箱第一层文件夹；仅维护工具使用，访客页忽略。 */
+  stageFolder?: string;
   displayName?: string;
   featured?: boolean;
 };
@@ -122,10 +124,13 @@ const initialWorks: WorkRecord[] = initialWorkProjects.map((item) => ({
 // 首轮没有可直接公开的产线仿真静帧。视频项目不伪造图片占位，后续补图后再入内容池。
 const lineSimulationWorks: WorkRecord[] = [];
 
+/** 维护工具确认登记的空壳；访客列表仍按 consent 过滤。 */
+const registeredWorks: WorkRecord[] = [];
+
 /**
  * 全站唯一作品内容池。景观施工图与无授权人像不进入该数组。
  */
-export const workRecords: WorkRecord[] = [...initialWorks, ...lineSimulationWorks];
+export const workRecords: WorkRecord[] = [...initialWorks, ...lineSimulationWorks, ...registeredWorks];
 
 function isPublished(work: WorkRecord): boolean {
   return !work.consent || work.consent === "granted";

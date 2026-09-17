@@ -16,6 +16,7 @@ import {
 import { pausePageLenis, resumePageLenis } from "../../hooks/useLenis";
 import { assetUrl } from "../../lib/assets";
 import { ImageLightbox } from "./ImageLightbox";
+import { NavMark } from "./NavMarks";
 import "../../styles/develop-landscape-board.css";
 
 type LandscapeProjectBoardProps = {
@@ -599,7 +600,7 @@ function ProjectModule({ work, syncIndex, onOpen }: ProjectModuleProps) {
                 {...holdPrev}
               >
                 <span className="lrb-strip-step-mark" aria-hidden="true">
-                  ‹
+                  <NavMark name="prev" />
                 </span>
               </button>
               <button
@@ -609,7 +610,7 @@ function ProjectModule({ work, syncIndex, onOpen }: ProjectModuleProps) {
                 {...holdNext}
               >
                 <span className="lrb-strip-step-mark" aria-hidden="true">
-                  ›
+                  <NavMark name="next" />
                 </span>
               </button>
             </>

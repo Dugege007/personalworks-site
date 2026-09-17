@@ -26,6 +26,10 @@
   overflow: visible;
 }
 
+.photo-masonry .card-cover {
+  margin: 0;
+}
+
 .photo-masonry .card-cover,
 .photo-masonry .project-gallery-shot {
   aspect-ratio: auto;
@@ -41,6 +45,41 @@
   display: block;
   object-fit: contain;
   object-position: center;
+}
+
+/* 总览卡片：图按原比例铺开，上左右只留 12px；字号不变，只收行距。 */
+.photo-masonry.is-catalog .card {
+  padding: 12px 12px 12px;
+}
+
+.photo-masonry.is-catalog .card-cover {
+  aspect-ratio: auto;
+  overflow: visible;
+}
+
+.photo-masonry.is-catalog .card-cover img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.photo-masonry.is-catalog .card-body {
+  padding: 10px 0 0;
+  gap: 5px;
+  flex: none;
+}
+
+.photo-masonry.is-catalog .card h2 {
+  margin: 5px 0;
+  line-height: 1.45;
+}
+
+.photo-masonry.is-catalog .card p {
+  line-height: 1.52;
+}
+
+.photo-masonry.is-catalog .card small {
+  line-height: 1.45;
 }
 
 @media (min-width: 1400px) {

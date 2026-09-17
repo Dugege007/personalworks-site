@@ -1,4 +1,5 @@
 import { Link, useParams } from "react-router-dom";
+import { ChannelHead } from "../components/work/ChannelHead";
 import { CoverTile } from "../components/work/CoverTile";
 import { ProjectGallery } from "../components/work/ProjectGallery";
 import { lexicon } from "../content/lexicon";
@@ -45,12 +46,7 @@ export function WorkKindPage({ kind }: WorkKindViewProps) {
 
   return (
     <div className="develop-kind" data-theme={kind}>
-      <div className="develop-kind-head">
-        <Link className="develop-work-back" to={workIndexRoot()}>
-          {lexicon.workIndex.zh}
-        </Link>
-        <h1>{title}</h1>
-        <p className="develop-kind-lead">{lead}</p>
+      <ChannelHead backTo={workIndexRoot()} backLabel={lexicon.workIndex.zh} title={title} lead={lead}>
         {photoKind ? (
           <Link className="develop-work-textlink" to={`/${lexicon.photography.key}/${lexicon.photoCatalog.key}`}>
             {lexicon.photoCatalog.zh}
@@ -64,7 +60,7 @@ export function WorkKindPage({ kind }: WorkKindViewProps) {
             {lexicon.gameMenu.zh}
           </Link>
         ) : null}
-      </div>
+      </ChannelHead>
       {gameKind ? (
         <div className="develop-game-projects">
           {playableGames.length === 0 ? (

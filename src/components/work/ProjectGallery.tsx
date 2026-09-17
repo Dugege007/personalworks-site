@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { readPhotoExif } from "../../content/photoExif";
 import { assetUrl } from "../../lib/assets";
 import { ImageLightbox } from "./ImageLightbox";
 import "../../styles/photo-masonry.css";
@@ -18,6 +19,8 @@ export type ProjectGalleryItem = {
 type ProjectGalleryProps = {
   projects: ProjectGalleryItem[];
   variant: "twin" | "photo" | "game";
+  /** 详情页顶栏已有标题时关掉，类目列表仍显示。默认开。 */
+  showHead?: boolean;
 };
 
 type OpenImage = {
@@ -28,7 +31,7 @@ type OpenImage = {
 /**
  * 数字孪生、摄影与游戏共用项目图集；各类型只切换版式，不复制内容池。
  */
-export function ProjectGallery({ projects, variant }: ProjectGalleryProps) {
+export function ProjectGallery({ projects, variant, showHead = true }: ProjectGalleryProps) {
   const galleryRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState<OpenImage | null>(null);
   const activeProject = projects.find((project) => project.id === open?.projectId);
@@ -37,8 +40,9 @@ export function ProjectGallery({ projects, variant }: ProjectGalleryProps) {
       activeProject?.images.map((image) => ({
         ...image,
         alt: `${activeProject.title} ${image.label}`,
+        exif: variant === "photo" ? readPhotoExif(image.src) : undefined,
       })) ?? [],
-    [activeProject],
+    [activeProject, variant],
   );
 
   const close = useCallback(() => setOpen(null), []);
@@ -88,20 +92,22 @@ export function ProjectGallery({ projects, variant }: ProjectGalleryProps) {
   return (
     <div className={`project-gallery is-${variant}`} ref={galleryRef}>
       {projects.map((project) => (
-        <article className="project-gallery-item" key={project.id}>
-          <header className="project-gallery-head">
-            <div>
-              <h2>
-                {project.href ? <Link to={project.href}>{project.title}</Link> : project.title}
-              </h2>
-              {project.summary ? <p>{project.summary}</p> : null}
-            </div>
-            {project.date || project.place ? (
-              <small>
-                {[project.date, project.place].filter(Boolean).join(" / ")}
-              </small>
-            ) : null}
-          </header>
+        <article className={`project-gallery-item${showHead ? "" : " is-bare"}`} key={project.id}>
+          {showHead ? (
+            <header className="project-gallery-head">
+              <div>
+                <h2>
+                  {project.href ? <Link to={project.href}>{project.title}</Link> : project.title}
+                </h2>
+                {project.summary ? <p>{project.summary}</p> : null}
+              </div>
+              {project.date || project.place ? (
+                <small>
+                  {[project.date, project.place].filter(Boolean).join(" / ")}
+                </small>
+              ) : null}
+            </header>
+          ) : null}
           <div
             className={variant === "photo" ? "photo-masonry" : "project-gallery-images"}
             data-count={variant === "photo" ? project.images.length : undefined}

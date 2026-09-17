@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import { ChannelHead } from "../components/work/ChannelHead";
 import { LandscapeProjectBoard } from "../components/work/LandscapeProjectBoard";
 import { ProjectGallery } from "../components/work/ProjectGallery";
 import { lexicon } from "../content/lexicon";
@@ -16,6 +17,7 @@ import { kindOfChannel } from "../ia/query";
 import { hrefForDevelopChannel, parseWorkIndexPath, workIndexRoot } from "../ia/workTree";
 import { assetUrl } from "../lib/assets";
 import { usePrefs } from "../prefs/PrefsProvider";
+import "../styles/develop-work.css";
 import "../styles/placeholder.css";
 
 type MetaItem = {
@@ -163,41 +165,37 @@ export function WorkDetailPage() {
     ),
   };
 
-  return (
-    <div className="page" data-theme={theme}>
-      <Link className="back" to={back.path}>
-        ← 返回{back.label}
-      </Link>
-      {parsed ? null : (
-        <div className="page-kicker">
-          {work.year} / {collection?.titleDeco ?? "ARCHIVE"}
-        </div>
-      )}
-      <h1>{work.title}</h1>
-      <p className="page-lead">{work.summary}</p>
-      {work.tags && work.tags.length > 0 ? (
-        <div className="archive-tags">
-          {work.tags.map((tag) => (
-            <span className="archive-tag" key={tag}>
-              {tag}
-            </span>
-          ))}
-        </div>
-      ) : null}
-      <dl className="archive-meta">
-        {metaItems.map((item) => (
-          <div key={item.label}>
-            <dt>{item.label}</dt>
-            <dd>{item.value}</dd>
-          </div>
+  const tags =
+    work.tags && work.tags.length > 0 ? (
+      <div className="archive-tags">
+        {work.tags.map((tag) => (
+          <span className="archive-tag" key={tag}>
+            {tag}
+          </span>
         ))}
-      </dl>
-      <p className="archive-body">{work.body}</p>
-      {work.channel === lexicon.landscapeRendering.key ? (
-        <LandscapeProjectBoard works={[work]} />
-      ) : galleryVariant ? (
-        <ProjectGallery projects={[galleryProject]} variant={galleryVariant} />
-      ) : (
+      </div>
+    ) : null;
+  const meta = (
+    <dl className="archive-meta">
+      {metaItems.map((item) => (
+        <div key={item.label}>
+          <dt>{item.label}</dt>
+          <dd>{item.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+  const body = work.body && work.body !== work.summary ? <p className="archive-body">{work.body}</p> : null;
+  const gallery =
+    work.channel === lexicon.landscapeRendering.key ? (
+      <LandscapeProjectBoard works={[work]} />
+    ) : galleryVariant ? (
+      <ProjectGallery
+        projects={[galleryProject]}
+        variant={galleryVariant}
+        showHead={galleryVariant !== "photo"}
+      />
+    ) : (
       <div className="media-grid">
         {work.media.map((item) => {
           const href = item.src ? assetUrl(item.src) : "";
@@ -220,7 +218,38 @@ export function WorkDetailPage() {
           );
         })}
       </div>
+    );
+
+  if (photoChannel) {
+    return (
+      <div className="develop-channel" data-theme={theme}>
+        <ChannelHead backTo={back.path} backLabel={back.label} title={work.title} lead={work.summary} />
+        <div className="develop-project-gallery">
+          {tags}
+          {meta}
+          {body}
+          {gallery}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="page" data-theme={theme}>
+      <Link className="back" to={back.path}>
+        ← 返回{back.label}
+      </Link>
+      {parsed ? null : (
+        <div className="page-kicker">
+          {work.year} / {collection?.titleDeco ?? "ARCHIVE"}
+        </div>
       )}
+      <h1>{work.title}</h1>
+      <p className="page-lead">{work.summary}</p>
+      {tags}
+      {meta}
+      {body}
+      {gallery}
       {work.channel === lexicon.landscapeCDs.key ? (
         <p className="archive-disclaimer">仅供作品展示，不作为施工依据。</p>
       ) : null}
