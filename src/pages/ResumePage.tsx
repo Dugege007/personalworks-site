@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { ProfileName } from "../components/ProfileName";
 import { ContactIcons } from "../components/home/ContactIcons";
 import { lexicon } from "../content/lexicon";
 import {
@@ -50,7 +51,9 @@ export function ResumePage() {
         </div>
         <div className="resume-id">
           <p className="resume-deco">{lexicon.profileResume.deco}</p>
-          <h1 className="resume-name">{profile.name}</h1>
+          <h1 className="resume-name">
+            <ProfileName />
+          </h1>
           <p className="resume-en">{profile.nameEn}</p>
           <p className="resume-role">{resumeIdentity()}</p>
           <ContactIcons channels={profile.contactChannels} />

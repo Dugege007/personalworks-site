@@ -19,3 +19,18 @@ createRoot(root).render(
     </BrowserRouter>
   </StrictMode>,
 );
+
+const signalSiteReady = () => {
+  window.__siteBoot?.ready();
+};
+
+const holdPreview =
+  import.meta.env.DEV && new URLSearchParams(window.location.search).has("boot");
+
+if (holdPreview) {
+  window.setTimeout(signalSiteReady, 4500);
+} else {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(signalSiteReady);
+  });
+}

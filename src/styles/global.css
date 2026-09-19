@@ -98,3 +98,18 @@ button {
   50% { transform: translate(1%, -1%); }
   100% { transform: translate(0, 0); }
 }
+
+.profile-name-toggle {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  text-align: inherit;
+  cursor: pointer;
+  appearance: none;
+}

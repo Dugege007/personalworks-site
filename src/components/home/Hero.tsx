@@ -3,6 +3,7 @@ import { archiveIndexByNavId, profile } from "../../content/site";
 import { lexicon } from "../../content/lexicon";
 import { assetUrl } from "../../lib/assets";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
+import { ProfileName } from "../ProfileName";
 import { ContactIcons } from "./ContactIcons";
 import { ScrollHint } from "./ScrollHint";
 
@@ -69,7 +70,9 @@ export function Hero() {
           <i />
           {archiveIndexByNavId("home")} / {lexicon.homePage.deco}
         </div>
-        <h1 className="hero-name reveal is-in">{profile.name}</h1>
+        <h1 className="hero-name reveal is-in">
+          <ProfileName />
+        </h1>
         <div className="hero-en">{profile.nameEn}</div>
         <div className="hero-id">{profile.identity}</div>
         <p className="hero-bio">

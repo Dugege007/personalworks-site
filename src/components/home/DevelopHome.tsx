@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState, type MouseEvent, type PointerEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { lexicon } from "../../content/lexicon";
 import { gameProjects, profile } from "../../content/site";
 import { stockPlaceholderSrc, workCoverSrc } from "../../content/stockMedia";
@@ -18,11 +18,14 @@ import { assetUrl } from "../../lib/assets";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { useViewportOrientation } from "../../hooks/useViewportOrientation";
 import { usePrefs } from "../../prefs/PrefsProvider";
+import { ProfileName } from "../ProfileName";
 import { ContactIcons } from "./ContactIcons";
 import { HomeBeian } from "./HomeBeian";
 import "../../styles/develop-home.css";
 
 const HERO_INTERVAL_MS = 5000;
+const HERO_ENTER_MS = 3000;
+const HERO_HINT = "再次点击进入该相册";
 const HERO_NOREPEAT = 10;
 const FRAME_NOREPEAT = 10;
 const FRAME_IDLE_MIN_MS = 3000;
@@ -74,9 +77,15 @@ function DevelopBlock({ block, ia }: DevelopBlockProps) {
 function HeroBleed({ block }: { block: HomeBlock }) {
   const reduced = usePrefersReducedMotion();
   const viewport = useViewportOrientation();
+  const navigate = useNavigate();
   const frames = useMemo(() => collectHeroFrames(block), [block]);
   const [measured, setMeasured] = useState<Record<string, { width: number; height: number }>>({});
   const [failed, setFailed] = useState<Record<string, true>>({});
+  const [paused, setPaused] = useState(false);
+  const [hint, setHint] = useState(false);
+  const hintTimerRef = useRef(0);
+  const enterUntilRef = useRef(0);
+  const hrefRef = useRef("");
   const startRef = useRef("");
   const upcomingStartRef = useRef("");
   if (!startRef.current) {
@@ -118,6 +127,7 @@ function HeroBleed({ block }: { block: HomeBlock }) {
   const selected = pool.find((frame) => frame.src === currentSrc) ?? null;
   const current = selected ?? pool.find((frame) => frame.src === eligibleSrcs[0]) ?? null;
   const src = current?.src ?? "";
+  hrefRef.current = current?.href ?? "";
   if (selected) {
     currentRef.current = selected.src;
   }
@@ -177,7 +187,7 @@ function HeroBleed({ block }: { block: HomeBlock }) {
   }, [currentSrc, eligibleSrcs]);
 
   useEffect(() => {
-    if (reduced || eligibleSrcs.length < 2) {
+    if (reduced || paused || eligibleSrcs.length < 2) {
       return;
     }
     const timer = window.setInterval(() => {
@@ -197,10 +207,48 @@ function HeroBleed({ block }: { block: HomeBlock }) {
       setUpcomingSrc(upcoming);
     }, HERO_INTERVAL_MS);
     return () => window.clearInterval(timer);
-  }, [eligibleSrcs, reduced]);
+  }, [eligibleSrcs, paused, reduced]);
+
+  useEffect(() => {
+    return () => window.clearTimeout(hintTimerRef.current);
+  }, []);
+
+  /**
+   * 头图点击：先暂停轮换并居中提示；三秒内再点进入相册，超时重置轮换计时。
+   */
+  function handleHeroClick(event: MouseEvent<HTMLElement>) {
+    const target = event.target as HTMLElement;
+    if (target.closest("a, button")) {
+      return;
+    }
+    if (Date.now() < enterUntilRef.current) {
+      enterUntilRef.current = 0;
+      window.clearTimeout(hintTimerRef.current);
+      setHint(false);
+      const href = hrefRef.current;
+      if (href) {
+        navigate(href);
+      }
+      return;
+    }
+    setPaused(true);
+    setHint(true);
+    enterUntilRef.current = Date.now() + HERO_ENTER_MS;
+    window.clearTimeout(hintTimerRef.current);
+    hintTimerRef.current = window.setTimeout(() => {
+      enterUntilRef.current = 0;
+      setHint(false);
+      setPaused(false);
+    }, HERO_ENTER_MS);
+  }
 
   return (
-    <section className="develop-hero" id="hero-bleed" data-tone={src ? "dark" : "light"}>
+    <section
+      className="develop-hero"
+      id="hero-bleed"
+      data-tone={src ? "dark" : "light"}
+      onClick={handleHeroClick}
+    >
       {src ? (
         shownSrcs.map((item) => (
           <img
@@ -215,6 +263,17 @@ function HeroBleed({ block }: { block: HomeBlock }) {
         <div className="develop-hero-well" aria-hidden="true" />
       )}
       <div className="develop-hero-veil" aria-hidden="true" />
+      {hint ? (
+        <p className="develop-hero-hint" aria-live="polite">
+          <span className="develop-hero-hint-box">
+            <i aria-hidden="true" />
+            <i aria-hidden="true" />
+            <i aria-hidden="true" />
+            <i aria-hidden="true" />
+            {HERO_HINT}
+          </span>
+        </p>
+      ) : null}
       <div className="develop-hero-band">
         <div className="develop-hero-copy">
           {src ? (
@@ -222,7 +281,9 @@ function HeroBleed({ block }: { block: HomeBlock }) {
               {lexicon.shotIn.deco} · {year}
             </p>
           ) : null}
-          <h1 className="develop-hero-name">{profile.name}</h1>
+          <h1 className="develop-hero-name">
+            <ProfileName />
+          </h1>
           <p className="develop-hero-en">{profile.nameEn}</p>
           <p className="develop-hero-id">{block.identity}</p>
           <div className="develop-hero-cta">
@@ -258,12 +319,25 @@ function collectHeroFrames(block: HomeBlock): HomeHeroFrame[] {
       {
         src: block.heroSrc,
         year: block.heroYear ?? profile.portraitYear,
+        href: hrefForHeroSrc(block.heroSrc),
         width: size?.width,
         height: size?.height,
       },
     ];
   }
   return [];
+}
+
+/**
+ * 回退头图按对象键找回所属风光摄影项目页。
+ */
+function hrefForHeroSrc(src: string): string | undefined {
+  for (const work of listPublishedWorks(lexicon.landscapePhoto.key)) {
+    if (listWorkImages(work).some((media) => media.src === src)) {
+      return `/${lexicon.photography.key}/${work.channel}/${work.id}`;
+    }
+  }
+  return undefined;
 }
 
 /**

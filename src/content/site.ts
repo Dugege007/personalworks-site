@@ -99,6 +99,8 @@ export type ContactChannel = {
 
 export const profile = {
   name: "杜宏博",
+  /** 身份证现用名；头图点击切换，默认仍显示曾用名 name。 */
+  legalName: "杜红勃",
   nameEn: "DU HONGBO",
   siteLabel: "层境",
   siteLabelEn: "STRATA",

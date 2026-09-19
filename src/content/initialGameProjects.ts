@@ -71,39 +71,43 @@ export const initialGameProjects = [
     "lead": "3DRPG项目截图，共收录 8 张图片。",
     "playable": false,
     "screenshots": [
-      [
-        "game-dev/3d-rpg/01.webp",
-        "3DRPG_练习 0"
-      ],
-      [
-        "game-dev/3d-rpg/02.webp",
-        "3DRPG_练习 1"
-      ],
-      [
-        "game-dev/3d-rpg/03.webp",
-        "3DRPG_练习 2"
-      ],
-      [
-        "game-dev/3d-rpg/04.webp",
-        "3DRPG_练习 3"
-      ],
-      [
-        "game-dev/3d-rpg/05.webp",
-        "3DRPG_练习 4"
-      ],
-      [
-        "game-dev/3d-rpg/06.webp",
-        "3DRPG_练习 5"
-      ],
-      [
-        "game-dev/3d-rpg/07.webp",
-        "3DRPG_练习 6"
-      ],
-      [
-        "game-dev/3d-rpg/08.webp",
-        "3DRPG_游戏架构图 1"
-      ]
+    [
+      "game-dev/3d-rpg/01.webp",
+      "3DRPG_练习 01"
+    ],
+    [
+      "game-dev/3d-rpg/02.webp",
+      "3DRPG_练习 02"
+    ],
+    [
+      "game-dev/3d-rpg/03.webp",
+      "3DRPG_练习 03"
+    ],
+    [
+      "game-dev/3d-rpg/04.webp",
+      "3DRPG_练习 04"
+    ],
+    [
+      "game-dev/3d-rpg/05.webp",
+      "3DRPG_练习 05"
+    ],
+    [
+      "game-dev/3d-rpg/06.webp",
+      "3DRPG_练习 06"
+    ],
+    [
+      "game-dev/3d-rpg/07.webp",
+      "3DRPG_练习 07"
+    ],
+    [
+      "game-dev/3d-rpg/08.webp",
+      "3DRPG_练习 08"
+    ],
+    [
+      "game-dev/3d-rpg/09.webp",
+      "3DRPG_练习 09"
     ]
+  ]
   },
   {
     "id": "dark-queen-3d-action",
@@ -231,7 +235,12 @@ export const registeredGames: Array<{
     playable: false,
     consent: "pending",
     stageFolder: "game-dev/参赛作品/蛄蛹者 Squirmeal",
-    screenshots: [],
+    screenshots: [
+    [
+      "game-dev/squirmeal/01.mp4",
+      "蛄蛹者_参赛视频"
+    ]
+  ],
   },
   {
     id: "explorer",
@@ -241,6 +250,11 @@ export const registeredGames: Array<{
     playable: false,
     consent: "pending",
     stageFolder: "game-dev/参赛作品/探索者号 Explorer",
-    screenshots: [],
+    screenshots: [
+    [
+      "game-dev/explorer/01.mp4",
+      "探索者号_参赛视频"
+    ]
+  ],
   },
 ];

@@ -35,6 +35,7 @@
   overflow: hidden;
   background: var(--ink-block);
   color: var(--on-ink);
+  cursor: pointer;
 }
 
 .develop-hero[data-tone="light"] {
@@ -124,6 +125,75 @@
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: 0.04em;
+}
+
+.develop-hero-hint {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  pointer-events: none;
+}
+
+.develop-hero-hint-box {
+  position: relative;
+  transform: translateY(-120px);
+  padding: 14px 22px;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  color: rgb(255 255 255 / 1);
+  text-shadow:
+    0 1px 3px rgb(26 29 34 / 0.55),
+    0 8px 28px rgb(26 29 34 / 0.66);
+}
+
+.develop-hero-hint-box::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  z-index: 0;
+  background: rgb(120 124 130 / 0.15);
+}
+
+.develop-hero-hint-box i {
+  position: absolute;
+  z-index: 1;
+  width: 12px;
+  height: 12px;
+  border: 1px solid currentColor;
+}
+
+.develop-hero-hint-box i:nth-child(1) {
+  top: 0;
+  left: 0;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.develop-hero-hint-box i:nth-child(2) {
+  top: 0;
+  right: 0;
+  border-left: 0;
+  border-bottom: 0;
+}
+
+.develop-hero-hint-box i:nth-child(3) {
+  bottom: 0;
+  left: 0;
+  border-right: 0;
+  border-top: 0;
+}
+
+.develop-hero-hint-box i:nth-child(4) {
+  bottom: 0;
+  right: 0;
+  border-left: 0;
+  border-top: 0;
 }
 
 .develop-hero-en {
@@ -555,9 +625,13 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .develop-hero-media.is-on {
-    animation: develop-hero-zoom 28s ease-in-out infinite alternate;
+  .develop-hero-media {
+    transform: scale(1.1);
     transform-origin: center;
+  }
+
+  .develop-hero-media.is-on {
+    animation: develop-hero-zoom 4.5s linear both;
   }
 
   .develop-hero-name {
@@ -567,7 +641,7 @@
 
 @keyframes develop-hero-zoom {
   from { transform: scale(1); }
-  to { transform: scale(1.08); }
+  to { transform: scale(1.1); }
 }
 
 @keyframes develop-name-rise {

@@ -29,9 +29,322 @@
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;600;700;900&family=Noto+Serif+SC:wght@500;600;700&family=Outfit:wght@400;500;600&family=Syne:wght@600;700;800&display=swap"
       rel="stylesheet"
     />
+    <style>
+      /* 进站闸：须写在首包内。令牌未到前不能读 tokens.css。z=90，高于灯箱 80 / 颗粒 40 / 顶栏 34。 */
+      html { background: #e8eaed; }
+      html[data-skin="strata"] { background: #0b0d10; }
+      html[data-boot="on"] { overflow: hidden; }
+
+      .boot-gate {
+        --boot-bg: #e8eaed;
+        --boot-text: #16181c;
+        --boot-muted: #5a6169;
+        --boot-accent: #2b4c7e;
+        --boot-line: rgba(22, 24, 28, 0.12);
+        --boot-grid: rgba(22, 24, 28, 0.055);
+        position: fixed;
+        inset: 0;
+        z-index: 90;
+        overflow: hidden;
+        background: var(--boot-bg);
+        color: var(--boot-text);
+        font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+        will-change: transform;
+      }
+
+      html[data-skin="strata"] .boot-gate {
+        --boot-bg: #0b0d10;
+        --boot-text: #e8e6e1;
+        --boot-muted: #8a8680;
+        --boot-accent: #c4a574;
+        --boot-line: rgba(232, 230, 225, 0.12);
+        --boot-grid: rgba(232, 230, 225, 0.055);
+      }
+
+      .boot-gate-grid,
+      .boot-gate-scan {
+        position: absolute;
+        pointer-events: none;
+      }
+
+      .boot-gate-grid {
+        inset: 0;
+        background-image:
+          linear-gradient(var(--boot-grid) 1px, transparent 1px),
+          linear-gradient(90deg, var(--boot-grid) 1px, transparent 1px);
+        background-size: 56px 56px;
+      }
+
+      .boot-gate-scan {
+        left: 10%;
+        right: 10%;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--boot-accent), transparent);
+        animation: boot-scan 2.6s ease-in-out infinite;
+      }
+
+      @keyframes boot-scan {
+        0% { transform: translate3d(0, 16vh, 0); opacity: 0; }
+        18% { opacity: 0.5; }
+        82% { opacity: 0.5; }
+        100% { transform: translate3d(0, 78vh, 0); opacity: 0; }
+      }
+
+      .boot-gate-frame {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        min-height: 100dvh;
+        max-width: 42rem;
+        padding: 4.5rem 8vw 14vh;
+      }
+
+      .boot-gate-brand {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.35rem;
+        margin: 0 0 2.75rem;
+      }
+
+      .boot-gate-zh {
+        margin: 0;
+        font-size: clamp(1.35rem, 2.6vw, 1.85rem);
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        line-height: 1.2;
+      }
+
+      .boot-gate-deco {
+        display: block;
+        font-family: "Outfit", "IBM Plex Mono", sans-serif;
+        font-size: 0.85rem;
+        font-weight: 500;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--boot-muted);
+        white-space: nowrap;
+      }
+
+      .boot-gate-num {
+        display: block;
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: clamp(5.25rem, 16vw, 10.5rem);
+        font-weight: 500;
+        line-height: 0.9;
+        letter-spacing: -0.06em;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .boot-gate-track {
+        width: min(100%, 22rem);
+        height: 2px;
+        margin: 1.35rem 0 1.1rem;
+        overflow: hidden;
+        background: var(--boot-line);
+      }
+
+      .boot-gate-fill {
+        width: 100%;
+        height: 100%;
+        background: var(--boot-accent);
+        transform: scaleX(0);
+        transform-origin: left center;
+      }
+
+      .boot-gate-status {
+        margin: 0;
+        max-width: 28ch;
+        font-size: 0.95rem;
+        line-height: 1.5;
+        color: var(--boot-muted);
+        white-space: nowrap;
+      }
+
+      .boot-gate-sr {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+      }
+
+      .boot-gate.is-out {
+        transform: translate3d(0, -100%, 0);
+        transition: transform 0.72s cubic-bezier(0.76, 0, 0.24, 1);
+      }
+
+      @media (max-width: 768px) {
+        .boot-gate-frame {
+          padding: 4rem 20px 12vh;
+          max-width: none;
+        }
+
+        .boot-gate-track {
+          width: 100%;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .boot-gate-scan { display: none; }
+        .boot-gate.is-out {
+          transform: none;
+          opacity: 0;
+          transition: opacity 0.2s linear;
+        }
+      }
+    </style>
   </head>
   <body>
+    <div
+      id="boot-gate"
+      class="boot-gate"
+      role="progressbar"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="0"
+      aria-label="页面载入"
+    >
+      <div class="boot-gate-grid" aria-hidden="true"></div>
+      <div class="boot-gate-scan" aria-hidden="true"></div>
+      <div class="boot-gate-frame">
+        <p class="boot-gate-brand">
+          <span class="boot-gate-zh" data-boot-zh>显影</span>
+          <span class="boot-gate-deco" data-boot-deco aria-hidden="true">DEVELOP</span>
+        </p>
+        <span class="boot-gate-num" data-boot-num>00</span>
+        <div class="boot-gate-track" aria-hidden="true">
+          <div class="boot-gate-fill" data-boot-fill></div>
+        </div>
+        <p class="boot-gate-status" data-boot-status>底片正在显现</p>
+        <p class="boot-gate-sr" aria-live="polite" data-boot-live></p>
+      </div>
+    </div>
     <div id="root"></div>
+    <script>
+      (function () {
+        var gate = document.getElementById("boot-gate");
+        if (!gate) return;
+
+        var skin = document.documentElement.getAttribute("data-skin") || "develop";
+        var numEl = gate.querySelector("[data-boot-num]");
+        var fillEl = gate.querySelector("[data-boot-fill]");
+        var statusEl = gate.querySelector("[data-boot-status]");
+        var liveEl = gate.querySelector("[data-boot-live]");
+        var zhEl = gate.querySelector("[data-boot-zh]");
+        var decoEl = gate.querySelector("[data-boot-deco]");
+        var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var shown = 0;
+        var target = 0.06;
+        var finished = false;
+        var exiting = false;
+        var lastLive = -1;
+        var startedAt = performance.now();
+        var raf = 0;
+        var waitCopy = skin === "strata" ? "档案正在展开" : "底片正在显现";
+        var slowCopy = skin === "strata" ? "线路较慢，档案仍在展开" : "线路较慢，底片仍在显现";
+
+        if (skin === "strata") {
+          if (zhEl) zhEl.textContent = "层境";
+          if (decoEl) decoEl.textContent = "STRATA";
+        }
+        if (statusEl) statusEl.textContent = waitCopy;
+
+        document.documentElement.setAttribute("data-boot", "on");
+
+        function setTarget(next) {
+          if (next > 1) next = 1;
+          if (next > target) target = next;
+        }
+
+        function render(value) {
+          var pct = Math.round(value * 100);
+          if (numEl) numEl.textContent = pct < 10 ? "0" + pct : String(pct);
+          if (fillEl) fillEl.style.transform = "scaleX(" + value + ")";
+          gate.setAttribute("aria-valuenow", String(pct));
+          if (statusEl && !reduce) {
+            statusEl.style.opacity = String(0.42 + value * 0.58);
+            statusEl.style.transform = "translateY(" + ((1 - value) * 8) + "px)";
+          }
+          if (liveEl && pct >= lastLive + 10) {
+            lastLive = pct - (pct % 10);
+            liveEl.textContent = "页面载入百分之" + lastLive;
+          }
+        }
+
+        function tick(now) {
+          if (!finished) {
+            var creep = 0.1 + Math.min(0.72, (now - startedAt) / 14000);
+            if (creep > target) target = creep;
+          }
+          shown += (target - shown) * (finished ? 0.2 : 0.08);
+          if (Math.abs(target - shown) < 0.001) shown = target;
+          render(shown);
+          if (finished && shown >= 0.995) {
+            exit();
+            return;
+          }
+          raf = requestAnimationFrame(tick);
+        }
+
+        function exit() {
+          if (exiting) return;
+          exiting = true;
+          cancelAnimationFrame(raf);
+          render(1);
+          if (liveEl) liveEl.textContent = "页面已载入";
+          var hold = reduce ? 0 : Math.max(0, 280 - (performance.now() - startedAt));
+          window.setTimeout(function () {
+            gate.classList.add("is-out");
+            window.setTimeout(function () {
+              if (gate.parentNode) gate.parentNode.removeChild(gate);
+              document.documentElement.removeAttribute("data-boot");
+            }, reduce ? 200 : 720);
+          }, hold);
+        }
+
+        window.__siteBoot = {
+          mark: function (progress) {
+            setTarget(progress);
+          },
+          ready: function () {
+            finished = true;
+            setTarget(1);
+          },
+        };
+
+        if (document.readyState === "interactive") setTarget(0.22);
+        if (document.readyState === "complete") setTarget(0.55);
+        document.addEventListener("readystatechange", function () {
+          if (document.readyState === "interactive") setTarget(0.22);
+          if (document.readyState === "complete") setTarget(0.55);
+        });
+
+        if (typeof PerformanceObserver === "function") {
+          try {
+            var seen = 0;
+            var obs = new PerformanceObserver(function (list) {
+              list.getEntries().forEach(function () {
+                seen += 1;
+                setTarget(Math.min(0.78, 0.18 + seen * 0.08));
+              });
+            });
+            obs.observe({ type: "resource", buffered: true });
+          } catch (err) {}
+        }
+
+        render(shown);
+        raf = requestAnimationFrame(tick);
+
+        window.setTimeout(function () {
+          if (!finished && statusEl) statusEl.textContent = slowCopy;
+        }, 10000);
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

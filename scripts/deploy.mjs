@@ -26,6 +26,7 @@ import {
 } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { withTransientRetry } from "./cos-retry.mjs";
 
 const require = createRequire(import.meta.url);
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -261,14 +262,26 @@ async function syncAssets(env, flags) {
       ? "public, max-age=2592000"
       : "public, max-age=3600";
     console.log(`COS 上传 ${file.key}`);
-    await cos.uploadFile({
-      Bucket: bucket,
-      Region: region,
-      Key: file.key,
-      FilePath: file.abs,
-      SliceSize: 8 * 1024 * 1024,
-      Headers: { "Cache-Control": cacheControl },
-    });
+    await withTransientRetry(
+      () =>
+        cos.uploadFile({
+          Bucket: bucket,
+          Region: region,
+          Key: file.key,
+          FilePath: file.abs,
+          SliceSize: 8 * 1024 * 1024,
+          Headers: { "Cache-Control": cacheControl },
+        }),
+      {
+        onRetry(error, attempt) {
+          const code =
+            error && typeof error === "object" && "code" in error
+              ? String(error.code)
+              : "未知";
+          console.log(`COS 重试 ${file.key}（第 ${attempt} 次，${code}）`);
+        },
+      },
+    );
     uploaded += 1;
   }
 
