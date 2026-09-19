@@ -12,35 +12,46 @@ export const initialWorkProjects = [
     "summary": "上海曼盛包装项目静帧，共收录 7 张图片。",
     "body": "上海曼盛包装项目静帧，共收录 7 张图片。",
     "media": [
-      [
-        "digital-twin/shanghai-mansheng-packaging/01.webp",
-        "01"
-      ],
-      [
-        "digital-twin/shanghai-mansheng-packaging/02.webp",
-        "02"
-      ],
-      [
-        "digital-twin/shanghai-mansheng-packaging/03.webp",
-        "03"
-      ],
-      [
-        "digital-twin/shanghai-mansheng-packaging/04.webp",
-        "04_1"
-      ],
-      [
-        "digital-twin/shanghai-mansheng-packaging/05.webp",
-        "04_2"
-      ],
-      [
-        "digital-twin/shanghai-mansheng-packaging/06.webp",
-        "05"
-      ],
-      [
-        "digital-twin/shanghai-mansheng-packaging/07.webp",
-        "06"
-      ]
-    ]
+    [
+      "digital-twin/shanghai-mansheng-packaging/01.webp",
+      "01 01"
+    ],
+    [
+      "digital-twin/shanghai-mansheng-packaging/02.webp",
+      "01 02"
+    ],
+    [
+      "digital-twin/shanghai-mansheng-packaging/03.webp",
+      "01 03"
+    ],
+    [
+      "digital-twin/shanghai-mansheng-packaging/04.webp",
+      "01 04"
+    ],
+    [
+      "digital-twin/shanghai-mansheng-packaging/05.webp",
+      "01 05"
+    ],
+    [
+      "digital-twin/shanghai-mansheng-packaging/06.webp",
+      "01 06"
+    ],
+    [
+      "digital-twin/shanghai-mansheng-packaging/07.webp",
+      "01 07"
+    ],
+    [
+      "digital-twin/shanghai-mansheng-packaging/08.mp4",
+      "01 08"
+    ],
+    {
+  "kind": "video",
+  "label": "视频",
+  "src": "digital-twin/shanghai-mansheng-packaging/09.mp4",
+  "displayName": "立库动画",
+  "description": "立库动画测试"
+}
+  ]
   },
   {
     "id": "ningbo-siweier",

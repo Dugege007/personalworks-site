@@ -14,6 +14,7 @@ import {
 } from "../ia/workTree";
 import { listPublishedWorks, listWorkImages } from "../content/works";
 import { stockPlaceholderSrc, workCoverSrc } from "../content/stockMedia";
+import { resolveLead } from "../content/copyDisplay";
 import { findCollectionByChannel, playableGames } from "../content/site";
 import { LandscapeProjectBoard } from "../components/work/LandscapeProjectBoard";
 import { tx } from "../prefs/tx";
@@ -87,7 +88,7 @@ export function WorkChannelPage() {
             >
               <strong>{game.title}</strong>
               <em>{game.titleEn}</em>
-              <span>{game.lead}</span>
+              {resolveLead(game.lead) ? <span>{resolveLead(game.lead)}</span> : null}
             </CoverTile>
           ))}
         </div>

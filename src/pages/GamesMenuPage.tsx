@@ -1,4 +1,5 @@
 import { Link, Navigate } from "react-router-dom";
+import { resolveLead } from "../content/copyDisplay";
 import { lexicon } from "../content/lexicon";
 import { archiveSubIndex, playableGames } from "../content/site";
 import { stockPlaceholderSrc } from "../content/stockMedia";
@@ -38,7 +39,7 @@ export function GamesMenuPage() {
                 <small>{game.titleEn}</small>
                 <div>
                   <h2>{game.title}</h2>
-                  <p>{game.lead}</p>
+                  {resolveLead(game.lead) ? <p>{resolveLead(game.lead)}</p> : null}
                 </div>
                 {game.sizeHint ? <p>{game.sizeHint}</p> : null}
               </div>

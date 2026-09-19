@@ -16,6 +16,9 @@ export type WorkMedia = {
   kind: "image" | "video";
   label: string;
   src?: string;
+  poster?: string;
+  displayName?: string;
+  description?: string;
 };
 
 export type WorkConsent = "granted" | "denied" | "pending";
@@ -51,10 +54,28 @@ export type WorkRecord = {
 };
 
 /**
- * 按给定对象键与图名生成媒体，禁止推断连续对象键。
+ * 成片对象键对应的封面伴生键。
  */
-function listed(entries: readonly (readonly [src: string, label: string])[]): WorkMedia[] {
-  return entries.map(([src, label]) => ({ kind: "image" as const, src, label }));
+function posterForVideoSrc(src: string): string {
+  return src.replace(/\.mp4$/i, ".poster.webp");
+}
+
+/**
+ * 按给定对象键与图名生成媒体，禁止推断连续对象键。
+ * MP4 成片记为视频并带上约定封面键。
+ */
+type ListedEntry = readonly [src: string, label: string] | WorkMedia;
+
+function listed(entries: readonly ListedEntry[]): WorkMedia[] {
+  return entries.map((entry): WorkMedia => {
+    if ("kind" in entry) {
+      return entry;
+    }
+    const [src, label] = entry;
+    return /\.mp4$/i.test(src)
+      ? { kind: "video", src, poster: posterForVideoSrc(src), label }
+      : { kind: "image", src, label };
+  });
 }
 
 /**
@@ -82,6 +103,20 @@ export function formatStartedOn(value: string): string {
  */
 export function listWorkImages(work: WorkRecord): WorkMedia[] {
   return work.media.filter((item) => item.kind === "image" && item.src);
+}
+
+/**
+ * 已列入内容池的视频，按 media 原序返回。
+ */
+export function listWorkVideos(work: WorkRecord): WorkMedia[] {
+  return work.media.filter((item) => item.kind === "video");
+}
+
+/**
+ * 已列入内容池、可供画册与灯箱翻页的媒体，按 media 原序返回。
+ */
+export function listWorkShots(work: WorkRecord): WorkMedia[] {
+  return work.media.filter((item) => item.src);
 }
 
 export type HomeHeroFrame = {

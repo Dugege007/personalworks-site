@@ -2,6 +2,7 @@ import { Link, Navigate } from "react-router-dom";
 import { lexicon } from "../content/lexicon";
 import { categories } from "../content/site";
 import { stockPlaceholderSrc, workCoverSrc } from "../content/stockMedia";
+import { resolveLead } from "../content/copyDisplay";
 import { listPublishedWorks } from "../content/works";
 import { iaOfSkin } from "../ia";
 import { hrefForDevelopKind } from "../ia/workTree";
@@ -41,7 +42,7 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
         {category.index} / {category.indexEn}
       </div>
       <h1>{category.title}</h1>
-      <p className="page-lead">{category.lead}</p>
+      {resolveLead(category.lead) ? <p className="page-lead">{resolveLead(category.lead)}</p> : null}
       {category.id === lexicon.photography.key ? (
         <Link className="archive-btn" to={`/${lexicon.photography.key}/${lexicon.photoCatalog.key}`}>
           浏览全部作品
@@ -52,7 +53,7 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
         <section key={collection.id} className="category-block" data-theme={collection.theme}>
           <div className="page-kicker">{collection.titleDeco}</div>
           <h2>{collection.title}</h2>
-          <p>{collection.lead}</p>
+          {resolveLead(collection.lead) ? <p>{resolveLead(collection.lead)}</p> : null}
           {collection.comingSoon ? (
             <p className="note">位置已留，作品待收录。不进入详情占位。</p>
           ) : null}
@@ -94,7 +95,7 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
                       </small>
                       <div>
                         <h2>{work.title}</h2>
-                        <p>{work.summary}</p>
+                        {resolveLead(work.summary) ? <p>{resolveLead(work.summary)}</p> : null}
                       </div>
                     </div>
                   </Link>

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { lexicon } from "../../content/lexicon";
 import { gameProjects, profile } from "../../content/site";
 import { stockPlaceholderSrc, workCoverSrc } from "../../content/stockMedia";
-import { heroFrameFitsViewport } from "../../content/photoOrientation";
+import { heroFrameFitsViewport, type PhotoOrientation } from "../../content/photoOrientation";
 import { photoSizes } from "../../content/photoSizes";
 import {
   listLandscapeHeroFrames,
@@ -77,8 +77,17 @@ function HeroBleed({ block }: { block: HomeBlock }) {
   const frames = useMemo(() => collectHeroFrames(block), [block]);
   const [measured, setMeasured] = useState<Record<string, { width: number; height: number }>>({});
   const [failed, setFailed] = useState<Record<string, true>>({});
-  const [currentSrc, setCurrentSrc] = useState("");
-  const [upcomingSrc, setUpcomingSrc] = useState("");
+  const startRef = useRef("");
+  const upcomingStartRef = useRef("");
+  if (!startRef.current) {
+    startRef.current = pickHeroStartSrc(frames, viewport);
+    upcomingStartRef.current = pickFreshSrc(
+      frames.filter((frame) => heroFrameFitsViewport(frame, viewport)).map((frame) => frame.src),
+      [startRef.current],
+    );
+  }
+  const [currentSrc, setCurrentSrc] = useState(startRef.current);
+  const [upcomingSrc, setUpcomingSrc] = useState(upcomingStartRef.current);
   const [lastSrc, setLastSrc] = useState("");
   const recentRef = useRef<string[]>([]);
   const currentRef = useRef(currentSrc);
@@ -106,9 +115,12 @@ function HeroBleed({ block }: { block: HomeBlock }) {
     [failed, sizedFrames, viewport],
   );
   const pool = sizedFrames.filter((frame) => !failed[frame.src]);
-  const current = pool.find((frame) => frame.src === currentSrc) ?? pool.find((frame) => frame.src === eligibleSrcs[0]) ?? null;
+  const selected = pool.find((frame) => frame.src === currentSrc) ?? null;
+  const current = selected ?? pool.find((frame) => frame.src === eligibleSrcs[0]) ?? null;
   const src = current?.src ?? "";
-  currentRef.current = src;
+  if (selected) {
+    currentRef.current = selected.src;
+  }
   const shownSrcs = [lastSrc, src, upcomingSrc].filter(
     (item, index, list): item is string => Boolean(item) && !failed[item] && list.indexOf(item) === index,
   );
@@ -144,7 +156,7 @@ function HeroBleed({ block }: { block: HomeBlock }) {
     if (eligibleSrcs.length === 0) {
       return;
     }
-    const cur = currentRef.current;
+    const cur = currentSrc;
     if (cur && eligibleSrcs.includes(cur)) {
       if (upcomingRef.current && !eligibleSrcs.includes(upcomingRef.current)) {
         const upcoming = pickFreshSrc(eligibleSrcs, [cur, ...recentRef.current]);
@@ -162,7 +174,7 @@ function HeroBleed({ block }: { block: HomeBlock }) {
     const upcoming = pickFreshSrc(eligibleSrcs, [next, ...recentRef.current]);
     upcomingRef.current = upcoming;
     setUpcomingSrc(upcoming);
-  }, [eligibleSrcs]);
+  }, [currentSrc, eligibleSrcs]);
 
   useEffect(() => {
     if (reduced || eligibleSrcs.length < 2) {
@@ -252,6 +264,16 @@ function collectHeroFrames(block: HomeBlock): HomeHeroFrame[] {
     ];
   }
   return [];
+}
+
+/**
+ * 打开首页时从当前视口可抽池随机首张，不钉死可抽池第一张。
+ */
+function pickHeroStartSrc(frames: HomeHeroFrame[], viewport: PhotoOrientation): string {
+  return pickFreshSrc(
+    frames.filter((frame) => heroFrameFitsViewport(frame, viewport)).map((frame) => frame.src),
+    [],
+  );
 }
 
 /**

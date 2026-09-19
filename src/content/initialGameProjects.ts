@@ -211,3 +211,36 @@ export const initialGameProjects = [
     ]
   }
 ] as const;
+
+/** 工具确认登记的游戏空壳；无截图时不进访客选单。 */
+export const registeredGames: Array<{
+  id: string;
+  title: string;
+  titleEn: string;
+  lead: string;
+  playable: boolean;
+  consent?: string;
+  stageFolder?: string;
+  screenshots: Array<[string, string]>;
+}> = [
+  {
+    id: "squirmeal",
+    title: "蛄蛹者",
+    titleEn: "",
+    lead: "",
+    playable: false,
+    consent: "pending",
+    stageFolder: "game-dev/参赛作品/蛄蛹者 Squirmeal",
+    screenshots: [],
+  },
+  {
+    id: "explorer",
+    title: "探索者号",
+    titleEn: "",
+    lead: "",
+    playable: false,
+    consent: "pending",
+    stageFolder: "game-dev/参赛作品/探索者号 Explorer",
+    screenshots: [],
+  },
+];

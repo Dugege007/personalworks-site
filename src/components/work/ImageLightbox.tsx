@@ -3,29 +3,38 @@ import {
   useRef,
   useState,
   type MouseEvent,
+  type MutableRefObject,
   type PointerEvent as ReactPointerEvent,
   type TransitionEvent,
 } from "react";
 import { createPortal } from "react-dom";
 import type { PhotoExif } from "../../content/photoExif";
 import { pausePageLenis, resumePageLenis } from "../../hooks/useLenis";
+import { resolveLead } from "../../content/copyDisplay";
 import { assetUrl } from "../../lib/assets";
 import { PhotoExifStrip } from "./ExifMarks";
 import { NavMark } from "./NavMarks";
 import "../../styles/image-lightbox.css";
 
-type LightboxImage = {
+export type LightboxShot = {
   src: string;
   alt: string;
   label: string;
+  kind?: "image" | "video";
+  poster?: string;
+  description?: string;
   exif?: PhotoExif;
 };
 
 type ImageLightboxProps = {
-  images: LightboxImage[];
+  images: LightboxShot[];
   index: number;
   title: string;
   summary?: string;
+  videoProgressRef?: MutableRefObject<Map<string, number>>;
+  onVideoTime?: (src: string, time: number) => void;
+  videoMuted?: boolean;
+  onVideoMutedChange?: (muted: boolean) => void;
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
@@ -127,6 +136,10 @@ export function ImageLightbox({
   index,
   title,
   summary,
+  videoProgressRef,
+  onVideoTime,
+  videoMuted = true,
+  onVideoMutedChange,
   onClose,
   onPrev,
   onNext,
@@ -134,6 +147,9 @@ export function ImageLightbox({
   const closeRef = useRef<HTMLButtonElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const photoRef = useRef<HTMLImageElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const onVideoTimeRef = useRef(onVideoTime);
+  onVideoTimeRef.current = onVideoTime;
   const wheelCarryRef = useRef(0);
   const zoomedRef = useRef(false);
   const zoomScaleRef = useRef(ZOOM_MIN);
@@ -180,6 +196,53 @@ export function ImageLightbox({
     setZoomMotion(false);
     setFrameBox({ w: 0, h: 0 });
   }, [index]);
+
+  useEffect(() => {
+    const item = images[index];
+    if (!item || item.kind !== "video") {
+      return;
+    }
+    const video = videoRef.current;
+    if (!video) {
+      return;
+    }
+    const start = videoProgressRef?.current.get(item.src) ?? 0;
+    const report = () => {
+      const time = video.currentTime;
+      videoProgressRef?.current.set(item.src, time);
+      onVideoTimeRef.current?.(item.src, time);
+    };
+    const apply = () => {
+      const time = Number.isFinite(start) ? Math.max(0, start) : 0;
+      if (Math.abs(video.currentTime - time) > 0.05) {
+        video.currentTime = time;
+      }
+      video.pause();
+    };
+    const onPause = () => {
+      if (!video.seeking) {
+        report();
+      }
+    };
+    video.muted = videoMuted;
+    const onVolumeChange = () => {
+      onVideoMutedChange?.(video.muted);
+    };
+    video.addEventListener("pause", onPause);
+    video.addEventListener("volumechange", onVolumeChange);
+    if (video.readyState >= 1) {
+      apply();
+    } else {
+      video.addEventListener("loadedmetadata", apply);
+    }
+    return () => {
+      video.removeEventListener("loadedmetadata", apply);
+      video.removeEventListener("pause", onPause);
+      video.removeEventListener("volumechange", onVolumeChange);
+      video.pause();
+      report();
+    };
+  }, [images, index, videoProgressRef]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -360,15 +423,18 @@ export function ImageLightbox({
   };
 
   const shotIndex = `(${index + 1}/${images.length})`;
+  const isVideo = current.kind === "video";
   const photoSrc = assetUrl(current.src);
+  const posterSrc = current.poster ? assetUrl(current.poster) : undefined;
   const frameClass = [
     "lrb-lightbox-frame",
+    isVideo ? "is-video" : "",
     zoomed ? "is-zoomed" : "",
     panning ? "is-panning" : "",
   ]
     .filter(Boolean)
     .join(" ");
-  const photoClass = ["lrb-lightbox-photo", zoomMotion ? "is-motion" : ""]
+  const photoClass = ["lrb-lightbox-photo", isVideo ? "is-video" : "", zoomMotion ? "is-motion" : ""]
     .filter(Boolean)
     .join(" ");
   const photoStyle = zoomed
@@ -388,21 +454,34 @@ export function ImageLightbox({
         <div className="lrb-lightbox-stage">
           <div className="lrb-lightbox-picture">
             <figure className={frameClass}>
-              <img
-                ref={photoRef}
-                className={photoClass}
-                src={photoSrc}
-                alt={current.alt}
-                draggable={false}
-                style={photoStyle}
-                onDragStart={(event) => event.preventDefault()}
-                onPointerDown={onPhotoPointerDown}
-                onPointerMove={onPhotoPointerMove}
-                onPointerUp={(event) => endPhotoPointer(event, true)}
-                onPointerCancel={(event) => endPhotoPointer(event, false)}
-                onTransitionEnd={onPhotoTransitionEnd}
-              />
-              {zoomed ? (
+              {isVideo ? (
+                <video
+                  ref={videoRef}
+                  className={photoClass}
+                  src={photoSrc}
+                  poster={posterSrc}
+                  muted={videoMuted}
+                  controls
+                  playsInline
+                  preload="metadata"
+                />
+              ) : (
+                <img
+                  ref={photoRef}
+                  className={photoClass}
+                  src={photoSrc}
+                  alt={current.alt}
+                  draggable={false}
+                  style={photoStyle}
+                  onDragStart={(event) => event.preventDefault()}
+                  onPointerDown={onPhotoPointerDown}
+                  onPointerMove={onPhotoPointerMove}
+                  onPointerUp={(event) => endPhotoPointer(event, true)}
+                  onPointerCancel={(event) => endPhotoPointer(event, false)}
+                  onTransitionEnd={onPhotoTransitionEnd}
+                />
+              )}
+              {zoomed && !isVideo ? (
                 <div className="lrb-lightbox-map" style={mapBoxStyle(frameBox)} aria-hidden="true">
                   <img src={photoSrc} alt="" draggable={false} />
                   <span className="lrb-lightbox-map-view" style={mapViewStyle(pan, photoRef.current, zoomScale)} />
@@ -419,7 +498,7 @@ export function ImageLightbox({
                   {title && title !== current.label ? <p className="lrb-lightbox-title">{title}</p> : null}
                 </div>
               ) : null}
-              {summary ? <p className="lrb-lightbox-lead">{summary}</p> : null}
+              {resolveLead(summary) ? <p className="lrb-lightbox-lead">{resolveLead(summary)}</p> : null}
             </div>
           </div>
         </div>

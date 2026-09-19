@@ -1,14 +1,16 @@
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { ChannelHead } from "../components/work/ChannelHead";
 import { LandscapeProjectBoard } from "../components/work/LandscapeProjectBoard";
 import { ProjectGallery } from "../components/work/ProjectGallery";
+import { resolveLead, resolveMediaDisplayName } from "../content/copyDisplay";
 import { lexicon } from "../content/lexicon";
 import { findCategoryByPath, findCollectionByChannel, findCollectionByPath } from "../content/site";
 import {
   findPublishedWork,
   findPublishedWorksById,
   formatStartedOn,
-  listWorkImages,
+  listWorkShots,
+  type WorkMedia,
   type WorkRecord,
 } from "../content/works";
 import { channelTitleZh } from "../ia/href";
@@ -66,6 +68,23 @@ function buildMetaItems(work: WorkRecord): MetaItem[] {
     items.push({ label: "署名", value: work.displayName });
   }
   return items;
+}
+
+/**
+ * 详情页未走画册时的视频框：只作占位，交互由画册与灯箱承接。
+ */
+function renderVideoFrame(item: WorkMedia) {
+  const href = item.src ? assetUrl(item.src) : "";
+  const poster = item.poster ? assetUrl(item.poster) : undefined;
+  return (
+    <figure className="media-frame is-video" key={item.label}>
+      {href ? (
+        <video src={href} poster={poster} muted playsInline />
+      ) : (
+        <span>视频框 · {item.label}</span>
+      )}
+    </figure>
+  );
 }
 
 /**
@@ -137,12 +156,13 @@ export function WorkDetailPage() {
 
   if (!work) {
     return (
-      <div className="page" data-theme={theme}>
-        <Link className="back" to={back.path}>
-          ← 返回{back.label}
-        </Link>
-        <h1>档案不存在</h1>
-        <p className="page-lead">这条档案未开放，或不在当前分类中。</p>
+      <div className="develop-channel" data-theme={theme}>
+        <ChannelHead
+          backTo={back.path}
+          backLabel={back.label}
+          title="档案不存在"
+          lead="这条档案未开放，或不在当前分类中。"
+        />
       </div>
     );
   }
@@ -159,9 +179,17 @@ export function WorkDetailPage() {
     title: work.title,
     date: work.capturedOn ?? work.startedOn ?? work.year,
     place: work.place,
-    summary: work.summary,
-    images: listWorkImages(work).flatMap((image) =>
-      image.src ? [{ src: image.src, label: image.label }] : [],
+    summary: resolveLead(work.summary),
+    images: listWorkShots(work).flatMap((item) =>
+      item.src
+        ? [{
+            src: item.src,
+            label: resolveMediaDisplayName(item),
+            kind: item.kind,
+            poster: item.poster,
+            description: item.description,
+          }]
+        : [],
     ),
   };
 
@@ -188,28 +216,20 @@ export function WorkDetailPage() {
   const body = work.body && work.body !== work.summary ? <p className="archive-body">{work.body}</p> : null;
   const gallery =
     work.channel === lexicon.landscapeRendering.key ? (
-      <LandscapeProjectBoard works={[work]} />
+      <LandscapeProjectBoard works={[work]} showHead={false} />
     ) : galleryVariant ? (
       <ProjectGallery
         projects={[galleryProject]}
         variant={galleryVariant}
-        showHead={galleryVariant !== "photo"}
+        showHead={false}
       />
     ) : (
       <div className="media-grid">
         {work.media.map((item) => {
-          const href = item.src ? assetUrl(item.src) : "";
           if (item.kind === "video") {
-            return (
-              <figure className="media-frame is-video" key={item.label}>
-                {href ? (
-                  <video src={href} muted controls playsInline />
-                ) : (
-                  <span>视频框 · {item.label}</span>
-                )}
-              </figure>
-            );
+            return renderVideoFrame(item);
           }
+          const href = item.src ? assetUrl(item.src) : "";
           return (
             <figure className="media-frame" key={item.label}>
               {href ? <img src={href} alt="" /> : null}
@@ -220,39 +240,18 @@ export function WorkDetailPage() {
       </div>
     );
 
-  if (photoChannel) {
-    return (
-      <div className="develop-channel" data-theme={theme}>
-        <ChannelHead backTo={back.path} backLabel={back.label} title={work.title} lead={work.summary} />
-        <div className="develop-project-gallery">
-          {tags}
-          {meta}
-          {body}
-          {gallery}
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="page" data-theme={theme}>
-      <Link className="back" to={back.path}>
-        ← 返回{back.label}
-      </Link>
-      {parsed ? null : (
-        <div className="page-kicker">
-          {work.year} / {collection?.titleDeco ?? "ARCHIVE"}
-        </div>
-      )}
-      <h1>{work.title}</h1>
-      <p className="page-lead">{work.summary}</p>
-      {tags}
-      {meta}
-      {body}
-      {gallery}
-      {work.channel === lexicon.landscapeCDs.key ? (
-        <p className="archive-disclaimer">仅供作品展示，不作为施工依据。</p>
-      ) : null}
+    <div className="develop-channel" data-theme={theme}>
+      <ChannelHead backTo={back.path} backLabel={back.label} title={work.title} lead={resolveLead(work.summary)} />
+      <div className="develop-project-gallery">
+        {tags}
+        {meta}
+        {body}
+        {gallery}
+        {work.channel === lexicon.landscapeCDs.key ? (
+          <p className="archive-disclaimer">仅供作品展示，不作为施工依据。</p>
+        ) : null}
+      </div>
     </div>
   );
 }

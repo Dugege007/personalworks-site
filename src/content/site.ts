@@ -1,5 +1,5 @@
 import { lexicon } from "./lexicon";
-import { initialGameProjects } from "./initialGameProjects";
+import { initialGameProjects, registeredGames } from "./initialGameProjects";
 import { sortByEffectiveDateDescending } from "./workDates";
 
 export type NavItem = {
@@ -128,6 +128,13 @@ export const profile = {
     { id: "profileGithub", value: "github.com/Dugege007", href: "https://github.com/Dugege007" },
   ] satisfies ContactChannel[],
 };
+
+/** 工具侧形象场次空壳；访客形象照仍只读 portraitSrcs。 */
+export const registeredProfileSessions: Array<{
+  id: string;
+  title: string;
+  stageFolder: string;
+}> = [];
 
 export const navItems: NavItem[] = [
   { id: "home", label: "主页", labelEn: "HOME", path: "/", theme: "home" },
@@ -341,7 +348,9 @@ export const workSections: WorkSection[] = categories.map((item) => ({
 }));
 
 export const gameProjects: GameCard[] = sortByEffectiveDateDescending(
-  initialGameProjects.map((item) => ({
+  [...initialGameProjects, ...registeredGames]
+    .filter((item) => Array.isArray(item.screenshots) && item.screenshots.length > 0)
+    .map((item) => ({
     id: item.id,
     title: item.title,
     titleEn: item.titleEn,

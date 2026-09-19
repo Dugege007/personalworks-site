@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ChannelHead } from "../components/work/ChannelHead";
+import { resolveLead } from "../content/copyDisplay";
 import { lexicon } from "../content/lexicon";
 import { categories } from "../content/site";
 import {
@@ -221,7 +222,7 @@ export function PhotoCatalogPage() {
                 </small>
                 <div>
                   <h2>{work.title}</h2>
-                  <p>{work.summary}</p>
+                  {resolveLead(work.summary) ? <p>{resolveLead(work.summary)}</p> : null}
                 </div>
               </div>
             </Link>

@@ -407,6 +407,43 @@
   aspect-ratio: 16 / 9;
 }
 
+button.media-frame {
+  width: 100%;
+  cursor: zoom-in;
+}
+
+.media-frame-kind {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  height: max-content;
+  gap: 5px;
+  padding: 3px 8px 3px 6px;
+  border: 1px solid rgb(255 255 255 / 0.28);
+  background: rgb(22 24 28 / 0.42);
+  color: rgb(255 255 255 / 0.92);
+  font-size: 12px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.media-frame .media-frame-kind {
+  inset: 10px auto auto 10px;
+  grid-area: 1 / 1 / -1 / -1;
+  align-self: start;
+  justify-self: start;
+}
+
+.media-frame-kind-mark {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+
 .media-frame img,
 .media-frame video {
   position: absolute;

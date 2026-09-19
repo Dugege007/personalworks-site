@@ -1668,6 +1668,28 @@
       "object": "home-page/beian-police.png",
       "stageRel": "首页（home-page）/公安备案徽章.png",
       "status": "published"
+    },
+    {
+      "object": "digital-twin/shanghai-mansheng-packaging/08.mp4",
+      "stageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/.site-ready/shanghai-mansheng-packaging/08.mp4",
+      "sourceStageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/01 曼盛AGV演示_0.2.mp4",
+      "status": "published"
+    },
+    {
+      "object": "digital-twin/shanghai-mansheng-packaging/08.poster.webp",
+      "stageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/.site-ready/shanghai-mansheng-packaging/08.poster.webp",
+      "status": "published"
+    },
+    {
+      "object": "digital-twin/shanghai-mansheng-packaging/09.mp4",
+      "stageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/.site-ready/shanghai-mansheng-packaging/09.mp4",
+      "status": "published",
+      "sourceStageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/02 立库动画演示_0.2.mp4"
+    },
+    {
+      "object": "digital-twin/shanghai-mansheng-packaging/09.poster.webp",
+      "stageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/.site-ready/shanghai-mansheng-packaging/09.poster.webp",
+      "status": "published"
     }
   ]
 }

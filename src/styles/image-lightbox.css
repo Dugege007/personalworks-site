@@ -66,6 +66,11 @@ html[data-lightbox="open"] .drawer {
   touch-action: none;
 }
 
+.lrb-lightbox-photo.is-video {
+  cursor: default;
+  touch-action: auto;
+}
+
 .lrb-lightbox-frame.is-zoomed .lrb-lightbox-photo {
   cursor: grab;
 }

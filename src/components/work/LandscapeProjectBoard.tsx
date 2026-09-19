@@ -8,6 +8,11 @@ import {
   type PointerEvent,
 } from "react";
 import {
+  resolveLead,
+  resolveMediaDescription,
+  resolveMediaDisplayName,
+} from "../../content/copyDisplay";
+import {
   formatShotCaption,
   formatStartedOn,
   listWorkImages,
@@ -21,6 +26,8 @@ import "../../styles/develop-landscape-board.css";
 
 type LandscapeProjectBoardProps = {
   works: WorkRecord[];
+  /** 详情页顶栏已有标题时关掉，细目列表仍显示。默认开。 */
+  showHead?: boolean;
 };
 
 type OpenShot = {
@@ -52,7 +59,7 @@ function isMousePointer(event: PointerEvent | globalThis.PointerEvent) {
  * 滚轮与左右拖拽按张换焦；悬停两侧只强调、不抢焦。
  * 循环仍是三份首尾相接，动画结束后无缝回到中间份。
  */
-export function LandscapeProjectBoard({ works }: LandscapeProjectBoardProps) {
+export function LandscapeProjectBoard({ works, showHead = true }: LandscapeProjectBoardProps) {
   const [open, setOpen] = useState<OpenShot | null>(null);
   const activeWork = works.find((item) => item.id === open?.workId);
   const activeImages = useMemo(
@@ -63,8 +70,9 @@ export function LandscapeProjectBoard({ works }: LandscapeProjectBoardProps) {
               ? [
                   {
                     src: item.src,
-                    alt: `${activeWork.title} ${item.label}`,
-                    label: item.label,
+                    alt: `${activeWork.title} ${resolveMediaDisplayName(item)}`,
+                    label: resolveMediaDisplayName(item),
+                    description: item.description,
                   },
                 ]
               : [],
@@ -102,6 +110,7 @@ export function LandscapeProjectBoard({ works }: LandscapeProjectBoardProps) {
         <ProjectModule
           key={work.id}
           work={work}
+          showHead={showHead}
           syncIndex={open?.workId === work.id ? open.index : null}
           onOpen={(index) => setOpen({ workId: work.id, index })}
         />
@@ -111,7 +120,10 @@ export function LandscapeProjectBoard({ works }: LandscapeProjectBoardProps) {
           images={activeImages}
           index={open.index}
           title={activeWork.title}
-          summary={activeWork.summary}
+          summary={resolveMediaDescription(
+            { description: activeImages[open.index]?.description },
+            activeWork.summary,
+          )}
           onClose={close}
           onPrev={toPrev}
           onNext={toNext}
@@ -123,6 +135,7 @@ export function LandscapeProjectBoard({ works }: LandscapeProjectBoardProps) {
 
 type ProjectModuleProps = {
   work: WorkRecord;
+  showHead?: boolean;
   syncIndex: number | null;
   onOpen: (index: number) => void;
 };
@@ -145,7 +158,7 @@ function wheelDelta(event: WheelEvent) {
   return raw;
 }
 
-function ProjectModule({ work, syncIndex, onOpen }: ProjectModuleProps) {
+function ProjectModule({ work, showHead = true, syncIndex, onOpen }: ProjectModuleProps) {
   const shots = listWorkImages(work);
   const count = shots.length;
   const looping = count >= 2;
@@ -533,17 +546,21 @@ function ProjectModule({ work, syncIndex, onOpen }: ProjectModuleProps) {
 
   return (
     <article className="lrb-project">
-      <header className="lrb-head">
-        <h2>{work.title}</h2>
-        {tags.length > 0 ? (
-          <ul className="lrb-tags">
-            {tags.map((tag) => (
-              <li key={tag}>{tag}</li>
-            ))}
-          </ul>
-        ) : null}
-      </header>
-      {work.summary ? <p className="lrb-lead">{work.summary}</p> : null}
+      {showHead ? (
+        <>
+          <header className="lrb-head">
+            <h2>{work.title}</h2>
+            {tags.length > 0 ? (
+              <ul className="lrb-tags">
+                {tags.map((tag) => (
+                  <li key={tag}>{tag}</li>
+                ))}
+              </ul>
+            ) : null}
+          </header>
+          {resolveLead(work.summary) ? <p className="lrb-lead">{resolveLead(work.summary)}</p> : null}
+        </>
+      ) : null}
       {shots.length > 0 ? (
         <div
           className="lrb-strip-wrap"
@@ -583,7 +600,7 @@ function ProjectModule({ work, syncIndex, onOpen }: ProjectModuleProps) {
                   <img src={shot.src ? assetUrl(shot.src) : ""} alt="" draggable={false} />
                   {focused ? (
                     <span className="lrb-shot-cap">
-                      {formatShotCaption(logical, count, shot.label)}
+                      {formatShotCaption(logical, count, resolveMediaDisplayName(shot))}
                     </span>
                   ) : null}
                 </button>

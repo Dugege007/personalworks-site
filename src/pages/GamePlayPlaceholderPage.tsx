@@ -1,4 +1,5 @@
 import { Link, useParams } from "react-router-dom";
+import { resolveLead } from "../content/copyDisplay";
 import { lexicon } from "../content/lexicon";
 import { archiveSubIndex, playableGames } from "../content/site";
 import { iaOfSkin } from "../ia";
@@ -38,7 +39,7 @@ export function GamePlayPlaceholderPage() {
         {archiveSubIndex(lexicon.gameDev.key, 2)} / {lexicon.gamePlay.deco}
       </div>
       <h1>{game.title}</h1>
-      <p className="page-lead">{game.lead}</p>
+      {resolveLead(game.lead) ? <p className="page-lead">{resolveLead(game.lead)}</p> : null}
       <div className="play-stage">
         {game.coverSrc ? <img className="play-stage-cover" src={assetUrl(game.coverSrc)} alt="" /> : null}
         <div>
