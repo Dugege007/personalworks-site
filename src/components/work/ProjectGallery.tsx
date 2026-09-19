@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { planAlbumPreview, type ProjectAlbumShot } from "../../content/projectAlbum";
 import { readPhotoExif } from "../../content/photoExif";
 import { assetUrl } from "../../lib/assets";
 import { resolveLead, resolveMediaDescription } from "../../content/copyDisplay";
@@ -8,13 +9,7 @@ import { InlineWorkVideo } from "./InlineWorkVideo";
 import "../../styles/photo-masonry.css";
 import "../../styles/project-gallery.css";
 
-export type ProjectGalleryShot = {
-  src: string;
-  label: string;
-  kind?: "image" | "video";
-  poster?: string;
-  description?: string;
-};
+export type ProjectGalleryShot = ProjectAlbumShot;
 
 export type ProjectGalleryItem = {
   id: string;
@@ -24,6 +19,8 @@ export type ProjectGalleryItem = {
   summary?: string;
   href?: string;
   images: ProjectGalleryShot[];
+  /** 灯箱序列；缺省时用 images。列表预览可只铺静帧，翻页仍走全量。 */
+  shots?: ProjectGalleryShot[];
 };
 
 type ProjectGalleryProps = {
@@ -31,6 +28,8 @@ type ProjectGalleryProps = {
   variant: "twin" | "photo" | "game";
   /** 详情页顶栏已有标题时关掉，类目列表仍显示。默认开。 */
   showHead?: boolean;
+  /** 列表预览最多铺几格；超过则末格叠层并链到项目页。 */
+  previewLimit?: number;
 };
 
 type OpenImage = {
@@ -38,28 +37,51 @@ type OpenImage = {
   index: number;
 };
 
+function albumSequence(project: ProjectGalleryItem): ProjectGalleryShot[] {
+  return project.shots ?? project.images;
+}
+
+function shotIndexInSequence(sequence: ProjectGalleryShot[], src: string): number {
+  const index = sequence.findIndex((item) => item.src === src);
+  return index >= 0 ? index : 0;
+}
+
+function AlbumFace({ image }: { image: ProjectGalleryShot }) {
+  if (image.kind === "video" && !image.poster) {
+    return <video src={assetUrl(image.src)} muted playsInline preload="metadata" />;
+  }
+  const src = image.kind === "video" && image.poster ? image.poster : image.src;
+  return <img src={assetUrl(src)} alt="" loading="lazy" />;
+}
+
 /**
  * 数字孪生、摄影与游戏共用项目图集；各类型只切换版式，不复制内容池。
  */
-export function ProjectGallery({ projects, variant, showHead = true }: ProjectGalleryProps) {
+export function ProjectGallery({
+  projects,
+  variant,
+  showHead = true,
+  previewLimit,
+}: ProjectGalleryProps) {
   const galleryRef = useRef<HTMLDivElement>(null);
   const videoProgressRef = useRef<Map<string, number>>(new Map());
   const [videoClock, setVideoClock] = useState<Record<string, number>>({});
   const [videoMuted, setVideoMuted] = useState(true);
   const [open, setOpen] = useState<OpenImage | null>(null);
   const activeProject = projects.find((project) => project.id === open?.projectId);
+  const activeSequence = activeProject ? albumSequence(activeProject) : [];
   const activeImages = useMemo<LightboxShot[]>(
     () =>
-      activeProject?.images.map((image) => ({
+      activeSequence.map((image) => ({
         src: image.src,
         label: image.label,
         kind: image.kind ?? "image",
         poster: image.poster,
         description: image.description,
-        alt: `${activeProject.title} ${image.label}`,
+        alt: `${activeProject?.title ?? ""} ${image.label}`,
         exif: variant === "photo" && image.kind !== "video" ? readPhotoExif(image.src) : undefined,
-      })) ?? [],
-    [activeProject, variant],
+      })),
+    [activeProject?.title, activeSequence, variant],
   );
 
   const close = useCallback(() => setOpen(null), []);
@@ -69,13 +91,23 @@ export function ProjectGallery({ projects, variant, showHead = true }: ProjectGa
   }, []);
   const openShot = useCallback((projectId: string, index: number, resetVideo = false) => {
     const project = projects.find((item) => item.id === projectId);
-    const shot = project?.images[index];
+    const shot = project ? albumSequence(project)[index] : undefined;
     if (resetVideo && shot?.kind === "video") {
       videoProgressRef.current.set(shot.src, 0);
       setVideoClock((current) => (current[shot.src] === 0 ? current : { ...current, [shot.src]: 0 }));
     }
     setOpen({ projectId, index });
   }, [projects]);
+  const openBySrc = useCallback(
+    (projectId: string, src: string, resetVideo = false) => {
+      const project = projects.find((item) => item.id === projectId);
+      if (!project) {
+        return;
+      }
+      openShot(projectId, shotIndexInSequence(albumSequence(project), src), resetVideo);
+    },
+    [openShot, projects],
+  );
   const step = useCallback(
     (delta: number) => {
       setOpen((current) => {
@@ -83,7 +115,7 @@ export function ProjectGallery({ projects, variant, showHead = true }: ProjectGa
           return null;
         }
         const project = projects.find((item) => item.id === current.projectId);
-        const count = project?.images.length ?? 0;
+        const count = project ? albumSequence(project).length : 0;
         if (count === 0) {
           return current;
         }
@@ -120,8 +152,19 @@ export function ProjectGallery({ projects, variant, showHead = true }: ProjectGa
   }, [projects, variant]);
 
   return (
-    <div className={`project-gallery is-${variant}`} ref={galleryRef}>
-      {projects.map((project) => (
+    <div
+      className={`project-gallery is-${variant}${previewLimit != null ? " is-preview" : ""}`}
+      ref={galleryRef}
+    >
+      {projects.map((project) => {
+        const isTwinPreview = variant === "twin" && previewLimit != null;
+        const preview = isTwinPreview
+          ? planAlbumPreview(project.images.length, previewLimit)
+          : { visibleCount: project.images.length, overflow: false };
+        const tiles = project.images.slice(0, preview.visibleCount);
+        const useMasonry = variant === "photo";
+        const useTwinFlow = variant === "twin" && !isTwinPreview;
+        return (
         <article className={`project-gallery-item${showHead ? "" : " is-bare"}`} key={project.id}>
           {showHead ? (
             <header className="project-gallery-head">
@@ -139,11 +182,28 @@ export function ProjectGallery({ projects, variant, showHead = true }: ProjectGa
             </header>
           ) : null}
           <div
-            className={variant === "photo" ? "photo-masonry" : "project-gallery-images"}
-            data-count={variant === "photo" ? project.images.length : undefined}
+            className={
+              useMasonry ? "photo-masonry" : useTwinFlow ? "project-gallery-flow" : "project-gallery-images"
+            }
+            data-count={useMasonry || useTwinFlow ? tiles.length : undefined}
           >
-            {project.images.map((image, index) => {
-              const shotClass = `project-gallery-shot${variant === "twin" && index === 0 ? " is-main" : ""}`;
+            {tiles.map((image, index) => {
+              const isStack = preview.overflow && index === tiles.length - 1 && Boolean(project.href);
+              const shotClass = `project-gallery-shot${isTwinPreview && index === 0 ? " is-main" : ""}${isStack ? " is-stack" : ""}`;
+              if (isStack && project.href) {
+                return (
+                  <Link
+                    className={shotClass}
+                    to={project.href}
+                    key={`${image.src}-stack`}
+                    aria-label={`进入${project.title}项目页`}
+                  >
+                    <span className="project-gallery-stack-leaf" aria-hidden="true" />
+                    <span className="project-gallery-stack-leaf" aria-hidden="true" />
+                    <AlbumFace image={image} />
+                  </Link>
+                );
+              }
               if (image.kind === "video") {
                 return (
                   <InlineWorkVideo
@@ -155,7 +215,7 @@ export function ProjectGallery({ projects, variant, showHead = true }: ProjectGa
                     title={project.title}
                     paused={open !== null}
                     syncTime={videoClock[image.src]}
-                    onOpen={() => openShot(project.id, index, true)}
+                    onOpen={() => openBySrc(project.id, image.src, true)}
                   />
                 );
               }
@@ -164,7 +224,7 @@ export function ProjectGallery({ projects, variant, showHead = true }: ProjectGa
                   className={shotClass}
                   type="button"
                   key={image.src}
-                  onClick={() => openShot(project.id, index)}
+                  onClick={() => openBySrc(project.id, image.src)}
                   aria-label={`查看${project.title} ${image.label}`}
                 >
                   <img src={assetUrl(image.src)} alt="" loading="lazy" />
@@ -173,7 +233,8 @@ export function ProjectGallery({ projects, variant, showHead = true }: ProjectGa
             })}
           </div>
         </article>
-      ))}
+        );
+      })}
       {open && activeProject && activeImages.length > 0 ? (
         <ImageLightbox
           images={activeImages}

@@ -104,6 +104,7 @@ export const lexicon = {
   sketching: { zh: "手绘", en: "Sketching", deco: "SKETCHES", key: "sketches" },
   about: { zh: "关于", en: "About", deco: "ABOUT", key: "about" },
   workIndex: { zh: "作品", en: "Work", deco: "WORK", key: "work-index" },
+  workStudio: { zh: "公司", en: "Studio", deco: "STUDIO", key: "work-studio" },
   profileResume: { zh: "简历", en: "Resume", deco: "RESUME", key: "profile-resume" },
   profileSkills: { zh: "技能", en: "Skills", deco: "SKILLS", key: "profile-skills" },
   skillImaging: {

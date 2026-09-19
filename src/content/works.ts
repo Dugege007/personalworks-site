@@ -31,11 +31,13 @@ export type WorkRecord = {
   summary: string;
   body: string;
   media: WorkMedia[];
-  tags?: string[];
+  tags?: readonly string[];
   role?: string;
   lineType?: string;
   metrics?: string;
   clientAlias?: string;
+  /** 任职单位简称；缺省时从投放夹设计单位段解析。单任职单位栏目不展示。 */
+  studioAlias?: string;
   sheetType?: string;
   placeAlias?: string;
   place?: string;
@@ -160,7 +162,55 @@ const initialWorks: WorkRecord[] = initialWorkProjects.map((item) => ({
 const lineSimulationWorks: WorkRecord[] = [];
 
 /** 维护工具确认登记的空壳；访客列表仍按 consent 过滤。 */
-const registeredWorks: WorkRecord[] = [];
+const registeredWorks: WorkRecord[] = [
+  {
+    id: "shimao-beijing-yidu",
+    channel: "landscape-cds",
+    title: "世茂北京一渡",
+    year: "2026",
+    summary: "",
+    body: "",
+    consent: "pending",
+    stageFolder: "landscape-cds/上海道田景观工程咨询有限公司/201709 世茂北京一渡",
+    media: [],
+  }
+,
+  {
+    id: "vandeviele",
+    channel: "digital-twin",
+    title: "范德威尔",
+    year: "2026",
+    summary: "",
+    body: "",
+    consent: "pending",
+    stageFolder: "digital-twin/20250220 范德威尔",
+    media: [],
+  }
+,
+  {
+    id: "shanghai-baoniao-garments",
+    channel: "digital-twin",
+    title: "上海宝鸟服饰",
+    year: "2026",
+    summary: "",
+    body: "",
+    consent: "pending",
+    stageFolder: "digital-twin/20250527 上海宝鸟服饰",
+    media: [],
+  }
+,
+  {
+    id: "hangyu-assembly-workshop",
+    channel: "line-sim",
+    title: "某工厂车间装配线仿真",
+    year: "2026",
+    summary: "",
+    body: "",
+    consent: "pending",
+    stageFolder: "line-sim/FlexSim/20260821 某工厂车间装配线仿真",
+    media: [],
+  }
+];
 
 /**
  * 全站唯一作品内容池。景观施工图与无授权人像不进入该数组。

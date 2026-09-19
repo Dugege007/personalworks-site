@@ -63,11 +63,15 @@ export const initialWorkProjects = [
     "summary": "宁波四维尔项目静帧，共收录 1 张图片。",
     "body": "宁波四维尔项目静帧，共收录 1 张图片。",
     "media": [
-      [
-        "digital-twin/ningbo-siweier/01.webp",
-        "微信截图_20250530110624"
-      ]
+    [
+      "digital-twin/ningbo-siweier/01.webp",
+      "微信截图_20250530110624 01"
+    ],
+    [
+      "digital-twin/ningbo-siweier/02.mp4",
+      "四维尔_0.6.2_演示_250311"
     ]
+  ]
   },
   {
     "id": "weichai-spark-plug",
@@ -75,6 +79,8 @@ export const initialWorkProjects = [
     "title": "潍柴火炬",
     "year": "2024",
     "startedOn": "2024-09-26",
+    // 湖南省株洲市。投放夹「20240926 潍柴火炬」未写地点，整理时以本字段为准。
+    "place": "株洲",
     "summary": "潍柴火炬项目静帧，共收录 5 张图片。",
     "body": "潍柴火炬项目静帧，共收录 5 张图片。",
     "media": [
@@ -93,6 +99,14 @@ export const initialWorkProjects = [
     [
       "digital-twin/weichai-spark-plug/04.webp",
       "01 车间总览 04"
+    ],
+    [
+      "digital-twin/weichai-spark-plug/06.mp4",
+      "潍柴火炬_0.7.5.2_AGV演示"
+    ],
+    [
+      "digital-twin/weichai-spark-plug/07.mp4",
+      "潍柴火炬_0.7.5.2_界面演示"
     ]
   ]
   },
@@ -106,31 +120,35 @@ export const initialWorkProjects = [
     "summary": "阿克苏诺贝尔漆油·上海松江项目静帧，共收录 6 张图片。",
     "body": "阿克苏诺贝尔漆油·上海松江项目静帧，共收录 6 张图片。",
     "media": [
-      [
-        "digital-twin/akzonobel-shanghai-songjiang/01.webp",
-        "01 工厂总览"
-      ],
-      [
-        "digital-twin/akzonobel-shanghai-songjiang/02.webp",
-        "02 原料管理"
-      ],
-      [
-        "digital-twin/akzonobel-shanghai-songjiang/03.webp",
-        "03 产线管理"
-      ],
-      [
-        "digital-twin/akzonobel-shanghai-songjiang/04.webp",
-        "04 设备管理"
-      ],
-      [
-        "digital-twin/akzonobel-shanghai-songjiang/05.webp",
-        "05 仓储管理"
-      ],
-      [
-        "digital-twin/akzonobel-shanghai-songjiang/06.webp",
-        "06 现场部署 1"
-      ]
+    [
+      "digital-twin/akzonobel-shanghai-songjiang/01.webp",
+      "01 工厂总览 01"
     ],
+    [
+      "digital-twin/akzonobel-shanghai-songjiang/02.webp",
+      "01 工厂总览 02"
+    ],
+    [
+      "digital-twin/akzonobel-shanghai-songjiang/03.webp",
+      "01 工厂总览 03"
+    ],
+    [
+      "digital-twin/akzonobel-shanghai-songjiang/04.webp",
+      "01 工厂总览 04"
+    ],
+    [
+      "digital-twin/akzonobel-shanghai-songjiang/05.webp",
+      "01 工厂总览 05"
+    ],
+    [
+      "digital-twin/akzonobel-shanghai-songjiang/06.webp",
+      "01 工厂总览 06"
+    ],
+    [
+      "digital-twin/akzonobel-shanghai-songjiang/07.mp4",
+      "巡视动画 250924_1_Anyplex水印"
+    ]
+  ],
     "featured": true
   },
   {
@@ -140,8 +158,11 @@ export const initialWorkProjects = [
     "year": "2018",
     "startedOn": "2018-04",
     "place": "北京",
-    "summary": "北京丰台小瓦窑项目效果图，共收录 8 张图片。",
-    "body": "北京丰台小瓦窑项目效果图，共收录 8 张图片。",
+    "siteType": "示范区",
+    "tags": ["日式禅意", "现代东方"],
+    "role": "方案与效果图",
+    "summary": "叠拼样板庭院分南北两院，南院下叠、北院上叠，看房分精装与清水两路。按六口之家的生活场景，用日式禅意和现代东方做去繁从简的庭园。",
+    "body": "北京世茂丰台小瓦窑样板庭院。南院为下叠花园，北院为上叠花园。方案按六口之家模拟业主日常：手工、观天、书画与儿童活动。空间语言先走日式禅意，再落到现代东方的聚会与收藏。",
     "media": [
       [
         "landscape-rendering/xiaowayao/01.jpg",
@@ -183,8 +204,12 @@ export const initialWorkProjects = [
     "title": "河南科技大学 风景园林毕业设计",
     "year": "2018",
     "startedOn": "2018-06-01",
-    "summary": "河南科技大学 风景园林毕业设计项目效果图，共收录 8 张图片。",
-    "body": "河南科技大学 风景园林毕业设计项目效果图，共收录 8 张图片。",
+    "place": "洛阳",
+    "siteType": "街头绿地",
+    "tags": ["几何现代", "新城绿港"],
+    "role": "毕业设计",
+    "summary": "洛阳新安县汉关大道北侧约 2.7 公顷街头绿地，服务周边居民、幼儿园和小学。以「新城绿港」组织一心两部四区，用简约几何划分健身、安静、游览和儿童场地。",
+    "body": "基址位于新安县校场大街与北京路交叉口西侧，北高南低，邻近幼儿园、学校与居住区。设计遵循以人为本、因地制宜、可持续和低成本原则，形成健身交流、安静休息、游览观赏与儿童活动四个功能区。",
     "media": [
       [
         "landscape-rendering/henan-tech-landscape-graduation/01.webp",
@@ -227,8 +252,11 @@ export const initialWorkProjects = [
     "year": "2019",
     "startedOn": "2019-02",
     "place": "淮安",
-    "summary": "淮安富康城15#项目效果图，共收录 8 张图片。",
-    "body": "淮安富康城15#项目效果图，共收录 8 张图片。",
+    "siteType": "大区",
+    "tags": ["简约艺术", "诗意栖居"],
+    "role": "方案与效果图",
+    "summary": "淮阴区安置商住地块 15# 组团。周边以教育和居住为主，竞品多为新古典。以月相组织一环一带四花园，用简约艺术做全龄共享的大区。",
+    "body": "淮自然（阴）挂2019第6号地块商住安置项目 15# 组团。基地在长江西路以南、西安路以东。规划以高层安置为主，中心留出共享中庭。景观用晓月、满月、弦月等月相落位入口水景、林下活动和宅间花园。",
     "media": [
       [
         "landscape-rendering/huaian-fukang/01.jpg",
@@ -271,8 +299,11 @@ export const initialWorkProjects = [
     "year": "2019",
     "startedOn": "2019-02",
     "place": "淮安",
-    "summary": "淮安富康城3#项目效果图，共收录 8 张图片。",
-    "body": "淮安富康城3#项目效果图，共收录 8 张图片。",
+    "siteType": "大区",
+    "tags": ["简约艺术", "诗意栖居"],
+    "role": "方案与效果图",
+    "summary": "淮阴区安置商住地块 3# 组团。周边以教育和居住为主，竞品多为新古典。以月相组织一环一带四花园，用简约艺术做全龄共享的大区。",
+    "body": "淮自然（阴）挂2019第6号地块商住安置项目 3# 组团。基地在长江西路以南、西安路以东。规划以高层安置为主，中心留出共享中庭。景观用晓月、满月、弦月等月相落位入口水景、林下活动和宅间花园。",
     "media": [
       [
         "landscape-rendering/huaian-fukang/07.jpg",
@@ -315,8 +346,11 @@ export const initialWorkProjects = [
     "year": "2019",
     "startedOn": "2019-06",
     "place": "无锡",
-    "summary": "世茂无锡汽车北站项目效果图，共收录 8 张图片。",
-    "body": "世茂无锡汽车北站项目效果图，共收录 8 张图片。",
+    "siteType": "大区",
+    "tags": ["现代简洁", "森活"],
+    "role": "方案与效果图",
+    "summary": "梁溪区原汽车北站西侧，东侧紧邻火车站轨道，绿地偏紧、高层遮阴。延续建筑的现代线条，以乌桕林下氧吧和全龄活动做成森活社区。",
+    "body": "世茂无锡原汽车北站西侧。基地在兴源北路与惠勤路交叉口西北，东侧火车站轨道带来噪声与震动，绿地率紧张。景观策略是酒店式入口、九棵乌桕的林下氧吧、儿童活动与宅间秘境，把房子放进森林里。",
     "media": [
       [
         "landscape-rendering/wuxi-north-station/01.jpg",
@@ -359,8 +393,11 @@ export const initialWorkProjects = [
     "year": "2019",
     "startedOn": "2019-09",
     "place": "兴义",
-    "summary": "富康城兴义7#8#项目效果图，共收录 8 张图片。",
-    "body": "富康城兴义7#8#项目效果图，共收录 8 张图片。",
+    "siteType": "示范区",
+    "tags": ["片石水景", "林荫道"],
+    "role": "方案与效果图",
+    "summary": "麓榕岛7#8#样板庭院与宅间。用入户汀步、片石水景和对景景墙组织两套庭院，林荫道把归家界面连起来。",
+    "body": "富康城兴义麓榕岛样板庭院。庭院A以汀步、片石水景、对景景墙和茶室为主；庭院B补户外餐桌、廊架与吧台。同期效果图也收录林荫道与幼儿园示范界面。",
     "media": [
       [
         "landscape-rendering/xingyi-78/01.jpg",
@@ -403,8 +440,11 @@ export const initialWorkProjects = [
     "year": "2019",
     "startedOn": "2019-12",
     "place": "扬州",
-    "summary": "海伦堡扬州项目效果图，共收录 8 张图片。",
-    "body": "海伦堡扬州项目效果图，共收录 8 张图片。",
+    "siteType": "大区",
+    "tags": ["现代简约", "全龄共享"],
+    "role": "方案与效果图",
+    "summary": "扬州仪征海悦国际 C 地块，以长江线条与青山意象组织「一轴一心」和全龄共享中庭。简洁线条承接现代建筑，串联主入口、林荫归家、儿童与长者活动。",
+    "body": "项目位于仪征市工农北路与北辅路交叉处，中央日照条件较好。设计以悦享主轴和中心剧场为骨架，把入口门庭、林荫树阵、共享草坪、儿童主题活动和入户花园组织成连续归家体验。",
     "media": [
       [
         "landscape-rendering/hailunbao-yangzhou/01.webp",
@@ -447,8 +487,11 @@ export const initialWorkProjects = [
     "year": "2020",
     "startedOn": "2020-02",
     "place": "湖州",
-    "summary": "金成湖州项目效果图，共收录 8 张图片。",
-    "body": "金成湖州项目效果图，共收录 8 张图片。",
+    "siteType": "大区",
+    "tags": ["现代森居", "流动花园"],
+    "role": "方案与效果图",
+    "summary": "湖州织里镇金成首品 3#、4# 地块，以现代森居回应大中庭与滨水条件。共享中庭、全龄活动和宅间花园用简洁曲线串联，形成流动的花园居所。",
+    "body": "项目由高层与花园洋房组成，中心空间日照良好，南侧临近滨江公园。设计借鉴现代森居与酒店化功能，以共享中庭、林下活动、宅间花园和慢行系统提升全龄生活体验。",
     "media": [
       [
         "landscape-rendering/jincheng-huzhou/01.webp",
@@ -492,8 +535,11 @@ export const initialWorkProjects = [
     "year": "2020",
     "startedOn": "2020-03",
     "place": "郑州",
-    "summary": "郑州孟庄项目效果图，共收录 3 张图片。",
-    "body": "郑州孟庄项目效果图，共收录 3 张图片。",
+    "siteType": "大区",
+    "tags": ["森活美学", "疗愈花园"],
+    "role": "方案与效果图",
+    "summary": "郑州孟庄混合住区以双中庭和林下环道组织社区空间，将儿童、长者、会客与运动场地放入适宜日照区。用简洁现代的森居语言营造可居、可观、可游的疗愈花园。",
+    "body": "项目位于孟庄镇，住宅由高层与多层组成。景观把洋房中心做成精致中庭，高层宅间结合消防登高面布置活动空间，并以林下环道串联全龄功能，形成轻奢、艺术而舒适的社区环境。",
     "media": [
       [
         "landscape-rendering/zhengzhou-mengzhuang/01.webp",
@@ -516,8 +562,11 @@ export const initialWorkProjects = [
     "year": "2020",
     "startedOn": "2020-04",
     "place": "北京",
-    "summary": "北京首创长租公寓项目效果图，共收录 8 张图片。",
-    "body": "北京首创长租公寓项目效果图，共收录 8 张图片。",
+    "siteType": "租赁社区",
+    "tags": ["多元共享", "青年活力"],
+    "role": "方案与效果图",
+    "summary": "北京十八里店西直河村青年租赁社区，以共享生活和开放街区承接约 6800 套住房。环形跑道、草坪、剧场与复合庭院支持运动、社交、办公和持续更新。",
+    "body": "项目位于北京东南五环与京津高速一带，主要服务周边青年白领。设计以共融、交互和可运营为核心，把共享厨房、社区商业、健身、观影、宠物与邻里活动嵌入多功能公共空间。",
     "media": [
       [
         "landscape-rendering/beijing-shouchuang-rental-apartment/01.webp",
@@ -560,8 +609,11 @@ export const initialWorkProjects = [
     "year": "2020",
     "startedOn": "2020-05",
     "place": "郑州",
-    "summary": "世茂郑州常西湖项目效果图，共收录 8 张图片。",
-    "body": "世茂郑州常西湖项目效果图，共收录 8 张图片。",
+    "siteType": "示范区",
+    "tags": ["现代中式", "静谧花园"],
+    "role": "方案与效果图",
+    "summary": "郑州常西湖临时样板房以造型松、流水和对景景墙建立现代中式庭院氛围。南北花园通过植物地形营造静谧窗景，看房动线在精致庭院间渐次展开。",
+    "body": "项目位于常西湖新区，建筑采用现代风格和极简线条。样板区由入口景墙、对景景墙、南花园与北花园组成，入口流水负责引导视线，植物与微地形塑造安静的室内外借景关系。",
     "media": [
       [
         "landscape-rendering/zhengzhou-changxihu/01.webp",
@@ -604,8 +656,11 @@ export const initialWorkProjects = [
     "year": "2020",
     "startedOn": "2020-06",
     "place": "北京",
-    "summary": "北京分钟寺豪宅项目效果图，共收录 8 张图片。",
-    "body": "北京分钟寺豪宅项目效果图，共收录 8 张图片。",
+    "siteType": "样板区",
+    "tags": ["东方美学", "低调隐奢"],
+    "role": "方案与效果图",
+    "summary": "北京分钟寺样板区面向高净值改善客群，以画卷式动线串联迎宾、光影环廊、水庭与茶轩。传统园林的借景、对景经现代几何转译，形成典雅而低调隐奢的东方美学馆。",
+    "body": "项目位于朝阳区分钟寺地铁站附近。设计强调室内外一体、围合庭院与材料肌理，以展示界面、入口仪式、水影画卷、跌水流瀑和静谧水庭逐层推进精奢体验。",
     "media": [
       [
         "landscape-rendering/beijing-fenzhongsi-residence/01.webp",
@@ -648,8 +703,11 @@ export const initialWorkProjects = [
     "year": "2020",
     "startedOn": "2020-06",
     "place": "昆明",
-    "summary": "富康城昆明金泽园项目效果图，共收录 8 张图片。",
-    "body": "富康城昆明金泽园项目效果图，共收录 8 张图片。",
+    "siteType": "大区",
+    "tags": ["蝶舞墨韵", "台地花园"],
+    "role": "方案与效果图",
+    "summary": "昆明金泽园利用 18.3 米山地高差组织三级台地，以「蝶舞墨韵」串联酒店式入口、城市阳台和全龄花园。层叠台阶、浮桥绿道与观景平台把高差转化为流动游园体验。",
+    "body": "项目位于昆明经开区，中央景观空间随地势分成三级台地。设计以高山流水台地、流瀑蝶水、共享草坪、儿童乐园和慢跑道联动各级空间，并通过垂直电梯兼顾无障碍归家。",
     "media": [
       [
         "landscape-rendering/kunming-jinzeyuan/01.webp",
@@ -692,8 +750,11 @@ export const initialWorkProjects = [
     "year": "2020",
     "startedOn": "2020-06",
     "place": "韶关",
-    "summary": "世茂韶关项目效果图，共收录 8 张图片。",
-    "body": "世茂韶关项目效果图，共收录 8 张图片。",
+    "siteType": "展示区",
+    "tags": ["现代典雅", "广韵文化"],
+    "role": "方案与效果图",
+    "summary": "韶关北江一线江景展示区，从客家围楼、花窗、青瓦石墙和水渠藻井提取元素，以现代语言重塑典雅庭院。前场承担开放展示，后场呈现未来大区生活。",
+    "body": "项目位于武江区，展示区紧邻铜鼓大道和北江。设计以诗意山水、现代典雅和广韵文化为方向，把客家建筑的围合空间、窗栅纹样与北江水意转译为精致展示界面。",
     "media": [
       [
         "landscape-rendering/shaoguan/01.webp",
@@ -736,8 +797,11 @@ export const initialWorkProjects = [
     "year": "2020",
     "startedOn": "2020-06",
     "place": "潍坊",
-    "summary": "世茂潍坊商业项目效果图，共收录 8 张图片。",
-    "body": "世茂潍坊商业项目效果图，共收录 8 张图片。",
+    "siteType": "商业街区",
+    "tags": ["主题IP", "互动商业"],
+    "role": "方案与效果图",
+    "summary": "潍坊歌尔浞河商业以主题 IP 和互动装置激活外街、内庭与多层平台花园。连续展示面、落客广场和多元商业内街共同塑造可传播、可停留的城市新地标。",
+    "body": "项目集商业、公寓、办公与酒店于一体。设计通过铺装引流、营销活动场地、共享休憩空间和屋顶绿色平台回应多类客群，并用长颈鹿主题 IP 建立高识别度的乐活商业街。",
     "media": [
       [
         "landscape-rendering/weifang-commercial/01.webp",
@@ -780,8 +844,11 @@ export const initialWorkProjects = [
     "year": "2020",
     "startedOn": "2020-07",
     "place": "茂名",
-    "summary": "世茂茂名项目效果图，共收录 8 张图片。",
-    "body": "世茂茂名项目效果图，共收录 8 张图片。",
+    "siteType": "展示区",
+    "tags": ["现代极简", "诗意栖居"],
+    "role": "方案与效果图",
+    "summary": "茂名云悦壹号展示区从海岸、渔港、舟与流线提炼空间语言，以现代极简组织渐进式前场。有限尺度内营造小而精致、具有会所感的诗意栖居体验。",
+    "body": "项目展示区位于大区东侧、紧邻茂南大道。设计以「漫寻东方」为定位，采用极简线条、水景和舟行意象，强调现代轻奢的到达序列与后期可保留性。",
     "media": [
       [
         "landscape-rendering/maoming/01.webp",
@@ -824,8 +891,11 @@ export const initialWorkProjects = [
     "year": "2020",
     "startedOn": "2020-08",
     "place": "哈尔滨",
-    "summary": "哈尔滨江御府项目效果图，共收录 7 张图片。",
-    "body": "哈尔滨江御府项目效果图，共收录 7 张图片。",
+    "siteType": "示范区",
+    "tags": ["现代新东方", "园隐方寸"],
+    "role": "方案与效果图",
+    "summary": "哈尔滨江御府临近松花江，以院落、内庭与府邸序列回应现代新东方居住需求。展示区在对称秩序与紧凑转折之间移步异景，营造「园隐方寸、境现东方」的生活画卷。",
+    "body": "项目位于松北区滨水地带，建筑兼有中式低层与现代高层。景观延续院落式居住和东方意境，通过展示入口、精致内庭、曲折轴线与未来大区场景传递典雅而宜居的生活氛围。",
     "media": [
       [
         "landscape-rendering/harbin-jiangyufu/01.webp",

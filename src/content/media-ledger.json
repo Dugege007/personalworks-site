@@ -1690,6 +1690,95 @@
       "object": "digital-twin/shanghai-mansheng-packaging/09.poster.webp",
       "stageRel": "数字孪生（digital-twin）/20240408 上海曼盛包装/.site-ready/shanghai-mansheng-packaging/09.poster.webp",
       "status": "published"
+    },
+    {
+      "object": "profile/DSC04901.webp",
+      "stageRel": "形象照（profile）/20260905 徐汇区/.site-ready/徐汇区/DSC04901.webp",
+      "status": "published",
+      "sourceStageRel": "形象照（profile）/20260905 徐汇区/DSC04901.jpg"
+    },
+    {
+      "object": "profile/DSC05087.webp",
+      "stageRel": "形象照（profile）/20260905 徐汇区/.site-ready/徐汇区/DSC05087.webp",
+      "status": "published",
+      "sourceStageRel": "形象照（profile）/20260905 徐汇区/DSC05087.jpg"
+    },
+    {
+      "object": "digital-twin/vandeviele/01.mp4",
+      "stageRel": "数字孪生（digital-twin）/20250220 范德威尔/.site-ready/vandeviele/01.mp4",
+      "status": "published",
+      "sourceStageRel": "数字孪生（digital-twin）/20250220 范德威尔/范德威尔_注塑车间 服务器端运行 _250508.mp4"
+    },
+    {
+      "object": "digital-twin/vandeviele/01.poster.webp",
+      "stageRel": "数字孪生（digital-twin）/20250220 范德威尔/.site-ready/vandeviele/01.poster.webp",
+      "status": "published"
+    },
+    {
+      "object": "digital-twin/vandeviele/02.mp4",
+      "stageRel": "数字孪生（digital-twin）/20250220 范德威尔/.site-ready/vandeviele/02.mp4",
+      "status": "published",
+      "sourceStageRel": "数字孪生（digital-twin）/20250220 范德威尔/范德威尔_钣金车间自动化演示_250430.mp4"
+    },
+    {
+      "object": "digital-twin/vandeviele/02.poster.webp",
+      "stageRel": "数字孪生（digital-twin）/20250220 范德威尔/.site-ready/vandeviele/02.poster.webp",
+      "status": "published"
+    },
+    {
+      "object": "digital-twin/shanghai-baoniao-garments/01.mp4",
+      "stageRel": "数字孪生（digital-twin）/20250527 上海宝鸟服饰/.site-ready/shanghai-baoniao-garments/01.mp4",
+      "status": "published",
+      "sourceStageRel": "数字孪生（digital-twin）/20250527 上海宝鸟服饰/宝鸟_智能裁床动画演示_0.8.0.1b_250723.mp4"
+    },
+    {
+      "object": "digital-twin/shanghai-baoniao-garments/01.poster.webp",
+      "stageRel": "数字孪生（digital-twin）/20250527 上海宝鸟服饰/.site-ready/shanghai-baoniao-garments/01.poster.webp",
+      "status": "published"
+    },
+    {
+      "object": "digital-twin/ningbo-siweier/02.mp4",
+      "stageRel": "数字孪生（digital-twin）/20240530_宁波四维尔/.site-ready/ningbo-siweier/02.mp4",
+      "status": "published",
+      "sourceStageRel": "数字孪生（digital-twin）/20240530_宁波四维尔/四维尔_0.6.2_演示_250311.mp4"
+    },
+    {
+      "object": "digital-twin/ningbo-siweier/02.poster.webp",
+      "stageRel": "数字孪生（digital-twin）/20240530_宁波四维尔/.site-ready/ningbo-siweier/02.poster.webp",
+      "status": "published"
+    },
+    {
+      "object": "digital-twin/weichai-spark-plug/06.mp4",
+      "stageRel": "数字孪生（digital-twin）/20240926 潍柴火炬/.site-ready/weichai-spark-plug/06.mp4",
+      "status": "published",
+      "sourceStageRel": "数字孪生（digital-twin）/20240926 潍柴火炬/潍柴火炬_0.7.5.2_AGV演示.mp4"
+    },
+    {
+      "object": "digital-twin/weichai-spark-plug/06.poster.webp",
+      "stageRel": "数字孪生（digital-twin）/20240926 潍柴火炬/.site-ready/weichai-spark-plug/06.poster.webp",
+      "status": "published"
+    },
+    {
+      "object": "digital-twin/weichai-spark-plug/07.mp4",
+      "stageRel": "数字孪生（digital-twin）/20240926 潍柴火炬/.site-ready/weichai-spark-plug/07.mp4",
+      "status": "published",
+      "sourceStageRel": "数字孪生（digital-twin）/20240926 潍柴火炬/潍柴火炬_0.7.5.2_界面演示.mp4"
+    },
+    {
+      "object": "digital-twin/weichai-spark-plug/07.poster.webp",
+      "stageRel": "数字孪生（digital-twin）/20240926 潍柴火炬/.site-ready/weichai-spark-plug/07.poster.webp",
+      "status": "published"
+    },
+    {
+      "object": "digital-twin/akzonobel-shanghai-songjiang/07.mp4",
+      "stageRel": "数字孪生（digital-twin）/20250410 阿克苏诺贝尔漆油_上海松江/.site-ready/akzonobel-shanghai-songjiang/07.mp4",
+      "status": "published",
+      "sourceStageRel": "数字孪生（digital-twin）/20250410 阿克苏诺贝尔漆油_上海松江/巡视动画 250924_1_Anyplex水印.mp4"
+    },
+    {
+      "object": "digital-twin/akzonobel-shanghai-songjiang/07.poster.webp",
+      "stageRel": "数字孪生（digital-twin）/20250410 阿克苏诺贝尔漆油_上海松江/.site-ready/akzonobel-shanghai-songjiang/07.poster.webp",
+      "status": "published"
     }
   ]
 }

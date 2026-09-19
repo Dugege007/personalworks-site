@@ -12,6 +12,7 @@ import {
   resolveMediaDescription,
   resolveMediaDisplayName,
 } from "../../content/copyDisplay";
+import { studioAliasForDisplay } from "../../content/studios";
 import {
   formatShotCaption,
   formatStartedOn,
@@ -196,6 +197,7 @@ function ProjectModule({ work, showHead = true, syncIndex, onOpen }: ProjectModu
   }, [count, looping, shots]);
   const tags = [
     work.startedOn ? formatStartedOn(work.startedOn) : work.year,
+    studioAliasForDisplay(work),
     work.place,
     work.siteType,
     ...(work.tags ?? []),

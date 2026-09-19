@@ -12,7 +12,9 @@ import {
   kindTitle,
   listDevelopChannelDoors,
 } from "../ia/workTree";
-import { listPublishedWorks, listWorkImages } from "../content/works";
+import { studioAliasForDisplay } from "../content/studios";
+import { TWIN_PREVIEW_LIMIT, toProjectAlbumShots } from "../content/projectAlbum";
+import { listPublishedWorks, listWorkImages, listWorkShots } from "../content/works";
 import { stockPlaceholderSrc, workCoverSrc } from "../content/stockMedia";
 import { resolveLead } from "../content/copyDisplay";
 import { findCollectionByChannel, playableGames } from "../content/site";
@@ -100,7 +102,7 @@ export function WorkChannelPage() {
   const works = listPublishedWorks(channelKey);
   const isLandscapeBoard = channelKey === lexicon.landscapeRendering.key;
   const galleryVariant =
-    channelKey === lexicon.digitalTwin.key
+    channelKey === lexicon.digitalTwin.key || channelKey === lexicon.lineSimulation.key
       ? "twin"
       : channelKey === lexicon.landscapePhoto.key ||
           channelKey === lexicon.humanistPhoto.key ||
@@ -119,7 +121,7 @@ export function WorkChannelPage() {
         title={tx({ "zh-CN": door?.zh ?? channelTitleZh(channelKey), en: door?.en }, locale)}
         lead={door?.lead}
       />
-      {isLandscapeBoard && works.length === 0 ? (
+      {(isLandscapeBoard || Boolean(galleryVariant)) && works.length === 0 ? (
         <p className="develop-channel-empty">这一细目还没有可展示的作品。</p>
       ) : null}
       {isLandscapeBoard && works.length > 0 ? <LandscapeProjectBoard works={works} /> : null}
@@ -127,6 +129,7 @@ export function WorkChannelPage() {
         <div className="develop-project-gallery">
           <ProjectGallery
             variant={galleryVariant}
+            previewLimit={galleryVariant === "twin" ? TWIN_PREVIEW_LIMIT : undefined}
             projects={works.map((work) => ({
               id: work.id,
               title: work.title,
@@ -134,9 +137,8 @@ export function WorkChannelPage() {
               place: work.place,
               summary: work.summary,
               href: hrefForWork(work, ia.id),
-              images: listWorkImages(work).flatMap((image) =>
-                image.src ? [{ src: image.src, label: image.label }] : [],
-              ),
+              images: toProjectAlbumShots(listWorkImages(work)),
+              shots: toProjectAlbumShots(listWorkShots(work)),
             }))}
           />
         </div>
@@ -147,6 +149,7 @@ export function WorkChannelPage() {
         <div className="develop-channel-grid" data-count={works.length}>
           {works.map((work, index) => {
             const src = workCoverSrc(work, index);
+            const studio = studioAliasForDisplay(work);
             return (
               <CoverTile
                 key={`${work.channel}-${work.id}`}
@@ -157,7 +160,7 @@ export function WorkChannelPage() {
                 fallbackSrc={stockPlaceholderSrc(work.channel, index + 1)}
               >
                 <strong>{work.title}</strong>
-                <em>{work.year}</em>
+                <em>{studio ? `${work.year} · ${studio}` : work.year}</em>
               </CoverTile>
             );
           })}

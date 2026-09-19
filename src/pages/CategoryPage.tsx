@@ -3,6 +3,7 @@ import { lexicon } from "../content/lexicon";
 import { categories } from "../content/site";
 import { stockPlaceholderSrc, workCoverSrc } from "../content/stockMedia";
 import { resolveLead } from "../content/copyDisplay";
+import { studioAliasForDisplay } from "../content/studios";
 import { listPublishedWorks } from "../content/works";
 import { iaOfSkin } from "../ia";
 import { hrefForDevelopKind } from "../ia/workTree";
@@ -84,7 +85,9 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
                     </div>
                   </div>
                 ))
-              : listPublishedWorks(collection.id).map((work, index) => (
+              : listPublishedWorks(collection.id).map((work, index) => {
+                  const studio = studioAliasForDisplay(work);
+                  return (
                   <Link className="card" key={work.id} to={`${collection.detailBase}/${work.id}`}>
                     <figure className="card-cover">
                       <img src={assetUrl(workCoverSrc(work, index))} alt="" />
@@ -92,6 +95,7 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
                     <div className="card-body">
                       <small>
                         0{index + 1} / {work.year}
+                        {studio ? ` / ${studio}` : ""}
                       </small>
                       <div>
                         <h2>{work.title}</h2>
@@ -99,7 +103,8 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
                       </div>
                     </div>
                   </Link>
-                ))}
+                  );
+                })}
           </div>
         </section>
       ))}

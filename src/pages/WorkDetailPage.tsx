@@ -2,9 +2,11 @@ import { useLocation } from "react-router-dom";
 import { ChannelHead } from "../components/work/ChannelHead";
 import { LandscapeProjectBoard } from "../components/work/LandscapeProjectBoard";
 import { ProjectGallery } from "../components/work/ProjectGallery";
-import { resolveLead, resolveMediaDisplayName } from "../content/copyDisplay";
+import { resolveLead } from "../content/copyDisplay";
+import { toProjectAlbumShots } from "../content/projectAlbum";
 import { lexicon } from "../content/lexicon";
 import { findCategoryByPath, findCollectionByChannel, findCollectionByPath } from "../content/site";
+import { studioAliasForDisplay } from "../content/studios";
 import {
   findPublishedWork,
   findPublishedWorksById,
@@ -32,6 +34,10 @@ type MetaItem = {
  */
 function buildMetaItems(work: WorkRecord): MetaItem[] {
   const items: MetaItem[] = [{ label: "年份", value: work.year }];
+  const studio = studioAliasForDisplay(work);
+  if (studio) {
+    items.push({ label: lexicon.workStudio.zh, value: studio });
+  }
   if (work.capturedOn) {
     items.push({ label: "拍摄", value: formatStartedOn(work.capturedOn) });
   }
@@ -173,24 +179,18 @@ export function WorkDetailPage() {
     work.channel === lexicon.humanistPhoto.key ||
     work.channel === lexicon.portraitPhoto.key;
   const galleryVariant =
-    work.channel === lexicon.digitalTwin.key ? "twin" : photoChannel ? "photo" : undefined;
+    work.channel === lexicon.digitalTwin.key || work.channel === lexicon.lineSimulation.key
+      ? "twin"
+      : photoChannel
+        ? "photo"
+        : undefined;
   const galleryProject = {
     id: work.id,
     title: work.title,
     date: work.capturedOn ?? work.startedOn ?? work.year,
     place: work.place,
     summary: resolveLead(work.summary),
-    images: listWorkShots(work).flatMap((item) =>
-      item.src
-        ? [{
-            src: item.src,
-            label: resolveMediaDisplayName(item),
-            kind: item.kind,
-            poster: item.poster,
-            description: item.description,
-          }]
-        : [],
-    ),
+    images: toProjectAlbumShots(listWorkShots(work)),
   };
 
   const tags =

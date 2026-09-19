@@ -39,6 +39,7 @@
 
 .photo-masonry .card-cover img,
 .photo-masonry .project-gallery-shot img,
+.photo-masonry .project-gallery-shot video,
 .photo-masonry-item img {
   width: 100%;
   height: auto;

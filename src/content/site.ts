@@ -111,11 +111,9 @@ export const profile = {
   portraitSrcs: [
     "profile/portrait.webp",
     "profile/462A2697.webp",
-    "profile/462A2700.webp",
-    "profile/462A2703.webp",
-    "profile/462A2707.webp",
     "profile/462A2817.webp",
-    "profile/R0008304.webp",
+    "profile/DSC04901.webp",
+    "profile/DSC05087.webp",
   ],
   portraitYear: "2024",
   homeHeroSrc: "landscape-photo/zhoushan-miaozihu/01.webp",

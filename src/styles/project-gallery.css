@@ -89,17 +89,66 @@
 }
 
 .project-gallery.is-twin .project-gallery-images {
-  grid-template-columns: 1.8fr repeat(3, minmax(0, 1fr));
-  grid-auto-rows: minmax(104px, 1fr);
+  grid-template-columns: 2.1fr repeat(3, minmax(0, 1fr));
+  align-items: start;
+}
+
+/* 详情：横图按行从左到右，两列一对，避免瀑布流竖向填列打乱顺序。 */
+.project-gallery.is-twin .project-gallery-flow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
 }
 
 .project-gallery.is-twin .project-gallery-shot {
   aspect-ratio: auto;
+  height: auto;
+  overflow: visible;
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
+.project-gallery.is-twin .project-gallery-shot img,
+.project-gallery.is-twin .project-gallery-shot video {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  object-position: center;
 }
 
 .project-gallery.is-twin .project-gallery-shot.is-main {
   grid-row: span 2;
-  min-height: 320px;
+}
+
+.project-gallery.is-twin .project-gallery-shot.is-stack {
+  padding: 8px 8px 0 0;
+  background: transparent;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.project-gallery.is-twin .project-gallery-stack-leaf {
+  position: absolute;
+  inset: 0 8px 0 0;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  pointer-events: none;
+}
+
+.project-gallery.is-twin .project-gallery-stack-leaf:first-child {
+  transform: translate(8px, -8px);
+}
+
+.project-gallery.is-twin .project-gallery-stack-leaf:nth-child(2) {
+  transform: translate(4px, -4px);
+}
+
+.project-gallery.is-twin .project-gallery-shot.is-stack img,
+.project-gallery.is-twin .project-gallery-shot.is-stack video {
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 0 0 1px var(--line);
 }
 
 .project-gallery.is-photo .project-gallery-shot {
@@ -129,14 +178,22 @@
 }
 
 @media (pointer: fine) {
-  .project-gallery:not(.is-photo) .project-gallery-shot img,
-  .project-gallery:not(.is-photo) .project-gallery-shot video {
+  .project-gallery:not(.is-photo):not(.is-twin) .project-gallery-shot img,
+  .project-gallery:not(.is-photo):not(.is-twin) .project-gallery-shot video {
     transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  .project-gallery:not(.is-photo) .project-gallery-shot:hover img,
-  .project-gallery:not(.is-photo) .project-gallery-shot:hover video {
+  .project-gallery:not(.is-photo):not(.is-twin) .project-gallery-shot:hover img,
+  .project-gallery:not(.is-photo):not(.is-twin) .project-gallery-shot:hover video {
     transform: scale(1.035);
+  }
+
+  .project-gallery.is-twin .project-gallery-shot.is-stack {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .project-gallery.is-twin .project-gallery-shot.is-stack:hover {
+    transform: translateY(-2px);
   }
 }
 
@@ -157,8 +214,10 @@
   .project-gallery.is-twin .project-gallery-shot.is-main {
     grid-column: 1 / -1;
     grid-row: auto;
-    min-height: 0;
-    aspect-ratio: 16 / 10;
+  }
+
+  .project-gallery.is-twin.is-preview .project-gallery-shot:nth-child(n + 4) {
+    display: none;
   }
 
   .project-gallery.is-game .project-gallery-shot {
@@ -170,12 +229,25 @@
   .project-gallery.is-twin .project-gallery-images {
     grid-template-columns: 1fr;
   }
+
+  .project-gallery.is-twin .project-gallery-flow {
+    grid-template-columns: 1fr;
+  }
+
+  .project-gallery.is-twin.is-preview .project-gallery-shot:nth-child(n + 2) {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .project-gallery-shot img,
-  .project-gallery-shot video {
+  .project-gallery-shot video,
+  .project-gallery.is-twin .project-gallery-shot.is-stack {
     transition: none;
+  }
+
+  .project-gallery.is-twin .project-gallery-shot.is-stack:hover {
+    transform: none;
   }
 
   .project-gallery.is-game .project-gallery-images {
