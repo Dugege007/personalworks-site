@@ -12,13 +12,15 @@ import {
   findPublishedWorksById,
   formatStartedOn,
   listWorkShots,
+  photoWorkChannels,
   type WorkMedia,
   type WorkRecord,
 } from "../content/works";
 import { channelTitleZh } from "../ia/href";
 import { iaOfSkin } from "../ia";
 import { kindOfChannel } from "../ia/query";
-import { hrefForDevelopChannel, parseWorkIndexPath, workIndexRoot } from "../ia/workTree";
+import { hrefForDevelopChannel, hrefForPhotoCatalog, parseWorkIndexPath, workIndexRoot } from "../ia/workTree";
+import { readCatalogFromState } from "../ia/photoNav";
 import { assetUrl } from "../lib/assets";
 import { usePrefs } from "../prefs/PrefsProvider";
 import "../styles/develop-work.css";
@@ -94,14 +96,25 @@ function renderVideoFrame(item: WorkMedia) {
 }
 
 /**
- * 显影详情回到细目列表；层境详情回到分类室。
+ * 显影详情回到细目列表；摄影详情回到带来源查询的总览或拍摄列表。
  */
 function resolveDetailBack(
   parsed: ReturnType<typeof parseWorkIndexPath>,
   work: WorkRecord | undefined,
   category: ReturnType<typeof findCategoryByPath>,
   iaId: string,
+  fromState?: string,
 ): { path: string; label: string } {
+  if (work && (photoWorkChannels as readonly string[]).includes(work.channel)) {
+    const catalogPath = `/${lexicon.photography.key}/${lexicon.photoCatalog.key}`;
+    const shootsPath = `/${lexicon.photography.key}/${lexicon.photoShoots.key}`;
+    const from = readCatalogFromState(fromState, [catalogPath, shootsPath]);
+    const fromShoots = Boolean(from && (from.split("?")[0] ?? "") === shootsPath);
+    return {
+      path: from ?? hrefForPhotoCatalog(work.channel),
+      label: fromShoots ? lexicon.photoShoots.zh : lexicon.photoCatalog.zh,
+    };
+  }
   if (parsed?.layer === "detail") {
     return {
       path: hrefForDevelopChannel(parsed.kind, parsed.channel),
@@ -157,7 +170,13 @@ export function WorkDetailPage() {
     : collection
       ? findPublishedWork(collection.id, id)
       : undefined;
-  const back = resolveDetailBack(parsed, work, category, ia.id);
+  const fromState =
+    location.state && typeof location.state === "object" && "from" in location.state
+      ? typeof (location.state as { from?: unknown }).from === "string"
+        ? (location.state as { from: string }).from
+        : undefined
+      : undefined;
+  const back = resolveDetailBack(parsed, work, category, ia.id, fromState);
   const theme = collection?.theme ?? category?.theme ?? (parsed ? lexicon.workIndex.key : "home");
 
   if (!work) {

@@ -128,6 +128,7 @@
       }
 
       .boot-gate-num {
+        position: relative;
         display: block;
         font-family: "IBM Plex Mono", ui-monospace, monospace;
         font-size: clamp(5.25rem, 16vw, 10.5rem);
@@ -135,6 +136,33 @@
         line-height: 0.9;
         letter-spacing: -0.06em;
         font-variant-numeric: tabular-nums;
+        font-feature-settings: "tnum" 1, "lnum" 1;
+        font-kerning: none;
+        white-space: nowrap;
+        min-height: 0.9em;
+        visibility: hidden;
+      }
+
+      .boot-gate-num.is-font {
+        visibility: visible;
+      }
+
+      .boot-gate-num-sizer {
+        display: block;
+        visibility: hidden;
+        pointer-events: none;
+      }
+
+      .boot-gate-num-value {
+        position: absolute;
+        left: 0;
+        top: 0;
+        font: inherit;
+        letter-spacing: inherit;
+        font-variant-numeric: inherit;
+        font-feature-settings: inherit;
+        font-kerning: inherit;
+        white-space: inherit;
       }
 
       .boot-gate-track {
@@ -216,7 +244,10 @@
           <span class="boot-gate-zh" data-boot-zh>显影</span>
           <span class="boot-gate-deco" data-boot-deco aria-hidden="true">DEVELOP</span>
         </p>
-        <span class="boot-gate-num" data-boot-num>00</span>
+        <span class="boot-gate-num">
+          <span class="boot-gate-num-sizer" aria-hidden="true">100</span>
+          <span class="boot-gate-num-value" data-boot-num>00</span>
+        </span>
         <div class="boot-gate-track" aria-hidden="true">
           <div class="boot-gate-fill" data-boot-fill></div>
         </div>
@@ -232,6 +263,7 @@
 
         var skin = document.documentElement.getAttribute("data-skin") || "develop";
         var numEl = gate.querySelector("[data-boot-num]");
+        var numWrap = gate.querySelector(".boot-gate-num");
         var fillEl = gate.querySelector("[data-boot-fill]");
         var statusEl = gate.querySelector("[data-boot-status]");
         var liveEl = gate.querySelector("[data-boot-live]");
@@ -276,12 +308,25 @@
           }
         }
 
+        function bootCreep(elapsed) {
+          var earlyT = elapsed / 1100;
+          if (earlyT > 1) earlyT = 1;
+          var early = 0.75 * (1 - (1 - earlyT) * (1 - earlyT));
+          var extra = 0;
+          if (elapsed > 1100) {
+            extra = 0.13 * (1 - Math.exp(-(elapsed - 1100) / 7000));
+          }
+          var next = early + extra;
+          if (next > 0.88) next = 0.88;
+          return next;
+        }
+
         function tick(now) {
           if (!finished) {
-            var creep = 0.1 + Math.min(0.72, (now - startedAt) / 14000);
+            var creep = bootCreep(now - startedAt);
             if (creep > target) target = creep;
           }
-          shown += (target - shown) * (finished ? 0.2 : 0.08);
+          shown += (target - shown) * (finished ? 0.2 : 0.12);
           if (Math.abs(target - shown) < 0.001) shown = target;
           render(shown);
           if (finished && shown >= 0.995) {
@@ -317,11 +362,11 @@
           },
         };
 
-        if (document.readyState === "interactive") setTarget(0.22);
-        if (document.readyState === "complete") setTarget(0.55);
+        if (document.readyState === "interactive") setTarget(0.32);
+        if (document.readyState === "complete") setTarget(0.52);
         document.addEventListener("readystatechange", function () {
-          if (document.readyState === "interactive") setTarget(0.22);
-          if (document.readyState === "complete") setTarget(0.55);
+          if (document.readyState === "interactive") setTarget(0.32);
+          if (document.readyState === "complete") setTarget(0.52);
         });
 
         if (typeof PerformanceObserver === "function") {
@@ -330,15 +375,42 @@
             var obs = new PerformanceObserver(function (list) {
               list.getEntries().forEach(function () {
                 seen += 1;
-                setTarget(Math.min(0.78, 0.18 + seen * 0.08));
+                setTarget(Math.min(0.68, 0.22 + seen * 0.04));
               });
             });
             obs.observe({ type: "resource", buffered: true });
           } catch (err) {}
         }
 
-        render(shown);
-        raf = requestAnimationFrame(tick);
+        var tickStarted = false;
+        function startTick() {
+          if (tickStarted) return;
+          tickStarted = true;
+          if (numWrap) numWrap.classList.add("is-font");
+          render(shown);
+          raf = requestAnimationFrame(tick);
+        }
+
+        function whenNumFontReady(done) {
+          var fallback = window.setTimeout(done, 1200);
+          if (!document.fonts || !document.fonts.load) {
+            window.clearTimeout(fallback);
+            done();
+            return;
+          }
+          document.fonts.load('500 5.25rem "IBM Plex Mono"').then(
+            function () {
+              window.clearTimeout(fallback);
+              done();
+            },
+            function () {
+              window.clearTimeout(fallback);
+              done();
+            }
+          );
+        }
+
+        whenNumFontReady(startTick);
 
         window.setTimeout(function () {
           if (!finished && statusEl) statusEl.textContent = slowCopy;

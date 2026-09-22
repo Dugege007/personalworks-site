@@ -29,28 +29,21 @@ export const initialWorkProjects = [
       "01 04"
     ],
     [
-      "digital-twin/shanghai-mansheng-packaging/05.webp",
+      "digital-twin/shanghai-mansheng-packaging/07.webp",
       "01 05"
     ],
     [
-      "digital-twin/shanghai-mansheng-packaging/06.webp",
+      "digital-twin/shanghai-mansheng-packaging/08.mp4",
       "01 06"
     ],
     [
-      "digital-twin/shanghai-mansheng-packaging/07.webp",
+      "digital-twin/shanghai-mansheng-packaging/06.webp",
       "01 07"
     ],
     [
-      "digital-twin/shanghai-mansheng-packaging/08.mp4",
-      "01 08"
-    ],
-    {
-  "kind": "video",
-  "label": "视频",
-  "src": "digital-twin/shanghai-mansheng-packaging/09.mp4",
-  "displayName": "立库动画",
-  "description": "立库动画测试"
-}
+      "digital-twin/shanghai-mansheng-packaging/09.mp4",
+      "视频"
+    ]
   ]
   },
   {
@@ -64,12 +57,12 @@ export const initialWorkProjects = [
     "body": "宁波四维尔项目静帧，共收录 1 张图片。",
     "media": [
     [
-      "digital-twin/ningbo-siweier/01.webp",
-      "微信截图_20250530110624 01"
+      "digital-twin/ningbo-siweier/02.mp4",
+      "四维尔_0.6.2_演示_250311 01"
     ],
     [
-      "digital-twin/ningbo-siweier/02.mp4",
-      "四维尔_0.6.2_演示_250311"
+      "digital-twin/ningbo-siweier/01.webp",
+      "四维尔_0.6.2_演示_250311 02"
     ]
   ]
   },
@@ -85,28 +78,28 @@ export const initialWorkProjects = [
     "body": "潍柴火炬项目静帧，共收录 5 张图片。",
     "media": [
     [
-      "digital-twin/weichai-spark-plug/01.webp",
-      "01 车间总览 01"
-    ],
-    [
-      "digital-twin/weichai-spark-plug/02.webp",
-      "01 车间总览 02"
-    ],
-    [
-      "digital-twin/weichai-spark-plug/03.webp",
-      "01 车间总览 03"
-    ],
-    [
-      "digital-twin/weichai-spark-plug/04.webp",
-      "01 车间总览 04"
+      "digital-twin/weichai-spark-plug/07.mp4",
+      "潍柴火炬_0.7.5.2_界面演示 01"
     ],
     [
       "digital-twin/weichai-spark-plug/06.mp4",
-      "潍柴火炬_0.7.5.2_AGV演示"
+      "潍柴火炬_0.7.5.2_界面演示 02"
     ],
     [
-      "digital-twin/weichai-spark-plug/07.mp4",
-      "潍柴火炬_0.7.5.2_界面演示"
+      "digital-twin/weichai-spark-plug/01.webp",
+      "潍柴火炬_0.7.5.2_界面演示 03"
+    ],
+    [
+      "digital-twin/weichai-spark-plug/02.webp",
+      "潍柴火炬_0.7.5.2_界面演示 04"
+    ],
+    [
+      "digital-twin/weichai-spark-plug/03.webp",
+      "潍柴火炬_0.7.5.2_界面演示 05"
+    ],
+    [
+      "digital-twin/weichai-spark-plug/04.webp",
+      "潍柴火炬_0.7.5.2_界面演示 06"
     ]
   ]
   },
@@ -141,12 +134,12 @@ export const initialWorkProjects = [
       "01 工厂总览 05"
     ],
     [
-      "digital-twin/akzonobel-shanghai-songjiang/06.webp",
+      "digital-twin/akzonobel-shanghai-songjiang/07.mp4",
       "01 工厂总览 06"
     ],
     [
-      "digital-twin/akzonobel-shanghai-songjiang/07.mp4",
-      "巡视动画 250924_1_Anyplex水印"
+      "digital-twin/akzonobel-shanghai-songjiang/06.webp",
+      "01 工厂总览 07"
     ]
   ],
     "featured": true
@@ -181,52 +174,20 @@ export const initialWorkProjects = [
       "0816_01 04"
     ],
     [
-      "landscape-rendering/xiaowayao/05.jpg",
+      "landscape-rendering/xiaowayao/13.webp",
       "0816_01 05"
     ],
     [
-      "landscape-rendering/xiaowayao/06.jpg",
+      "landscape-rendering/xiaowayao/14.webp",
       "0816_01 06"
     ],
     [
-      "landscape-rendering/xiaowayao/07.jpg",
+      "landscape-rendering/xiaowayao/15.webp",
       "0816_01 07"
     ],
     [
-      "landscape-rendering/xiaowayao/08.jpg",
-      "0816_01 08"
-    ],
-    [
-      "landscape-rendering/xiaowayao/13.webp",
-      "0816_01 13"
-    ],
-    [
-      "landscape-rendering/xiaowayao/14.webp",
-      "0816_01 14"
-    ],
-    [
-      "landscape-rendering/xiaowayao/15.webp",
-      "0816_01 15"
-    ],
-    [
-      "landscape-rendering/xiaowayao/16.webp",
-      "0816_01 16"
-    ],
-    [
       "landscape-rendering/xiaowayao/17.webp",
-      "0816_01 17"
-    ],
-    [
-      "landscape-rendering/xiaowayao/22.webp",
-      "0816_01 22"
-    ],
-    [
-      "landscape-rendering/xiaowayao/23.webp",
-      "0816_01 23"
-    ],
-    [
-      "landscape-rendering/xiaowayao/24.webp",
-      "0816_01 24"
+      "0816_01 08"
     ]
   ]
   },
@@ -282,39 +243,31 @@ export const initialWorkProjects = [
     "summary": "淮阴区安置商住地块 15# 组团。周边以教育和居住为主，竞品多为新古典。以月相组织一环一带四花园，用简约艺术做全龄共享的大区。",
     "body": "淮自然（阴）挂2019第6号地块商住安置项目 15# 组团。基地在长江西路以南、西安路以东。规划以高层安置为主，中心留出共享中庭。景观用晓月、满月、弦月等月相落位入口水景、林下活动和宅间花园。",
     "media": [
-      [
-        "landscape-rendering/huaian-fukang/01.jpg",
-        "20200324-HAFKC-15#-DU_01"
-      ],
-      [
-        "landscape-rendering/huaian-fukang/02.jpg",
-        "20200324-HAFKC-15#-DU_02"
-      ],
-      [
-        "landscape-rendering/huaian-fukang/03.jpg",
-        "20200324-HAFKC-15#-DU_03"
-      ],
-      [
-        "landscape-rendering/huaian-fukang/04.jpg",
-        "20200324-HAFKC-15#-DU_04"
-      ],
-      [
-        "landscape-rendering/huaian-fukang/05.jpg",
-        "20200324-HAFKC-15#-DU_05"
-      ],
-      [
-        "landscape-rendering/huaian-fukang/06.jpg",
-        "20200324-HAFKC-15#-DU_06"
-      ],
-      [
-        "landscape-rendering/huaian-fukang-15/01.jpg",
-        "20200324-HAFKC-15#-DU_11"
-      ],
-      [
-        "landscape-rendering/huaian-fukang-15/02.jpg",
-        "20200324-HAFKC-15#-DU_12"
-      ]
+    [
+      "landscape-rendering/huaian-fukang/01.jpg",
+      "20200324-HAFKC-15#-DU_01 01"
+    ],
+    [
+      "landscape-rendering/huaian-fukang/02.jpg",
+      "20200324-HAFKC-15#-DU_01 02"
+    ],
+    [
+      "landscape-rendering/huaian-fukang/03.jpg",
+      "20200324-HAFKC-15#-DU_01 03"
+    ],
+    [
+      "landscape-rendering/huaian-fukang/04.jpg",
+      "20200324-HAFKC-15#-DU_01 04"
+    ],
+    [
+      "landscape-rendering/huaian-fukang/06.jpg",
+      "20200324-HAFKC-15#-DU_01 05"
+    ],
+    [
+      "landscape-rendering/huaian-fukang-15/02.jpg",
+      "20200324-HAFKC-15#-DU_01 06"
     ]
+  ]
   },
   {
     "id": "huaian-fukang-3",
@@ -342,52 +295,48 @@ export const initialWorkProjects = [
       "0810_01 03"
     ],
     [
-      "landscape-rendering/huaian-fukang/10.jpg",
+      "landscape-rendering/huaian-fukang-3/01.jpg",
       "0810_01 04"
     ],
     [
-      "landscape-rendering/huaian-fukang-3/01.jpg",
+      "landscape-rendering/huaian-fukang-3/02.jpg",
       "0810_01 05"
     ],
     [
-      "landscape-rendering/huaian-fukang-3/02.jpg",
+      "landscape-rendering/huaian-fukang-3/03.jpg",
       "0810_01 06"
     ],
     [
-      "landscape-rendering/huaian-fukang-3/03.jpg",
+      "landscape-rendering/huaian-fukang-3/04.jpg",
       "0810_01 07"
     ],
     [
-      "landscape-rendering/huaian-fukang-3/04.jpg",
+      "landscape-rendering/huaian-fukang-3/17.webp",
       "0810_01 08"
     ],
     [
-      "landscape-rendering/huaian-fukang-3/17.webp",
-      "0810_01 19"
-    ],
-    [
       "landscape-rendering/huaian-fukang-3/18.webp",
-      "0810_01 20"
+      "0810_01 09"
     ],
     [
       "landscape-rendering/huaian-fukang-3/19.webp",
-      "0810_01 21"
+      "0810_01 10"
     ],
     [
       "landscape-rendering/huaian-fukang-3/20.webp",
-      "0810_01 22"
+      "0810_01 11"
     ],
     [
       "landscape-rendering/huaian-fukang-3/21.webp",
-      "0810_01 23"
+      "0810_01 12"
     ],
     [
       "landscape-rendering/huaian-fukang-3/22.webp",
-      "0810_01 24"
+      "0810_01 13"
     ],
     [
-      "landscape-rendering/huaian-fukang-3/23.webp",
-      "0810_01 25"
+      "landscape-rendering/huaian-fukang-3/05.jpg",
+      "0810_01 14"
     ]
   ]
   },
@@ -404,39 +353,23 @@ export const initialWorkProjects = [
     "summary": "梁溪区原汽车北站西侧，东侧紧邻火车站轨道，绿地偏紧、高层遮阴。延续建筑的现代线条，以乌桕林下氧吧和全龄活动做成森活社区。",
     "body": "世茂无锡原汽车北站西侧。基地在兴源北路与惠勤路交叉口西北，东侧火车站轨道带来噪声与震动，绿地率紧张。景观策略是酒店式入口、九棵乌桕的林下氧吧、儿童活动与宅间秘境，把房子放进森林里。",
     "media": [
-      [
-        "landscape-rendering/wuxi-north-station/01.jpg",
-        "20200326-QCBZ-DU_03"
-      ],
-      [
-        "landscape-rendering/wuxi-north-station/02.jpg",
-        "20200326-QCBZ-DU_04"
-      ],
-      [
-        "landscape-rendering/wuxi-north-station/03.jpg",
-        "20200326-QCBZ-DU_05"
-      ],
-      [
-        "landscape-rendering/wuxi-north-station/04.jpg",
-        "20200326-QCBZ-DU_06"
-      ],
-      [
-        "landscape-rendering/wuxi-north-station/05.jpg",
-        "20200326-QCBZ-DU_07"
-      ],
-      [
-        "landscape-rendering/wuxi-north-station/06.jpg",
-        "20200326-QCBZ-DU_08"
-      ],
-      [
-        "landscape-rendering/wuxi-north-station/07.jpg",
-        "20200326-QCBZ-DU_09"
-      ],
-      [
-        "landscape-rendering/wuxi-north-station/08.jpg",
-        "20200326-QCBZ-DU_10"
-      ]
+    [
+      "landscape-rendering/wuxi-north-station/01.jpg",
+      "20200326-QCBZ-DU_03 01"
+    ],
+    [
+      "landscape-rendering/wuxi-north-station/05.jpg",
+      "20200326-QCBZ-DU_03 02"
+    ],
+    [
+      "landscape-rendering/wuxi-north-station/06.jpg",
+      "20200326-QCBZ-DU_03 03"
+    ],
+    [
+      "landscape-rendering/wuxi-north-station/08.jpg",
+      "20200326-QCBZ-DU_03 04"
     ]
+  ]
   },
   {
     "id": "xingyi-78",
@@ -476,24 +409,16 @@ export const initialWorkProjects = [
       "01_31 06"
     ],
     [
-      "landscape-rendering/xingyi-78/07.jpg",
+      "landscape-rendering/xingyi-78/09.webp",
       "01_31 07"
     ],
     [
-      "landscape-rendering/xingyi-78/08.jpg",
+      "landscape-rendering/xingyi-78/10.webp",
       "01_31 08"
     ],
     [
-      "landscape-rendering/xingyi-78/09.webp",
-      "01_31 09"
-    ],
-    [
-      "landscape-rendering/xingyi-78/10.webp",
-      "01_31 10"
-    ],
-    [
       "landscape-rendering/xingyi-78/11.webp",
-      "01_31 11"
+      "01_31 09"
     ]
   ]
   },
@@ -547,92 +472,56 @@ export const initialWorkProjects = [
       "__01 09"
     ],
     [
-      "landscape-rendering/hailunbao-yangzhou/10.webp",
+      "landscape-rendering/hailunbao-yangzhou/11.webp",
       "__01 10"
     ],
     [
-      "landscape-rendering/hailunbao-yangzhou/11.webp",
+      "landscape-rendering/hailunbao-yangzhou/12.webp",
       "__01 11"
     ],
     [
-      "landscape-rendering/hailunbao-yangzhou/12.webp",
+      "landscape-rendering/hailunbao-yangzhou/13.webp",
       "__01 12"
     ],
     [
-      "landscape-rendering/hailunbao-yangzhou/13.webp",
+      "landscape-rendering/hailunbao-yangzhou/14.webp",
       "__01 13"
     ],
     [
-      "landscape-rendering/hailunbao-yangzhou/14.webp",
+      "landscape-rendering/hailunbao-yangzhou/15.webp",
       "__01 14"
     ],
     [
-      "landscape-rendering/hailunbao-yangzhou/15.webp",
+      "landscape-rendering/hailunbao-yangzhou/16.webp",
       "__01 15"
     ],
     [
-      "landscape-rendering/hailunbao-yangzhou/16.webp",
+      "landscape-rendering/hailunbao-yangzhou/18.webp",
       "__01 16"
     ],
     [
-      "landscape-rendering/hailunbao-yangzhou/17.webp",
+      "landscape-rendering/hailunbao-yangzhou/20.webp",
       "__01 17"
     ],
     [
-      "landscape-rendering/hailunbao-yangzhou/18.webp",
+      "landscape-rendering/hailunbao-yangzhou/23.webp",
       "__01 18"
     ],
     [
-      "landscape-rendering/hailunbao-yangzhou/19.webp",
+      "landscape-rendering/hailunbao-yangzhou/24.webp",
       "__01 19"
     ],
     [
-      "landscape-rendering/hailunbao-yangzhou/20.webp",
+      "landscape-rendering/hailunbao-yangzhou/25.webp",
       "__01 20"
     ],
     [
-      "landscape-rendering/hailunbao-yangzhou/21.webp",
+      "landscape-rendering/hailunbao-yangzhou/30.webp",
       "__01 21"
     ],
     [
-      "landscape-rendering/hailunbao-yangzhou/22.webp",
-      "__01 22"
-    ],
-    [
-      "landscape-rendering/hailunbao-yangzhou/23.webp",
-      "__01 23"
-    ],
-    [
-      "landscape-rendering/hailunbao-yangzhou/24.webp",
-      "__01 24"
-    ],
-    [
-      "landscape-rendering/hailunbao-yangzhou/25.webp",
-      "__01 25"
-    ],
-    [
-      "landscape-rendering/hailunbao-yangzhou/26.webp",
-      "__01 26"
-    ],
-    [
-      "landscape-rendering/hailunbao-yangzhou/27.webp",
-      "__01 27"
-    ],
-    [
-      "landscape-rendering/hailunbao-yangzhou/28.webp",
-      "__01 28"
-    ],
-    [
-      "landscape-rendering/hailunbao-yangzhou/29.webp",
-      "__01 29"
-    ],
-    [
-      "landscape-rendering/hailunbao-yangzhou/30.webp",
-      "__01 30"
-    ],
-    [
       "landscape-rendering/hailunbao-yangzhou/31.webp",
-      "__01 31"
+      "__01 22"
     ]
   ]
   },
@@ -650,112 +539,96 @@ export const initialWorkProjects = [
     "body": "项目由高层与花园洋房组成，中心空间日照良好，南侧临近滨江公园。设计借鉴现代森居与酒店化功能，以共享中庭、林下活动、宅间花园和慢行系统提升全龄生活体验。",
     "media": [
     [
-      "landscape-rendering/jincheng-huzhou/01.webp",
+      "landscape-rendering/jincheng-huzhou/12.webp",
       "20200428-JCHZ-3#-DU_01 01"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/02.webp",
+      "landscape-rendering/jincheng-huzhou/13.webp",
       "20200428-JCHZ-3#-DU_01 02"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/03.webp",
+      "landscape-rendering/jincheng-huzhou/15.webp",
       "20200428-JCHZ-3#-DU_01 03"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/04.webp",
+      "landscape-rendering/jincheng-huzhou/02.webp",
       "20200428-JCHZ-3#-DU_01 04"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/05.webp",
+      "landscape-rendering/jincheng-huzhou/03.webp",
       "20200428-JCHZ-3#-DU_01 05"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/06.webp",
+      "landscape-rendering/jincheng-huzhou/04.webp",
       "20200428-JCHZ-3#-DU_01 06"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/07.webp",
+      "landscape-rendering/jincheng-huzhou/05.webp",
       "20200428-JCHZ-3#-DU_01 07"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/08.webp",
+      "landscape-rendering/jincheng-huzhou/06.webp",
       "20200428-JCHZ-3#-DU_01 08"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/09.webp",
+      "landscape-rendering/jincheng-huzhou/07.webp",
       "20200428-JCHZ-3#-DU_01 09"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/10.webp",
+      "landscape-rendering/jincheng-huzhou/08.webp",
       "20200428-JCHZ-3#-DU_01 10"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/11.webp",
+      "landscape-rendering/jincheng-huzhou/09.webp",
       "20200428-JCHZ-3#-DU_01 11"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/12.webp",
+      "landscape-rendering/jincheng-huzhou/10.webp",
       "20200428-JCHZ-3#-DU_01 12"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/13.webp",
+      "landscape-rendering/jincheng-huzhou/11.webp",
       "20200428-JCHZ-3#-DU_01 13"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/14.webp",
+      "landscape-rendering/jincheng-huzhou/16.webp",
       "20200428-JCHZ-3#-DU_01 14"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/15.webp",
+      "landscape-rendering/jincheng-huzhou/17.webp",
       "20200428-JCHZ-3#-DU_01 15"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/16.webp",
+      "landscape-rendering/jincheng-huzhou/20.webp",
       "20200428-JCHZ-3#-DU_01 16"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/17.webp",
+      "landscape-rendering/jincheng-huzhou/21.webp",
       "20200428-JCHZ-3#-DU_01 17"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/18.webp",
+      "landscape-rendering/jincheng-huzhou/22.webp",
       "20200428-JCHZ-3#-DU_01 18"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/19.webp",
+      "landscape-rendering/jincheng-huzhou/23.webp",
       "20200428-JCHZ-3#-DU_01 19"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/20.webp",
+      "landscape-rendering/jincheng-huzhou/24.webp",
       "20200428-JCHZ-3#-DU_01 20"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/21.webp",
+      "landscape-rendering/jincheng-huzhou/25.webp",
       "20200428-JCHZ-3#-DU_01 21"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/22.webp",
+      "landscape-rendering/jincheng-huzhou/26.webp",
       "20200428-JCHZ-3#-DU_01 22"
     ],
     [
-      "landscape-rendering/jincheng-huzhou/23.webp",
-      "20200428-JCHZ-3#-DU_01 23"
-    ],
-    [
-      "landscape-rendering/jincheng-huzhou/24.webp",
-      "20200428-JCHZ-3#-DU_01 24"
-    ],
-    [
-      "landscape-rendering/jincheng-huzhou/25.webp",
-      "20200428-JCHZ-3#-DU_01 25"
-    ],
-    [
-      "landscape-rendering/jincheng-huzhou/26.webp",
-      "20200428-JCHZ-3#-DU_01 26"
-    ],
-    [
       "landscape-rendering/jincheng-huzhou/27.webp",
-      "20200428-JCHZ-3#-DU_01 27"
+      "20200428-JCHZ-3#-DU_01 23"
     ]
   ],
     "featured": true
@@ -817,104 +690,68 @@ export const initialWorkProjects = [
       "0604_15 04"
     ],
     [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/05.webp",
+      "landscape-rendering/beijing-shouchuang-rental-apartment/06.webp",
       "0604_15 05"
     ],
     [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/06.webp",
+      "landscape-rendering/beijing-shouchuang-rental-apartment/08.webp",
       "0604_15 06"
     ],
     [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/07.webp",
+      "landscape-rendering/beijing-shouchuang-rental-apartment/09.webp",
       "0604_15 07"
     ],
     [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/08.webp",
+      "landscape-rendering/beijing-shouchuang-rental-apartment/12.webp",
       "0604_15 08"
     ],
     [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/09.webp",
+      "landscape-rendering/beijing-shouchuang-rental-apartment/13.webp",
       "0604_15 09"
     ],
     [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/10.webp",
+      "landscape-rendering/beijing-shouchuang-rental-apartment/14.webp",
       "0604_15 10"
     ],
     [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/11.webp",
+      "landscape-rendering/beijing-shouchuang-rental-apartment/15.webp",
       "0604_15 11"
     ],
     [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/12.webp",
+      "landscape-rendering/beijing-shouchuang-rental-apartment/16.webp",
       "0604_15 12"
     ],
     [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/13.webp",
+      "landscape-rendering/beijing-shouchuang-rental-apartment/17.webp",
       "0604_15 13"
     ],
     [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/14.webp",
+      "landscape-rendering/beijing-shouchuang-rental-apartment/18.webp",
       "0604_15 14"
     ],
     [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/15.webp",
+      "landscape-rendering/beijing-shouchuang-rental-apartment/19.webp",
       "0604_15 15"
     ],
     [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/16.webp",
+      "landscape-rendering/beijing-shouchuang-rental-apartment/20.webp",
       "0604_15 16"
     ],
     [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/17.webp",
+      "landscape-rendering/beijing-shouchuang-rental-apartment/21.webp",
       "0604_15 17"
     ],
     [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/18.webp",
+      "landscape-rendering/beijing-shouchuang-rental-apartment/22.webp",
       "0604_15 18"
     ],
     [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/19.webp",
+      "landscape-rendering/beijing-shouchuang-rental-apartment/24.webp",
       "0604_15 19"
     ],
     [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/20.webp",
-      "0604_15 20"
-    ],
-    [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/21.webp",
-      "0604_15 21"
-    ],
-    [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/22.webp",
-      "0604_15 22"
-    ],
-    [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/23.webp",
-      "0604_15 23"
-    ],
-    [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/24.webp",
-      "0604_15 24"
-    ],
-    [
       "landscape-rendering/beijing-shouchuang-rental-apartment/25.webp",
-      "0604_15 25"
-    ],
-    [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/26.webp",
-      "0604_15 26"
-    ],
-    [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/27.webp",
-      "0604_15 27"
-    ],
-    [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/28.webp",
-      "0604_15 28"
-    ],
-    [
-      "landscape-rendering/beijing-shouchuang-rental-apartment/29.webp",
-      "0604_15 29"
+      "0604_15 20"
     ]
   ]
   },
@@ -931,39 +768,23 @@ export const initialWorkProjects = [
     "summary": "郑州常西湖临时样板房以造型松、流水和对景景墙建立现代中式庭院氛围。南北花园通过植物地形营造静谧窗景，看房动线在精致庭院间渐次展开。",
     "body": "项目位于常西湖新区，建筑采用现代风格和极简线条。样板区由入口景墙、对景景墙、南花园与北花园组成，入口流水负责引导视线，植物与微地形塑造安静的室内外借景关系。",
     "media": [
-      [
-        "landscape-rendering/zhengzhou-changxihu/01.webp",
-        "0703_18"
-      ],
-      [
-        "landscape-rendering/zhengzhou-changxihu/02.webp",
-        "0703_31"
-      ],
-      [
-        "landscape-rendering/zhengzhou-changxihu/03.webp",
-        "0703_32"
-      ],
-      [
-        "landscape-rendering/zhengzhou-changxihu/04.webp",
-        "0703_33"
-      ],
-      [
-        "landscape-rendering/zhengzhou-changxihu/05.webp",
-        "0703_34"
-      ],
-      [
-        "landscape-rendering/zhengzhou-changxihu/06.webp",
-        "0703_36"
-      ],
-      [
-        "landscape-rendering/zhengzhou-changxihu/07.webp",
-        "0703_37"
-      ],
-      [
-        "landscape-rendering/zhengzhou-changxihu/08.webp",
-        "0703_38"
-      ]
+    [
+      "landscape-rendering/zhengzhou-changxihu/06.webp",
+      "0703_18 01"
+    ],
+    [
+      "landscape-rendering/zhengzhou-changxihu/07.webp",
+      "0703_18 02"
+    ],
+    [
+      "landscape-rendering/zhengzhou-changxihu/02.webp",
+      "0703_18 03"
+    ],
+    [
+      "landscape-rendering/zhengzhou-changxihu/01.webp",
+      "0703_18 04"
     ]
+  ]
   },
   {
     "id": "beijing-fenzhongsi-residence",
@@ -987,44 +808,16 @@ export const initialWorkProjects = [
       "0617_01 02"
     ],
     [
-      "landscape-rendering/beijing-fenzhongsi-residence/03.webp",
+      "landscape-rendering/beijing-fenzhongsi-residence/07.webp",
       "0617_01 03"
     ],
     [
-      "landscape-rendering/beijing-fenzhongsi-residence/04.webp",
+      "landscape-rendering/beijing-fenzhongsi-residence/09.webp",
       "0617_01 04"
     ],
     [
-      "landscape-rendering/beijing-fenzhongsi-residence/05.webp",
-      "0617_01 05"
-    ],
-    [
-      "landscape-rendering/beijing-fenzhongsi-residence/06.webp",
-      "0617_01 06"
-    ],
-    [
-      "landscape-rendering/beijing-fenzhongsi-residence/07.webp",
-      "0617_01 07"
-    ],
-    [
-      "landscape-rendering/beijing-fenzhongsi-residence/08.webp",
-      "0617_01 08"
-    ],
-    [
-      "landscape-rendering/beijing-fenzhongsi-residence/09.webp",
-      "0617_01 09"
-    ],
-    [
-      "landscape-rendering/beijing-fenzhongsi-residence/10.webp",
-      "0617_01 10"
-    ],
-    [
       "landscape-rendering/beijing-fenzhongsi-residence/11.webp",
-      "0617_01 11"
-    ],
-    [
-      "landscape-rendering/beijing-fenzhongsi-residence/12.webp",
-      "0617_01 12"
+      "0617_01 05"
     ]
   ]
   },
@@ -1058,24 +851,20 @@ export const initialWorkProjects = [
       "0710_01 04"
     ],
     [
-      "landscape-rendering/kunming-jinzeyuan/05.webp",
+      "landscape-rendering/kunming-jinzeyuan/06.webp",
       "0710_01 05"
     ],
     [
-      "landscape-rendering/kunming-jinzeyuan/06.webp",
+      "landscape-rendering/kunming-jinzeyuan/07.webp",
       "0710_01 06"
     ],
     [
-      "landscape-rendering/kunming-jinzeyuan/07.webp",
+      "landscape-rendering/kunming-jinzeyuan/08.webp",
       "0710_01 07"
     ],
     [
-      "landscape-rendering/kunming-jinzeyuan/08.webp",
-      "0710_01 08"
-    ],
-    [
       "landscape-rendering/kunming-jinzeyuan/09.webp",
-      "0710_01 09"
+      "0710_01 08"
     ]
   ]
   },
@@ -1093,64 +882,40 @@ export const initialWorkProjects = [
     "body": "项目位于武江区，展示区紧邻铜鼓大道和北江。设计以诗意山水、现代典雅和广韵文化为方向，把客家建筑的围合空间、窗栅纹样与北江水意转译为精致展示界面。",
     "media": [
     [
-      "landscape-rendering/shaoguan/01.webp",
+      "landscape-rendering/shaoguan/04.webp",
       "0628_01 01"
     ],
     [
-      "landscape-rendering/shaoguan/02.webp",
+      "landscape-rendering/shaoguan/03.webp",
       "0628_01 02"
     ],
     [
-      "landscape-rendering/shaoguan/03.webp",
+      "landscape-rendering/shaoguan/06.webp",
       "0628_01 03"
     ],
     [
-      "landscape-rendering/shaoguan/04.webp",
+      "landscape-rendering/shaoguan/07.webp",
       "0628_01 04"
     ],
     [
-      "landscape-rendering/shaoguan/05.webp",
+      "landscape-rendering/shaoguan/08.webp",
       "0628_01 05"
     ],
     [
-      "landscape-rendering/shaoguan/06.webp",
+      "landscape-rendering/shaoguan/09.webp",
       "0628_01 06"
     ],
     [
-      "landscape-rendering/shaoguan/07.webp",
+      "landscape-rendering/shaoguan/12.webp",
       "0628_01 07"
     ],
     [
-      "landscape-rendering/shaoguan/08.webp",
+      "landscape-rendering/shaoguan/13.webp",
       "0628_01 08"
     ],
     [
-      "landscape-rendering/shaoguan/09.webp",
-      "0628_01 09"
-    ],
-    [
-      "landscape-rendering/shaoguan/10.webp",
-      "0628_01 10"
-    ],
-    [
-      "landscape-rendering/shaoguan/11.webp",
-      "0628_01 11"
-    ],
-    [
-      "landscape-rendering/shaoguan/12.webp",
-      "0628_01 12"
-    ],
-    [
-      "landscape-rendering/shaoguan/13.webp",
-      "0628_01 13"
-    ],
-    [
       "landscape-rendering/shaoguan/14.webp",
-      "0628_01 14"
-    ],
-    [
-      "landscape-rendering/shaoguan/15.webp",
-      "0628_01 15"
+      "0628_01 09"
     ]
   ]
   },
@@ -1172,92 +937,56 @@ export const initialWorkProjects = [
       "0803_01 01"
     ],
     [
-      "landscape-rendering/weifang-commercial/02.webp",
+      "landscape-rendering/weifang-commercial/03.webp",
       "0803_01 02"
     ],
     [
-      "landscape-rendering/weifang-commercial/03.webp",
+      "landscape-rendering/weifang-commercial/04.webp",
       "0803_01 03"
     ],
     [
-      "landscape-rendering/weifang-commercial/04.webp",
+      "landscape-rendering/weifang-commercial/06.webp",
       "0803_01 04"
     ],
     [
-      "landscape-rendering/weifang-commercial/05.webp",
+      "landscape-rendering/weifang-commercial/09.webp",
       "0803_01 05"
     ],
     [
-      "landscape-rendering/weifang-commercial/06.webp",
+      "landscape-rendering/weifang-commercial/11.webp",
       "0803_01 06"
     ],
     [
-      "landscape-rendering/weifang-commercial/07.webp",
+      "landscape-rendering/weifang-commercial/12.webp",
       "0803_01 07"
     ],
     [
-      "landscape-rendering/weifang-commercial/08.webp",
+      "landscape-rendering/weifang-commercial/15.webp",
       "0803_01 08"
     ],
     [
-      "landscape-rendering/weifang-commercial/09.webp",
+      "landscape-rendering/weifang-commercial/16.webp",
       "0803_01 09"
     ],
     [
-      "landscape-rendering/weifang-commercial/10.webp",
+      "landscape-rendering/weifang-commercial/17.webp",
       "0803_01 10"
     ],
     [
-      "landscape-rendering/weifang-commercial/11.webp",
+      "landscape-rendering/weifang-commercial/18.webp",
       "0803_01 11"
     ],
     [
-      "landscape-rendering/weifang-commercial/12.webp",
+      "landscape-rendering/weifang-commercial/19.webp",
       "0803_01 12"
     ],
     [
-      "landscape-rendering/weifang-commercial/13.webp",
+      "landscape-rendering/weifang-commercial/20.webp",
       "0803_01 13"
     ],
     [
-      "landscape-rendering/weifang-commercial/14.webp",
-      "0803_01 14"
-    ],
-    [
-      "landscape-rendering/weifang-commercial/15.webp",
-      "0803_01 15"
-    ],
-    [
-      "landscape-rendering/weifang-commercial/16.webp",
-      "0803_01 16"
-    ],
-    [
-      "landscape-rendering/weifang-commercial/17.webp",
-      "0803_01 17"
-    ],
-    [
-      "landscape-rendering/weifang-commercial/18.webp",
-      "0803_01 18"
-    ],
-    [
-      "landscape-rendering/weifang-commercial/19.webp",
-      "0803_01 19"
-    ],
-    [
-      "landscape-rendering/weifang-commercial/20.webp",
-      "0803_01 20"
-    ],
-    [
-      "landscape-rendering/weifang-commercial/21.webp",
-      "0803_01 21"
-    ],
-    [
-      "landscape-rendering/weifang-commercial/22.webp",
-      "0803_01 22"
-    ],
-    [
       "landscape-rendering/weifang-commercial/23.webp",
-      "0803_01 23"
+      "0803_01 14"
     ]
   ]
   },
@@ -1283,44 +1012,24 @@ export const initialWorkProjects = [
       "0724_11 02"
     ],
     [
-      "landscape-rendering/maoming/03.webp",
+      "landscape-rendering/maoming/05.webp",
       "0724_11 03"
     ],
     [
-      "landscape-rendering/maoming/04.webp",
+      "landscape-rendering/maoming/08.webp",
       "0724_11 04"
     ],
     [
-      "landscape-rendering/maoming/05.webp",
+      "landscape-rendering/maoming/09.webp",
       "0724_11 05"
     ],
     [
-      "landscape-rendering/maoming/06.webp",
+      "landscape-rendering/maoming/10.webp",
       "0724_11 06"
     ],
     [
-      "landscape-rendering/maoming/07.webp",
-      "0724_11 07"
-    ],
-    [
-      "landscape-rendering/maoming/08.webp",
-      "0724_11 08"
-    ],
-    [
-      "landscape-rendering/maoming/09.webp",
-      "0724_11 09"
-    ],
-    [
-      "landscape-rendering/maoming/10.webp",
-      "0724_11 10"
-    ],
-    [
       "landscape-rendering/maoming/11.webp",
-      "0724_11 11"
-    ],
-    [
-      "landscape-rendering/maoming/12.webp",
-      "0724_11 12"
+      "0724_11 07"
     ]
   ]
   },
@@ -1337,35 +1046,31 @@ export const initialWorkProjects = [
     "summary": "哈尔滨江御府临近松花江，以院落、内庭与府邸序列回应现代新东方居住需求。展示区在对称秩序与紧凑转折之间移步异景，营造「园隐方寸、境现东方」的生活画卷。",
     "body": "项目位于松北区滨水地带，建筑兼有中式低层与现代高层。景观延续院落式居住和东方意境，通过展示入口、精致内庭、曲折轴线与未来大区场景传递典雅而宜居的生活氛围。",
     "media": [
-      [
-        "landscape-rendering/harbin-jiangyufu/01.webp",
-        "0813_01"
-      ],
-      [
-        "landscape-rendering/harbin-jiangyufu/02.webp",
-        "0813_05"
-      ],
-      [
-        "landscape-rendering/harbin-jiangyufu/03.webp",
-        "0813_06"
-      ],
-      [
-        "landscape-rendering/harbin-jiangyufu/04.webp",
-        "0813_07"
-      ],
-      [
-        "landscape-rendering/harbin-jiangyufu/05.webp",
-        "0813_08"
-      ],
-      [
-        "landscape-rendering/harbin-jiangyufu/06.webp",
-        "0813_09"
-      ],
-      [
-        "landscape-rendering/harbin-jiangyufu/07.webp",
-        "0813_10"
-      ]
+    [
+      "landscape-rendering/harbin-jiangyufu/01.webp",
+      "0813_01 01"
+    ],
+    [
+      "landscape-rendering/harbin-jiangyufu/02.webp",
+      "0813_01 02"
+    ],
+    [
+      "landscape-rendering/harbin-jiangyufu/03.webp",
+      "0813_01 03"
+    ],
+    [
+      "landscape-rendering/harbin-jiangyufu/04.webp",
+      "0813_01 04"
+    ],
+    [
+      "landscape-rendering/harbin-jiangyufu/06.webp",
+      "0813_01 05"
+    ],
+    [
+      "landscape-rendering/harbin-jiangyufu/07.webp",
+      "0813_01 06"
     ]
+  ]
   },
   {
     "id": "singapore-20191125",

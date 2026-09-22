@@ -10,6 +10,7 @@ type CoverTileProps = {
   wellClass?: string;
   children: ReactNode;
   disabled?: boolean;
+  bootFirst?: boolean;
 };
 
 /**
@@ -23,6 +24,7 @@ export function CoverTile({
   wellClass = "develop-work-well",
   children,
   disabled,
+  bootFirst = false,
 }: CoverTileProps) {
   const [failed, setFailed] = useState(false);
   const [fallbackFailed, setFallbackFailed] = useState(false);
@@ -35,6 +37,7 @@ export function CoverTile({
         <img
           src={href}
           alt=""
+          {...(bootFirst ? { "data-boot-first": "" } : {})}
           onError={() => {
             if (primary) {
               setFailed(true);

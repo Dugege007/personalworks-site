@@ -39,6 +39,7 @@
 [data-skin="strata"] [data-theme="game-dev"],
 [data-skin="strata"] [data-theme="game-design"],
 [data-skin="strata"] [data-theme="game-photo"],
+[data-skin="strata"] [data-theme="ai-photo"],
 [data-skin="strata"] [data-theme="menu"],
 [data-skin="strata"] [data-theme="play"] { --accent: var(--signal); --accent-soft: rgba(224, 138, 76, 0.16); }
 [data-skin="strata"] [data-theme="notes"],

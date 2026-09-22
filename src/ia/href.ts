@@ -3,7 +3,9 @@ import { findCollectionByChannel } from "../content/site";
 import { photoWorkChannels, type WorkRecord } from "../content/works";
 import { strataKindPathDict } from "./strata";
 import type { IaId } from "./types";
-import { hrefForDevelopKind, hrefForDevelopWork } from "./workTree";
+import { hrefForDevelopKind, hrefForDevelopWork, hrefForPhotoCatalog, hrefForPhotoShoots } from "./workTree";
+
+export { hrefForPhotoCatalog, hrefForPhotoShoots };
 
 /**
  * 作品在当前 IA 下的详情地址。摄影始终走既有单帧路径。
@@ -45,6 +47,7 @@ export function channelTitleZh(channel: string): string {
     [lexicon.humanistPhoto.key]: lexicon.humanistPhoto.zh,
     [lexicon.portraitPhoto.key]: lexicon.portraitPhoto.zh,
     [lexicon.gamePhoto.key]: lexicon.gamePhoto.zh,
+    [lexicon.aiPhoto.key]: lexicon.aiPhoto.zh,
   };
   return table[channel] ?? channel;
 }

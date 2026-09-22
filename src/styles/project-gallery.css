@@ -88,9 +88,29 @@
   outline-offset: 3px;
 }
 
+/* 列表：首栏独立，侧栏自排，避免首图跨行把右侧行高撑出空缺。 */
 .project-gallery.is-twin .project-gallery-images {
-  grid-template-columns: 2.1fr repeat(3, minmax(0, 1fr));
+  grid-template-columns: 2.1fr 3fr;
   align-items: start;
+}
+
+.project-gallery.is-twin .project-gallery-side {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  align-items: start;
+  min-width: 0;
+}
+
+.project-gallery.is-twin .project-gallery-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.project-gallery.is-twin .project-gallery-pack {
+  min-width: 0;
 }
 
 /* 详情：横图按行从左到右，两列一对，避免瀑布流竖向填列打乱顺序。 */
@@ -117,7 +137,7 @@
 }
 
 .project-gallery.is-twin .project-gallery-shot.is-main {
-  grid-row: span 2;
+  min-width: 0;
 }
 
 .project-gallery.is-twin .project-gallery-shot.is-stack {
@@ -208,15 +228,18 @@
   }
 
   .project-gallery.is-twin .project-gallery-images {
+    grid-template-columns: 1fr;
+  }
+
+  .project-gallery.is-twin .project-gallery-side {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .project-gallery.is-twin .project-gallery-shot.is-main {
-    grid-column: 1 / -1;
-    grid-row: auto;
+  .project-gallery.is-twin.is-preview .project-gallery-col:nth-child(n + 3) {
+    display: none;
   }
 
-  .project-gallery.is-twin.is-preview .project-gallery-shot:nth-child(n + 4) {
+  .project-gallery.is-twin.is-preview .project-gallery-pack:not([data-side-index="0"]):not([data-side-index="1"]) {
     display: none;
   }
 
@@ -234,7 +257,7 @@
     grid-template-columns: 1fr;
   }
 
-  .project-gallery.is-twin.is-preview .project-gallery-shot:nth-child(n + 2) {
+  .project-gallery.is-twin.is-preview .project-gallery-side {
     display: none;
   }
 }

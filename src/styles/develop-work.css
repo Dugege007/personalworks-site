@@ -38,6 +38,17 @@
   border-bottom: 1px solid var(--text);
 }
 
+.develop-work-textlinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-top: 20px;
+}
+
+.develop-work-textlinks .develop-work-textlink {
+  margin-top: 0;
+}
+
 .develop-work-copy {
   position: absolute;
   left: 22px;
@@ -150,6 +161,7 @@
 }
 
 .develop-work-well.is-channel-game-photo,
+.develop-work-well.is-channel-ai-photo,
 .develop-work-well.is-game {
   background:
     linear-gradient(180deg, rgb(196 92 62 / 0.2), transparent 60%),
@@ -305,6 +317,28 @@
 .develop-kind-doors[data-count="4"] .develop-kind-door:nth-child(1) { flex-grow: 1.4; }
 .develop-kind-doors[data-count="4"] .develop-kind-door:nth-child(4) { border-right: 0; }
 
+.develop-kind-doors[data-count="5"] {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.develop-kind-doors[data-count="5"] .develop-kind-door:nth-child(-n + 3) {
+  grid-column: span 2;
+}
+
+.develop-kind-doors[data-count="5"] .develop-kind-door:nth-child(n + 4) {
+  grid-column: span 3;
+}
+
+.develop-kind-doors[data-count="5"] .develop-kind-door:nth-child(3),
+.develop-kind-doors[data-count="5"] .develop-kind-door:nth-child(5) {
+  border-right: 0;
+}
+
+.develop-kind-doors[data-count="5"] .develop-kind-door:nth-child(n + 4) {
+  border-top: 1px solid rgb(238 240 242 / 0.1);
+}
+
 /* 第三层：细目条目 */
 .develop-channel {
   padding: 0 0 72px;
@@ -431,6 +465,11 @@
   .develop-kind-doors {
     flex-direction: column;
     min-height: 0;
+    grid-template-columns: 1fr;
+  }
+
+  .develop-kind-doors[data-count="5"] .develop-kind-door:nth-child(n + 4) {
+    border-top: 0;
   }
 
   .develop-kind-door,
@@ -438,8 +477,10 @@
   .develop-kind-doors[data-count="2"] .develop-kind-door:first-child,
   .develop-kind-doors[data-count="3"] .develop-kind-door:nth-child(1),
   .develop-kind-doors[data-count="3"] .develop-kind-door:nth-child(2),
-  .develop-kind-doors[data-count="3"] .develop-kind-door:nth-child(3) {
+  .develop-kind-doors[data-count="3"] .develop-kind-door:nth-child(3),
+  .develop-kind-doors[data-count="5"] .develop-kind-door {
     flex: none;
+    grid-column: auto;
     min-height: 38vh;
     border-right: 0;
     border-bottom: 1px solid rgb(238 240 242 / 0.1);

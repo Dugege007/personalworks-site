@@ -8,6 +8,7 @@ import {
   type TransitionEvent,
 } from "react";
 import { createPortal } from "react-dom";
+import { Link } from "react-router-dom";
 import type { PhotoExif } from "../../content/photoExif";
 import { pausePageLenis, resumePageLenis } from "../../hooks/useLenis";
 import { resolveLead } from "../../content/copyDisplay";
@@ -26,11 +27,20 @@ export type LightboxShot = {
   exif?: PhotoExif;
 };
 
+/** 总览灯箱回拍摄详情；详情灯箱不传。 */
+export type LightboxViewAll = {
+  href: string;
+  title: string;
+  from?: string;
+};
+
 type ImageLightboxProps = {
   images: LightboxShot[];
   index: number;
   title: string;
   summary?: string;
+  /** 有值时右侧用「查看全部 {title}」替换只读拍摄名。 */
+  viewAll?: LightboxViewAll;
   videoProgressRef?: MutableRefObject<Map<string, number>>;
   onVideoTime?: (src: string, time: number) => void;
   videoMuted?: boolean;
@@ -136,6 +146,7 @@ export function ImageLightbox({
   index,
   title,
   summary,
+  viewAll,
   videoProgressRef,
   onVideoTime,
   videoMuted = true,
@@ -305,6 +316,21 @@ export function ImageLightbox({
     root.addEventListener("wheel", onWheel, { passive: false });
     return () => root.removeEventListener("wheel", onWheel);
   }, [images.length, onNext, onPrev]);
+
+  useEffect(() => {
+    if (images.length < 2) {
+      return;
+    }
+    const neighbors = [images[(index - 1 + images.length) % images.length], images[(index + 1) % images.length]];
+    const currentSrc = images[index]?.src;
+    for (const shot of neighbors) {
+      if (!shot || shot.kind === "video" || shot.src === currentSrc) {
+        continue;
+      }
+      const preload = new Image();
+      preload.src = assetUrl(shot.src);
+    }
+  }, [images, index]);
 
   useEffect(() => {
     if (!zoomed) {
@@ -492,10 +518,20 @@ export function ImageLightbox({
           <div className={`lrb-lightbox-dock${current.exif ? " has-exif" : ""}`}>
             <PhotoExifStrip exif={current.exif} />
             <div className="lrb-lightbox-copy">
-              {current.label || (title && title !== current.label) ? (
+              {current.label || viewAll || (title && title !== current.label) ? (
                 <div className="lrb-lightbox-names">
                   {current.label ? <p className="lrb-lightbox-shot">{current.label}</p> : null}
-                  {title && title !== current.label ? <p className="lrb-lightbox-title">{title}</p> : null}
+                  {viewAll ? (
+                    <Link
+                      className="lrb-lightbox-title lrb-lightbox-viewall"
+                      to={viewAll.href}
+                      state={viewAll.from ? { from: viewAll.from } : undefined}
+                    >
+                      查看全部 {viewAll.title}
+                    </Link>
+                  ) : title && title !== current.label ? (
+                    <p className="lrb-lightbox-title">{title}</p>
+                  ) : null}
                 </div>
               ) : null}
               {resolveLead(summary) ? <p className="lrb-lightbox-lead">{resolveLead(summary)}</p> : null}

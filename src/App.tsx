@@ -1,5 +1,7 @@
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import { lexicon } from "./content/lexicon";
+import { photoWorkChannels } from "./content/works";
+import { hrefForPhotoCatalog } from "./ia/workTree";
 import { SiteShell } from "./layouts/SiteShell";
 import { AboutPage } from "./pages/AboutPage";
 import { CategoryPage } from "./pages/CategoryPage";
@@ -10,6 +12,7 @@ import { HomePage } from "./pages/HomePage";
 import { NoteDetailPage } from "./pages/NoteDetailPage";
 import { NotesPage } from "./pages/NotesPage";
 import { PhotoCatalogPage } from "./pages/PhotoCatalogPage";
+import { PhotoShootsPage } from "./pages/PhotoShootsPage";
 import { ResumePage } from "./pages/ResumePage";
 import { SkillsPage } from "./pages/SkillsPage";
 import { WorkChannelPage } from "./pages/WorkChannelPage";
@@ -24,6 +27,17 @@ type RedirectIdProps = {
 function RedirectId({ to }: RedirectIdProps) {
   const { id } = useParams();
   return <Navigate to={to(id ?? "")} replace />;
+}
+
+/**
+ * 旧摄影细目列表直达带筛选的总览，避免先闪条目墙。
+ */
+function RedirectPhotoIndexChannel() {
+  const { channel } = useParams();
+  if (channel && (photoWorkChannels as readonly string[]).includes(channel)) {
+    return <Navigate to={hrefForPhotoCatalog(channel)} replace />;
+  }
+  return <WorkChannelPage />;
 }
 
 const twinSim = `/${lexicon.twinAndSim.key}`;
@@ -46,6 +60,10 @@ export function App() {
         <Route path="/" element={<HomePage />} />
         <Route path={`/${lexicon.workIndex.key}`} element={<WorkIndexPage />} />
         <Route path={`/${lexicon.workIndex.key}/:kind/:channel/:id`} element={<WorkDetailPage />} />
+        <Route
+          path={`/${lexicon.workIndex.key}/${lexicon.photography.key}/:channel`}
+          element={<RedirectPhotoIndexChannel />}
+        />
         <Route path={`/${lexicon.workIndex.key}/:kind/:channel`} element={<WorkChannelPage />} />
         <Route path={`/${lexicon.workIndex.key}/:kind`} element={<WorkIndexSegmentPage />} />
         <Route path={`/${lexicon.profileResume.key}`} element={<ResumePage />} />
@@ -58,6 +76,7 @@ export function App() {
         <Route path={`${landscapeCDs}/:id`} element={<WorkDetailPage />} />
         <Route path={photo} element={<CategoryPage categoryId={lexicon.photography.key} />} />
         <Route path={`${photo}/${lexicon.photoCatalog.key}`} element={<PhotoCatalogPage />} />
+        <Route path={`${photo}/${lexicon.photoShoots.key}`} element={<PhotoShootsPage />} />
         <Route path={`${landscapePhoto}/:id`} element={<WorkDetailPage />} />
         <Route path={`${humanistPhoto}/:id`} element={<WorkDetailPage />} />
         <Route path={`${portraitPhoto}/:id`} element={<WorkDetailPage />} />

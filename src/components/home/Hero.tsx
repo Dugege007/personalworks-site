@@ -55,6 +55,7 @@ export function Hero() {
               className="portrait-photo"
               src={assetUrl(profile.portraitSrc)}
               alt={`${profile.name} / ${lexicon.profile.zh}`}
+              data-boot-first=""
             />
           ) : null}
           <div className="portrait-grid" />

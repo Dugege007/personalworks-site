@@ -93,6 +93,24 @@ export function hrefForDevelopChannel(kind: string, channel: string): string {
 }
 
 /**
+ * 摄影总览地址；可选预选题材。
+ */
+export function hrefForPhotoCatalog(channel?: string): string {
+  const path = `/${lexicon.photography.key}/${lexicon.photoCatalog.key}`;
+  if (!channel) {
+    return path;
+  }
+  return `${path}?channel=${encodeURIComponent(channel)}`;
+}
+
+/**
+ * 拍摄列表地址。
+ */
+export function hrefForPhotoShoots(): string {
+  return `/${lexicon.photography.key}/${lexicon.photoShoots.key}`;
+}
+
+/**
  * 显影项目详情地址；带门类与细目以免 id 跨 channel 撞名。
  */
 export function hrefForDevelopWork(work: WorkRecord): string {
@@ -188,7 +206,10 @@ export function listDevelopChannelDoors(kind: string): DevelopChannelDoor[] {
       en: collection.titleEn,
       deco: collection.titleDeco,
       lead: collection.lead,
-      href: hrefForDevelopChannel(kind, collection.id),
+      href:
+        kind === lexicon.photography.key && !collection.comingSoon
+          ? hrefForPhotoCatalog(collection.id)
+          : hrefForDevelopChannel(kind, collection.id),
       comingSoon: collection.comingSoon,
       coverSrc: firstCoverSrc(works) ?? `${collection.id}/stock/01.webp`,
       count: works.length,
@@ -230,6 +251,9 @@ export function shotsOfKind(kind: string): string[] {
     for (const game of gameProjects) {
       add(game.coverSrc);
       for (const shot of game.screenshots) {
+        if (shot.kind === "video") {
+          continue;
+        }
         add(shot.src);
       }
     }

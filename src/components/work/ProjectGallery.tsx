@@ -7,6 +7,7 @@ import { resolveLead, resolveMediaDescription } from "../../content/copyDisplay"
 import { ImageLightbox, type LightboxShot } from "./ImageLightbox";
 import { InlineWorkVideo } from "./InlineWorkVideo";
 import "../../styles/photo-masonry.css";
+import "../../styles/placeholder.css";
 import "../../styles/project-gallery.css";
 
 export type ProjectGalleryShot = ProjectAlbumShot;
@@ -19,7 +20,7 @@ export type ProjectGalleryItem = {
   summary?: string;
   href?: string;
   images: ProjectGalleryShot[];
-  /** 灯箱序列；缺省时用 images。列表预览可只铺静帧，翻页仍走全量。 */
+  /** 灯箱序列；缺省时用 images。列表预览与灯箱均按 media 原序，含视频。 */
   shots?: ProjectGalleryShot[];
 };
 
@@ -46,12 +47,13 @@ function shotIndexInSequence(sequence: ProjectGalleryShot[], src: string): numbe
   return index >= 0 ? index : 0;
 }
 
-function AlbumFace({ image }: { image: ProjectGalleryShot }) {
+function AlbumFace({ image, bootFirst = false }: { image: ProjectGalleryShot; bootFirst?: boolean }) {
+  const bootAttr = bootFirst ? { "data-boot-first": "" } : {};
   if (image.kind === "video" && !image.poster) {
-    return <video src={assetUrl(image.src)} muted playsInline preload="metadata" />;
+    return <video src={assetUrl(image.src)} muted playsInline preload="metadata" {...bootAttr} />;
   }
   const src = image.kind === "video" && image.poster ? image.poster : image.src;
-  return <img src={assetUrl(src)} alt="" loading="lazy" />;
+  return <img src={assetUrl(src)} alt="" loading={bootFirst ? "eager" : "lazy"} {...bootAttr} />;
 }
 
 /**
@@ -156,14 +158,63 @@ export function ProjectGallery({
       className={`project-gallery is-${variant}${previewLimit != null ? " is-preview" : ""}`}
       ref={galleryRef}
     >
-      {projects.map((project) => {
+      {projects.map((project, projectIndex) => {
         const isTwinPreview = variant === "twin" && previewLimit != null;
         const preview = isTwinPreview
           ? planAlbumPreview(project.images.length, previewLimit)
           : { visibleCount: project.images.length, overflow: false };
         const tiles = project.images.slice(0, preview.visibleCount);
+        const mainTile = tiles[0];
+        const sideTiles = isTwinPreview ? tiles.slice(1) : [];
         const useMasonry = variant === "photo";
         const useTwinFlow = variant === "twin" && !isTwinPreview;
+        const renderShot = (image: ProjectGalleryShot, index: number) => {
+          const isStack = preview.overflow && index === tiles.length - 1 && Boolean(project.href);
+          const bootFirst = projectIndex === 0 && index === 0;
+          const bootAttr = bootFirst ? { "data-boot-first": "" } : {};
+          const shotClass = `project-gallery-shot${isTwinPreview && index === 0 ? " is-main" : ""}${isStack ? " is-stack" : ""}`;
+          if (isStack && project.href) {
+            return (
+              <Link
+                className={shotClass}
+                to={project.href}
+                key={`${image.src}-stack`}
+                aria-label={`进入${project.title}项目页`}
+              >
+                <span className="project-gallery-stack-leaf" aria-hidden="true" />
+                <span className="project-gallery-stack-leaf" aria-hidden="true" />
+                <AlbumFace image={image} bootFirst={bootFirst} />
+              </Link>
+            );
+          }
+          if (image.kind === "video") {
+            return (
+              <InlineWorkVideo
+                key={image.src}
+                className={shotClass}
+                src={image.src}
+                poster={image.poster}
+                label={image.label}
+                title={project.title}
+                paused={open !== null}
+                syncTime={videoClock[image.src]}
+                bootFirst={bootFirst}
+                onOpen={() => openBySrc(project.id, image.src, true)}
+              />
+            );
+          }
+          return (
+            <button
+              className={shotClass}
+              type="button"
+              key={image.src}
+              onClick={() => openBySrc(project.id, image.src)}
+              aria-label={`查看${project.title} ${image.label}`}
+            >
+              <img src={assetUrl(image.src)} alt="" loading={bootFirst ? "eager" : "lazy"} {...bootAttr} />
+            </button>
+          );
+        };
         return (
         <article className={`project-gallery-item${showHead ? "" : " is-bare"}`} key={project.id}>
           {showHead ? (
@@ -187,50 +238,30 @@ export function ProjectGallery({
             }
             data-count={useMasonry || useTwinFlow ? tiles.length : undefined}
           >
-            {tiles.map((image, index) => {
-              const isStack = preview.overflow && index === tiles.length - 1 && Boolean(project.href);
-              const shotClass = `project-gallery-shot${isTwinPreview && index === 0 ? " is-main" : ""}${isStack ? " is-stack" : ""}`;
-              if (isStack && project.href) {
-                return (
-                  <Link
-                    className={shotClass}
-                    to={project.href}
-                    key={`${image.src}-stack`}
-                    aria-label={`进入${project.title}项目页`}
-                  >
-                    <span className="project-gallery-stack-leaf" aria-hidden="true" />
-                    <span className="project-gallery-stack-leaf" aria-hidden="true" />
-                    <AlbumFace image={image} />
-                  </Link>
-                );
-              }
-              if (image.kind === "video") {
-                return (
-                  <InlineWorkVideo
-                    key={image.src}
-                    className={shotClass}
-                    src={image.src}
-                    poster={image.poster}
-                    label={image.label}
-                    title={project.title}
-                    paused={open !== null}
-                    syncTime={videoClock[image.src]}
-                    onOpen={() => openBySrc(project.id, image.src, true)}
-                  />
-                );
-              }
-              return (
-                <button
-                  className={shotClass}
-                  type="button"
-                  key={image.src}
-                  onClick={() => openBySrc(project.id, image.src)}
-                  aria-label={`查看${project.title} ${image.label}`}
-                >
-                  <img src={assetUrl(image.src)} alt="" loading="lazy" />
-                </button>
-              );
-            })}
+            {isTwinPreview && mainTile && sideTiles.length > 0 ? (
+              <>
+                {renderShot(mainTile, 0)}
+                <div className="project-gallery-side">
+                  {Array.from({ length: 3 }, (_, column) => (
+                    <div className="project-gallery-col" key={column}>
+                      {sideTiles.map((image, sideIndex) =>
+                        sideIndex % 3 === column ? (
+                          <div
+                            className="project-gallery-pack"
+                            data-side-index={sideIndex}
+                            key={image.src}
+                          >
+                            {renderShot(image, sideIndex + 1)}
+                          </div>
+                        ) : null,
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              tiles.map((image, index) => renderShot(image, index))
+            )}
           </div>
         </article>
         );

@@ -7,6 +7,7 @@ import { iaOfSkin } from "../ia";
 import { hrefForWork, channelTitleZh } from "../ia/href";
 import {
   hrefForDevelopKind,
+  hrefForPhotoCatalog,
   isChannelOfKind,
   isDevelopWorkKind,
   kindTitle,
@@ -14,7 +15,7 @@ import {
 } from "../ia/workTree";
 import { studioAliasForDisplay } from "../content/studios";
 import { TWIN_PREVIEW_LIMIT, toProjectAlbumShots } from "../content/projectAlbum";
-import { listPublishedWorks, listWorkImages, listWorkShots } from "../content/works";
+import { listPublishedWorks, listWorkShots, photoWorkChannels } from "../content/works";
 import { stockPlaceholderSrc, workCoverSrc } from "../content/stockMedia";
 import { resolveLead } from "../content/copyDisplay";
 import { findCollectionByChannel, playableGames } from "../content/site";
@@ -38,6 +39,10 @@ export function WorkChannelPage() {
   const channelKey = channel ?? "";
   const door = listDevelopChannelDoors(kind).find((item) => item.channel === channelKey);
   const isGameMenu = kind === lexicon.gameDev.key && channelKey === lexicon.gameMenu.key;
+
+  if (kind === lexicon.photography.key && (photoWorkChannels as readonly string[]).includes(channelKey)) {
+    return <Navigate to={hrefForPhotoCatalog(channelKey)} replace />;
+  }
 
   if (door?.comingSoon) {
     return (
@@ -87,6 +92,7 @@ export function WorkChannelPage() {
               to={`/${lexicon.gameDev.key}/${game.id}`}
               src={game.coverSrc}
               fallbackSrc={stockPlaceholderSrc(lexicon.gameDev.key, index + 1)}
+              bootFirst={index === 0}
             >
               <strong>{game.title}</strong>
               <em>{game.titleEn}</em>
@@ -137,7 +143,7 @@ export function WorkChannelPage() {
               place: work.place,
               summary: work.summary,
               href: hrefForWork(work, ia.id),
-              images: toProjectAlbumShots(listWorkImages(work)),
+              images: toProjectAlbumShots(listWorkShots(work)),
               shots: toProjectAlbumShots(listWorkShots(work)),
             }))}
           />
@@ -158,6 +164,7 @@ export function WorkChannelPage() {
                 to={hrefForWork(work, ia.id)}
                 src={src}
                 fallbackSrc={stockPlaceholderSrc(work.channel, index + 1)}
+                bootFirst={index === 0}
               >
                 <strong>{work.title}</strong>
                 <em>{studio ? `${work.year} · ${studio}` : work.year}</em>

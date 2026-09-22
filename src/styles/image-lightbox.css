@@ -241,6 +241,24 @@ html[data-lightbox="open"] .drawer {
   text-align: right;
 }
 
+.lrb-lightbox-viewall {
+  overflow: hidden;
+  min-width: 0;
+  max-width: min(55%, 16em);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.lrb-lightbox-viewall:hover {
+  text-decoration: underline;
+}
+
+.lrb-lightbox-viewall:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .lrb-lightbox-lead {
   margin: 0;
   color: var(--muted);

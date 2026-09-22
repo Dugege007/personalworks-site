@@ -3,6 +3,29 @@ import { assetUrl } from "../../lib/assets";
 
 const LOOP_GAP_MS = 1000;
 
+/**
+ * 页内视频格左上角标，列表与效果图条共用。
+ */
+export function VideoKindMark() {
+  return (
+    <span className="media-frame-kind" aria-hidden="true">
+      <svg
+        className="media-frame-kind-mark"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" />
+        <rect x="2" y="6" width="14" height="12" rx="2" />
+      </svg>
+      视频
+    </span>
+  );
+}
+
 type InlineWorkVideoProps = {
   src: string;
   poster?: string;
@@ -11,6 +34,7 @@ type InlineWorkVideoProps = {
   paused: boolean;
   syncTime?: number;
   className?: string;
+  bootFirst?: boolean;
   onOpen: () => void;
 };
 
@@ -18,7 +42,7 @@ type InlineWorkVideoProps = {
  * 页内视频框：整框进入视口后自动播，离开即停；播完停 1 秒再从头循环。
  * 无条件静音，不提供音量控件；静音与音量只在灯箱 / 全屏里改。
  */
-export function InlineWorkVideo({ src, poster, label, title, paused, syncTime, className, onOpen }: InlineWorkVideoProps) {
+export function InlineWorkVideo({ src, poster, label, title, paused, syncTime, className, bootFirst = false, onOpen }: InlineWorkVideoProps) {
   const frameRef = useRef<HTMLButtonElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const visibleRef = useRef(false);
@@ -129,23 +153,10 @@ export function InlineWorkVideo({ src, poster, label, title, paused, syncTime, c
         muted
         playsInline
         preload="metadata"
+        {...(bootFirst ? { "data-boot-first": "" } : {})}
         onEnded={onEnded}
       />
-      <span className="media-frame-kind" aria-hidden="true">
-        <svg
-          className="media-frame-kind-mark"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" />
-          <rect x="2" y="6" width="14" height="12" rx="2" />
-        </svg>
-        视频
-      </span>
+      <VideoKindMark />
     </button>
   );
 }

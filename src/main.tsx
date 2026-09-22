@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { App } from "./App";
+import { releaseSiteBootWhenFirstScreenReady } from "./lib/siteBoot";
 import { PrefsProvider } from "./prefs/PrefsProvider";
 import "./styles/global.css";
 
@@ -20,17 +21,4 @@ createRoot(root).render(
   </StrictMode>,
 );
 
-const signalSiteReady = () => {
-  window.__siteBoot?.ready();
-};
-
-const holdPreview =
-  import.meta.env.DEV && new URLSearchParams(window.location.search).has("boot");
-
-if (holdPreview) {
-  window.setTimeout(signalSiteReady, 4500);
-} else {
-  requestAnimationFrame(() => {
-    requestAnimationFrame(signalSiteReady);
-  });
-}
+releaseSiteBootWhenFirstScreenReady();

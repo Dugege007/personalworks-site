@@ -17,7 +17,7 @@ export type AlbumPreviewPlan = {
 };
 
 /**
- * 孪生 / 仿真列表预览：最多 7 格。超过 7 张静帧时末格改叠层。
+ * 孪生 / 仿真列表预览：最多 7 格。超过 7 条媒体（静帧与视频）时末格改叠层。
  */
 export function planAlbumPreview(imageCount: number, limit = TWIN_PREVIEW_LIMIT): AlbumPreviewPlan {
   if (imageCount <= limit) {

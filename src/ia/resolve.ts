@@ -3,9 +3,11 @@ import { findCollectionByChannel } from "../content/site";
 import { findPublishedWorksById, photoWorkChannels } from "../content/works";
 import { strataKindPathDict } from "./strata";
 import type { IaId } from "./types";
+import { splitHref } from "./photoNav";
 import {
   hrefForDevelopChannel,
   hrefForDevelopKind,
+  hrefForPhotoCatalog,
   parseWorkIndexPath,
   workIndexRoot,
 } from "./workTree";
@@ -35,6 +37,13 @@ function mapToDevelop(pathname: string, search: string): ResolvedPath {
   if (pathname === "/" || pathname === `/${lexicon.profileResume.key}` || pathname === `/${lexicon.profileSkills.key}`) {
     return stay;
   }
+  const parsed = parseWorkIndexPath(pathname);
+  if (parsed?.layer === "channel" && parsed.kind === lexicon.photography.key) {
+    const catalog = mapPhotoChannelToCatalog(parsed.channel);
+    if (catalog) {
+      return catalog;
+    }
+  }
   if (pathname === workIndexRoot() || pathname.startsWith(`${workIndexRoot()}/`)) {
     return stay;
   }
@@ -53,7 +62,7 @@ function mapToDevelop(pathname: string, search: string): ResolvedPath {
   if (pathname === `/${lexicon.photography.key}`) {
     return { pathname: hrefForDevelopKind(lexicon.photography.key), search: "" };
   }
-  if (pathname === `/${lexicon.photography.key}/${lexicon.photoCatalog.key}` || isPhotoDetail(pathname)) {
+  if (isSharedPhotoPath(pathname) || isPhotoDetail(pathname)) {
     return stay;
   }
   if (isGamePlay(pathname)) {
@@ -81,7 +90,7 @@ function mapToStrata(pathname: string, search: string): ResolvedPath {
   if (parsed) {
     return mapWorkIndexToStrata(parsed, search);
   }
-  if (pathname === `/${lexicon.photography.key}/${lexicon.photoCatalog.key}` || isPhotoDetail(pathname)) {
+  if (isSharedPhotoPath(pathname) || isPhotoDetail(pathname)) {
     return stay;
   }
   if (isGamePlay(pathname)) {
@@ -122,6 +131,9 @@ function mapWorkIndexToStrata(
     if (parsed.kind === lexicon.gameDev.key && parsed.channel === lexicon.gameMenu.key) {
       return { pathname: `/${lexicon.gameDev.key}/${lexicon.gameMenu.key}`, search: "" };
     }
+    if (parsed.kind === lexicon.photography.key) {
+      return mapPhotoChannelToCatalog(parsed.channel) ?? { pathname: `/${lexicon.photography.key}`, search: "" };
+    }
     if (strataKindPathDict[parsed.kind]) {
       return { pathname: strataKindPathDict[parsed.kind], search: "" };
     }
@@ -154,6 +166,22 @@ function mapStrataDetailToDevelop(pathname: string): ResolvedPath | undefined {
     };
   }
   return undefined;
+}
+
+function mapPhotoChannelToCatalog(channel: string): ResolvedPath | undefined {
+  const collection = findCollectionByChannel(channel);
+  if (!collection || collection.comingSoon) {
+    return undefined;
+  }
+  if (!photoTypeSet.has(channel)) {
+    return undefined;
+  }
+  return splitHref(hrefForPhotoCatalog(channel));
+}
+
+function isSharedPhotoPath(pathname: string): boolean {
+  const root = `/${lexicon.photography.key}`;
+  return pathname === `${root}/${lexicon.photoCatalog.key}` || pathname === `${root}/${lexicon.photoShoots.key}`;
 }
 
 function isPhotoDetail(pathname: string): boolean {

@@ -19,6 +19,8 @@ html {
   color: var(--text);
   /* 经典滚动条占位固定，避免 overflow 切换时版心左右跳 */
   scrollbar-gutter: stable;
+  /* 关掉手机内核点按可交互元素时的默认蓝底高亮 */
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Lenis.stop() 默认 overflow:clip，会藏掉滚动条并挤动中间内容。

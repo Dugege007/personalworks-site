@@ -15,7 +15,7 @@ test("预览格：不足或正好 7 张不叠层", () => {
   });
 });
 
-test("预览格：超过 7 张静帧时末格叠层，仍只露 7 格", () => {
+test("预览格：超过 7 条媒体时末格叠层，仍只露 7 格", () => {
   assert.deepEqual(planAlbumPreview(8), { visibleCount: 7, overflow: true });
   assert.deepEqual(planAlbumPreview(12), { visibleCount: 7, overflow: true });
 });

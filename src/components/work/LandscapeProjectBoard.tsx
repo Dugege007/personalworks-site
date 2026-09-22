@@ -16,14 +16,16 @@ import { studioAliasForDisplay } from "../../content/studios";
 import {
   formatShotCaption,
   formatStartedOn,
-  listWorkImages,
+  listWorkShots,
   type WorkRecord,
 } from "../../content/works";
 import { pausePageLenis, resumePageLenis } from "../../hooks/useLenis";
 import { assetUrl } from "../../lib/assets";
 import { ImageLightbox } from "./ImageLightbox";
+import { VideoKindMark } from "./InlineWorkVideo";
 import { NavMark } from "./NavMarks";
 import "../../styles/develop-landscape-board.css";
+import "../../styles/placeholder.css";
 
 type LandscapeProjectBoardProps = {
   works: WorkRecord[];
@@ -66,7 +68,7 @@ export function LandscapeProjectBoard({ works, showHead = true }: LandscapeProje
   const activeImages = useMemo(
     () =>
       activeWork
-        ? listWorkImages(activeWork).flatMap((item) =>
+        ? listWorkShots(activeWork).flatMap((item) =>
             item.src
               ? [
                   {
@@ -74,6 +76,8 @@ export function LandscapeProjectBoard({ works, showHead = true }: LandscapeProje
                     alt: `${activeWork.title} ${resolveMediaDisplayName(item)}`,
                     label: resolveMediaDisplayName(item),
                     description: item.description,
+                    kind: item.kind,
+                    poster: item.poster,
                   },
                 ]
               : [],
@@ -90,7 +94,7 @@ export function LandscapeProjectBoard({ works, showHead = true }: LandscapeProje
           return current;
         }
         const work = works.find((item) => item.id === current.workId);
-        const count = work ? listWorkImages(work).length : 0;
+        const count = work ? listWorkShots(work).length : 0;
         if (count === 0) {
           return current;
         }
@@ -107,11 +111,12 @@ export function LandscapeProjectBoard({ works, showHead = true }: LandscapeProje
 
   return (
     <div className="lrb">
-      {works.map((work) => (
+      {works.map((work, index) => (
         <ProjectModule
           key={work.id}
           work={work}
           showHead={showHead}
+          bootFirst={index === 0}
           syncIndex={open?.workId === work.id ? open.index : null}
           onOpen={(index) => setOpen({ workId: work.id, index })}
         />
@@ -137,6 +142,7 @@ export function LandscapeProjectBoard({ works, showHead = true }: LandscapeProje
 type ProjectModuleProps = {
   work: WorkRecord;
   showHead?: boolean;
+  bootFirst?: boolean;
   syncIndex: number | null;
   onOpen: (index: number) => void;
 };
@@ -159,8 +165,8 @@ function wheelDelta(event: WheelEvent) {
   return raw;
 }
 
-function ProjectModule({ work, showHead = true, syncIndex, onOpen }: ProjectModuleProps) {
-  const shots = listWorkImages(work);
+function ProjectModule({ work, showHead = true, bootFirst = false, syncIndex, onOpen }: ProjectModuleProps) {
+  const shots = listWorkShots(work);
   const count = shots.length;
   const looping = count >= 2;
   const [focusIndex, setFocusIndex] = useState(() => (count >= 2 ? count : 0));
@@ -599,7 +605,13 @@ function ProjectModule({ work, showHead = true, syncIndex, onOpen }: ProjectModu
                   }}
                   onClick={() => onShotClick(slot, logical)}
                 >
-                  <img src={shot.src ? assetUrl(shot.src) : ""} alt="" draggable={false} />
+                  <img
+                    src={assetUrl(shot.kind === "video" && shot.poster ? shot.poster : (shot.src ?? ""))}
+                    alt=""
+                    draggable={false}
+                    {...(bootFirst && focused ? { "data-boot-first": "" } : {})}
+                  />
+                  {shot.kind === "video" ? <VideoKindMark /> : null}
                   {focused ? (
                     <span className="lrb-shot-cap">
                       {formatShotCaption(logical, count, resolveMediaDisplayName(shot))}

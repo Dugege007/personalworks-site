@@ -48,9 +48,14 @@ export function WorkKindPage({ kind }: WorkKindViewProps) {
     <div className="develop-kind" data-theme={kind}>
       <ChannelHead backTo={workIndexRoot()} backLabel={lexicon.workIndex.zh} title={title} lead={lead}>
         {photoKind ? (
-          <Link className="develop-work-textlink" to={`/${lexicon.photography.key}/${lexicon.photoCatalog.key}`}>
-            {lexicon.photoCatalog.zh}
-          </Link>
+          <div className="develop-work-textlinks">
+            <Link className="develop-work-textlink" to={`/${lexicon.photography.key}/${lexicon.photoCatalog.key}`}>
+              {lexicon.photoCatalog.zh}
+            </Link>
+            <Link className="develop-work-textlink" to={`/${lexicon.photography.key}/${lexicon.photoShoots.key}`}>
+              {lexicon.photoShoots.zh}
+            </Link>
+          </div>
         ) : null}
         {gameKind && playableGames.length > 0 ? (
           <Link

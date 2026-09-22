@@ -80,11 +80,29 @@ export const lexicon = {
     deco: "GAME PHOTO",
     key: "game-photo",
   },
+  aiPhoto: {
+    zh: "AI摄影",
+    en: "AI Photography",
+    deco: "AI PHOTO",
+    key: "ai-photo",
+  },
+  realWorldPhoto: {
+    zh: "现实摄影",
+    en: "Real-world Photography",
+    deco: "REAL-WORLD",
+    key: "real-world-photo",
+  },
   photoCatalog: {
-    zh: "摄影总览",
+    zh: "照片总览",
     en: "Photography Catalog",
     deco: "CATALOG",
     key: "catalog",
+  },
+  photoShoots: {
+    zh: "主题总览",
+    en: "Shoots",
+    deco: "SHOOTS",
+    key: "shoots",
   },
   gameDesign: {
     zh: "游戏设计",

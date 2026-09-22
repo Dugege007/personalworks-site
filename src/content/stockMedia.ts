@@ -11,13 +11,22 @@ export function stockPlaceholderSrc(channel: string, slot: number): string {
 }
 
 /**
- * 作品封面：优先用内容层 src，否则按序号取该栏目 stock。
+ * 作品封面：优先静帧 src；仅视频时用伴生 poster。否则按序号取该栏目 stock。
  */
 export function workCoverSrc(
-  work: { channel: string; media: Array<{ src?: string }> },
+  work: { channel: string; media: Array<{ src?: string; kind?: string; poster?: string }> },
   index = 0,
 ): string {
-  return work.media.find((item) => item.src)?.src ?? stockPlaceholderSrc(work.channel, index + 1);
+  const listed = work.media.filter((item) => item.src);
+  const image = listed.find((item) => item.kind !== "video");
+  if (image?.src) {
+    return image.src;
+  }
+  const video = listed.find((item) => item.kind === "video" && item.poster);
+  if (video?.poster) {
+    return video.poster;
+  }
+  return listed[0]?.src ?? stockPlaceholderSrc(work.channel, index + 1);
 }
 
 /**

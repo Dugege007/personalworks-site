@@ -631,7 +631,7 @@
   }
 
   .develop-hero-media.is-on {
-    animation: develop-hero-zoom 4.5s linear both;
+    animation: develop-hero-zoom 5s linear both;
   }
 
   .develop-hero-name {

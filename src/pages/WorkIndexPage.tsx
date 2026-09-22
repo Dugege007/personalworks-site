@@ -10,6 +10,7 @@ import {
   type DevelopKindDoor,
 } from "../ia/workTree";
 import { assetUrl } from "../lib/assets";
+import { whenSiteBootReleased } from "../lib/siteBoot";
 import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import "../styles/develop-work.css";
 
@@ -42,8 +43,16 @@ function WorkGate() {
   const timerRef = useRef(0);
 
   useEffect(() => {
-    scheduleGateTurn();
-    return () => window.clearTimeout(timerRef.current);
+    let cancelled = false;
+    void whenSiteBootReleased().then(() => {
+      if (!cancelled) {
+        scheduleGateTurn();
+      }
+    });
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timerRef.current);
+    };
   }, [reduced]);
 
   function scheduleGateTurn() {
@@ -175,6 +184,7 @@ function KindDoorCard({ door, index, advance, onPointerEnter, onPointerLeave }: 
             className={src === shown ? "is-on" : undefined}
             src={assetUrl(src)}
             alt=""
+            {...(index === 0 && src === shown ? { "data-boot-first": "" } : {})}
             onError={() => setFailed((prev) => ({ ...prev, [src]: true }))}
           />
         ))

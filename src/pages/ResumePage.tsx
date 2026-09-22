@@ -43,6 +43,7 @@ export function ResumePage() {
             <img
               src={portrait}
               alt={`${profile.name} / ${lexicon.profile.zh}`}
+              data-boot-first=""
               onError={() => setFailed(true)}
             />
           ) : (

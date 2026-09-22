@@ -15,6 +15,7 @@ import { hrefForWork } from "../../ia/href";
 import { queryNotes, queryWorks } from "../../ia/query";
 import type { HomeBlock, IaRecord } from "../../ia/types";
 import { assetUrl } from "../../lib/assets";
+import { whenSiteBootReleased } from "../../lib/siteBoot";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { useViewportOrientation } from "../../hooks/useViewportOrientation";
 import { usePrefs } from "../../prefs/PrefsProvider";
@@ -190,23 +191,33 @@ function HeroBleed({ block }: { block: HomeBlock }) {
     if (reduced || paused || eligibleSrcs.length < 2) {
       return;
     }
-    const timer = window.setInterval(() => {
-      const available = eligibleSrcs.filter((item) => !failedRef.current[item]);
-      const cur = currentRef.current;
-      const reserved = upcomingRef.current;
-      const next =
-        reserved && reserved !== cur && available.includes(reserved)
-          ? reserved
-          : pickFreshSrc(available, [cur, ...recentRef.current]);
-      recentRef.current = [...recentRef.current, cur].slice(-(HERO_NOREPEAT - 1));
-      setLastSrc(cur);
-      setCurrentSrc(next);
-      currentRef.current = next;
-      const upcoming = pickFreshSrc(available, [next, ...recentRef.current]);
-      upcomingRef.current = upcoming;
-      setUpcomingSrc(upcoming);
-    }, HERO_INTERVAL_MS);
-    return () => window.clearInterval(timer);
+    let timer = 0;
+    let cancelled = false;
+    void whenSiteBootReleased().then(() => {
+      if (cancelled) {
+        return;
+      }
+      timer = window.setInterval(() => {
+        const available = eligibleSrcs.filter((item) => !failedRef.current[item]);
+        const cur = currentRef.current;
+        const reserved = upcomingRef.current;
+        const next =
+          reserved && reserved !== cur && available.includes(reserved)
+            ? reserved
+            : pickFreshSrc(available, [cur, ...recentRef.current]);
+        recentRef.current = [...recentRef.current, cur].slice(-(HERO_NOREPEAT - 1));
+        setLastSrc(cur);
+        setCurrentSrc(next);
+        currentRef.current = next;
+        const upcoming = pickFreshSrc(available, [next, ...recentRef.current]);
+        upcomingRef.current = upcoming;
+        setUpcomingSrc(upcoming);
+      }, HERO_INTERVAL_MS);
+    });
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
   }, [eligibleSrcs, paused, reduced]);
 
   useEffect(() => {
@@ -256,6 +267,7 @@ function HeroBleed({ block }: { block: HomeBlock }) {
             className={`develop-hero-media${item === src ? " is-on" : ""}`}
             src={assetUrl(item)}
             alt=""
+            {...(item === src ? { "data-boot-first": "" } : {})}
             onError={() => setFailed((prevFailed) => ({ ...prevFailed, [item]: true }))}
           />
         ))
@@ -412,8 +424,16 @@ function WaypointSlices() {
   const timerRef = useRef(0);
 
   useEffect(() => {
-    scheduleSliceTurn();
-    return () => window.clearTimeout(timerRef.current);
+    let cancelled = false;
+    void whenSiteBootReleased().then(() => {
+      if (!cancelled) {
+        scheduleSliceTurn();
+      }
+    });
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timerRef.current);
+    };
   }, [reduced]);
 
   /**
@@ -586,8 +606,16 @@ function SelectedFrames({ ia }: { block: HomeBlock; ia: IaRecord }) {
   const timerRef = useRef(0);
 
   useEffect(() => {
-    scheduleFrameTurn();
-    return () => window.clearTimeout(timerRef.current);
+    let cancelled = false;
+    void whenSiteBootReleased().then(() => {
+      if (!cancelled) {
+        scheduleFrameTurn();
+      }
+    });
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timerRef.current);
+    };
   }, [reduced]);
 
   /**
@@ -699,7 +727,7 @@ function shotsOfGames(): FrameShot[] {
   for (const game of gameProjects) {
     const href = `/${lexicon.gameDev.key}/${game.id}`;
     for (const shot of game.screenshots) {
-      if (!shot.src) {
+      if (!shot.src || shot.kind === "video") {
         continue;
       }
       shots.push({ src: shot.src, title: game.title, href });

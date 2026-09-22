@@ -1,5 +1,7 @@
 import { lexicon } from "./lexicon";
 import { initialGameProjects, registeredGames } from "./initialGameProjects";
+import { toListedMedia } from "./listedMedia";
+import { workCoverSrc } from "./stockMedia";
 import { sortByEffectiveDateDescending } from "./workDates";
 
 export type NavItem = {
@@ -53,7 +55,7 @@ export type GameCard = {
   lead: string;
   capturedOn?: string;
   place?: string;
-  screenshots: Array<{ src: string; label: string }>;
+  screenshots: Array<{ src: string; label: string; kind: "image" | "video"; poster?: string }>;
   playable: boolean;
   buildPath?: string;
   accent?: string;
@@ -286,7 +288,7 @@ export const categories: CategoryRecord[] = [
     index: archiveIndexByNavId(lexicon.photography.key),
     indexEn: lexicon.photography.deco,
     title: lexicon.photography.zh,
-    lead: "人像只放已授权的肖像。",
+    lead: "",
     path: `/${lexicon.photography.key}`,
     theme: lexicon.photography.key,
     homeFrames: ["风光摄影", "人文摄影", "人像摄影"],
@@ -332,6 +334,17 @@ export const categories: CategoryRecord[] = [
         frames: ["场景", "角色", "光影"],
         comingSoon: true,
       },
+      {
+        id: lexicon.aiPhoto.key,
+        title: lexicon.aiPhoto.zh,
+        titleEn: lexicon.aiPhoto.en,
+        titleDeco: lexicon.aiPhoto.deco,
+        lead: "位置已留。未上线生成能力前不宣称本站已提供生成式 AI。",
+        theme: lexicon.aiPhoto.key,
+        detailBase: `/${lexicon.photography.key}/${lexicon.aiPhoto.key}`,
+        frames: ["静帧", "构图", "光线"],
+        comingSoon: true,
+      },
     ],
   },
 ];
@@ -350,15 +363,18 @@ export const workSections: WorkSection[] = categories.map((item) => ({
 export const gameProjects: GameCard[] = sortByEffectiveDateDescending(
   [...initialGameProjects, ...registeredGames]
     .filter((item) => Array.isArray(item.screenshots) && item.screenshots.length > 0)
-    .map((item) => ({
-    id: item.id,
-    title: item.title,
-    titleEn: item.titleEn,
-    lead: item.lead,
-    playable: item.playable,
-    screenshots: item.screenshots.map(([src, label]) => ({ src, label })),
-    coverSrc: item.screenshots[0]?.[0],
-  })),
+    .map((item) => {
+    const screenshots = item.screenshots.map(([src, label]) => toListedMedia(src, label));
+    return {
+      id: item.id,
+      title: item.title,
+      titleEn: item.titleEn,
+      lead: item.lead,
+      playable: item.playable,
+      screenshots,
+      coverSrc: workCoverSrc({ channel: lexicon.gameDev.key, media: screenshots }),
+    };
+  }),
 );
 
 /**
@@ -547,8 +563,12 @@ export function resolveShellTheme(pathname: string): string {
     return lexicon.workIndex.key;
   }
   const catalogPath = `/${lexicon.photography.key}/${lexicon.photoCatalog.key}`;
+  const shootsPath = `/${lexicon.photography.key}/${lexicon.photoShoots.key}`;
   if (pathname === catalogPath || pathname.startsWith(`${catalogPath}/`)) {
     return lexicon.photoCatalog.key;
+  }
+  if (pathname === shootsPath || pathname.startsWith(`${shootsPath}/`)) {
+    return lexicon.photoShoots.key;
   }
   if (pathname === `/${lexicon.notes.key}/${lexicon.sketching.key}`) {
     return lexicon.sketching.key;
