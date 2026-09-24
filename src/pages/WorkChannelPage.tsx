@@ -1,5 +1,6 @@
 import { Navigate, useParams } from "react-router-dom";
 import { ChannelHead } from "../components/work/ChannelHead";
+import { ConstructionSetList } from "../components/work/ConstructionSetList";
 import { CoverTile } from "../components/work/CoverTile";
 import { lexicon } from "../content/lexicon";
 import { ProjectGallery } from "../components/work/ProjectGallery";
@@ -107,6 +108,7 @@ export function WorkChannelPage() {
 
   const works = listPublishedWorks(channelKey);
   const isLandscapeBoard = channelKey === lexicon.landscapeRendering.key;
+  const isConstructionRegister = channelKey === lexicon.landscapeCDs.key;
   const galleryVariant =
     channelKey === lexicon.digitalTwin.key || channelKey === lexicon.lineSimulation.key
       ? "twin"
@@ -127,10 +129,13 @@ export function WorkChannelPage() {
         title={tx({ "zh-CN": door?.zh ?? channelTitleZh(channelKey), en: door?.en }, locale)}
         lead={door?.lead}
       />
-      {(isLandscapeBoard || Boolean(galleryVariant)) && works.length === 0 ? (
+      {(isLandscapeBoard || isConstructionRegister || Boolean(galleryVariant)) && works.length === 0 ? (
         <p className="develop-channel-empty">这一细目还没有可展示的作品。</p>
       ) : null}
       {isLandscapeBoard && works.length > 0 ? <LandscapeProjectBoard works={works} /> : null}
+      {isConstructionRegister && works.length > 0 ? (
+        <ConstructionSetList works={works} hrefFor={(work) => hrefForWork(work, ia.id)} />
+      ) : null}
       {galleryVariant && works.length > 0 ? (
         <div className="develop-project-gallery">
           <ProjectGallery
@@ -149,7 +154,7 @@ export function WorkChannelPage() {
           />
         </div>
       ) : null}
-      {isLandscapeBoard || galleryVariant ? null : works.length === 0 ? (
+      {isLandscapeBoard || isConstructionRegister || galleryVariant ? null : works.length === 0 ? (
         <p className="develop-channel-empty">这一细目还没有可展示的作品。</p>
       ) : (
         <div className="develop-channel-grid" data-count={works.length}>

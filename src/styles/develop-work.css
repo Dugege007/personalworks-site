@@ -348,6 +348,7 @@
 .develop-channel-grid,
 .develop-channel-empty,
 .develop-channel .lrb,
+.develop-channel .cds-register,
 .develop-project-gallery {
   padding-inline: var(--page-inset);
 }

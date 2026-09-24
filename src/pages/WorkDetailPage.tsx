@@ -1,5 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { ChannelHead } from "../components/work/ChannelHead";
+import { ConstructionSheetDesk } from "../components/work/ConstructionSheetDesk";
 import { LandscapeProjectBoard } from "../components/work/LandscapeProjectBoard";
 import { ProjectGallery } from "../components/work/ProjectGallery";
 import { resolveLead } from "../content/copyDisplay";
@@ -234,7 +235,9 @@ export function WorkDetailPage() {
   );
   const body = work.body && work.body !== work.summary ? <p className="archive-body">{work.body}</p> : null;
   const gallery =
-    work.channel === lexicon.landscapeRendering.key ? (
+    work.channel === lexicon.landscapeCDs.key ? (
+      <ConstructionSheetDesk title={work.title} media={work.media} />
+    ) : work.channel === lexicon.landscapeRendering.key ? (
       <LandscapeProjectBoard works={[work]} showHead={false} />
     ) : galleryVariant ? (
       <ProjectGallery
@@ -267,9 +270,6 @@ export function WorkDetailPage() {
         {meta}
         {body}
         {gallery}
-        {work.channel === lexicon.landscapeCDs.key ? (
-          <p className="archive-disclaimer">仅供作品展示，不作为施工依据。</p>
-        ) : null}
       </div>
     </div>
   );

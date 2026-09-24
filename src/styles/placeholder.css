@@ -492,14 +492,6 @@ button.media-frame {
   z-index: 1;
 }
 
-.archive-disclaimer {
-  margin-top: 32px;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 13px;
-}
-
 [data-theme="photo"] .media-grid,
 [data-theme="landscape-photo"] .media-grid,
 [data-theme="humanist-photo"] .media-grid,

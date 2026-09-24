@@ -1,4 +1,5 @@
 import { Link, Navigate } from "react-router-dom";
+import { ConstructionSetList } from "../components/work/ConstructionSetList";
 import { lexicon } from "../content/lexicon";
 import { categories, type WorkCollection } from "../content/site";
 import { stockPlaceholderSrc, workCoverSrc } from "../content/stockMedia";
@@ -71,6 +72,12 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
             {collection.comingSoon ? (
               <p className="note">位置已留，作品待收录。不进入详情占位。</p>
             ) : null}
+            {collection.id === lexicon.landscapeCDs.key && !collection.comingSoon ? (
+              <ConstructionSetList
+                works={listPublishedWorks(collection.id)}
+                hrefFor={(work) => `${collection.detailBase}/${work.id}`}
+              />
+            ) : (
             <div className="card-grid">
               {collection.comingSoon
                 ? collection.frames.map((label, index) => (
@@ -110,6 +117,7 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
                     );
                   })}
             </div>
+            )}
           </section>
         ))
       )}

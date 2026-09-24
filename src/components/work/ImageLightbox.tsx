@@ -48,6 +48,8 @@ type ImageLightboxProps = {
   onClose: () => void;
   onPrev: () => void;
   onNext: () => void;
+  /** 施工图等大图关掉相邻预解码，避免多张原图同时进主线程。 */
+  preloadNeighbors?: boolean;
 };
 
 type Pan = {
@@ -154,6 +156,7 @@ export function ImageLightbox({
   onClose,
   onPrev,
   onNext,
+  preloadNeighbors = true,
 }: ImageLightboxProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -318,7 +321,7 @@ export function ImageLightbox({
   }, [images.length, onNext, onPrev]);
 
   useEffect(() => {
-    if (images.length < 2) {
+    if (!preloadNeighbors || images.length < 2) {
       return;
     }
     const neighbors = [images[(index - 1 + images.length) % images.length], images[(index + 1) % images.length]];
@@ -330,7 +333,7 @@ export function ImageLightbox({
       const preload = new Image();
       preload.src = assetUrl(shot.src);
     }
-  }, [images, index]);
+  }, [images, index, preloadNeighbors]);
 
   useEffect(() => {
     if (!zoomed) {
