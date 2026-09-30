@@ -1,12 +1,12 @@
 import { lexicon } from "../content/lexicon";
 import { placeholderNotes, type NoteCard } from "../content/site";
-import { listAllPublishedWorks, photoWorkChannels, type WorkRecord } from "../content/works";
+import { listAllPublishedWorks, photoPoolChannels, type WorkRecord } from "../content/works";
 import type { ContentQuery } from "./types";
 
 const kindChannelDict: Record<string, string[]> = {
   [lexicon.twinAndSim.key]: [lexicon.digitalTwin.key, lexicon.lineSimulation.key],
   [lexicon.landscapeArch.key]: [lexicon.landscapeRendering.key, lexicon.landscapeCDs.key],
-  [lexicon.photography.key]: [...photoWorkChannels],
+  [lexicon.photography.key]: [...photoPoolChannels],
   [lexicon.gameDev.key]: [],
 };
 

@@ -80,6 +80,9 @@ export function App() {
         <Route path={`${landscapePhoto}/:id`} element={<WorkDetailPage />} />
         <Route path={`${humanistPhoto}/:id`} element={<WorkDetailPage />} />
         <Route path={`${portraitPhoto}/:id`} element={<WorkDetailPage />} />
+        <Route path={`${photo}/${lexicon.realWorldPhoto.key}/:id`} element={<WorkDetailPage />} />
+        <Route path={`${photo}/${lexicon.gamePhoto.key}/:id`} element={<WorkDetailPage />} />
+        <Route path={`${photo}/${lexicon.aiPhoto.key}/:id`} element={<WorkDetailPage />} />
         <Route path={gameDev} element={<GamesHubPage />} />
         <Route path={gameMenu} element={<GamesMenuPage />} />
         <Route path={`${gameDev}/:id`} element={<GamePlayPlaceholderPage />} />

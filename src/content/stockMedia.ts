@@ -50,7 +50,7 @@ export const homeFrameSrcs: Record<string, string[]> = {
   ],
   photo: [
     "landscape-photo/zhoushan-miaozihu/01.webp",
-    "humanist-photo/chongqing-baiheliang/01.webp",
+    stockPlaceholderSrc("humanist-photo", 1),
     stockPlaceholderSrc("portrait-photo", 1),
   ],
 };

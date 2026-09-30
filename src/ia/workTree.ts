@@ -1,7 +1,13 @@
 import { lexicon } from "../content/lexicon";
 import { categories, gameProjects, playableGames } from "../content/site";
 import { stockPlaceholderSrc } from "../content/stockMedia";
-import { listPublishedWorks, listWorkImages, type WorkRecord } from "../content/works";
+import {
+  listPublishedPhotoWorks,
+  listPublishedWorks,
+  listWorkImages,
+  themesOfPhotoWork,
+  type WorkRecord,
+} from "../content/works";
 import { channelsOfKind, kindOfChannel, kindTitle, queryWorks } from "./query";
 
 export const developWorkKinds = [
@@ -95,12 +101,12 @@ export function hrefForDevelopChannel(kind: string, channel: string): string {
 /**
  * 摄影总览地址；可选预选题材。
  */
-export function hrefForPhotoCatalog(channel?: string): string {
+export function hrefForPhotoCatalog(theme?: string): string {
   const path = `/${lexicon.photography.key}/${lexicon.photoCatalog.key}`;
-  if (!channel) {
+  if (!theme) {
     return path;
   }
-  return `${path}?channel=${encodeURIComponent(channel)}`;
+  return `${path}?theme=${encodeURIComponent(theme)}`;
 }
 
 /**
@@ -199,7 +205,10 @@ export function listDevelopChannelDoors(kind: string): DevelopChannelDoor[] {
     return [];
   }
   return category.collections.map((collection) => {
-    const works = listPublishedWorks(collection.id);
+    const works =
+      kind === lexicon.photography.key && !collection.comingSoon
+        ? listPublishedPhotoWorks().filter((work) => themesOfPhotoWork(work).includes(collection.id))
+        : listPublishedWorks(collection.id);
     return {
       channel: collection.id,
       zh: collection.title,

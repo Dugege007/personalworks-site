@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { effectiveDate, sortByEffectiveDateDescending } from "../src/content/workDates.ts";
+import { compareByStartedOn, comparePhotoTime, effectiveDate, photoTimeKey, startedOnDate, sortByEffectiveDateDescending } from "../src/content/workDates.ts";
 
 test("有效日期按拍摄、项目、年份依次回退", () => {
   assert.equal(
@@ -27,6 +27,32 @@ test("有效日期按拍摄、项目、年份依次回退", () => {
     }),
     "2024-02-00",
   );
+});
+
+test("开始日期不采用拍摄日", () => {
+  const olderStart = {
+    id: "start",
+    title: "开始更早",
+    startedOn: "2024-03-01",
+    capturedOn: "2026-08-15",
+  };
+  const newerStart = {
+    id: "later",
+    title: "开始更晚",
+    startedOn: "2025-01-01",
+    capturedOn: "2020-01-01",
+  };
+  assert.equal(startedOnDate(olderStart), "2024-03-01");
+  assert.deepEqual(
+    [newerStart, olderStart].sort((a, b) => compareByStartedOn(a, b, "desc")).map((item) => item.id),
+    ["later", "start"],
+  );
+});
+
+test("拍摄时刻优先于开始日期的零点", () => {
+  assert.equal(photoTimeKey("2018-04-06T20:14:32", "2018-04-06"), "2018-04-06T20:14:32");
+  assert.equal(photoTimeKey("", "2018-04-06"), "2018-04-06T00:00:00");
+  assert.ok(comparePhotoTime("2018-04-06T20:26:17", "2018-04-06T20:14:32", "desc") < 0);
 });
 
 test("倒序函数使用完整日期并把无日期项目放到末尾", () => {

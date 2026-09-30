@@ -1,6 +1,12 @@
 import { lexicon } from "../content/lexicon";
 import { findCollectionByChannel } from "../content/site";
-import { findPublishedWorksById, photoWorkChannels } from "../content/works";
+import {
+  findPublishedWork,
+  findPublishedWorksById,
+  hrefForPhotoWork,
+  photoDeliveryChannels,
+  photoWorkChannels,
+} from "../content/works";
 import { strataKindPathDict } from "./strata";
 import type { IaId } from "./types";
 import { splitHref } from "./photoNav";
@@ -18,6 +24,7 @@ export type ResolvedPath = {
 };
 
 const photoTypeSet = new Set<string>(photoWorkChannels);
+const photoDeliverySet = new Set<string>(photoDeliveryChannels);
 
 /**
  * 切肤时按目标 IA 映射路径；无对等则回该 IA 首页。调用方须 `replace`。
@@ -141,7 +148,13 @@ function mapWorkIndexToStrata(
   if (parsed.layer === "detail") {
     const collection = findCollectionByChannel(parsed.channel);
     if (collection) {
-      return { pathname: `${collection.detailBase}/${parsed.id}`, search: "" };
+      return { pathname: `${collection.detailBase}/${encodeURIComponent(parsed.id)}`, search: "" };
+    }
+    if (photoDeliverySet.has(parsed.channel)) {
+      const work = findPublishedWork(parsed.channel, parsed.id);
+      if (work) {
+        return splitHref(hrefForPhotoWork(work));
+      }
     }
   }
   if (parsed.layer === "legacy-id") {
@@ -186,7 +199,11 @@ function isSharedPhotoPath(pathname: string): boolean {
 
 function isPhotoDetail(pathname: string): boolean {
   const parts = pathname.split("/").filter(Boolean);
-  return parts.length === 3 && parts[0] === lexicon.photography.key && photoTypeSet.has(parts[1] ?? "");
+  return (
+    parts.length >= 3 &&
+    parts[0] === lexicon.photography.key &&
+    (photoTypeSet.has(parts[1] ?? "") || photoDeliverySet.has(parts[1] ?? ""))
+  );
 }
 
 function isGamePlay(pathname: string): boolean {

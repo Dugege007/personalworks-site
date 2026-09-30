@@ -280,11 +280,29 @@
   clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
 }
 
-.filter-chip.is-on,
+.filter-chip {
+  border-color: color-mix(in srgb, var(--text) 30%, transparent);
+  background: color-mix(in srgb, var(--text) 3.5%, var(--bg));
+  color: var(--text);
+}
+
 .filter-sort:hover,
 .filter-clear:hover {
   border-color: var(--accent);
   background: var(--accent-soft);
+}
+
+.filter-chip.is-on {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.filter-chip:disabled {
+  border-color: var(--line);
+  background: transparent;
+  color: var(--muted);
+  cursor: default;
 }
 
 .filter-toolbar {

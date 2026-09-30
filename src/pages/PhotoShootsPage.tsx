@@ -2,14 +2,26 @@ import { useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ChannelHead } from "../components/work/ChannelHead";
 import { FilterRow } from "../components/work/FilterRow";
+import { PhotoMasonry } from "../components/work/PhotoMasonry";
 import { resolveLead } from "../content/copyDisplay";
 import { lexicon } from "../content/lexicon";
 import { categories } from "../content/site";
 import { workCoverSrc } from "../content/stockMedia";
 import {
   collectPhotoFacets,
+  orderPhotoCustomTags,
+  photoTagResourceCounts,
+  disabledPhotoFacetValues,
+  disabledPrimaryFacets,
   filterPhotoWorks,
+  isPhotoDefaultTag,
   listPublishedPhotoWorks,
+  occupiedPhotoFacetsFromWorks,
+  photoTypeChipLabel,
+  photoUntaggedKey,
+  primaryFacetValues,
+  readPhotoThemes,
+  selectedPrimaryFacets,
   sortPhotoWorks,
   type PhotoCatalogQuery,
 } from "../content/works";
@@ -22,9 +34,15 @@ import "../styles/develop-work.css";
 import "../styles/placeholder.css";
 import "../styles/photo-masonry.css";
 
-const photoTypeEntries = [lexicon.landscapePhoto, lexicon.humanistPhoto, lexicon.portraitPhoto];
+const photoTypeEntries = [
+  lexicon.landscapePhoto,
+  lexicon.humanistPhoto,
+  lexicon.portraitPhoto,
+  lexicon.gamePhoto,
+  lexicon.aiPhoto,
+];
 
-type FilterKey = "channel" | "year" | "place";
+type FilterKey = "year" | "place" | "tag";
 
 /**
  * 读取可重复查询参数。
@@ -53,10 +71,11 @@ function toggleValue(params: URLSearchParams, key: FilterKey, value: string): UR
 function parseQuery(params: URLSearchParams): PhotoCatalogQuery {
   const sort = params.get("sort") === "asc" ? "asc" : "desc";
   return {
-    channels: readList(params, "channel"),
+    themes: readPhotoThemes(params),
     years: readList(params, "year"),
     places: readList(params, "place"),
-    tags: [],
+    tags: readList(params, "tag"),
+    untagged: params.get("untagged") === "1",
     sort,
   };
 }
@@ -76,13 +95,60 @@ export function PhotoShootsPage() {
   const published = useMemo(() => listPublishedPhotoWorks(), []);
   const facets = useMemo(() => collectPhotoFacets(published), [published]);
   const visible = useMemo(() => sortPhotoWorks(filterPhotoWorks(published, query), query.sort), [published, query]);
-  const hasFilter = query.channels.length > 0 || query.years.length > 0 || query.places.length > 0;
-  const typeCaptions = Object.fromEntries(photoTypeEntries.map((item) => [item.key, item.zh]));
+  const occupied = useMemo(() => occupiedPhotoFacetsFromWorks(visible), [visible]);
+  const hasFilter =
+    query.themes.length > 0 ||
+    query.years.length > 0 ||
+    query.places.length > 0 ||
+    query.tags.length > 0 ||
+    query.untagged;
+  const catalogOccupied = useMemo(() => occupiedPhotoFacetsFromWorks(published), [published]);
+  const primaryValues = primaryFacetValues(catalogOccupied.untagged);
+  const customTags = useMemo(
+    () => orderPhotoCustomTags(facets.tags, photoTagResourceCounts(published)),
+    [facets.tags, published],
+  );
+  const typeCaptions = {
+    ...Object.fromEntries(photoTypeEntries.map((item) => [item.key, photoTypeChipLabel(item.zh)])),
+    展馆: "展馆",
+    随拍: "随拍",
+    [photoUntaggedKey]: "无标签",
+  };
+
+  /**
+   * 类型第一行：冻结类型、默认自由标签，以及「无标签」。
+   */
+  function handlePrimaryToggle(value: string) {
+    if (value === photoUntaggedKey) {
+      const next = new URLSearchParams(params);
+      if (query.untagged) {
+        next.delete("untagged");
+      } else {
+        next.set("untagged", "1");
+      }
+      setParams(next, { replace: true });
+      return;
+    }
+    handleToggle(isPhotoDefaultTag(value) ? "tag" : "theme", value);
+  }
 
   /**
    * 写入某一维的开关结果。
    */
-  function handleToggle(key: FilterKey, value: string) {
+  function handleToggle(key: FilterKey | "theme", value: string) {
+    if (key === "theme") {
+      const remaining = query.themes.includes(value)
+        ? query.themes.filter((item) => item !== value)
+        : [...query.themes, value];
+      const next = new URLSearchParams(params);
+      next.delete("theme");
+      next.delete("channel");
+      for (const item of remaining) {
+        next.append("theme", item);
+      }
+      setParams(next, { replace: true });
+      return;
+    }
     setParams(toggleValue(params, key, value), { replace: true });
   }
 
@@ -112,27 +178,36 @@ export function PhotoShootsPage() {
         backTo={hrefForKind(lexicon.photography.key, ia.id)}
         backLabel={category?.title ?? lexicon.photography.zh}
         title={lexicon.photoShoots.zh}
-        lead="按年份、地点回看一次外出。可选含某题材。未选某维即不限制。"
       />
       <div className="develop-project-gallery">
         <div className="filter-board">
           <FilterRow
-            label="题材"
-            values={[...photoTypeEntries.map((item) => item.key)]}
-            selected={query.channels}
+            label="类型"
+            values={primaryValues}
+            selected={selectedPrimaryFacets(query)}
+            disabled={disabledPrimaryFacets(primaryValues, occupied, query)}
             captions={typeCaptions}
-            onToggle={(value) => handleToggle("channel", value)}
+            onToggle={handlePrimaryToggle}
+          />
+          <FilterRow
+            label=""
+            values={customTags}
+            selected={query.tags}
+            disabled={disabledPhotoFacetValues(customTags, occupied.tags, query.tags)}
+            onToggle={(value) => handleToggle("tag", value)}
           />
           <FilterRow
             label="年份"
             values={facets.years}
             selected={query.years}
+            disabled={disabledPhotoFacetValues(facets.years, occupied.years, query.years)}
             onToggle={(value) => handleToggle("year", value)}
           />
           <FilterRow
             label="地点"
             values={facets.places}
             selected={query.places}
+            disabled={disabledPhotoFacetValues(facets.places, occupied.places, query.places)}
             onToggle={(value) => handleToggle("place", value)}
           />
           <div className="filter-toolbar">
@@ -150,7 +225,7 @@ export function PhotoShootsPage() {
         {visible.length === 0 ? (
           <p className="note">当前筛选没有主题。</p>
         ) : (
-          <div className="photo-masonry" data-count={visible.length}>
+          <PhotoMasonry count={visible.length}>
             {visible.map((work, index) => (
               <Link
                 className="card"
@@ -177,7 +252,7 @@ export function PhotoShootsPage() {
                 </div>
               </Link>
             ))}
-          </div>
+          </PhotoMasonry>
         )}
       </div>
     </div>

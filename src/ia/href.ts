@@ -1,6 +1,6 @@
 import { lexicon } from "../content/lexicon";
 import { findCollectionByChannel } from "../content/site";
-import { photoWorkChannels, type WorkRecord } from "../content/works";
+import { hrefForPhotoWork, isPhotoPoolChannel, type WorkRecord } from "../content/works";
 import { strataKindPathDict } from "./strata";
 import type { IaId } from "./types";
 import { hrefForDevelopKind, hrefForDevelopWork, hrefForPhotoCatalog, hrefForPhotoShoots } from "./workTree";
@@ -11,8 +11,8 @@ export { hrefForPhotoCatalog, hrefForPhotoShoots };
  * 作品在当前 IA 下的详情地址。摄影始终走既有单帧路径。
  */
 export function hrefForWork(work: WorkRecord, iaId: IaId): string {
-  if ((photoWorkChannels as readonly string[]).includes(work.channel)) {
-    return `/${lexicon.photography.key}/${work.channel}/${work.id}`;
+  if (isPhotoPoolChannel(work.channel)) {
+    return hrefForPhotoWork(work);
   }
   if (iaId === "develop-editorial") {
     return hrefForDevelopWork(work);

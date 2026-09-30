@@ -6,7 +6,7 @@ export const initialGameProjects = [
     "id": "antigravity",
     "title": "反重力",
     "titleEn": "AntiGravity",
-    "lead": "反重力项目截图，共收录 8 张图片。",
+    "lead": "NewbiesJam参赛作品，获得“通关奖”。\r\n玩法简介：尝试收集母星碎片，并尝试克服母星斥力返回母星。",
     "playable": false,
     "screenshots": [
       [
@@ -45,9 +45,9 @@ export const initialGameProjects = [
   },
   {
     "id": "unity-basics",
-    "title": "Unity基础教程",
+    "title": "Unity基础教程技术书",
     "titleEn": "",
-    "lead": "Unity基础教程项目截图，共收录 3 张图片。",
+    "lead": "与谭兴涛共同编写的Unity基础教程，暂未出版。",
     "playable": false,
     "screenshots": [
       [
@@ -68,7 +68,7 @@ export const initialGameProjects = [
     "id": "3d-rpg",
     "title": "3DRPG",
     "titleEn": "",
-    "lead": "3DRPG项目截图，共收录 8 张图片。",
+    "lead": "M.Studio的《3DRPG》项目练习。",
     "playable": false,
     "screenshots": [
     [
@@ -111,9 +111,9 @@ export const initialGameProjects = [
   },
   {
     "id": "dark-queen-3d-action",
-    "title": "暗黑女王 3D动作",
+    "title": "黑暗女王的复活",
     "titleEn": "",
-    "lead": "暗黑女王 3D动作项目截图，共收录 3 张图片。",
+    "lead": "Siki学院的《黑暗女王的复活》项目练习。",
     "playable": false,
     "screenshots": [
       [
@@ -132,9 +132,9 @@ export const initialGameProjects = [
   },
   {
     "id": "classic-games",
-    "title": "经典游戏",
+    "title": "经典游戏开发练习",
     "titleEn": "",
-    "lead": "经典游戏项目截图，共收录 6 张图片。",
+    "lead": "贪吃蛇、俄罗斯方块、愤怒的小鸟、捕鱼达人等小游戏项目练习。",
     "playable": false,
     "screenshots": [
       [
@@ -165,9 +165,9 @@ export const initialGameProjects = [
   },
   {
     "id": "p-grade-position-tower-defense",
-    "title": "P级阵地 塔防",
+    "title": "P级阵地",
     "titleEn": "",
-    "lead": "P级阵地 塔防项目截图，共收录 2 张图片。",
+    "lead": "《游戏开发设计模式》一书中的《P级阵地》塔防游戏项目练习。",
     "playable": false,
     "screenshots": [
       [
@@ -182,9 +182,9 @@ export const initialGameProjects = [
   },
   {
     "id": "qframework",
-    "title": "QFramework 框架",
+    "title": "QFramework 框架练习",
     "titleEn": "",
-    "lead": "QFramework 框架项目截图，共收录 2 张图片。",
+    "lead": "QFramework 框架项目练习。",
     "playable": false,
     "screenshots": [
       [
@@ -199,9 +199,9 @@ export const initialGameProjects = [
   },
   {
     "id": "unity-official-tutorial",
-    "title": "Unity官方教程",
+    "title": "Unity官方教程练习",
     "titleEn": "",
-    "lead": "Unity官方教程项目截图，共收录 2 张图片。",
+    "lead": "Unity官方教程项目练习。",
     "playable": false,
     "screenshots": [
       [
@@ -231,7 +231,7 @@ export const registeredGames: Array<{
     id: "squirmeal",
     title: "蛄蛹者",
     titleEn: "",
-    lead: "",
+    lead: "GGJ2024参赛项目。\r\n鼠标上下晃动以控制海豹蠕动和跳跃，在规定时间内到达终点并尽量获得高分。",
     playable: false,
     consent: "pending",
     stageFolder: "game-dev/参赛作品/蛄蛹者 Squirmeal",
@@ -246,7 +246,7 @@ export const registeredGames: Array<{
     id: "explorer",
     title: "探索者号",
     titleEn: "",
-    lead: "",
+    lead: "SikiGameJamS2参赛项目，获得“三等奖”。\r\n控制飞船，通过引力弹弓效应飞得更远以探索更多星球。",
     playable: false,
     consent: "pending",
     stageFolder: "game-dev/参赛作品/探索者号 Explorer",

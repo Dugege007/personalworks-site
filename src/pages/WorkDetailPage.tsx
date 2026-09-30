@@ -12,8 +12,10 @@ import {
   findPublishedWork,
   findPublishedWorksById,
   formatStartedOn,
+  isPhotoPoolChannel,
   listWorkShots,
-  photoWorkChannels,
+  photoDeliveryChannels,
+  themesOfPhotoWork,
   type WorkMedia,
   type WorkRecord,
 } from "../content/works";
@@ -82,6 +84,32 @@ function buildMetaItems(work: WorkRecord): MetaItem[] {
 /**
  * 详情页未走画册时的视频框：只作占位，交互由画册与灯箱承接。
  */
+/**
+ * 解码路径段；已解码或含非法百分号时原样返回。
+ */
+function decodePathSegment(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+/**
+ * 现实摄影、游戏摄影、AI摄影详情：`/photo/{channel}/{项目夹名}`。
+ */
+function findPhotoDeliveryWork(pathname: string): WorkRecord | undefined {
+  const parts = pathname.split("/").filter(Boolean);
+  if (parts.length < 3 || parts[0] !== lexicon.photography.key) {
+    return undefined;
+  }
+  const channel = parts[1] ?? "";
+  if (!(photoDeliveryChannels as readonly string[]).includes(channel)) {
+    return undefined;
+  }
+  return findPublishedWork(channel, decodePathSegment(parts.slice(2).join("/")));
+}
+
 function renderVideoFrame(item: WorkMedia) {
   const href = item.src ? assetUrl(item.src) : "";
   const poster = item.poster ? assetUrl(item.poster) : undefined;
@@ -106,13 +134,14 @@ function resolveDetailBack(
   iaId: string,
   fromState?: string,
 ): { path: string; label: string } {
-  if (work && (photoWorkChannels as readonly string[]).includes(work.channel)) {
+  if (work && isPhotoPoolChannel(work.channel)) {
     const catalogPath = `/${lexicon.photography.key}/${lexicon.photoCatalog.key}`;
     const shootsPath = `/${lexicon.photography.key}/${lexicon.photoShoots.key}`;
     const from = readCatalogFromState(fromState, [catalogPath, shootsPath]);
     const fromShoots = Boolean(from && (from.split("?")[0] ?? "") === shootsPath);
+    const types = themesOfPhotoWork(work);
     return {
-      path: from ?? hrefForPhotoCatalog(work.channel),
+      path: from ?? (types.length === 1 ? hrefForPhotoCatalog(types[0]) : catalogPath),
       label: fromShoots ? lexicon.photoShoots.zh : lexicon.photoCatalog.zh,
     };
   }
@@ -158,7 +187,7 @@ export function WorkDetailPage() {
   const collectionFromPath = findCollectionByPath(location.pathname);
   const workFromTree =
     parsed?.layer === "detail"
-      ? findPublishedWork(parsed.channel, parsed.id)
+      ? findPublishedWork(parsed.channel, decodePathSegment(parsed.id))
       : parsed?.layer === "legacy-id"
         ? findPublishedWorksById(parsed.id)[0]
         : undefined;
@@ -166,11 +195,14 @@ export function WorkDetailPage() {
     collectionFromPath ??
     (workFromTree ? findCollectionByChannel(workFromTree.channel) : undefined) ??
     (parsed?.layer === "detail" ? findCollectionByChannel(parsed.channel) : undefined);
-  const work = parsed
-    ? workFromTree
-    : collection
-      ? findPublishedWork(collection.id, id)
-      : undefined;
+  const deliveryWork = findPhotoDeliveryWork(location.pathname);
+  const work = deliveryWork
+    ? deliveryWork
+    : parsed
+      ? workFromTree
+      : collection
+        ? findPublishedWork(collection.id, decodePathSegment(id))
+        : undefined;
   const fromState =
     location.state && typeof location.state === "object" && "from" in location.state
       ? typeof (location.state as { from?: unknown }).from === "string"
@@ -178,7 +210,11 @@ export function WorkDetailPage() {
         : undefined
       : undefined;
   const back = resolveDetailBack(parsed, work, category, ia.id, fromState);
-  const theme = collection?.theme ?? category?.theme ?? (parsed ? lexicon.workIndex.key : "home");
+  const theme =
+    collection?.theme ??
+    (work && isPhotoPoolChannel(work.channel) ? lexicon.photography.key : undefined) ??
+    category?.theme ??
+    (parsed ? lexicon.workIndex.key : "home");
 
   if (!work) {
     return (
@@ -194,10 +230,7 @@ export function WorkDetailPage() {
   }
 
   const metaItems = buildMetaItems(work);
-  const photoChannel =
-    work.channel === lexicon.landscapePhoto.key ||
-    work.channel === lexicon.humanistPhoto.key ||
-    work.channel === lexicon.portraitPhoto.key;
+  const photoChannel = isPhotoPoolChannel(work.channel);
   const galleryVariant =
     work.channel === lexicon.digitalTwin.key || work.channel === lexicon.lineSimulation.key
       ? "twin"

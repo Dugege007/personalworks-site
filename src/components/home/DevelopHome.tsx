@@ -6,7 +6,9 @@ import { stockPlaceholderSrc, workCoverSrc } from "../../content/stockMedia";
 import { heroFrameFitsViewport, type PhotoOrientation } from "../../content/photoOrientation";
 import { photoSizes } from "../../content/photoSizes";
 import {
+  hrefForPhotoWork,
   listLandscapeHeroFrames,
+  listPublishedPhotoWorks,
   listPublishedWorks,
   listWorkImages,
   type HomeHeroFrame,
@@ -344,9 +346,9 @@ function collectHeroFrames(block: HomeBlock): HomeHeroFrame[] {
  * 回退头图按对象键找回所属风光摄影项目页。
  */
 function hrefForHeroSrc(src: string): string | undefined {
-  for (const work of listPublishedWorks(lexicon.landscapePhoto.key)) {
+  for (const work of listPublishedPhotoWorks()) {
     if (listWorkImages(work).some((media) => media.src === src)) {
-      return `/${lexicon.photography.key}/${work.channel}/${work.id}`;
+      return hrefForPhotoWork(work);
     }
   }
   return undefined;

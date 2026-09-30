@@ -1,8 +1,32 @@
 import { initialWorkProjects } from "./initialWorkProjects";
 import { lexicon } from "./lexicon";
 import { toListedMedia } from "./listedMedia";
+import { photoTypeKeys, themesOfPhotoFrame } from "./photoFacet";
 import { photoSizes } from "./photoSizes";
-import { effectiveDate, sortByEffectiveDateDescending } from "./workDates";
+import { photoTakenAt } from "./photoExif";
+import { comparePhotoTime, photoTimeKey, sortByEffectiveDateDescending, startedOnDate } from "./workDates";
+
+export type { PhotoCatalogQuery, PhotoFacetOccupancy } from "./photoFacet";
+export {
+  disabledPhotoFacetValues,
+  filterPhotoFrames,
+  filterPhotoWorks,
+  occupiedPhotoFacetsFromFrames,
+  occupiedPhotoFacetsFromWorks,
+  customPhotoTags,
+  orderPhotoCustomTags,
+  photoTagResourceCounts,
+  disabledPrimaryFacets,
+  isPhotoDefaultTag,
+  photoPrimaryFacetOrder,
+  photoTypeChipLabel,
+  photoTypeKeys,
+  photoUntaggedKey,
+  primaryFacetValues,
+  selectedPrimaryFacets,
+  themesOfPhotoFrame,
+  themesOfPhotoWork,
+} from "./photoFacet";
 
 export type WorkChannel =
   | typeof lexicon.digitalTwin.key
@@ -11,7 +35,10 @@ export type WorkChannel =
   | typeof lexicon.landscapeCDs.key
   | typeof lexicon.landscapePhoto.key
   | typeof lexicon.humanistPhoto.key
-  | typeof lexicon.portraitPhoto.key;
+  | typeof lexicon.portraitPhoto.key
+  | typeof lexicon.realWorldPhoto.key
+  | typeof lexicon.gamePhoto.key
+  | typeof lexicon.aiPhoto.key;
 
 export type WorkMedia = {
   kind: "image" | "video";
@@ -20,6 +47,10 @@ export type WorkMedia = {
   poster?: string;
   displayName?: string;
   description?: string;
+  /** 冻结类型键，可多值。 */
+  themes?: readonly string[];
+  /** 自由标签，不含年份、不含类型键。 */
+  tags?: readonly string[];
 };
 
 export type WorkConsent = "granted" | "denied" | "pending";
@@ -33,6 +64,8 @@ export type WorkRecord = {
   body: string;
   media: WorkMedia[];
   tags?: readonly string[];
+  /** 作品级类型并集；缺省则由帧 themes 或旧 channel 推导。 */
+  themes?: readonly string[];
   role?: string;
   lineType?: string;
   metrics?: string;
@@ -121,22 +154,25 @@ export type HomeHeroFrame = {
 };
 
 /**
- * 风光摄影项目页地址；头图二次点击进入所属相册。
+ * 摄影详情地址。现实摄影、游戏摄影、AI摄影的 id 即中转站项目夹名。
  */
-function hrefForLandscapeWork(work: WorkRecord): string {
-  return `/${lexicon.photography.key}/${work.channel}/${work.id}`;
+export function hrefForPhotoWork(work: WorkRecord): string {
+  return `/${lexicon.photography.key}/${work.channel}/${encodeURIComponent(work.id)}`;
 }
 
 /**
- * 显影头图图池：已发布风光摄影的全部画面，按有效日期倒序。
+ * 显影头图图池：已发布、类型含风光的静帧，按有效日期倒序。
  */
 export function listLandscapeHeroFrames(): HomeHeroFrame[] {
   const frames: HomeHeroFrame[] = [];
   const seen = new Set<string>();
-  for (const work of listPublishedWorks(lexicon.landscapePhoto.key)) {
-    const href = hrefForLandscapeWork(work);
+  for (const work of listPublishedPhotoWorks()) {
+    const href = hrefForPhotoWork(work);
     for (const media of listWorkImages(work)) {
       if (!media.src || seen.has(media.src)) {
+        continue;
+      }
+      if (!themesOfPhotoFrame(work, media).includes(lexicon.landscapePhoto.key)) {
         continue;
       }
       seen.add(media.src);
@@ -179,11 +215,11 @@ const registeredWorks: WorkRecord[] = [
   {
     id: "vandeviele",
     channel: "digital-twin",
-    title: "范德威尔",
+    title: "无锡范德威尔",
     year: "2025",
     startedOn: "2025-02-20",
     place: "无锡",
-    summary: "",
+    summary: "注塑车间数字孪生；钣金车间加工站点设计动画演示。",
     body: "",
     consent: "granted",
     stageFolder: "digital-twin/20250220 范德威尔",
@@ -197,7 +233,7 @@ const registeredWorks: WorkRecord[] = [
     year: "2025",
     startedOn: "2025-05-27",
     place: "上海",
-    summary: "",
+    summary: "裁剪车架数字孪生；上线截图演示。",
     body: "",
     consent: "granted",
     stageFolder: "digital-twin/20250527 上海宝鸟服饰",
@@ -209,7 +245,7 @@ const registeredWorks: WorkRecord[] = [
     channel: "line-sim",
     title: "某工厂车间装配线仿真",
     year: "2026",
-    summary: "",
+    summary: "尝试使用FlexSim搭建某工厂车间的装配线，并产生KPI报表，用于分析产能与提供改造方案。",
     body: "",
     consent: "granted",
     stageFolder: "line-sim/FlexSim/20260821 某工厂车间装配线仿真",
@@ -287,6 +323,485 @@ const registeredWorks: WorkRecord[] = [
     stageFolder: "landscape-cds/上海道田景观工程咨询有限公司/201905 合肥9#",
     media: [{ kind: "image", label: "效果图 01", src: "landscape-cds/shimao-hefei-9/01.webp" }, { kind: "image", label: "效果图 02", src: "landscape-cds/shimao-hefei-9/02.webp" }, { kind: "image", label: "效果图 03", src: "landscape-cds/shimao-hefei-9/03.webp" }, { kind: "image", label: "效果图 04", src: "landscape-cds/shimao-hefei-9/04.webp" }, { kind: "image", label: "效果图 05", src: "landscape-cds/shimao-hefei-9/05.webp" }, { kind: "image", label: "效果图 06", src: "landscape-cds/shimao-hefei-9/06.webp" }, { kind: "image", label: "效果图 07", src: "landscape-cds/shimao-hefei-9/07.webp" }, { kind: "image", label: "效果图 08", src: "landscape-cds/shimao-hefei-9/08.webp" }, { kind: "image", label: "效果图 09", src: "landscape-cds/shimao-hefei-9/09.webp" }, { kind: "image", label: "效果图 10", src: "landscape-cds/shimao-hefei-9/10.webp" }, { kind: "image", label: "效果图 11", src: "landscape-cds/shimao-hefei-9/11.webp" }, { kind: "image", label: "效果图 12", src: "landscape-cds/shimao-hefei-9/12.webp" }],
   }
+
+
+,
+  {
+    id: "20191125 新加坡",
+    channel: "real-world-photo",
+    title: "新加坡",
+    year: "2019",
+    startedOn: "2019-11-25",
+    place: "新加坡",
+    summary: "道田景观公司团建，国外旅行",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/20191125 新加坡",
+    themes: ["landscape-photo"],
+
+    media: [{"kind":"image","label":"P1330899-3","src":"photo/real-world-photo/20191125 新加坡/05.webp","themes":["landscape-photo"],"tags":["城市","夜景"], "displayName": "金沙酒店远眺" }, {"kind":"image","label":"P1340964","src":"photo/real-world-photo/20191125 新加坡/06.webp","themes":["landscape-photo"],"tags":["城市"]}, {"kind":"image","label":"P1350049-3","src":"photo/real-world-photo/20191125 新加坡/07.webp","themes":["landscape-photo"],"tags":["城市"], "displayName": "鱼尾狮公园" }, {"kind":"image","label":"P1350052-Enhanced-4","src":"photo/real-world-photo/20191125 新加坡/08.webp","themes":["landscape-photo"],"tags":["城市"], "displayName": "市政大厦" }],
+  }
+,
+  {
+    id: "20211119 南京",
+    channel: "real-world-photo",
+    title: "南京",
+    year: "2021",
+    startedOn: "2021-11-19",
+    place: "南京",
+    summary: "和老朋友去南京",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/20211119 南京",
+    themes: ["landscape-photo"],
+
+    media: [{"kind":"image","label":"P1588490","src":"photo/real-world-photo/20211119 南京/03.webp","tags":["随拍","夜景","街头"]}, {"kind":"image","label":"P1599032","src":"photo/real-world-photo/20211119 南京/04.webp","themes":["landscape-photo"],"tags":["城市"]}],
+  }
+,
+  {
+    id: "20220912 鹤壁 星空",
+    channel: "real-world-photo",
+    title: "鹤壁 星空",
+    year: "2022",
+    startedOn: "2022-09-12",
+    place: "鹤壁",
+    summary: "去城市边缘喂蚊子",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/20220912 鹤壁 星空",
+    themes: ["landscape-photo"],
+
+    media: [{"kind":"image","label":"20220912-106","src":"photo/real-world-photo/20220912 鹤壁 星空/02.webp","themes":["landscape-photo"],"tags":["夜景","星空"]}],
+  }
+,
+  {
+    id: "20230903 苏州 大阳山",
+    channel: "real-world-photo",
+    title: "苏州 大阳山",
+    year: "2023",
+    startedOn: "2023-09-03",
+    place: "苏州",
+    summary: "和阿岳、大黄、文章一起去徒步",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/20230903 苏州 大阳山",
+    themes: ["landscape-photo"],
+
+    media: [{"kind":"image","label":"P1360849","src":"photo/real-world-photo/20230903 苏州 大阳山/05.webp","themes":["landscape-photo"],"tags":["古建"]}, {"kind":"image","label":"P1360934","src":"photo/real-world-photo/20230903 苏州 大阳山/06.webp","themes":["landscape-photo"],"tags":["城市"]}, {"kind":"image","label":"P1370007","src":"photo/real-world-photo/20230903 苏州 大阳山/07.webp","themes":["landscape-photo"],"tags":["山景"]}, {"kind":"image","label":"P1370159","src":"photo/real-world-photo/20230903 苏州 大阳山/08.webp","tags":["随拍","街头"]}],
+  }
+,
+  {
+    id: "20231115 南昌 滕王阁",
+    channel: "real-world-photo",
+    title: "南昌 滕王阁",
+    year: "2023",
+    startedOn: "2023-11-15",
+    place: "南昌",
+    summary: "和阿岳去南昌",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/20231115 南昌 滕王阁",
+    themes: ["landscape-photo", "humanist-photo"],
+
+    media: [{"kind":"image","label":"P1370776","src":"photo/real-world-photo/20231115 南昌 滕王阁/04.webp","themes":["humanist-photo"],"tags":["古建"]}, {"kind":"image","label":"P1370939","src":"photo/real-world-photo/20231115 南昌 滕王阁/05.webp","themes":["humanist-photo"],"tags":["夜景"]}, {"kind":"image","label":"P1370967","src":"photo/real-world-photo/20231115 南昌 滕王阁/06.webp","themes":["landscape-photo"],"tags":["夜景","古建"]}],
+  }
+,
+  {
+    id: "20241002 鹤壁 星空",
+    channel: "real-world-photo",
+    title: "鹤壁 星空",
+    year: "2024",
+    startedOn: "2024-10-02",
+    place: "鹤壁",
+    summary: "和阿岳去水库边拍星空",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/20241002 鹤壁 星空",
+    themes: ["landscape-photo"],
+
+    media: [{"kind":"image","label":"DSC00768","src":"photo/real-world-photo/20241002 鹤壁 星空/02.webp","themes":["landscape-photo"],"tags":["夜景","星空"]}],
+  }
+,
+  {
+    id: "20250413 上海 静安寺",
+    channel: "real-world-photo",
+    title: "上海 静安寺",
+    year: "2025",
+    startedOn: "2025-04-13",
+    place: "上海",
+    summary: "来拜拜佛",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/20250413 上海 静安寺",
+    themes: ["landscape-photo"],
+
+    media: [{"kind":"image","label":"DSC04068","src":"photo/real-world-photo/20250413 上海 静安寺/05.webp","themes":["landscape-photo"],"tags":["古建","寺庙"]}, {"kind":"image","label":"DSC04069","src":"photo/real-world-photo/20250413 上海 静安寺/06.webp","themes":["landscape-photo"],"tags":["古建","寺庙"]}, {"kind":"image","label":"DSC04073","src":"photo/real-world-photo/20250413 上海 静安寺/07.webp","themes":["landscape-photo"],"tags":["古建","寺庙"]}, {"kind":"image","label":"DSC04081","src":"photo/real-world-photo/20250413 上海 静安寺/08.webp","themes":["landscape-photo"],"tags":["古建","寺庙"]}],
+  }
+,
+  {
+    id: "20250519 安阳 殷墟博物馆",
+    channel: "real-world-photo",
+    title: "安阳 殷墟博物馆",
+    year: "2025",
+    startedOn: "2025-05-19",
+    place: "安阳",
+    summary: "“殷墟我向往已久”",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/20250519 安阳 殷墟博物馆",
+    themes: ["landscape-photo"],
+
+    media: [{"kind":"image","label":"DSC05712","src":"photo/real-world-photo/20250519 安阳 殷墟博物馆/13.webp","tags":["展馆"]}, {"kind":"image","label":"DSC05716","src":"photo/real-world-photo/20250519 安阳 殷墟博物馆/14.webp","tags":["展馆"]}, {"kind":"image","label":"DSC05717","src":"photo/real-world-photo/20250519 安阳 殷墟博物馆/15.webp","tags":["展馆","建筑"]}, {"kind":"image","label":"DSC05724","src":"photo/real-world-photo/20250519 安阳 殷墟博物馆/16.webp","tags":["展馆"]}, {"kind":"image","label":"DSC05730","src":"photo/real-world-photo/20250519 安阳 殷墟博物馆/17.webp","tags":["展馆"]}, {"kind":"image","label":"DSC05732","src":"photo/real-world-photo/20250519 安阳 殷墟博物馆/18.webp","tags":["展馆"]}, {"kind":"image","label":"DSC05747","src":"photo/real-world-photo/20250519 安阳 殷墟博物馆/19.webp","tags":["展馆"]}, {"kind":"image","label":"DSC05771","src":"photo/real-world-photo/20250519 安阳 殷墟博物馆/20.webp","tags":["展馆"]}, {"kind":"image","label":"DSC05834","src":"photo/real-world-photo/20250519 安阳 殷墟博物馆/21.webp","tags":["展馆"]}, {"kind":"image","label":"DSC05879","src":"photo/real-world-photo/20250519 安阳 殷墟博物馆/22.webp","themes":["landscape-photo"],"tags":["展馆","建筑"]}, {"kind":"image","label":"DSC06020","src":"photo/real-world-photo/20250519 安阳 殷墟博物馆/23.webp","tags":["随拍","街头"]}, {"kind":"image","label":"DSC06092","src":"photo/real-world-photo/20250519 安阳 殷墟博物馆/24.webp","tags":["随拍","街头"]}],
+  }
+,
+  {
+    id: "20250531 上海 龙美术馆",
+    channel: "real-world-photo",
+    title: "上海 龙美术馆",
+    year: "2025",
+    startedOn: "2025-05-31",
+    place: "上海",
+    summary: "出来拍照",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/20250531 上海 龙美术馆",
+    themes: ["humanist-photo"],
+
+    media: [{"kind":"image","label":"DSC06877","src":"photo/real-world-photo/20250531 上海 龙美术馆/03.webp","themes":["humanist-photo"],"tags":["街头","雕塑"]}, {"kind":"image","label":"DSC06881","src":"photo/real-world-photo/20250531 上海 龙美术馆/04.webp","themes":["humanist-photo"],"tags":["街头"]}],
+  }
+,
+  {
+    id: "20250713 杭州 黑神话展",
+    channel: "real-world-photo",
+    title: "杭州 黑神话展",
+    year: "2025",
+    startedOn: "2025-07-13",
+    place: "杭州",
+    summary: "和陆哥去看展",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/20250713 杭州 黑神话展",
+
+    media: [{"kind":"image","label":"DSC07631","src":"photo/real-world-photo/20250713 杭州 黑神话展/12.webp","tags":["展馆"]}, {"kind":"image","label":"DSC07707","src":"photo/real-world-photo/20250713 杭州 黑神话展/13.webp","tags":["展馆"]}, {"kind":"image","label":"DSC07718","src":"photo/real-world-photo/20250713 杭州 黑神话展/14.webp","tags":["展馆"]}, {"kind":"image","label":"DSC07791","src":"photo/real-world-photo/20250713 杭州 黑神话展/15.webp","tags":["展馆"]}, {"kind":"image","label":"DSC07825","src":"photo/real-world-photo/20250713 杭州 黑神话展/16.webp","tags":["展馆","雕塑"]}, {"kind":"image","label":"DSC07845","src":"photo/real-world-photo/20250713 杭州 黑神话展/17.webp","tags":["展馆"]}, {"kind":"image","label":"DSC07887","src":"photo/real-world-photo/20250713 杭州 黑神话展/18.webp","tags":["展馆","雕塑"]}, {"kind":"image","label":"DSC07889","src":"photo/real-world-photo/20250713 杭州 黑神话展/19.webp","tags":["展馆","雕塑"]}, {"kind":"image","label":"DSC07921","src":"photo/real-world-photo/20250713 杭州 黑神话展/20.webp","tags":["展馆"]}, {"kind":"image","label":"DSC07931","src":"photo/real-world-photo/20250713 杭州 黑神话展/21.webp","tags":["展馆","雕塑"]}, {"kind":"image","label":"DSC07956","src":"photo/real-world-photo/20250713 杭州 黑神话展/22.webp","tags":["展馆"]}],
+  }
+,
+  {
+    id: "20251004 杭州 九溪十八涧",
+    channel: "real-world-photo",
+    title: "杭州 九溪十八涧",
+    year: "2025",
+    startedOn: "2025-10-04",
+    place: "杭州",
+    summary: "徒步随拍",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/20251004 杭州 九溪十八涧",
+    themes: ["landscape-photo"],
+
+    media: [{"kind":"image","label":"DSC08058","src":"photo/real-world-photo/20251004 杭州 九溪十八涧/04.webp","themes":["landscape-photo"],"tags":["建筑"]}, {"kind":"image","label":"DSC08154","src":"photo/real-world-photo/20251004 杭州 九溪十八涧/05.webp","themes":["landscape-photo"],"tags":["山景"]}, {"kind":"image","label":"DSC08194","src":"photo/real-world-photo/20251004 杭州 九溪十八涧/06.webp","themes":["landscape-photo"],"tags":["山景"]}],
+  }
+,
+  {
+    id: "20251008 重庆 渝中区",
+    channel: "real-world-photo",
+    title: "重庆 渝中区",
+    year: "2025",
+    startedOn: "2025-10-08",
+    place: "重庆",
+    summary: "梦幻般的钢铁丛林",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/20251008 重庆 渝中区",
+    themes: ["landscape-photo"],
+
+    media: [{"kind":"image","label":"DSC09551-已增强-降噪","src":"photo/real-world-photo/20251008 重庆 渝中区/06.webp","themes":["landscape-photo"],"tags":["夜景","城市"]}, {"kind":"image","label":"DSC09558-已增强-降噪","src":"photo/real-world-photo/20251008 重庆 渝中区/07.webp","themes":["landscape-photo"],"tags":["夜景","城市"]}, {"kind":"image","label":"DSC09632-已增强-降噪","src":"photo/real-world-photo/20251008 重庆 渝中区/08.webp","themes":["landscape-photo"],"tags":["夜景","城市"]}, {"kind":"image","label":"DSC09668-已增强-降噪","src":"photo/real-world-photo/20251008 重庆 渝中区/09.webp","themes":["landscape-photo"],"tags":["夜景","城市"]}, {"kind":"image","label":"DSC09674-已增强-降噪","src":"photo/real-world-photo/20251008 重庆 渝中区/10.webp","themes":["landscape-photo"],"tags":["夜景","城市"]}],
+  }
+,
+  {
+    id: "20251009 重庆 南岸区",
+    channel: "real-world-photo",
+    title: "重庆 南岸区",
+    year: "2025",
+    startedOn: "2025-10-09",
+    place: "重庆",
+    summary: "没有逛完，下次还来",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/20251009 重庆 南岸区",
+
+    media: [{"kind":"image","label":"DSC00543","src":"photo/real-world-photo/20251009 重庆 南岸区/04.webp","tags":["夜景","城市"]}, {"kind":"image","label":"DSC00552","src":"photo/real-world-photo/20251009 重庆 南岸区/05.webp","tags":["夜景","城市"]}, {"kind":"image","label":"DSC00826","src":"photo/real-world-photo/20251009 重庆 南岸区/06.webp","tags":["夜景","城市"]}],
+  }
+,
+  {
+    id: "20251010 重庆 涪陵 816核工程遗址",
+    channel: "real-world-photo",
+    title: "重庆 816核工程遗址",
+    year: "2025",
+    startedOn: "2025-10-10",
+    place: "重庆",
+    summary: "“岂曰无名，山河为证”",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/20251010 重庆 涪陵 816核工程遗址",
+
+    media: [{"kind":"image","label":"DSC01033","src":"photo/real-world-photo/20251010 重庆 涪陵 816核工程遗址/08.webp","tags":["展馆"]}, {"kind":"image","label":"DSC01043","src":"photo/real-world-photo/20251010 重庆 涪陵 816核工程遗址/09.webp","tags":["展馆"]}, {"kind":"image","label":"DSC01051","src":"photo/real-world-photo/20251010 重庆 涪陵 816核工程遗址/10.webp","tags":["展馆"]}, {"kind":"image","label":"DSC01075","src":"photo/real-world-photo/20251010 重庆 涪陵 816核工程遗址/11.webp","tags":["展馆"]}, {"kind":"image","label":"DSC01127","src":"photo/real-world-photo/20251010 重庆 涪陵 816核工程遗址/12.webp","tags":["展馆"]}, {"kind":"image","label":"DSC01142","src":"photo/real-world-photo/20251010 重庆 涪陵 816核工程遗址/13.webp","tags":["展馆"]}, {"kind":"image","label":"DSC01158","src":"photo/real-world-photo/20251010 重庆 涪陵 816核工程遗址/14.webp","tags":["展馆"]}],
+  }
+,
+  {
+    id: "20251010 重庆 涪陵 白鹤梁",
+    channel: "real-world-photo",
+    title: "重庆 白鹤梁",
+    year: "2025",
+    startedOn: "2025-10-10",
+    place: "重庆",
+    summary: "",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/20251010 重庆 涪陵 白鹤梁",
+    themes: ["humanist-photo"],
+
+    media: [{"kind":"image","label":"DSC01284","src":"photo/real-world-photo/20251010 重庆 涪陵 白鹤梁/04.webp","themes":["humanist-photo"],"tags":["展馆"]}, {"kind":"image","label":"DSC01312","src":"photo/real-world-photo/20251010 重庆 涪陵 白鹤梁/05.webp","tags":["展馆"]}, {"kind":"image","label":"DSC01319","src":"photo/real-world-photo/20251010 重庆 涪陵 白鹤梁/06.webp","tags":["展馆"]}],
+  }
+,
+  {
+    id: "20260504 舟山 普陀山",
+    channel: "real-world-photo",
+    title: "舟山 普陀山",
+    year: "2026",
+    startedOn: "2026-05-04",
+    place: "舟山",
+    summary: "跟团来拜拜佛",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/20260504 舟山 普陀山",
+    themes: ["landscape-photo", "humanist-photo"],
+
+    media: [{"kind":"image","label":"DSC01544","src":"photo/real-world-photo/20260504 舟山 普陀山/09.webp","themes":["landscape-photo"],"tags":["动物"]}, {"kind":"image","label":"DSC01648","src":"photo/real-world-photo/20260504 舟山 普陀山/10.webp","themes":["landscape-photo"],"tags":["动物"]}, {"kind":"image","label":"DSC01746","src":"photo/real-world-photo/20260504 舟山 普陀山/11.webp","themes":["landscape-photo"],"tags":["寺庙","古建"]}, {"kind":"image","label":"DSC01767","src":"photo/real-world-photo/20260504 舟山 普陀山/12.webp","themes":["landscape-photo"],"tags":["寺庙","古建","雕塑"]}, {"kind":"image","label":"DSC01828","src":"photo/real-world-photo/20260504 舟山 普陀山/13.webp","themes":["landscape-photo"]}, {"kind":"image","label":"DSC01868","src":"photo/real-world-photo/20260504 舟山 普陀山/14.webp","themes":["humanist-photo"],"tags":["寺庙","古建"]}, {"kind":"image","label":"DSC01880","src":"photo/real-world-photo/20260504 舟山 普陀山/15.webp","themes":["landscape-photo"],"tags":["寺庙","雕塑"]}, {"kind":"image","label":"DSC01953","src":"photo/real-world-photo/20260504 舟山 普陀山/16.webp","themes":["landscape-photo"],"tags":["寺庙","雕塑"]}],
+  }
+,
+  {
+    id: "20260517 兴义 马岭古道",
+    channel: "real-world-photo",
+    title: "兴义 马岭古道",
+    year: "2026",
+    startedOn: "2026-05-17",
+    place: "兴义",
+    summary: "徒步随拍",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/20260517 兴义 马岭古道",
+    themes: ["landscape-photo", "humanist-photo", "portrait-photo"],
+
+    media: [{"kind":"image","label":"DSC02092","src":"photo/real-world-photo/20260517 兴义 马岭古道/08.webp","themes":["landscape-photo"],"tags":["建筑"]}, {"kind":"image","label":"DSC02128","src":"photo/real-world-photo/20260517 兴义 马岭古道/09.webp","themes":["landscape-photo","humanist-photo"],"tags":["古建"]}, {"kind":"image","label":"DSC02165","src":"photo/real-world-photo/20260517 兴义 马岭古道/10.webp","themes":["landscape-photo"],"tags":["建筑"]}, {"kind":"image","label":"DSC02263","src":"photo/real-world-photo/20260517 兴义 马岭古道/11.webp","themes":["landscape-photo"]}, {"kind":"image","label":"DSC02301","src":"photo/real-world-photo/20260517 兴义 马岭古道/12.webp","themes":["landscape-photo","humanist-photo"],"tags":["江河"]}, {"kind":"image","label":"DSC02515","src":"photo/real-world-photo/20260517 兴义 马岭古道/13.webp","themes":["portrait-photo"],"tags":["运动","江河"]}, {"kind":"image","label":"DSC02520","src":"photo/real-world-photo/20260517 兴义 马岭古道/14.webp","themes":["portrait-photo"],"tags":["运动","江河"]}],
+  }
+,
+  {
+    id: "20260618 上海 萤火虫基地",
+    channel: "real-world-photo",
+    title: "上海 萤火虫基地",
+    year: "2026",
+    startedOn: "2026-06-18",
+    place: "上海",
+    summary: "AI推荐我来拍萤火虫，但是这天下雨，没拍到很多",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/20260618 上海 萤火虫基地",
+    themes: ["landscape-photo"],
+
+    media: [{ kind: "image", label: "DSC02760-已增强-降噪", src: "photo/real-world-photo/20260618 上海 萤火虫基地/05.webp", themes: ["landscape-photo"], tags: ["夜景", "昆虫"] }, { kind: "image", label: "DSC02762-已增强-降噪", src: "photo/real-world-photo/20260618 上海 萤火虫基地/06.webp", themes: ["landscape-photo"], tags: ["夜景", "昆虫"] }, { kind: "image", label: "DSC02776-已增强-降噪", src: "photo/real-world-photo/20260618 上海 萤火虫基地/08.webp", themes: ["landscape-photo"], tags: ["夜景", "昆虫"] }],
+  }
+,
+  {
+    id: "20260814 舟山 东极岛 东福山",
+    channel: "real-world-photo",
+    title: "舟山 东极岛 东福山",
+    year: "2026",
+    startedOn: "2026-08-14",
+    place: "舟山",
+    summary: "徒步随拍",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/2026/20260814 舟山 东极岛 东福山",
+    themes: ["landscape-photo", "humanist-photo", "portrait-photo"],
+
+    media: [{ kind: "image", label: "DSC04248", src: "photo/real-world-photo/20260814 舟山 东极岛 东福山/01.webp", themes: ["landscape-photo"], tags: ["海景"] }, { kind: "image", label: "DSC04329", src: "photo/real-world-photo/20260814 舟山 东极岛 东福山/02.webp", themes: ["landscape-photo"], tags: ["海景"] }, { kind: "image", label: "DSC04338", src: "photo/real-world-photo/20260814 舟山 东极岛 东福山/03.webp", themes: ["landscape-photo"], tags: ["建筑", "山景"] }, { kind: "image", label: "DSC04347", src: "photo/real-world-photo/20260814 舟山 东极岛 东福山/04.webp", themes: ["landscape-photo"], tags: ["山景"] }, { kind: "image", label: "DSC04395", src: "photo/real-world-photo/20260814 舟山 东极岛 东福山/05.webp", themes: ["landscape-photo"], tags: ["海景"] }, { kind: "image", label: "DSC04457", src: "photo/real-world-photo/20260814 舟山 东极岛 东福山/06.webp", themes: ["landscape-photo"], tags: ["海景"] }, { kind: "image", label: "DSC04484", src: "photo/real-world-photo/20260814 舟山 东极岛 东福山/07.webp", themes: ["landscape-photo"], tags: ["海景"] }, { kind: "image", label: "DSC04506", src: "photo/real-world-photo/20260814 舟山 东极岛 东福山/08.webp", themes: ["landscape-photo"], tags: ["建筑"] }, {"kind":"image","label":"DSC04301","src":"photo/real-world-photo/20260814 舟山 东极岛 东福山/09.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC04318","src":"photo/real-world-photo/20260814 舟山 东极岛 东福山/10.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC04517","src":"photo/real-world-photo/20260814 舟山 东极岛 东福山/11.webp","themes":["portrait-photo"],"tags":["夜景"]}, {"kind":"image","label":"DSC04523","src":"photo/real-world-photo/20260814 舟山 东极岛 东福山/12.webp","themes":["portrait-photo"],"tags":["夜景"]}, {"kind":"image","label":"DSC04562","src":"photo/real-world-photo/20260814 舟山 东极岛 东福山/13.webp","themes":["humanist-photo"],"tags":["夜景"]}, {"kind":"image","label":"DSC04580","src":"photo/real-world-photo/20260814 舟山 东极岛 东福山/14.webp","themes":["humanist-photo"],"tags":["夜景"]}, {"kind":"image","label":"DSC04588","src":"photo/real-world-photo/20260814 舟山 东极岛 东福山/15.webp","themes":["humanist-photo"],"tags":["夜景"]}],
+  }
+,
+  {
+    id: "20260815 舟山 东极岛 庙子湖",
+    channel: "real-world-photo",
+    title: "舟山 东极岛 庙子湖",
+    year: "2026",
+    startedOn: "2026-08-15",
+    place: "舟山",
+    summary: "徒步随拍",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/2026/20260815 舟山 东极岛 庙子湖",
+    themes: ["landscape-photo", "portrait-photo"],
+
+    media: [{"kind":"image","label":"DSC04707","src":"photo/real-world-photo/20260815 舟山 东极岛 庙子湖/01.webp","themes":["landscape-photo"],"tags":["建筑"]}, {"kind":"image","label":"DSC04725","src":"photo/real-world-photo/20260815 舟山 东极岛 庙子湖/02.webp","themes":["landscape-photo"],"tags":["海景"]}, {"kind":"image","label":"DSC04728","src":"photo/real-world-photo/20260815 舟山 东极岛 庙子湖/03.webp","themes":["landscape-photo"],"tags":["海景"]}, {"kind":"image","label":"DSC04731","src":"photo/real-world-photo/20260815 舟山 东极岛 庙子湖/04.webp","themes":["landscape-photo"],"tags":["建筑"]}, {"kind":"image","label":"DSC04749","src":"photo/real-world-photo/20260815 舟山 东极岛 庙子湖/05.webp","themes":["landscape-photo"],"tags":["建筑"]}, {"kind":"image","label":"DSC04680","src":"photo/real-world-photo/20260815 舟山 东极岛 庙子湖/06.webp","themes":["portrait-photo"],"tags":["海景"]}, {"kind":"image","label":"DSC04710_2026-08-16-21-36-31-915_创意图","src":"photo/real-world-photo/20260815 舟山 东极岛 庙子湖/07.webp","themes":["portrait-photo"],"tags":["街头"]}],
+  }
+,
+  {
+    id: "20260725 上海 南京路 小不点",
+    channel: "real-world-photo",
+    title: "上海 南京路 小不点",
+    year: "2026",
+    startedOn: "2026-07-25",
+    place: "上海",
+    summary: "和小不点出来逛街",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/2026/20260725 上海 南京路 小不点",
+    themes: ["portrait-photo"],
+
+    media: [{"kind":"image","label":"DSC04165_(2)","src":"photo/real-world-photo/20260725 上海 南京路 小不点/01.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC04166_(3)","src":"photo/real-world-photo/20260725 上海 南京路 小不点/02.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC04210_(2)","src":"photo/real-world-photo/20260725 上海 南京路 小不点/03.webp","themes":["portrait-photo"],"tags":["夜景"]}],
+  }
+,
+  {
+    id: "20260912 上海 蟠龙天地",
+    channel: "real-world-photo",
+    title: "上海 蟠龙天地",
+    year: "2026",
+    startedOn: "2026-09-12",
+    place: "上海",
+    summary: "和子良出来逛街",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/2026/20260912 上海 蟠龙天地",
+    themes: ["humanist-photo"],
+
+    media: [{"kind":"image","label":"DSC06148","src":"photo/real-world-photo/20260912 上海 蟠龙天地/01.webp","themes":["humanist-photo"],"tags":["街头"]}, {"kind":"image","label":"DSC06151","src":"photo/real-world-photo/20260912 上海 蟠龙天地/02.webp","tags":["随拍","街头","夜景"]}, {"kind":"image","label":"DSC06180","src":"photo/real-world-photo/20260912 上海 蟠龙天地/03.webp","tags":["随拍","街头","夜景"]}, {"kind":"image","label":"DSC06189","src":"photo/real-world-photo/20260912 上海 蟠龙天地/04.webp","tags":["随拍","街头","夜景"]}, {"kind":"image","label":"DSC06214","src":"photo/real-world-photo/20260912 上海 蟠龙天地/05.webp","tags":["随拍","街头"]}, {"kind":"image","label":"DSC06231","src":"photo/real-world-photo/20260912 上海 蟠龙天地/06.webp","tags":["随拍","街头","夜景"]}],
+  }
+,
+  {
+    id: "20260926 南京 凡人展",
+    channel: "real-world-photo",
+    title: "南京 凡人展",
+    year: "2026",
+    startedOn: "2026-09-26",
+    place: "南京",
+    summary: "去看凡人修仙传展，Coser挺还原的，没看到结婴银月有点遗憾",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/2026/20260926 南京 凡人展",
+    themes: ["portrait-photo"],
+
+    media: [{ kind: "image", label: "DSC07437_2026-09-27-14-13-52-924_创意图", src: "photo/real-world-photo/20260926 南京 凡人展/02.webp", tags: ["展馆", "雕塑"] }, { kind: "image", label: "DSC07438", src: "photo/real-world-photo/20260926 南京 凡人展/03.webp", tags: ["展馆", "雕塑"] }, { kind: "image", label: "DSC07446_2026-09-27-14-18-59-568_创意图", src: "photo/real-world-photo/20260926 南京 凡人展/04.webp", themes: ["portrait-photo"], tags: ["展馆"] }, { kind: "image", label: "DSC07477", src: "photo/real-world-photo/20260926 南京 凡人展/05.webp", themes: ["portrait-photo"], tags: ["展馆", "Cos"] }, { kind: "image", label: "DSC07522_2026-09-27-14-21-15-785_创意图", src: "photo/real-world-photo/20260926 南京 凡人展/06.webp", tags: ["展馆", "Cos"] }, { kind: "image", label: "DSC07540_2026-09-27-14-23-22-151_创意图", src: "photo/real-world-photo/20260926 南京 凡人展/07.webp", tags: ["展馆", "Cos"] }, { kind: "image", label: "DSC07583", src: "photo/real-world-photo/20260926 南京 凡人展/08.webp", themes: ["portrait-photo"], tags: ["展馆", "Cos"] }],
+  }
+,
+  {
+    id: "20260926 南京 牛首山 佛顶宫",
+    channel: "real-world-photo",
+    title: "南京 牛首山 佛顶宫",
+    year: "2026",
+    startedOn: "2026-09-26",
+    place: "南京",
+    summary: "朋友推荐我来牛首山逛逛",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/2026/20260926 南京 牛首山 佛顶宫",
+    themes: ["landscape-photo", "portrait-photo"],
+
+    media: [{"kind":"image","label":"DSC07627_2026-09-27-20-23-07-228_创意图","src":"photo/real-world-photo/20260926 南京 牛首山 佛顶宫/01.webp","tags":["展馆","建筑"]}, {"kind":"image","label":"DSC07647","src":"photo/real-world-photo/20260926 南京 牛首山 佛顶宫/02.webp","tags":["展馆"]}, {"kind":"image","label":"DSC07651","src":"photo/real-world-photo/20260926 南京 牛首山 佛顶宫/03.webp","tags":["展馆"]}, {"kind":"image","label":"DSC07657","src":"photo/real-world-photo/20260926 南京 牛首山 佛顶宫/04.webp","tags":["展馆","雕塑"]}, {"kind":"image","label":"DSC07665","src":"photo/real-world-photo/20260926 南京 牛首山 佛顶宫/05.webp","tags":["展馆","雕塑"]}, {"kind":"image","label":"DSC07670","src":"photo/real-world-photo/20260926 南京 牛首山 佛顶宫/06.webp","tags":["展馆","雕塑"]}, {"kind":"image","label":"DSC07680","src":"photo/real-world-photo/20260926 南京 牛首山 佛顶宫/07.webp","tags":["展馆"]}, {"kind":"image","label":"DSC07681","src":"photo/real-world-photo/20260926 南京 牛首山 佛顶宫/08.webp","tags":["展馆"]}, {"kind":"image","label":"DSC07720_2026-09-27-20-15-31-472_创意图","src":"photo/real-world-photo/20260926 南京 牛首山 佛顶宫/09.webp","themes":["portrait-photo"],"tags":["展馆","建筑"]}, {"kind":"image","label":"DSC07747","src":"photo/real-world-photo/20260926 南京 牛首山 佛顶宫/10.webp","tags":["展馆"]}, {"kind":"image","label":"DSC07749","src":"photo/real-world-photo/20260926 南京 牛首山 佛顶宫/11.webp","tags":["展馆","建筑"]}, {"kind":"image","label":"DSC07752","src":"photo/real-world-photo/20260926 南京 牛首山 佛顶宫/12.webp","tags":["展馆","雕塑"]}, {"kind":"image","label":"DSC07767_2026-09-27-20-23-52-123_创意图","src":"photo/real-world-photo/20260926 南京 牛首山 佛顶宫/13.webp","tags":["展馆","建筑"]}, {"kind":"image","label":"DSC07777","src":"photo/real-world-photo/20260926 南京 牛首山 佛顶宫/14.webp","tags":["展馆","建筑"]}, {"kind":"image","label":"DSC07810","src":"photo/real-world-photo/20260926 南京 牛首山 佛顶宫/15.webp","themes":["landscape-photo"],"tags":["展馆","古建","寺庙","夜景"]}, {"kind":"image","label":"DSC07835","src":"photo/real-world-photo/20260926 南京 牛首山 佛顶宫/16.webp","themes":["landscape-photo"],"tags":["夜景"]}, {"kind":"image","label":"DSC07841","src":"photo/real-world-photo/20260926 南京 牛首山 佛顶宫/17.webp","themes":["landscape-photo"],"tags":["夜景"]}, {"kind":"image","label":"IMG_20260926_164950","src":"photo/real-world-photo/20260926 南京 牛首山 佛顶宫/18.webp","tags":["展馆","建筑"]}],
+  }
+,
+  {
+    id: "20180323 武汉",
+    channel: "real-world-photo",
+    title: "武汉",
+    year: "2018",
+    startedOn: "2018-03-23",
+    place: "武汉",
+    summary: "和同学去武汉",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/2018/20180323 武汉",
+    themes: ["landscape-photo", "portrait-photo"],
+
+    media: [{"kind":"image","label":"P1210021","src":"photo/real-world-photo/20180323 武汉/01.webp","themes":["portrait-photo"],"tags":["街头"]}, {"kind":"image","label":"P1210046","src":"photo/real-world-photo/20180323 武汉/02.webp","themes":["portrait-photo"],"tags":["街头"]}, {"kind":"image","label":"P1210048","src":"photo/real-world-photo/20180323 武汉/03.webp","themes":["portrait-photo"],"tags":["街头"]}, {"kind":"image","label":"P1210068","src":"photo/real-world-photo/20180323 武汉/04.webp","themes":["portrait-photo"],"tags":["街头"]}, {"kind":"image","label":"P1210110","src":"photo/real-world-photo/20180323 武汉/05.webp","themes":["landscape-photo"],"tags":["湖景"]}, {"kind":"image","label":"P1210132","src":"photo/real-world-photo/20180323 武汉/06.webp","themes":["portrait-photo"],"tags":["湖景"]}, {"kind":"image","label":"P1210221","src":"photo/real-world-photo/20180323 武汉/07.webp","themes":["landscape-photo","portrait-photo"],"tags":["湖景"]}, {"kind":"image","label":"P1210235","src":"photo/real-world-photo/20180323 武汉/08.webp","themes":["portrait-photo"],"tags":["湖景"]}, {"kind":"image","label":"P1210241","src":"photo/real-world-photo/20180323 武汉/09.webp","themes":["landscape-photo"],"tags":["湖景"]}, {"kind":"image","label":"P1210310","src":"photo/real-world-photo/20180323 武汉/10.webp","themes":["portrait-photo"]}, {"kind":"image","label":"P1210335","src":"photo/real-world-photo/20180323 武汉/11.webp","themes":["portrait-photo"]}, {"kind":"image","label":"P1210417","src":"photo/real-world-photo/20180323 武汉/12.webp","themes":["portrait-photo"],"tags":["随拍","夜景"]}, {"kind":"image","label":"P1210435","src":"photo/real-world-photo/20180323 武汉/13.webp","themes":["portrait-photo"],"tags":["街头"]}, {"kind":"image","label":"P1210522","src":"photo/real-world-photo/20180323 武汉/14.webp","themes":["portrait-photo"],"tags":["街头"]}, {"kind":"image","label":"P1210773","src":"photo/real-world-photo/20180323 武汉/15.webp","themes":["portrait-photo"],"tags":["街头"]}, {"kind":"image","label":"P1210826","src":"photo/real-world-photo/20180323 武汉/16.webp","tags":["展馆","雕塑"]}, {"kind":"image","label":"P1210848","src":"photo/real-world-photo/20180323 武汉/17.webp","tags":["展馆","雕塑"]}, {"kind":"image","label":"P1220051","src":"photo/real-world-photo/20180323 武汉/18.webp","tags":["随拍","街头"]}, {"kind":"image","label":"P1220055","src":"photo/real-world-photo/20180323 武汉/19.webp","themes":["portrait-photo"],"tags":["街头"]}, {"kind":"image","label":"P1220074","src":"photo/real-world-photo/20180323 武汉/20.webp","tags":["展馆","随拍","科技"]}, {"kind":"image","label":"P1220099","src":"photo/real-world-photo/20180323 武汉/21.webp","themes":["portrait-photo"],"tags":["街头"]}],
+  }
+,
+  {
+    id: "20180406 上海 外滩",
+    channel: "real-world-photo",
+    title: "上海 外滩",
+    year: "2018",
+    startedOn: "2018-04-06",
+    place: "上海",
+    summary: "第一次来上海",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/2018/20180406 上海 外滩",
+    themes: ["landscape-photo"],
+
+    media: [{"kind":"image","label":"P1220178","src":"photo/real-world-photo/20180406 上海 外滩/01.webp","themes":["landscape-photo"],"tags":["城市","夜景","江河"]}, {"kind":"image","label":"P1220169","src":"photo/real-world-photo/20180406 上海 外滩/02.webp","themes":["landscape-photo"],"tags":["城市","夜景","江河"]}, {"kind":"image","label":"P1220161","src":"photo/real-world-photo/20180406 上海 外滩/03.webp","themes":["landscape-photo"],"tags":["城市","夜景","江河"]}],
+  }
+,
+  {
+    id: "20180523 毕业啦",
+    channel: "real-world-photo",
+    title: "毕业啦",
+    year: "2018",
+    startedOn: "2018-05-23",
+    place: "洛阳",
+    summary: "整了一些有意思的毕业照",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/2018/20180523 毕业啦",
+    themes: ["portrait-photo"],
+
+    media: [{"kind":"image","label":"P1240226","src":"photo/real-world-photo/20180523 毕业啦/01.webp","themes":["portrait-photo"]}, {"kind":"image","label":"P1240171","src":"photo/real-world-photo/20180523 毕业啦/02.webp","themes":["portrait-photo"]}, {"kind":"image","label":"P1240367","src":"photo/real-world-photo/20180523 毕业啦/03.webp","themes":["portrait-photo"]}, {"kind":"image","label":"P1240539","src":"photo/real-world-photo/20180523 毕业啦/04.webp","themes":["portrait-photo"]}, {"kind":"image","label":"P1240656","src":"photo/real-world-photo/20180523 毕业啦/05.webp","themes":["portrait-photo"]}, {"kind":"image","label":"P1240675","src":"photo/real-world-photo/20180523 毕业啦/06.webp","themes":["portrait-photo"]}, {"kind":"image","label":"P1240993","src":"photo/real-world-photo/20180523 毕业啦/07.webp","themes":["portrait-photo"]}, {"kind":"image","label":"P1250121","src":"photo/real-world-photo/20180523 毕业啦/08.webp","themes":["portrait-photo"]}, {"kind":"image","label":"P1250214","src":"photo/real-world-photo/20180523 毕业啦/09.webp","themes":["portrait-photo"]}, {"kind":"image","label":"P1250248","src":"photo/real-world-photo/20180523 毕业啦/10.webp","themes":["portrait-photo"]}, {"kind":"image","label":"P1250409","src":"photo/real-world-photo/20180523 毕业啦/11.webp","themes":["portrait-photo"],"tags":["运动"]}, {"kind":"image","label":"P1250463","src":"photo/real-world-photo/20180523 毕业啦/12.webp","themes":["portrait-photo"]}],
+  }
+,
+  {
+    id: "20180728 上海 现场酒吧",
+    channel: "real-world-photo",
+    title: "上海 现场酒吧",
+    year: "2018",
+    startedOn: "2018-07-28",
+    place: "上海",
+    summary: "第二次去酒吧",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/2018/20180728 上海 现场酒吧",
+    themes: ["portrait-photo"],
+
+    media: [{"kind":"image","label":"P1270168","src":"photo/real-world-photo/20180728 上海 现场酒吧/01.webp","themes":["portrait-photo"],"tags":["酒吧"]}, {"kind":"image","label":"P1270183","src":"photo/real-world-photo/20180728 上海 现场酒吧/02.webp","themes":["portrait-photo"],"tags":["酒吧"]}, {"kind":"image","label":"P1270262","src":"photo/real-world-photo/20180728 上海 现场酒吧/03.webp","themes":["portrait-photo"],"tags":["酒吧"]}, {"kind":"image","label":"P1270364","src":"photo/real-world-photo/20180728 上海 现场酒吧/04.webp","themes":["portrait-photo"],"tags":["酒吧"]}, {"kind":"image","label":"P1270522","src":"photo/real-world-photo/20180728 上海 现场酒吧/05.webp","themes":["portrait-photo"],"tags":["酒吧"]}, {"kind":"image","label":"P1270571","src":"photo/real-world-photo/20180728 上海 现场酒吧/06.webp","themes":["portrait-photo"],"tags":["酒吧"]}, {"kind":"image","label":"P1270598","src":"photo/real-world-photo/20180728 上海 现场酒吧/07.webp","themes":["portrait-photo"],"tags":["酒吧"]}, {"kind":"image","label":"P1270770","src":"photo/real-world-photo/20180728 上海 现场酒吧/08.webp","themes":["portrait-photo"],"tags":["酒吧"]}, {"kind":"image","label":"P1270795","src":"photo/real-world-photo/20180728 上海 现场酒吧/09.webp","themes":["portrait-photo"],"tags":["酒吧"]}],
+  }
+,
+  {
+    id: "20260627 南京 JK室外 糖次",
+    channel: "real-world-photo",
+    title: "南京 JK室外 糖次",
+    year: "2026",
+    startedOn: "2026-06-27",
+    place: "南京",
+    summary: "麻家班课堂练习",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/2026/20260627 南京 JK室外 糖次",
+    themes: ["portrait-photo"],
+
+    media: [{"kind":"image","label":"DSC03371","src":"photo/real-world-photo/20260627 南京 JK室外 糖次/01.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03420","src":"photo/real-world-photo/20260627 南京 JK室外 糖次/02.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03584","src":"photo/real-world-photo/20260627 南京 JK室外 糖次/03.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03586","src":"photo/real-world-photo/20260627 南京 JK室外 糖次/04.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03730","src":"photo/real-world-photo/20260627 南京 JK室外 糖次/05.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03760","src":"photo/real-world-photo/20260627 南京 JK室外 糖次/06.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03772","src":"photo/real-world-photo/20260627 南京 JK室外 糖次/07.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03803","src":"photo/real-world-photo/20260627 南京 JK室外 糖次/08.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03861","src":"photo/real-world-photo/20260627 南京 JK室外 糖次/09.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03917","src":"photo/real-world-photo/20260627 南京 JK室外 糖次/10.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC04000","src":"photo/real-world-photo/20260627 南京 JK室外 糖次/11.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC04050","src":"photo/real-world-photo/20260627 南京 JK室外 糖次/12.webp","themes":["portrait-photo"],"tags":["夜景"]}, {"kind":"image","label":"DSC04072","src":"photo/real-world-photo/20260627 南京 JK室外 糖次/13.webp","themes":["portrait-photo"],"tags":["夜景"]}, {"kind":"image","label":"DSC04088","src":"photo/real-world-photo/20260627 南京 JK室外 糖次/14.webp","themes":["portrait-photo"],"tags":["夜景"]}],
+  }
+,
+  {
+    id: "20260627 南京 树野小屋 糖次",
+    channel: "real-world-photo",
+    title: "南京 树野小屋 糖次",
+    year: "2026",
+    startedOn: "2026-06-27",
+    place: "南京",
+    summary: "麻家班课堂练习",
+    body: "",
+    consent: "granted",
+    stageFolder: "real-world-photo/2026/20260627 南京 树野小屋 糖次",
+    themes: ["portrait-photo"],
+
+    media: [{"kind":"image","label":"DSC03036","src":"photo/real-world-photo/20260627 南京 树野小屋 糖次/01.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03049","src":"photo/real-world-photo/20260627 南京 树野小屋 糖次/02.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03091","src":"photo/real-world-photo/20260627 南京 树野小屋 糖次/03.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03100","src":"photo/real-world-photo/20260627 南京 树野小屋 糖次/04.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03204","src":"photo/real-world-photo/20260627 南京 树野小屋 糖次/05.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03241","src":"photo/real-world-photo/20260627 南京 树野小屋 糖次/06.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03250","src":"photo/real-world-photo/20260627 南京 树野小屋 糖次/07.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03273","src":"photo/real-world-photo/20260627 南京 树野小屋 糖次/08.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03280","src":"photo/real-world-photo/20260627 南京 树野小屋 糖次/09.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03297","src":"photo/real-world-photo/20260627 南京 树野小屋 糖次/10.webp","themes":["portrait-photo"]}, {"kind":"image","label":"DSC03314","src":"photo/real-world-photo/20260627 南京 树野小屋 糖次/11.webp","themes":["portrait-photo"]}],
+  }
 ];
 
 /**
@@ -329,27 +844,54 @@ export function findPublishedWork(channel: string, id: string): WorkRecord | und
   return work && isPublished(work) ? work : undefined;
 }
 
+/** 访客类型门：风光 / 人文 / 人像。不是投放夹。 */
 export const photoWorkChannels = [
   lexicon.landscapePhoto.key,
   lexicon.humanistPhoto.key,
   lexicon.portraitPhoto.key,
 ] as const;
 
+/** 摄影大栏目下的投放夹。详情与资源前缀为 `photo/{channel}/{项目夹名}/`。 */
+export const photoDeliveryChannels = [
+  lexicon.realWorldPhoto.key,
+  lexicon.gamePhoto.key,
+  lexicon.aiPhoto.key,
+] as const;
+
+export const photoPoolChannels = [...photoWorkChannels, ...photoDeliveryChannels] as const;
+
 export type PhotoWorkChannel = (typeof photoWorkChannels)[number];
 
-export type PhotoCatalogQuery = {
-  channels: string[];
-  years: string[];
-  places: string[];
-  tags: string[];
-  sort: "asc" | "desc";
-};
+/**
+ * 读取类型查询。`theme` 为主名，旧 `channel` 仅在没有 `theme` 时作别名。
+ */
+export function readPhotoThemes(params: URLSearchParams): string[] {
+  const themes = params.getAll("theme");
+  if (themes.length > 0) {
+    return themes;
+  }
+  return params.getAll("channel");
+}
+
+/**
+ * 是否为主题类型键：风光、人文、人像、游戏、AI。
+ */
+export function isPhotoTypeKey(value: string): boolean {
+  return (photoTypeKeys as readonly string[]).includes(value);
+}
+
+/**
+ * 是否为摄影内容池栏目（旧三栏或现实 / 游戏 / AI 摄影）。
+ */
+export function isPhotoPoolChannel(channel: string): boolean {
+  return (photoPoolChannels as readonly string[]).includes(channel);
+}
 
 /**
  * 列出访客可见的摄影作品，默认按完整拍摄日期倒序。
  */
 export function listPublishedPhotoWorks(): WorkRecord[] {
-  const allowed = new Set<string>(photoWorkChannels);
+  const allowed = new Set<string>(photoPoolChannels);
   return sortByEffectiveDateDescending(
     workRecords.filter((item) => allowed.has(item.channel) && isPublished(item)),
   );
@@ -374,6 +916,14 @@ export function collectPhotoFacets(works: WorkRecord[]): {
     for (const tag of work.tags ?? []) {
       tags.add(tag);
     }
+    for (const media of work.media) {
+      if (!media.src) {
+        continue;
+      }
+      for (const tag of media.tags ?? []) {
+        tags.add(tag);
+      }
+    }
   }
   return {
     years: [...years].sort(),
@@ -383,36 +933,28 @@ export function collectPhotoFacets(works: WorkRecord[]): {
 }
 
 /**
- * 按维度过滤摄影作品：维度内并集，维度间交集。
+ * 一次外出的排序时刻：已上页照片里最早的拍摄时刻，没有则用开始日期的零点。
  */
-export function filterPhotoWorks(works: WorkRecord[], query: PhotoCatalogQuery): WorkRecord[] {
-  return works.filter((work) => {
-    if (query.channels.length > 0 && !query.channels.includes(work.channel)) {
-      return false;
+function workPhotoTime(work: WorkRecord): string {
+  let earliest = "";
+  for (const media of listWorkImages(work)) {
+    const taken = photoTakenAt(media.src);
+    if (!taken) {
+      continue;
     }
-    if (query.years.length > 0 && !query.years.includes(work.year)) {
-      return false;
+    if (!earliest || taken < earliest) {
+      earliest = taken;
     }
-    if (query.places.length > 0 && (!work.place || !query.places.includes(work.place))) {
-      return false;
-    }
-    if (query.tags.length > 0 && !query.tags.some((tag) => work.tags?.includes(tag))) {
-      return false;
-    }
-    return true;
-  });
+  }
+  return photoTimeKey(earliest, startedOnDate(work));
 }
 
 /**
- * 按完整有效日期排序；同日按标题与 id 稳定排序。
+ * 按拍摄时刻排序。主题总览用该次外出最早一张的时刻；没有时刻时退回开始日期。
  */
 export function sortPhotoWorks(works: WorkRecord[], sort: "asc" | "desc"): WorkRecord[] {
-  const descending = sortByEffectiveDateDescending(works);
-  if (sort === "desc") {
-    return descending;
-  }
-  return descending.sort((a, b) => {
-    const dateDiff = effectiveDate(a).localeCompare(effectiveDate(b));
+  return [...works].sort((a, b) => {
+    const dateDiff = comparePhotoTime(workPhotoTime(a), workPhotoTime(b), sort);
     if (dateDiff !== 0) {
       return dateDiff;
     }
@@ -428,8 +970,7 @@ export type PhotoCatalogFrame = {
 };
 
 /**
- * 把已发布摄影作品摊成静帧；帧先继承所在记录的 channel。
- * //TODO: 帧级题材字段
+ * 把已发布摄影作品摊成静帧。类型只读这一张。
  * //TODO: 历史重复批次合并为一次外出
  */
 export function listPublishedPhotoFrames(): PhotoCatalogFrame[] {
@@ -446,40 +987,19 @@ export function listPublishedPhotoFrames(): PhotoCatalogFrame[] {
 }
 
 /**
- * 按维度过滤摊帧：维度内并集，维度间交集。题材暂读记录 channel。
- */
-export function filterPhotoFrames(frames: PhotoCatalogFrame[], query: PhotoCatalogQuery): PhotoCatalogFrame[] {
-  return frames.filter((frame) => {
-    const work = frame.work;
-    if (query.channels.length > 0 && !query.channels.includes(work.channel)) {
-      return false;
-    }
-    if (query.years.length > 0 && !query.years.includes(work.year)) {
-      return false;
-    }
-    if (query.places.length > 0 && (!work.place || !query.places.includes(work.place))) {
-      return false;
-    }
-    if (query.tags.length > 0 && !query.tags.some((tag) => work.tags?.includes(tag))) {
-      return false;
-    }
-    return true;
-  });
-}
-
-/**
- * 按拍摄日期排序摊帧；同一次外出保持 media 原序。
+ * 按每张的拍摄时刻排序。没有时刻时退回所在作品的开始日期，同刻再按标题、id 与 media 原序。
  */
 export function sortPhotoFrames(frames: PhotoCatalogFrame[], sort: "asc" | "desc"): PhotoCatalogFrame[] {
   const decorated = frames.map((frame) => ({
     frame,
-    date: effectiveDate(frame.work),
     mediaIndex: frame.work.media.indexOf(frame.media),
   }));
   decorated.sort((a, b) => {
-    const dateDiff = a.date.localeCompare(b.date);
+    const left = photoTimeKey(photoTakenAt(a.frame.src), startedOnDate(a.frame.work));
+    const right = photoTimeKey(photoTakenAt(b.frame.src), startedOnDate(b.frame.work));
+    const dateDiff = comparePhotoTime(left, right, sort);
     if (dateDiff !== 0) {
-      return sort === "asc" ? dateDiff : -dateDiff;
+      return dateDiff;
     }
     const titleDiff = a.frame.work.title.localeCompare(b.frame.work.title, "zh-CN");
     if (titleDiff !== 0) {

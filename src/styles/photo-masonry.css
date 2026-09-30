@@ -84,3 +84,126 @@
     column-count: 1;
   }
 }
+
+/* 总览按行分列：横读即排序。详情图墙仍用上面的纵向多列。 */
+.photo-masonry.is-row,
+.photo-masonry.is-row[data-count="1"],
+.photo-masonry.is-row[data-count="2"] {
+  display: flex;
+  align-items: flex-start;
+  column-count: auto;
+  gap: 14px;
+}
+
+.photo-masonry.is-row .photo-masonry-col {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.photo-masonry.is-row .photo-masonry-col > .card,
+.photo-masonry.is-row .photo-masonry-col > .project-gallery-shot {
+  margin-bottom: 0;
+}
+
+@media (min-width: 1400px) {
+  .photo-masonry.is-row:not([data-count="1"]):not([data-count="2"]) {
+    column-count: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .photo-masonry.is-row {
+    column-count: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .photo-masonry.is-row:not([data-count="1"]):not([data-count="2"]) {
+    column-count: auto;
+  }
+}
+
+/* 总览按行分列：横读即排序。详情图墙仍用上面的纵向多列。 */
+.photo-masonry.is-row,
+.photo-masonry.is-row[data-count="1"],
+.photo-masonry.is-row[data-count="2"] {
+  display: flex;
+  align-items: flex-start;
+  column-count: auto;
+  gap: 14px;
+}
+
+.photo-masonry.is-row .photo-masonry-col {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.photo-masonry.is-row .photo-masonry-col > .card,
+.photo-masonry.is-row .photo-masonry-col > .project-gallery-shot {
+  margin-bottom: 0;
+}
+
+@media (min-width: 1400px) {
+  .photo-masonry.is-row:not([data-count="1"]):not([data-count="2"]) {
+    column-count: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .photo-masonry.is-row {
+    column-count: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .photo-masonry.is-row:not([data-count="1"]):not([data-count="2"]) {
+    column-count: auto;
+  }
+}
+
+/* 总览按行分列：横读即排序。详情图墙仍用上面的纵向多列。 */
+.photo-masonry.is-row,
+.photo-masonry.is-row[data-count="1"],
+.photo-masonry.is-row[data-count="2"] {
+  display: flex;
+  align-items: flex-start;
+  column-count: auto;
+  gap: 14px;
+}
+
+.photo-masonry.is-row .photo-masonry-col {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.photo-masonry.is-row .photo-masonry-col > .card,
+.photo-masonry.is-row .photo-masonry-col > .project-gallery-shot {
+  margin-bottom: 0;
+}
+
+@media (min-width: 1400px) {
+  .photo-masonry.is-row:not([data-count="1"]):not([data-count="2"]) {
+    column-count: auto;
+  }
+}
+
+@media (max-width: 900px) {
+  .photo-masonry.is-row {
+    column-count: auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .photo-masonry.is-row:not([data-count="1"]):not([data-count="2"]) {
+    column-count: auto;
+  }
+}
