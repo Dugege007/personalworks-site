@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { planAlbumPreview, type ProjectAlbumShot } from "../../content/projectAlbum";
 import { readPhotoExif } from "../../content/photoExif";
 import { assetUrl } from "../../lib/assets";
+import { TermText } from "../TermText";
 import { resolveLead, resolveMediaDescription } from "../../content/copyDisplay";
 import { ImageLightbox, type LightboxShot } from "./ImageLightbox";
 import { InlineWorkVideo } from "./InlineWorkVideo";
@@ -223,7 +224,11 @@ export function ProjectGallery({
                 <h2>
                   {project.href ? <Link to={project.href}>{project.title}</Link> : project.title}
                 </h2>
-                {resolveLead(project.summary) ? <p>{resolveLead(project.summary)}</p> : null}
+                {resolveLead(project.summary) ? (
+                  <p>
+                    <TermText text={resolveLead(project.summary)!} />
+                  </p>
+                ) : null}
               </div>
               {project.date || project.place ? (
                 <small>

@@ -5,7 +5,7 @@
 姓名与联系不写在这里。工具先在「工具」里登记名称与图标，再在「领域」里写分。
 图标文件放在 `public/skill-icons/`，本表「图标」只写文件名。
 「官网」写软件首页；开源无独立站则写仓库页。不写则图标不可点。
-「描述」写一两句用途，悬停技能名时显示。某行留空则页面不显示该字段。
+「描述」写一两句用途。名词表已有同名或别名时，悬停技能名改读名词表；本字段只在对不上时显示。某行留空且名词表也没有该名称，则技能名不出现提示。
 
 ## 页眉
 
@@ -292,7 +292,7 @@ id：cursor
 描述：AI 辅助编程编辑器，用于日常开发。
 英文描述：AI-assisted editor used in daily development.
 
-### Agent开发
+### Agent 开发
 
 id：agent-dev
 英文：Agent Development
@@ -300,7 +300,7 @@ id：agent-dev
 描述：智能体编排与工具调用相关的开发。
 英文描述：Agent orchestration and tool-calling development.
 
-### AI训练
+### AI 训练
 
 id：ai-train
 英文：AI Training

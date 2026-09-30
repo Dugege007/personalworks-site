@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { WorkSection as WorkSectionData } from "../../content/site";
+import { TermText } from "../TermText";
+import { resolveLead } from "../../content/copyDisplay";
 import { homeFrameSrcs } from "../../content/stockMedia";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { assetUrl } from "../../lib/assets";
@@ -55,7 +57,9 @@ export function WorkSection({ data, flip }: WorkSectionProps) {
           {data.index} / {data.indexEn}
         </div>
         <h2>{data.title}</h2>
-        <p className="work-lead">{data.lead}</p>
+        <p className="work-lead">
+          {resolveLead(data.lead) ? <TermText text={resolveLead(data.lead)!} /> : data.lead}
+        </p>
         <Link className="archive-btn" to={data.path}>
           进入档案
           <span aria-hidden="true">→</span>

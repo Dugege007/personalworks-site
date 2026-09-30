@@ -3,6 +3,7 @@ import { ConstructionSetList } from "../components/work/ConstructionSetList";
 import { lexicon } from "../content/lexicon";
 import { categories, type WorkCollection } from "../content/site";
 import { stockPlaceholderSrc, workCoverSrc } from "../content/stockMedia";
+import { TermText } from "../components/TermText";
 import { resolveLead } from "../content/copyDisplay";
 import { studioAliasForDisplay } from "../content/studios";
 import { listPublishedWorks } from "../content/works";
@@ -45,7 +46,11 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
         {category.index} / {category.indexEn}
       </div>
       <h1>{category.title}</h1>
-      {resolveLead(category.lead) ? <p className="page-lead">{resolveLead(category.lead)}</p> : null}
+      {resolveLead(category.lead) ? (
+        <p className="page-lead">
+          <TermText text={resolveLead(category.lead)!} />
+        </p>
+      ) : null}
       {isPhoto ? (
         <>
           <Link className="archive-btn" to={`/${lexicon.photography.key}/${lexicon.photoCatalog.key}`}>
@@ -68,7 +73,11 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
           <section key={collection.id} className="category-block" data-theme={collection.theme}>
             <div className="page-kicker">{collection.titleDeco}</div>
             <h2>{collection.title}</h2>
-            {resolveLead(collection.lead) ? <p>{resolveLead(collection.lead)}</p> : null}
+            {resolveLead(collection.lead) ? (
+              <p>
+                <TermText text={resolveLead(collection.lead)!} />
+              </p>
+            ) : null}
             {collection.comingSoon ? (
               <p className="note">位置已留，作品待收录。不进入详情占位。</p>
             ) : null}

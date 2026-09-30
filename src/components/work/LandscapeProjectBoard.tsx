@@ -7,6 +7,7 @@ import {
   useState,
   type PointerEvent,
 } from "react";
+import { TermText } from "../TermText";
 import {
   resolveLead,
   resolveMediaDescription,
@@ -566,7 +567,11 @@ function ProjectModule({ work, showHead = true, bootFirst = false, syncIndex, on
               </ul>
             ) : null}
           </header>
-          {resolveLead(work.summary) ? <p className="lrb-lead">{resolveLead(work.summary)}</p> : null}
+          {resolveLead(work.summary) ? (
+            <p className="lrb-lead">
+              <TermText text={resolveLead(work.summary)!} />
+            </p>
+          ) : null}
         </>
       ) : null}
       {shots.length > 0 ? (

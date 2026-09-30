@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import type { ReactNode } from "react";
+import { TermText } from "../TermText";
 import { resolveLead } from "../../content/copyDisplay";
 
 type ChannelHeadProps = {
@@ -21,7 +22,11 @@ export function ChannelHead({ backTo, backLabel, title, lead, children }: Channe
         {backLabel}
       </Link>
       <h1>{title}</h1>
-      {filledLead ? <p className="develop-kind-lead">{filledLead}</p> : null}
+      {filledLead ? (
+        <p className="develop-kind-lead">
+          <TermText text={filledLead} />
+        </p>
+      ) : null}
       {children}
     </div>
   );

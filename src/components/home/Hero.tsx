@@ -4,6 +4,7 @@ import { lexicon } from "../../content/lexicon";
 import { assetUrl } from "../../lib/assets";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { ProfileName } from "../ProfileName";
+import { TermText } from "../TermText";
 import { ContactIcons } from "./ContactIcons";
 import { ScrollHint } from "./ScrollHint";
 
@@ -78,7 +79,9 @@ export function Hero() {
         <div className="hero-id">{profile.identity}</div>
         <p className="hero-bio">
           {profile.bio.map((line) => (
-            <span key={line}>{line}</span>
+            <span key={line}>
+              <TermText text={line} />
+            </span>
           ))}
         </p>
         <ContactIcons channels={profile.contactChannels} />

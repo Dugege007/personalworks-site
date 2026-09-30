@@ -50,7 +50,7 @@
   margin: 0;
 }
 
-.skills-domain button {
+.skills-domain > h2 > button {
   display: flex;
   width: 100%;
   align-items: center;
@@ -60,7 +60,7 @@
   cursor: pointer;
 }
 
-.skills-domain.is-open button {
+.skills-domain.is-open > h2 > button {
   padding-bottom: 10px;
 }
 
@@ -281,7 +281,7 @@ a.skill-mark:focus-visible {
     animation: skills-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
-  .skills-domain button {
+  .skills-domain > h2 > button {
     transition: padding 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
@@ -320,7 +320,7 @@ a.skill-mark:focus-visible {
 }
 
 @media (max-width: 520px) {
-  .skills-domain button {
+  .skills-domain > h2 > button {
     align-items: flex-start;
     flex-direction: column;
     gap: 10px;

@@ -1,6 +1,9 @@
 import { useState, type CSSProperties, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { lexicon } from "../content/lexicon";
+import { glossaryEntryFor } from "../content/glossary";
+import { glossaryBook } from "../content/glossaryDoc";
+import { TermLabel, TermText } from "../components/TermText";
 import {
   defaultOpenSkillIds,
   levelForScore,
@@ -37,7 +40,11 @@ export function SkillsPage() {
     <div className="skills" data-theme={lexicon.profileSkills.key}>
       <header className="skills-head">
         <h1>{tx(skillsPage.title, locale)}</h1>
-        {skillsPage.lead ? <p className="skills-lead">{tx(skillsPage.lead, locale)}</p> : null}
+        {skillsPage.lead ? (
+          <p className="skills-lead">
+            <TermText text={tx(skillsPage.lead, locale)} />
+          </p>
+        ) : null}
         {skillsPage.resumeLabel ? (
           <Link className="skills-cross" to={`/${lexicon.profileResume.key}`}>
             {tx(skillsPage.resumeLabel, locale)}
@@ -92,6 +99,7 @@ function SkillMeter({ tool, score, locale }: { tool: SkillTool; score: number; l
   const level = levelForScore(score);
   const name = skillToolName(tool, locale);
   const blurb = skillToolBlurb(tool, locale);
+  const glossaryEntry = glossaryEntryFor(glossaryBook, skillLookupNames(tool));
   const fill = Math.min(100, Math.max(0, score));
   const grade = level ? skillLevelName(level, locale) : "";
   const nameLabel = <div className="skill-name">{name}</div>;
@@ -100,7 +108,9 @@ function SkillMeter({ tool, score, locale }: { tool: SkillTool; score: number; l
     <div className="skill-meter">
       <SkillMark tool={tool} name={name} />
       <div className="skill-copy">
-        {blurb ? (
+        {glossaryEntry ? (
+          <TermLabel label={name} entry={glossaryEntry} plain className="skill-name" />
+        ) : blurb ? (
           <HoverTip variant="name" panel={<p className="skill-tip-line">{blurb}</p>}>
             {nameLabel}
           </HoverTip>
@@ -133,6 +143,14 @@ function SkillMeter({ tool, score, locale }: { tool: SkillTool; score: number; l
       </div>
     </div>
   );
+}
+
+function skillLookupNames(tool: SkillTool): string[] {
+  const name = tool.name;
+  if (typeof name === "string") {
+    return [name];
+  }
+  return [name["zh-CN"], name.en ?? ""].filter((item) => item.length > 0);
 }
 
 function SkillMark({ tool, name, compact }: { tool: SkillTool; name: string; compact?: boolean }) {

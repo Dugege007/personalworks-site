@@ -273,10 +273,11 @@
 
 .develop-kind-lead {
   margin: 0;
-  max-width: 36em;
+  max-width: 65em;
   font-size: 17px;
   line-height: 1.7;
   color: var(--muted);
+  white-space: pre-line;
 }
 
 .develop-kind-doors {

@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import { Link } from "react-router-dom";
 import { ProfileName } from "../components/ProfileName";
+import { TermText } from "../components/TermText";
 import { ContactIcons } from "../components/home/ContactIcons";
 import { lexicon } from "../content/lexicon";
 import {
@@ -64,7 +65,9 @@ export function ResumePage() {
       <div className="resume-main">
         <section className="resume-block">
           <h2>简介</h2>
-          <p className="resume-summary">{tx(resume.summary, locale)}</p>
+          <p className="resume-summary">
+            <ResumeMarks text={tx(resume.summary, locale)} annotate />
+          </p>
         </section>
 
         {resume.jobs.length > 0 ? (
@@ -91,7 +94,11 @@ export function ResumePage() {
                     </div>
                     <time>{school.years}</time>
                   </div>
-                  {school.note ? <p>{tx(school.note, locale)}</p> : null}
+                  {school.note ? (
+                    <p>
+                      <ResumeMarks text={tx(school.note, locale)} annotate />
+                    </p>
+                  ) : null}
                 </li>
               ))}
             </ul>
@@ -194,7 +201,7 @@ function ResumeJobItem({ job, index, locale }: { job: ResumeJob; index: number; 
       </button>
       {open && summary ? (
         <p>
-          <ResumeMarks text={summary} />
+          <ResumeMarks text={summary} annotate />
         </p>
       ) : null}
     </li>
@@ -204,12 +211,14 @@ function ResumeJobItem({ job, index, locale }: { job: ResumeJob; index: number; 
 /**
  * 履历正文里的 `**加粗**`。
  */
-function ResumeMarks({ text }: { text: string }) {
+function ResumeMarks({ text, annotate }: { text: string; annotate?: boolean }) {
   return (
     <>
-      {parseResumeMarks(text).map((mark, index) =>
-        mark.bold ? <strong key={`${mark.text}-${index}`}>{mark.text}</strong> : mark.text,
-      )}
+      {parseResumeMarks(text).map((mark, index) => {
+        const key = `${mark.text}-${index}`;
+        const body = annotate ? <TermText text={mark.text} /> : mark.text;
+        return mark.bold ? <strong key={key}>{body}</strong> : <Fragment key={key}>{body}</Fragment>;
+      })}
     </>
   );
 }

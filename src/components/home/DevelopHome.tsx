@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent, type PointerEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { lexicon } from "../../content/lexicon";
+import { TermText } from "../TermText";
 import { gameProjects, profile } from "../../content/site";
 import { stockPlaceholderSrc, workCoverSrc } from "../../content/stockMedia";
 import { heroFrameFitsViewport, type PhotoOrientation } from "../../content/photoOrientation";
@@ -310,8 +311,16 @@ function HeroBleed({ block }: { block: HomeBlock }) {
           </div>
         </div>
         <div className="develop-hero-note">
-          {lead ? <p className="develop-hero-lead">{lead}</p> : null}
-          {quote ? <p className="develop-hero-quote">{quote}</p> : null}
+          {lead ? (
+            <p className="develop-hero-lead">
+              <TermText text={lead} />
+            </p>
+          ) : null}
+          {quote ? (
+            <p className="develop-hero-quote">
+              <TermText text={quote} />
+            </p>
+          ) : null}
         </div>
       </div>
     </section>

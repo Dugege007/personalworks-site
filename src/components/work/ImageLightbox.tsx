@@ -12,6 +12,7 @@ import { Link } from "react-router-dom";
 import type { PhotoExif } from "../../content/photoExif";
 import { pausePageLenis, resumePageLenis } from "../../hooks/useLenis";
 import { resolveLead } from "../../content/copyDisplay";
+import { TermText } from "../TermText";
 import { assetUrl } from "../../lib/assets";
 import { PhotoExifStrip } from "./ExifMarks";
 import { NavMark } from "./NavMarks";
@@ -537,7 +538,11 @@ export function ImageLightbox({
                   ) : null}
                 </div>
               ) : null}
-              {resolveLead(summary) ? <p className="lrb-lightbox-lead">{resolveLead(summary)}</p> : null}
+              {resolveLead(summary) ? (
+                <p className="lrb-lightbox-lead">
+                  <TermText text={resolveLead(summary)!} />
+                </p>
+              ) : null}
             </div>
           </div>
         </div>
