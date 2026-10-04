@@ -1,0 +1,33 @@
+[data-skin="strata"] {
+  --bg: #0b0d10;
+  --surface: #14181c;
+  --text: #e8e6e1;
+  --muted: #8a8680;
+  --line: rgba(232, 230, 225, 0.12);
+  --gold: #c4a574;
+  --mist: #7ba3a8;
+  --signal: #e08a4c;
+  --ink: #3a322c;
+  --accent: var(--gold);
+  --accent-soft: rgba(196, 165, 116, 0.16);
+  --header-bg: color-mix(in srgb, var(--bg) 72%, transparent);
+  --drawer-bg: color-mix(in srgb, var(--bg) 94%, transparent);
+  --scrim: color-mix(in srgb, var(--bg) 56%, transparent);
+  --veil: color-mix(in srgb, var(--bg) 72%, transparent);
+  --panel-bg: #12161b;
+  --portrait-base: #101318;
+  --portrait-placeholder:
+    linear-gradient(160deg, rgba(196, 165, 116, 0.16), transparent 42%),
+    linear-gradient(20deg, #1a2228, #101318 55%, #1c1814);
+  --spot-color: rgba(196, 165, 116, 0.28);
+  --caption-shadow: 0 1px 8px rgba(8, 10, 12, 0.7);
+  --motion-grain: 1;
+  --motion-spot: 1;
+  --motion-stage: 1;
+  --stage-play: running;
+  --font-serif: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  --font-sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-display-en: "Outfit", "Noto Sans SC", sans-serif;
+  --font-en: "Outfit", "Noto Sans SC", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}

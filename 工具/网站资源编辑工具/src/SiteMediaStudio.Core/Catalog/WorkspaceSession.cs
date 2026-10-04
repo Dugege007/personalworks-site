@@ -38,6 +38,7 @@ public sealed class WorkspaceSession
         var withdrawSet = PendingWithdrawSet(profile, pending);
         var stageItems = StageCatalogScanner.Scan(profile, ledgerDict);
         MarkPendingWithdraw(stageItems, withdrawSet);
+        NoteCatalog.ApplyPublishState(profile, stageItems);
         var registeredList = ProfileStageSessions.Merge(LoadWorks(profile, ledgerDict), stageItems)
             .Concat(NoteCatalog.Discover(profile, stageItems))
             .ToList();

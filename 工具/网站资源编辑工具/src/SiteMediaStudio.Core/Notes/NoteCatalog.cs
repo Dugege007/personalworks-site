@@ -90,6 +90,66 @@ public static class NoteCatalog
         return list;
     }
 
+    /// <summary>
+    /// 按发布索引给正文和已收录配图打上已发布或已隐藏。不改媒体台账。
+    /// </summary>
+    public static void ApplyPublishState(WorkspaceProfile profile, IReadOnlyList<StageItem> stageItems)
+    {
+        var channel = profile.Channels.FirstOrDefault(item => NoteRules.IsNotesChannel(item.Key));
+        if (channel == null)
+        {
+            return;
+        }
+
+        ApplyPublishState(
+            stageItems,
+            NoteIndexStore.Load(profile),
+            WorkspaceProfileLoader.ChannelStageRelative(profile, channel));
+    }
+
+    /// <summary>
+    /// 按给定索引给正文和已收录配图打上已发布或已隐藏。
+    /// </summary>
+    public static void ApplyPublishState(
+        IReadOnlyList<StageItem> stageItems,
+        NoteIndexFile index,
+        string channelFolder)
+    {
+        foreach (var item in stageItems)
+        {
+            if (!NoteRules.IsNotesChannel(item.ChannelKey))
+            {
+                continue;
+            }
+
+            var folder = NoteRules.NoteFolderFromStageRel(item.StageRel, channelFolder);
+            if (string.IsNullOrWhiteSpace(folder))
+            {
+                continue;
+            }
+
+            var entry = index.Notes.FirstOrDefault(note =>
+                string.Equals(note.Folder, folder, StringComparison.Ordinal)
+                && !note.Draft
+                && !string.IsNullOrWhiteSpace(note.Slug));
+            if (entry == null)
+            {
+                continue;
+            }
+
+            var listed = NoteRules.IsBodyStageRel(item.StageRel)
+                || entry.Images.Any(image =>
+                    string.Equals(JsonUtil.ToRel(image.StageRel), JsonUtil.ToRel(item.StageRel), StringComparison.Ordinal));
+            if (!listed)
+            {
+                continue;
+            }
+
+            item.IsNoteListed = true;
+            item.IsNoteHidden = entry.Hidden;
+        }
+    }
+
     private static string? NullIfEmpty(string? value)
     {
         return string.IsNullOrWhiteSpace(value) ? null : value;

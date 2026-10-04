@@ -1,0 +1,117 @@
+@import "./tokens.css";
+@import "./skins/strata.css";
+@import "lenis/dist/lenis.css";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  /* 经典滚动条占位固定，避免 overflow 切换时版心左右跳 */
+  scrollbar-gutter: stable;
+  /* 关掉手机内核点按可交互元素时的默认蓝底高亮 */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Lenis.stop() 默认 overflow:clip，会藏掉滚动条并挤动中间内容。
+   图条悬停只需停平滑滚动，滚动条仍显示；灯箱才锁溢流。 */
+html.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: auto;
+}
+
+html[data-lightbox="open"],
+html[data-lightbox="open"].lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.7;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  opacity: calc(0.055 * var(--motion-grain));
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.85'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain {
+    animation: none;
+  }
+}
+
+@media (pointer: fine) {
+  .grain {
+    animation: grain-shift calc(0.8s * var(--motion-grain)) steps(2) infinite;
+  }
+}
+
+@keyframes grain-shift {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-1%, 1%); }
+  50% { transform: translate(1%, -1%); }
+  100% { transform: translate(0, 0); }
+}
+
+.profile-name-toggle {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  text-align: inherit;
+  cursor: pointer;
+  appearance: none;
+}

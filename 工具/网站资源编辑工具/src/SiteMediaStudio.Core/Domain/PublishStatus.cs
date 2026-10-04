@@ -67,10 +67,20 @@ public static class PublishStatus
             return Withdrawn;
         }
 
+        if (stage.IsNoteHidden)
+        {
+            return Hidden;
+        }
+
         var zh = ToChinese(stage.LedgerStatus);
         if (!string.IsNullOrEmpty(zh))
         {
             return zh;
+        }
+
+        if (stage.IsNoteListed)
+        {
+            return Published;
         }
 
         return string.IsNullOrWhiteSpace(stage.MatchedObject) ? Unpublished : Paired;

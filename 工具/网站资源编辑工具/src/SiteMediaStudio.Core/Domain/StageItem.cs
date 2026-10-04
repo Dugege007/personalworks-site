@@ -25,6 +25,16 @@ public sealed class StageItem
     /// </summary>
     public bool IsPendingWithdraw { get; set; }
 
+    /// <summary>
+    /// 心得发布索引已收录该正文或配图。不写入媒体台账，再次上页仍允许。
+    /// </summary>
+    public bool IsNoteListed { get; set; }
+
+    /// <summary>
+    /// 心得索引将该篇标为隐藏。卡片显示已隐藏，媒体台账保持原状。
+    /// </summary>
+    public bool IsNoteHidden { get; set; }
+
     public bool IsStock { get; init; }
 
     /// <summary>

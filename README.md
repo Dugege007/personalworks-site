@@ -4,7 +4,7 @@
 
 ## 目前可以复用
 
-简历页和技能页可以换内容，不必改路由，也不必会 React。
+简历页和技能页可以换内容。
 
 简历改 [`文稿/resume.md`](PersonalSite/文稿/resume.md)。版式是简介、经历、教育、技能和语言。某行留空，页面上就不显示。姓名和联系方式不在这份文稿里，沿用站点形象。
 
@@ -22,7 +22,7 @@
 
 正在运行的网站：[https://duhongbo.com](https://duhongbo.com)。
 
-访客看到的是作品站：首页、作品、数字孪生与仿真、景观设计、摄影、游戏开发、心得、简历、技能、关于。皮肤可以切换。界面默认中文，可以切到英文。各页路径、预览和发布命令见 [PersonalSite/README.md](PersonalSite/README.md)。
+访客看到的是作品站：首页、作品、数字孪生与仿真、景观设计、摄影、游戏开发、心得、简历、技能、关于。皮肤可以切换。界面默认中文，英文切换正在开发中。各页路径、预览和发布命令见 [PersonalSite/README.md](PersonalSite/README.md)。
 
 ## 素材与发布
 
@@ -33,7 +33,7 @@
 发到公网用的是 `PersonalSite` 里的发布脚本。它按本机的 `.env.deploy` 把静态页送到服务器，把图片同步到对象存储。这份配置不进仓库。`.env.deploy.example` 里只有占位，没有真实地址。克隆之后页面能打开，图是空的。`VITE_ASSET_BASE` 留空时从 `/placeholders` 读图；要看已经发布的图，把它写成资源地址。
 
 
-## 先跑起来
+## 运行
 
 站点需要 Node.js 20 或以上。在仓库根执行：
 
@@ -45,7 +45,10 @@ npm run dev
 
 浏览器打开终端里的地址，默认是 `http://localhost:5173/`。
 
-维护窗口是 Windows 上的 WPF 程序，需要 .NET 8。不想改正式站点时，用它自带的模拟站 `fixtures/sample-site`。怎么运行、窗口能做什么，见 [工具/网站资源编辑工具/README.md](工具/网站资源编辑工具/README.md)。压图入库、PDF 转 JPG 和脱敏的命令在各自目录的 README 里。
+维护窗口是 Windows 上的 WPF 程序，需要 .NET 8。
+不想改正式站点时，用它自带的模拟站 `fixtures/sample-site`。
+怎么运行、窗口能做什么，见 [工具/网站资源编辑工具/README.md](工具/网站资源编辑工具/README.md)。
+压图入库、PDF 转 JPG 和脱敏的命令在各自目录的 README 里。
 
 ## 目录
 
@@ -73,3 +76,5 @@ npm run dev
     ├── 摄影（photo）/
     └── 心得（notes）/
 ```
+
+> 本站使用 Vibe Coding 的方式搭建，目前使用 Cursor 继续完善功能。

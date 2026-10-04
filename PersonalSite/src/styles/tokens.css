@@ -1,0 +1,60 @@
+@import "./skins/develop.css";
+
+:root {
+  --header-h: 64px;
+  --motion-reveal: 1;
+  --motion-hint: 1;
+  --motion-ticks: 1;
+  /* 横屏内容栏：宽于此时只加左右留白，窄于此时才开始压缩与重排 */
+  --page-max: 1200px;
+  --page-gutter: 56px;
+  /* 竖拍形象照头部多在画面上三分之一，裁切锚在此以免削顶 */
+  --portrait-focus: 50% 18%;
+}
+
+@media (max-width: 860px) {
+  :root {
+    --page-gutter: 20px;
+  }
+}
+
+@media (max-width: 390px) {
+  :root {
+    --page-gutter: 16px;
+  }
+}
+
+[data-skin="strata"] [data-theme="home"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.16); }
+[data-skin="strata"] [data-theme="twin-sim"],
+[data-skin="strata"] [data-theme="digital-twin"] { --accent: var(--mist); --accent-soft: rgba(123, 163, 168, 0.16); }
+[data-skin="strata"] [data-theme="line-sim"],
+[data-skin="strata"] [data-theme="plant-sim"] { --accent: #c9925a; --accent-soft: rgba(201, 146, 90, 0.16); }
+[data-skin="strata"] [data-theme="landscape-arch"],
+[data-skin="strata"] [data-theme="landscape-rendering"],
+[data-skin="strata"] [data-theme="photo"],
+[data-skin="strata"] [data-theme="landscape-photo"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.16); }
+[data-skin="strata"] [data-theme="humanist-photo"] { --accent: #b89a82; --accent-soft: rgba(184, 154, 130, 0.18); }
+[data-skin="strata"] [data-theme="landscape-cds"] { --accent: #8bb8c1; --accent-soft: rgba(139, 184, 193, 0.16); }
+[data-skin="strata"] [data-theme="portrait-photo"] { --accent: #d4b49a; --accent-soft: rgba(212, 180, 154, 0.18); }
+[data-skin="strata"] [data-theme="game-dev"],
+[data-skin="strata"] [data-theme="game-design"],
+[data-skin="strata"] [data-theme="game-photo"],
+[data-skin="strata"] [data-theme="ai-photo"],
+[data-skin="strata"] [data-theme="menu"],
+[data-skin="strata"] [data-theme="play"] { --accent: var(--signal); --accent-soft: rgba(224, 138, 76, 0.16); }
+[data-skin="strata"] [data-theme="notes"],
+[data-skin="strata"] [data-theme="about"],
+[data-skin="strata"] [data-theme="profile-resume"],
+[data-skin="strata"] [data-theme="profile-skills"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.12); }
+[data-skin="strata"] [data-theme="sketches"] { --accent: #b08968; --accent-soft: rgba(176, 137, 104, 0.18); }
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-grain: 0;
+    --motion-spot: 0;
+    --motion-reveal: 0;
+    --motion-ticks: 1;
+    --motion-stage: 0;
+    --stage-play: paused;
+  }
+}

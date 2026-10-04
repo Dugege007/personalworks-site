@@ -201,6 +201,87 @@ public sealed class NoteRulesTests
         Assert.False(NoteIndexStore.Load(profile).Notes[0].Hidden);
     }
 
+    [Fact]
+    public void ApplyPublishState_ListedBodyWithoutLedger_ShowsPublished()
+    {
+        var body = Stage("心得（notes）/20261005_021341/正文.md");
+        var extra = Stage("心得（notes）/20261005_021341/extra.jpg");
+        var index = new NoteIndexFile
+        {
+            Notes =
+            {
+                new NoteEntry
+                {
+                    Folder = "20261005_021341",
+                    Slug = "n-20261005-021341",
+                    Images =
+                    {
+                        new NoteImageMeta { StageRel = "心得（notes）/20261005_021341/shot.jpg" }
+                    }
+                }
+            }
+        };
+
+        NoteCatalog.ApplyPublishState(new[] { body, extra }, index, "心得（notes）");
+
+        Assert.Equal("已发布", PublishStatus.ForStage(body));
+        Assert.Equal("未上页", PublishStatus.ForStage(extra));
+    }
+
+    [Fact]
+    public void ApplyPublishState_HiddenListedImage_ShowsHiddenOverLedger()
+    {
+        var shot = Stage("心得（notes）/20261005_021341/shot.jpg", "published");
+        var index = new NoteIndexFile
+        {
+            Notes =
+            {
+                new NoteEntry
+                {
+                    Folder = "20261005_021341",
+                    Slug = "n-20261005-021341",
+                    Hidden = true,
+                    Images =
+                    {
+                        new NoteImageMeta { StageRel = "心得（notes）/20261005_021341/shot.jpg" }
+                    }
+                }
+            }
+        };
+
+        NoteCatalog.ApplyPublishState(new[] { shot }, index, "心得（notes）");
+
+        Assert.Equal("已隐藏", PublishStatus.ForStage(shot));
+    }
+
+    [Fact]
+    public void ApplyPublishState_Draft_StaysUnpublished()
+    {
+        var body = Stage("心得（notes）/20261005_021341/正文.md");
+        var index = new NoteIndexFile
+        {
+            Notes =
+            {
+                new NoteEntry { Folder = "20261005_021341", Slug = "n-20261005-021341", Draft = true }
+            }
+        };
+
+        NoteCatalog.ApplyPublishState(new[] { body }, index, "心得（notes）");
+
+        Assert.Equal("未上页", PublishStatus.ForStage(body));
+    }
+
+    private static StageItem Stage(string stageRel, string? ledgerStatus = null)
+    {
+        return new StageItem
+        {
+            ChannelKey = "notes",
+            StageRel = stageRel,
+            FullPath = "x",
+            LedgerStatus = ledgerStatus
+        };
+    }
+
     private static string TempDir()
     {
         var path = Path.Combine(Path.GetTempPath(), "sms-note-" + Guid.NewGuid().ToString("N"));

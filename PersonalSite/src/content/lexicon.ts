@@ -1,0 +1,185 @@
+/**
+ * 中英术语冻结表。
+ * `en`：正文与语言切换；`deco`：顶栏副标与档案编号。
+ * `key`：路由段、COS 前缀、`public/placeholders` 目录名、中转站括号内键。
+ * 中转站文件夹为「中文（key）」，不加文档序号；网页档案号按顶栏顺序生成。
+ * `key` 为小写短横线简写，须带领域前缀，禁止占用通用词（如 render、construction、games）。
+ */
+export type LexiconEntry = {
+  zh: string;
+  en: string;
+  deco: string;
+  key: string;
+};
+
+export const lexicon = {
+  digitalTwin: {
+    zh: "数字孪生",
+    en: "Digital Twin",
+    deco: "DIGITAL TWIN",
+    key: "digital-twin",
+  },
+  plantSimulation: {
+    zh: "工厂仿真",
+    en: "Plant Simulation",
+    deco: "PLANT SIM",
+    key: "plant-sim",
+  },
+  lineSimulation: {
+    zh: "产线仿真",
+    en: "Production Line Simulation",
+    deco: "LINE SIM",
+    key: "line-sim",
+  },
+  twinAndSim: {
+    zh: "数字孪生&仿真",
+    en: "Digital Twin & Simulation",
+    deco: "DIGITAL TWIN & SIM",
+    key: "twin-sim",
+  },
+  landscapeArch: {
+    zh: "景观设计",
+    en: "Landscape Architecture",
+    deco: "LANDSCAPE ARCH",
+    key: "landscape-arch",
+  },
+  landscapeRendering: {
+    zh: "景观效果图",
+    en: "Landscape Rendering",
+    deco: "L. RENDER",
+    key: "landscape-rendering",
+  },
+  landscapeCDs: {
+    zh: "景观施工图",
+    en: "Landscape Construction Drawings",
+    deco: "L. CDS",
+    key: "landscape-cds",
+  },
+  photography: { zh: "摄影", en: "Photography", deco: "PHOTO", key: "photo" },
+  landscapePhoto: {
+    zh: "风光摄影",
+    en: "Landscape Photography",
+    deco: "L. PHOTO",
+    key: "landscape-photo",
+  },
+  humanistPhoto: {
+    zh: "人文摄影",
+    en: "Humanist Photography",
+    deco: "HUMANIST",
+    key: "humanist-photo",
+  },
+  portraitPhoto: {
+    zh: "人像摄影",
+    en: "Portrait Photography",
+    deco: "PORTRAIT",
+    key: "portrait-photo",
+  },
+  gamePhoto: {
+    zh: "游戏摄影",
+    en: "Game Photography",
+    deco: "GAME PHOTO",
+    key: "game-photo",
+  },
+  aiPhoto: {
+    zh: "AI摄影",
+    en: "AI Photography",
+    deco: "AI PHOTO",
+    key: "ai-photo",
+  },
+  realWorldPhoto: {
+    zh: "现实摄影",
+    en: "Real-world Photography",
+    deco: "REAL-WORLD",
+    key: "real-world-photo",
+  },
+  photoCatalog: {
+    zh: "照片总览",
+    en: "Photography Catalog",
+    deco: "CATALOG",
+    key: "catalog",
+  },
+  photoShoots: {
+    zh: "主题总览",
+    en: "Shoots",
+    deco: "SHOOTS",
+    key: "shoots",
+  },
+  gameDesign: {
+    zh: "游戏设计",
+    en: "Game Design",
+    deco: "GAME DESIGN",
+    key: "game-design",
+  },
+  gameDev: {
+    zh: "游戏开发",
+    en: "Game Development",
+    deco: "GAME DEV",
+    key: "game-dev",
+  },
+  gameMenu: { zh: "游戏选单", en: "Game Menu", deco: "MENU", key: "menu" },
+  gamePlay: { zh: "游戏游玩", en: "Gameplay", deco: "PLAY", key: "play" },
+  notes: { zh: "心得", en: "Notes", deco: "NOTES", key: "notes" },
+  sketching: { zh: "手绘", en: "Sketching", deco: "SKETCHES", key: "sketches" },
+  about: { zh: "关于", en: "About", deco: "ABOUT", key: "about" },
+  workIndex: { zh: "作品", en: "Work", deco: "WORK", key: "work-index" },
+  workStudio: { zh: "公司", en: "Studio", deco: "STUDIO", key: "work-studio" },
+  profileResume: { zh: "简历", en: "Resume", deco: "RESUME", key: "profile-resume" },
+  profileSkills: { zh: "技能", en: "Skills", deco: "SKILLS", key: "profile-skills" },
+  skillImaging: {
+    zh: "影像",
+    en: "Imaging",
+    deco: "IMAGING",
+    key: "skill-imaging",
+  },
+  skillOffice: {
+    zh: "通用办公",
+    en: "Office Software",
+    deco: "OFFICE",
+    key: "skill-office",
+  },
+  skillAi: {
+    zh: "AI",
+    en: "Artificial Intelligence",
+    deco: "AI",
+    key: "skill-ai",
+  },
+  skillMastery: {
+    zh: "精通",
+    en: "Mastery",
+    deco: "MASTER",
+    key: "skill-mastery",
+  },
+  skillProficient: {
+    zh: "熟练",
+    en: "Proficient",
+    deco: "PROFICIENT",
+    key: "skill-proficient",
+  },
+  skillWorking: {
+    zh: "会用",
+    en: "Working Knowledge",
+    deco: "WORKING",
+    key: "skill-working",
+  },
+  skillUsed: {
+    zh: "用过",
+    en: "Used",
+    deco: "USED",
+    key: "skill-used",
+  },
+  skillAware: {
+    zh: "仅了解",
+    en: "Awareness",
+    deco: "AWARE",
+    key: "skill-aware",
+  },
+  homePage: { zh: "首页", en: "Home Page", deco: "HOME", key: "home-page" },
+  profile: { zh: "形象照", en: "Profile", deco: "PROFILE", key: "profile" },
+  shotIn: { zh: "拍摄于", en: "Shot in", deco: "SHOT", key: "shot-in" },
+  profileBase: { zh: "现居地", en: "Based in", deco: "BASE", key: "profile-base" },
+  profileMail: { zh: "邮箱", en: "Mail", deco: "MAIL", key: "profile-mail" },
+  profilePhone: { zh: "手机", en: "Phone", deco: "PHONE", key: "profile-phone" },
+  profileWechat: { zh: "微信", en: "WeChat", deco: "WECHAT", key: "profile-wechat" },
+  profileQq: { zh: "QQ", en: "QQ", deco: "QQ", key: "profile-qq" },
+  profileGithub: { zh: "GitHub", en: "GitHub", deco: "GITHUB", key: "profile-github" },
+} as const satisfies Record<string, LexiconEntry>;

@@ -5321,7 +5321,7 @@ public sealed class ShellViewModel : ViewModelBase
 
         resultCounts = resultCounts with
         {
-            IngestOk = result.IngestOk,
+            IngestOk = result.IngestOk + noteIngestList.Count,
             RestoreOk = result.RestoreOk,
             HideOk = result.HideOk,
             WithdrawOk = result.WithdrawOk,

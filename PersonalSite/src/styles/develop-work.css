@@ -1,0 +1,548 @@
+/* 显影作品树：第一层四门画册、第二层细目门、第三层条目格。圆角 0，与首页切片同属直角语言。 */
+
+.develop-work-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.develop-work-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 28px;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.develop-work-back::before {
+  content: "←";
+}
+
+.develop-work-back:active {
+  transform: scale(0.98);
+}
+
+.develop-work-textlink {
+  display: inline-block;
+  margin-top: 20px;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid var(--text);
+}
+
+.develop-work-textlinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-top: 20px;
+}
+
+.develop-work-textlinks .develop-work-textlink {
+  margin-top: 0;
+}
+
+.develop-work-copy {
+  position: absolute;
+  left: 22px;
+  bottom: 22px;
+  z-index: 1;
+  display: grid;
+  gap: 6px;
+  color: var(--on-ink);
+  text-shadow: 0 1px 16px rgb(26 29 34 / 0.4);
+}
+
+.develop-work-gate-cell .develop-work-copy {
+  z-index: 3;
+  text-shadow:
+    0 1px 3px rgb(26 29 34 / 0.7),
+    0 6px 22px rgb(26 29 34 / 0.78);
+}
+
+.develop-work-copy strong {
+  font-size: clamp(22px, 3.2vw, 36px);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.develop-work-copy em {
+  font-family: var(--font-en);
+  font-size: 11px;
+  font-style: normal;
+  letter-spacing: 0.08em;
+  color: rgb(238 240 242 / 0.72);
+}
+
+.develop-work-copy span {
+  font-size: 13px;
+  color: rgb(238 240 242 / 0.78);
+  max-width: 28em;
+}
+
+.develop-work-well {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(160deg, var(--accent-soft), transparent 48%),
+    var(--ink-block);
+}
+
+.develop-work-well.is-kind-twin-sim {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 36px,
+      rgb(238 240 242 / 0.06) 36px 37px
+    ),
+    linear-gradient(160deg, rgb(61 106 115 / 0.28), transparent 52%),
+    var(--ink-block);
+}
+
+.develop-work-well.is-kind-game-dev {
+  background:
+    linear-gradient(180deg, rgb(196 92 62 / 0.22), transparent 58%),
+    var(--ink-block);
+}
+
+.develop-work-well.is-kind-landscape-arch {
+  background:
+    linear-gradient(135deg, rgb(47 93 74 / 0.28), transparent 46%),
+    var(--ink-block);
+}
+
+.develop-work-well.is-kind-photo {
+  background:
+    radial-gradient(80% 70% at 70% 20%, rgb(43 76 126 / 0.28), transparent 54%),
+    var(--ink-block);
+}
+
+.develop-work-well.is-channel-digital-twin,
+.develop-work-well.is-channel-line-sim {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 42px,
+      rgb(238 240 242 / 0.05) 42px 43px
+    ),
+    var(--ink-block);
+}
+
+.develop-work-well.is-channel-landscape-rendering,
+.develop-work-well.is-channel-landscape-cds {
+  background:
+    linear-gradient(160deg, rgb(47 93 74 / 0.22), transparent 50%),
+    var(--ink-block);
+}
+
+.develop-work-well.is-channel-landscape-photo {
+  background:
+    radial-gradient(90% 80% at 80% 10%, rgb(43 76 126 / 0.24), transparent 50%),
+    var(--ink-block);
+}
+
+.develop-work-well.is-channel-humanist-photo {
+  background:
+    linear-gradient(180deg, rgb(106 90 78 / 0.28), transparent 55%),
+    var(--ink-block);
+}
+
+.develop-work-well.is-channel-portrait-photo {
+  background:
+    linear-gradient(135deg, rgb(122 101 88 / 0.3), transparent 48%),
+    var(--ink-block);
+}
+
+.develop-work-well.is-channel-game-photo,
+.develop-work-well.is-channel-ai-photo,
+.develop-work-well.is-game {
+  background:
+    linear-gradient(180deg, rgb(196 92 62 / 0.2), transparent 60%),
+    var(--ink-block);
+}
+
+.develop-work-well.is-game.is-2 {
+  background:
+    linear-gradient(135deg, rgb(196 92 62 / 0.32), transparent 46%),
+    var(--ink-block);
+}
+
+.develop-work-well.is-game.is-3 {
+  background:
+    radial-gradient(70% 80% at 20% 80%, rgb(196 92 62 / 0.26), transparent 52%),
+    var(--ink-block);
+}
+
+/* 第一层：四门非对称画册。横屏跟内容栏留白，竖屏铺满。 */
+.develop-work-gate {
+  min-height: calc(100dvh - var(--header-h));
+  margin-inline: var(--page-inset);
+  display: grid;
+  grid-template-columns: 1.35fr 0.9fr 1.2fr;
+  grid-template-rows: 1.18fr 0.82fr;
+  grid-template-areas:
+    "twin twin game"
+    "land photo photo";
+  background: var(--ink-block);
+  color: var(--on-ink);
+}
+
+.develop-work-gate-cell {
+  position: relative;
+  overflow: hidden;
+  min-height: 0;
+  color: var(--on-ink);
+  border-right: 1px solid rgb(238 240 242 / 0.1);
+  border-bottom: 1px solid rgb(238 240 242 / 0.1);
+}
+
+.develop-work-gate-cell.is-1 { grid-area: twin; }
+.develop-work-gate-cell.is-2 { grid-area: game; border-right: 0; }
+.develop-work-gate-cell.is-3 { grid-area: land; border-bottom: 0; }
+.develop-work-gate-cell.is-4 { grid-area: photo; border-right: 0; border-bottom: 0; }
+
+.develop-work-gate-cell img,
+.develop-work-gate-cell .develop-work-well,
+.develop-kind-door img,
+.develop-kind-door .develop-work-well,
+.develop-channel-cell img,
+.develop-channel-cell .develop-work-well {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.develop-work-gate-cell img {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.develop-work-gate-cell img.is-on {
+  opacity: 1;
+  z-index: 1;
+}
+
+.develop-kind-door.is-cycling img {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.develop-kind-door.is-cycling img.is-on {
+  opacity: 1;
+}
+
+.develop-work-gate-cell::after,
+.develop-kind-door::after,
+.develop-channel-cell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 38%, rgb(26 29 34 / 0.78));
+  pointer-events: none;
+}
+
+.develop-work-gate-cell::after {
+  z-index: 2;
+}
+
+.develop-work-gate-cell.is-soon,
+.develop-kind-door.is-soon,
+.develop-channel-cell.is-soon {
+  cursor: default;
+  opacity: 0.72;
+}
+
+/* 第二层：分类头 + 细目门 */
+.develop-kind {
+  min-height: calc(100dvh - var(--header-h));
+  display: grid;
+  grid-template-rows: auto 1fr;
+}
+
+.develop-kind-head {
+  padding: 36px var(--page-inset) 28px;
+}
+
+.develop-kind h1,
+.develop-channel h1 {
+  margin: 0 0 12px;
+  font-size: clamp(36px, 5.5vw, 64px);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.develop-kind-lead {
+  margin: 0;
+  max-width: 65em;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--muted);
+  white-space: pre-line;
+}
+
+.develop-kind-doors {
+  display: flex;
+  min-height: 58vh;
+  margin-inline: var(--page-inset);
+  border-top: 1px solid var(--line);
+}
+
+.develop-game-projects {
+  padding: 0 var(--page-inset) 72px;
+}
+
+.develop-kind-door {
+  position: relative;
+  flex: 1.05 1 0;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--on-ink);
+  border-right: 1px solid rgb(238 240 242 / 0.1);
+  transition: flex-grow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.develop-kind-doors[data-count="1"] .develop-kind-door {
+  flex: 1 1 auto;
+  min-height: 64vh;
+  border-right: 0;
+}
+
+.develop-kind-doors[data-count="2"] .develop-kind-door:first-child {
+  flex-grow: 1.5;
+}
+
+.develop-kind-doors[data-count="3"] .develop-kind-door:nth-child(1) { flex-grow: 1.35; }
+.develop-kind-doors[data-count="3"] .develop-kind-door:nth-child(2) { flex-grow: 0.82; }
+.develop-kind-doors[data-count="3"] .develop-kind-door:nth-child(3) { flex-grow: 1.08; border-right: 0; }
+
+.develop-kind-doors[data-count="4"] .develop-kind-door:nth-child(1) { flex-grow: 1.4; }
+.develop-kind-doors[data-count="4"] .develop-kind-door:nth-child(4) { border-right: 0; }
+
+.develop-kind-doors[data-count="5"] {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.develop-kind-doors[data-count="5"] .develop-kind-door:nth-child(-n + 3) {
+  grid-column: span 2;
+}
+
+.develop-kind-doors[data-count="5"] .develop-kind-door:nth-child(n + 4) {
+  grid-column: span 3;
+}
+
+.develop-kind-doors[data-count="5"] .develop-kind-door:nth-child(3),
+.develop-kind-doors[data-count="5"] .develop-kind-door:nth-child(5) {
+  border-right: 0;
+}
+
+.develop-kind-doors[data-count="5"] .develop-kind-door:nth-child(n + 4) {
+  border-top: 1px solid rgb(238 240 242 / 0.1);
+}
+
+/* 第三层：细目条目 */
+.develop-channel {
+  padding: 0 0 72px;
+  min-height: calc(100dvh - var(--header-h));
+}
+
+.develop-channel-grid,
+.develop-channel-empty,
+.develop-channel .lrb,
+.develop-channel .cds-register,
+.develop-project-gallery {
+  padding-inline: var(--page-inset);
+}
+
+.develop-channel .lrb {
+  margin-top: 0;
+}
+
+.develop-channel-empty {
+  margin: 48px 0 0;
+  color: var(--muted);
+}
+
+.develop-channel-grid {
+  display: grid;
+  gap: 10px;
+  margin-top: 36px;
+  min-height: 56vh;
+}
+
+.develop-channel-grid[data-count="1"] {
+  grid-template-columns: 1fr;
+  min-height: 62vh;
+}
+
+.develop-channel-grid[data-count="2"] {
+  grid-template-columns: 1.35fr 1fr;
+}
+
+.develop-channel-grid[data-count="3"] {
+  grid-template-columns: 1.45fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas:
+    "a b"
+    "a c";
+  min-height: 72vh;
+}
+
+.develop-channel-grid[data-count="3"] .is-1 { grid-area: a; }
+.develop-channel-grid[data-count="3"] .is-2 { grid-area: b; }
+.develop-channel-grid[data-count="3"] .is-3 { grid-area: c; }
+
+.develop-channel-grid[data-count="4"],
+.develop-channel-grid[data-count="5"],
+.develop-channel-grid[data-count="6"] {
+  grid-template-columns: 1.3fr 1fr 1fr;
+  grid-template-rows: 1.1fr 0.9fr;
+}
+
+.develop-channel-grid[data-count="4"] .is-1,
+.develop-channel-grid[data-count="5"] .is-1,
+.develop-channel-grid[data-count="6"] .is-1 {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+}
+
+.develop-channel-cell {
+  position: relative;
+  min-height: 220px;
+  overflow: hidden;
+  background: var(--ink-block);
+  color: var(--on-ink);
+}
+
+.develop-channel-grid[data-count="3"] .is-1,
+.develop-channel-grid[data-count="1"] .is-1 {
+  min-height: 360px;
+}
+
+@media (pointer: fine) {
+  .develop-work-gate-cell img {
+    transform: scale(1);
+    transition: opacity 0.9s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .develop-kind-door img,
+  .develop-channel-cell img {
+    transform: scale(1);
+    transition: opacity 0.55s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .develop-work-gate-cell:hover img,
+  .develop-kind-door:hover img,
+  .develop-channel-cell:hover img {
+    transform: scale(1.06);
+  }
+
+  .develop-kind-doors[data-count="2"] .develop-kind-door:hover,
+  .develop-kind-doors[data-count="3"] .develop-kind-door:hover,
+  .develop-kind-doors[data-count="4"] .develop-kind-door:hover {
+    flex-grow: 2.15;
+  }
+
+  .develop-kind-door.is-cycling img {
+    transition: opacity 0.9s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@media (max-width: 860px) {
+  .develop-work-gate {
+    margin-inline: 0;
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-template-areas:
+      "twin"
+      "game"
+      "land"
+      "photo";
+  }
+
+  .develop-work-gate-cell,
+  .develop-work-gate-cell.is-2,
+  .develop-work-gate-cell.is-3,
+  .develop-work-gate-cell.is-4 {
+    min-height: 42vh;
+    border-right: 0;
+  }
+
+  .develop-kind-doors {
+    flex-direction: column;
+    min-height: 0;
+    grid-template-columns: 1fr;
+  }
+
+  .develop-kind-doors[data-count="5"] .develop-kind-door:nth-child(n + 4) {
+    border-top: 0;
+  }
+
+  .develop-kind-door,
+  .develop-kind-doors[data-count="1"] .develop-kind-door,
+  .develop-kind-doors[data-count="2"] .develop-kind-door:first-child,
+  .develop-kind-doors[data-count="3"] .develop-kind-door:nth-child(1),
+  .develop-kind-doors[data-count="3"] .develop-kind-door:nth-child(2),
+  .develop-kind-doors[data-count="3"] .develop-kind-door:nth-child(3),
+  .develop-kind-doors[data-count="5"] .develop-kind-door {
+    flex: none;
+    grid-column: auto;
+    min-height: 38vh;
+    border-right: 0;
+    border-bottom: 1px solid rgb(238 240 242 / 0.1);
+  }
+
+  .develop-channel-grid,
+  .develop-channel-grid[data-count="1"],
+  .develop-channel-grid[data-count="2"],
+  .develop-channel-grid[data-count="3"],
+  .develop-channel-grid[data-count="4"],
+  .develop-channel-grid[data-count="5"],
+  .develop-channel-grid[data-count="6"] {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-template-areas: none;
+    min-height: 0;
+  }
+
+  .develop-channel-grid[data-count="3"] .is-1,
+  .develop-channel-grid[data-count="3"] .is-2,
+  .develop-channel-grid[data-count="3"] .is-3,
+  .develop-channel-grid[data-count="4"] .is-1,
+  .develop-channel-grid[data-count="5"] .is-1,
+  .develop-channel-grid[data-count="6"] .is-1 {
+    grid-area: auto;
+    grid-column: auto;
+    grid-row: auto;
+    min-height: 42vw;
+  }
+}
+
+@media (max-width: 390px) {
+  .develop-work-copy strong {
+    font-size: 22px;
+  }
+
+  .develop-kind h1,
+  .develop-channel h1 {
+    font-size: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .develop-work-gate-cell img,
+  .develop-kind-door img,
+  .develop-channel-cell img,
+  .develop-kind-door {
+    transition: none;
+  }
+}
