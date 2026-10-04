@@ -1,4 +1,5 @@
 import { lexicon } from "./lexicon";
+import { photoExhibitTag, photoExhibitTitle } from "./photoFacet";
 import { initialGameProjects, registeredGames } from "./initialGameProjects";
 import { toListedMedia } from "./listedMedia";
 import { workCoverSrc } from "./stockMedia";
@@ -33,6 +34,8 @@ export type WorkCollection = {
   detailBase: string;
   frames: string[];
   comingSoon?: boolean;
+  /** 有值时这扇门按自由标签打开总览，不用 id 当类型键。 */
+  catalogTag?: string;
 };
 
 export type CategoryRecord = {
@@ -55,7 +58,7 @@ export type GameCard = {
   lead: string;
   capturedOn?: string;
   place?: string;
-  screenshots: Array<{ src: string; label: string; kind: "image" | "video"; poster?: string }>;
+  screenshots: Array<{ src: string; label: string; kind: "image" | "video"; poster?: string; stars?: number }>;
   playable: boolean;
   buildPath?: string;
   accent?: string;
@@ -119,6 +122,13 @@ export const profile = {
     "profile/DSC04901.webp",
     "profile/DSC05087.webp",
   ],
+  portraitStars: {
+    "profile/portrait.webp": 3,
+    "profile/462A2697.webp": 5,
+    "profile/462A2817.webp": 4,
+    "profile/DSC04901.webp": 4,
+    "profile/DSC05087.webp": 1,
+  },
   portraitYear: "2024",
   homeHeroSrc: "photo/real-world-photo/20260815 舟山 东极岛 庙子湖/01.webp",
   homeHeroYear: "2026",
@@ -291,7 +301,7 @@ export const categories: CategoryRecord[] = [
     lead: "",
     path: `/${lexicon.photography.key}`,
     theme: lexicon.photography.key,
-    homeFrames: ["风光摄影", "人文摄影", "人像摄影"],
+    homeFrames: [lexicon.landscapePhoto.zh, photoExhibitTitle, lexicon.portraitPhoto.zh],
     collections: [
       {
         id: lexicon.landscapePhoto.key,
@@ -305,13 +315,14 @@ export const categories: CategoryRecord[] = [
       },
       {
         id: lexicon.humanistPhoto.key,
-        title: lexicon.humanistPhoto.zh,
-        titleEn: lexicon.humanistPhoto.en,
-        titleDeco: lexicon.humanistPhoto.deco,
-        lead: "现场抓拍，不是摆拍。",
+        title: photoExhibitTitle,
+        titleEn: "",
+        titleDeco: photoExhibitTag,
+        lead: "待填写描述",
         theme: lexicon.humanistPhoto.key,
         detailBase: `/${lexicon.photography.key}/${lexicon.humanistPhoto.key}`,
-        frames: ["重庆 涪陵 白鹤梁", "重庆 涪陵 816核工程遗址", "杭州 黑神话展"],
+        frames: [],
+        catalogTag: photoExhibitTag,
       },
       {
         id: lexicon.portraitPhoto.key,
@@ -360,11 +371,26 @@ export const workSections: WorkSection[] = categories.map((item) => ({
   frames: item.homeFrames,
 }));
 
+/**
+ * 游戏截图原是二元组。写入星级后该条会升成对象，两种都要能读。
+ */
+function listedScreenshot(entry: readonly [string, string] | { src?: string; label?: string; stars?: number }) {
+  if (Array.isArray(entry)) {
+    return toListedMedia(entry[0], entry[1]);
+  }
+  const shot = entry as { src?: string; label?: string; stars?: number };
+  const media = toListedMedia(shot.src ?? "", shot.label ?? "");
+  if (shot.stars == null) {
+    return media;
+  }
+  return { ...media, stars: shot.stars };
+}
+
 export const gameProjects: GameCard[] = sortByEffectiveDateDescending(
   [...initialGameProjects, ...registeredGames]
     .filter((item) => Array.isArray(item.screenshots) && item.screenshots.length > 0)
     .map((item) => {
-    const screenshots = item.screenshots.map(([src, label]) => toListedMedia(src, label));
+    const screenshots = item.screenshots.map((entry) => listedScreenshot(entry));
     return {
       id: item.id,
       title: item.title,

@@ -47,7 +47,7 @@ export type ResumeRecord = {
  */
 export function parseResumeMd(source: string): ResumeRecord {
   const sections = splitByHeading(source, MD_SECTION);
-  const extras = parseFields(sectionBody(sections, "补充"));
+  const extras = parseFields(sectionBody(sections, "笔记"));
 
   return {
     summary: firstParagraph(sectionBody(sections, "简介")),

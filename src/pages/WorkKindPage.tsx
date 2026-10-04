@@ -1,6 +1,6 @@
+import { type PointerEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ChannelHead } from "../components/work/ChannelHead";
-import { CoverTile } from "../components/work/CoverTile";
 import { ProjectGallery } from "../components/work/ProjectGallery";
 import { lexicon } from "../content/lexicon";
 import { categories, gameProjects, playableGames } from "../content/site";
@@ -10,7 +10,12 @@ import {
   kindEn,
   listDevelopChannelDoors,
   workIndexRoot,
+  type DevelopChannelDoor,
 } from "../ia/workTree";
+import { assetUrl } from "../lib/assets";
+import { comboRelay3s, fixedDraw, uniqueDraws } from "../lib/comboCycle";
+import { useComboRelay, useComboShown } from "../lib/useComboRelay";
+import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import { tx } from "../prefs/tx";
 import { usePrefs } from "../prefs/PrefsProvider";
 import { WorkDetailPage } from "./WorkDetailPage";
@@ -42,7 +47,6 @@ export function WorkKindPage({ kind }: WorkKindViewProps) {
   const lead = category?.lead ?? "";
   const photoKind = kind === lexicon.photography.key;
   const gameKind = kind === lexicon.gameDev.key;
-  const doorCount = doors.length;
 
   return (
     <div className="develop-kind" data-theme={kind}>
@@ -84,28 +88,83 @@ export function WorkKindPage({ kind }: WorkKindViewProps) {
           />
         </div>
       ) : (
-        <div className="develop-kind-doors" data-count={doorCount}>
-          {doors.map((door) => (
-            <CoverTile
-              key={door.channel}
-              className="develop-kind-door"
-              wellClass={`develop-work-well is-channel-${door.channel}`}
-              to={door.comingSoon ? undefined : door.href}
-              src={door.coverSrc}
-              fallbackSrc={
-                door.channel === lexicon.gameMenu.key
-                  ? stockPlaceholderSrc(lexicon.gameDev.key, 1)
-                  : stockPlaceholderSrc(door.channel, 1)
-              }
-              disabled={door.comingSoon}
-            >
-              <strong>{door.zh}</strong>
-              <em>{door.deco}</em>
-              {door.comingSoon ? <span>待收录</span> : null}
-            </CoverTile>
-          ))}
-        </div>
+        <KindDoorRail doors={doors} />
       )}
     </div>
+  );
+}
+
+/**
+ * 细目门：3 秒换一格，本门近 5 张不重复，换张 0.9s 淡入。悬停只跳过该门。
+ */
+function KindDoorRail({ doors }: { doors: DevelopChannelDoor[] }) {
+  const reduced = usePrefersReducedMotion();
+  const { advance, bind } = useComboRelay(doors.length, comboRelay3s, reduced, (index) => {
+    const door = doors[index];
+    return Boolean(door && !door.comingSoon && (door.srcs?.length ?? 0) >= 2);
+  });
+
+  return (
+    <div className="develop-kind-doors" data-count={doors.length}>
+      {doors.map((door, index) => (
+        <CyclingKindDoor key={door.channel} door={door} advance={advance[index] ?? 0} {...bind(index)} />
+      ))}
+    </div>
+  );
+}
+
+function CyclingKindDoor({
+  door,
+  advance,
+  onPointerEnter,
+  onPointerLeave,
+}: {
+  door: DevelopChannelDoor;
+  advance: number;
+  onPointerEnter: (event: PointerEvent<HTMLElement>) => void;
+  onPointerLeave: () => void;
+}) {
+  const srcs =
+    door.srcs && door.srcs.length > 0
+      ? door.srcs
+      : uniqueDraws([fixedDraw(stockPlaceholderSrc(door.channel, 1))]);
+  const { shown, stacked, fail } = useComboShown(srcs, advance, comboRelay3s.noRepeat);
+  const copy = (
+    <span className="develop-work-copy">
+      <strong>{door.zh}</strong>
+      <em>{door.deco}</em>
+      {door.comingSoon ? <span>待收录</span> : null}
+    </span>
+  );
+  const media =
+    stacked.length > 0 ? (
+      stacked.map((src) => (
+        <img
+          key={src}
+          className={src === shown ? "is-on" : undefined}
+          src={assetUrl(src)}
+          alt=""
+          onError={() => fail(src)}
+        />
+      ))
+    ) : (
+      <span className={`develop-work-well is-channel-${door.channel}`} aria-hidden="true" />
+    );
+  const className = `develop-kind-door is-cycling${door.comingSoon ? " is-soon" : ""}`;
+
+  if (door.comingSoon || !door.href) {
+    return (
+      <div className={className} onPointerEnter={onPointerEnter} onPointerLeave={onPointerLeave}>
+        {media}
+        {copy}
+      </div>
+    );
+  }
+
+  return (
+    <Link className={className} to={door.href} onPointerEnter={onPointerEnter} onPointerLeave={onPointerLeave}>
+      {media}
+      {copy}
+    </Link>
   );
 }

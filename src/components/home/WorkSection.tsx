@@ -5,6 +5,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import type { WorkSection as WorkSectionData } from "../../content/site";
 import { TermText } from "../TermText";
 import { resolveLead } from "../../content/copyDisplay";
+import { firstPhotoHomeSrc } from "../../content/works";
+import { lexicon } from "../../content/lexicon";
 import { homeFrameSrcs } from "../../content/stockMedia";
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion";
 import { assetUrl } from "../../lib/assets";
@@ -67,7 +69,10 @@ export function WorkSection({ data, flip }: WorkSectionProps) {
       </div>
       <div className="frames">
         {data.frames.map((label, index) => {
-          const src = homeFrameSrcs[data.id]?.[index];
+          const src =
+            data.id === lexicon.photography.key
+              ? (firstPhotoHomeSrc(label) ?? homeFrameSrcs[data.id]?.[index])
+              : homeFrameSrcs[data.id]?.[index];
           return (
             <div className="frame" key={label}>
               {src ? <img src={assetUrl(src)} alt="" /> : null}

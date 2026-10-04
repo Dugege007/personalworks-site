@@ -1,13 +1,14 @@
 import { lexicon } from "../content/lexicon";
-import { categories, gameProjects, playableGames } from "../content/site";
+import { categories, gameProjects, playableGames, type WorkCollection } from "../content/site";
 import { stockPlaceholderSrc } from "../content/stockMedia";
 import {
-  listPublishedPhotoWorks,
+  drawOfImage,
+  listMatchingPhotoFrames,
   listPublishedWorks,
-  listWorkImages,
-  themesOfPhotoWork,
   type WorkRecord,
 } from "../content/works";
+import { contentDraw } from "../content/stars";
+import { uniqueDraws, type DrawSrc } from "../lib/comboCycle";
 import { channelsOfKind, kindOfChannel, kindTitle, queryWorks } from "./query";
 
 export const developWorkKinds = [
@@ -34,7 +35,7 @@ export type DevelopKindDoor = {
   lead: string;
   href: string;
   coverSrc?: string;
-  srcs: string[];
+  srcs: DrawSrc[];
 };
 
 export type DevelopChannelDoor = {
@@ -46,6 +47,8 @@ export type DevelopChannelDoor = {
   href: string;
   comingSoon?: boolean;
   coverSrc?: string;
+  /** 本细目可轮换的静帧。不足两张时不换。 */
+  srcs?: DrawSrc[];
   count: number;
 };
 
@@ -107,6 +110,37 @@ export function hrefForPhotoCatalog(theme?: string): string {
     return path;
   }
   return `${path}?theme=${encodeURIComponent(theme)}`;
+}
+
+/**
+ * 摄影总览地址，预选一个自由标签。
+ */
+export function hrefForPhotoTag(tag: string): string {
+  const path = `/${lexicon.photography.key}/${lexicon.photoCatalog.key}`;
+  return `${path}?tag=${encodeURIComponent(tag)}`;
+}
+
+/**
+ * 摄影门打开总览：有自由标签时按标签，否则按类型键。
+ */
+export function hrefForPhotoDoor(collection: WorkCollection): string {
+  if (collection.catalogTag) {
+    return hrefForPhotoTag(collection.catalogTag);
+  }
+  return hrefForPhotoCatalog(collection.id);
+}
+
+/**
+ * 摄影门封面用的静帧。展馆按标签，其余门按类型。
+ */
+export function framesForPhotoDoor(collection: WorkCollection) {
+  if (collection.comingSoon) {
+    return [];
+  }
+  if (collection.catalogTag) {
+    return listMatchingPhotoFrames({ tags: [collection.catalogTag] });
+  }
+  return listMatchingPhotoFrames({ themes: [collection.id] });
 }
 
 /**
@@ -205,23 +239,26 @@ export function listDevelopChannelDoors(kind: string): DevelopChannelDoor[] {
     return [];
   }
   return category.collections.map((collection) => {
-    const works =
-      kind === lexicon.photography.key && !collection.comingSoon
-        ? listPublishedPhotoWorks().filter((work) => themesOfPhotoWork(work).includes(collection.id))
-        : listPublishedWorks(collection.id);
+    const photoDoor = kind === lexicon.photography.key;
+    const frames = photoDoor && !collection.comingSoon ? framesForPhotoDoor(collection) : [];
+    const works = photoDoor ? [] : listPublishedWorks(collection.id);
     return {
       channel: collection.id,
       zh: collection.title,
       en: collection.titleEn,
       deco: collection.titleDeco,
       lead: collection.lead,
-      href:
-        kind === lexicon.photography.key && !collection.comingSoon
-          ? hrefForPhotoCatalog(collection.id)
-          : hrefForDevelopChannel(kind, collection.id),
+      href: photoDoor && !collection.comingSoon
+        ? hrefForPhotoDoor(collection)
+        : hrefForDevelopChannel(kind, collection.id),
       comingSoon: collection.comingSoon,
-      coverSrc: firstCoverSrc(works) ?? `${collection.id}/stock/01.webp`,
-      count: works.length,
+      coverSrc: photoDoor
+        ? (frames[0]?.src ?? `${collection.theme}/stock/01.webp`)
+        : (firstCoverSrc(works) ?? `${collection.id}/stock/01.webp`),
+      srcs: photoDoor
+        ? uniqueDraws(frames.map((frame) => drawOfImage(frame.media)))
+        : channelStillDraws(collection.id),
+      count: photoDoor ? frames.length : works.length,
     };
   });
 }
@@ -244,36 +281,52 @@ export function isChannelOfKind(kind: string, channel: string | undefined): bool
 }
 
 /**
- * 某门全部可轮换画面：已发布作品图；游戏含封面与截图。
+ * 某门全部可轮换画面。内容层静帧去掉 0 星和未写星级。
+ * 游戏截图与其它静帧同一规则，不因仍是二元组而放行。
  */
-export function shotsOfKind(kind: string): string[] {
-  const seen = new Set<string>();
-  const list: string[] = [];
-  const add = (src?: string) => {
-    if (!src || seen.has(src)) {
-      return;
-    }
-    seen.add(src);
-    list.push(src);
-  };
+export function shotsOfKind(kind: string): DrawSrc[] {
   if (kind === lexicon.gameDev.key) {
+    const list: Array<DrawSrc | null> = [];
     for (const game of gameProjects) {
-      add(game.coverSrc);
+      const seen = new Set<string>();
       for (const shot of game.screenshots) {
         if (shot.kind === "video") {
           continue;
         }
-        add(shot.src);
+        const draw = contentDraw(shot.src, shot);
+        if (!draw || seen.has(draw.src)) {
+          continue;
+        }
+        seen.add(draw.src);
+        list.push(draw);
       }
     }
-    return list;
+    return uniqueDraws(list);
   }
-  for (const work of queryWorks({ source: "works", kind })) {
-    for (const media of listWorkImages(work)) {
-      add(media.src);
+  const works = channelsOfKind(kind).flatMap((channel) => listPublishedWorks(channel));
+  return doorStills(works);
+}
+
+/**
+ * 某一细目的轮换静帧。0 星和未写星级不进池，张数不够也不补回。
+ * 视频海报只在该条自身为 1～5 星时进入。不足两张时调用处不轮换。
+ */
+export function channelStillDraws(channel: string): DrawSrc[] {
+  return doorStills(listPublishedWorks(channel));
+}
+
+function doorStills(works: WorkRecord[]): DrawSrc[] {
+  const rated: Array<DrawSrc | null> = [];
+  for (const work of works) {
+    for (const media of work.media) {
+      if (media.kind === "video") {
+        rated.push(contentDraw(media.poster, media));
+        continue;
+      }
+      rated.push(drawOfImage(media));
     }
   }
-  return list;
+  return uniqueDraws(rated);
 }
 
 function coverOfKind(kind: string): string | undefined {

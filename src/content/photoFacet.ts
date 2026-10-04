@@ -9,15 +9,21 @@ export const photoTypeKeys = [
   lexicon.aiPhoto.key,
 ] as const;
 
-/** 摄影默认自由标签。展馆在风光与人文之间，随拍在人像后，不升为类型门。 */
+/** 摄影默认自由标签。不升为类型键。 */
 export const photoDefaultTagLabels = ["展馆", "随拍"] as const;
 
-/** 类型第一行的顺序：风光、展馆、人文、人像、随拍、游戏、AI。 */
+/**
+ * 访客门「展馆摄影」筛的是默认标签「展馆」，不另开类型键。
+ */
+export const photoExhibitTag = photoDefaultTagLabels[0];
+export const photoExhibitTitle = "展馆摄影";
+
+/** 类型第一行的顺序：风光、展馆、人像、人文、随拍、游戏、AI。 */
 export const photoPrimaryFacetOrder = [
   lexicon.landscapePhoto.key,
-  photoDefaultTagLabels[0],
-  lexicon.humanistPhoto.key,
+  photoExhibitTag,
   lexicon.portraitPhoto.key,
+  lexicon.humanistPhoto.key,
   photoDefaultTagLabels[1],
   lexicon.gamePhoto.key,
   lexicon.aiPhoto.key,

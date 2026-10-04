@@ -324,7 +324,7 @@
 .develop-slice img {
   opacity: 0;
   object-position: center center;
-  transition: opacity 0.55s ease;
+  transition: opacity 0.9s ease;
 }
 
 .develop-slice[data-slice="profile-resume"] img {
@@ -440,52 +440,7 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .develop-frame img {
-    transition: opacity 0.85s ease;
-  }
-
-  .develop-frame[data-fx="rise"] img.is-on {
-    animation: develop-frame-rise 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  .develop-frame[data-fx="zoom"] img.is-on {
-    animation: develop-frame-zoom 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  .develop-frame[data-fx="wipe"] img.is-on {
-    animation: develop-frame-wipe 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-}
-
-@keyframes develop-frame-rise {
-  from {
-    opacity: 0;
-    transform: translateY(12%);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes develop-frame-zoom {
-  from {
-    opacity: 0;
-    transform: scale(1.08);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes develop-frame-wipe {
-  from {
-    opacity: 1;
-    clip-path: inset(0 0 100% 0);
-  }
-  to {
-    opacity: 1;
-    clip-path: inset(0);
+    transition: opacity 0.9s ease;
   }
 }
 

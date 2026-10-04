@@ -1,3 +1,4 @@
+import { type PointerEvent } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { ConstructionSetList } from "../components/work/ConstructionSetList";
 import { lexicon } from "../content/lexicon";
@@ -6,10 +7,13 @@ import { stockPlaceholderSrc, workCoverSrc } from "../content/stockMedia";
 import { TermText } from "../components/TermText";
 import { resolveLead } from "../content/copyDisplay";
 import { studioAliasForDisplay } from "../content/studios";
-import { listPublishedWorks } from "../content/works";
+import { listPublishedWorks, drawOfImage } from "../content/works";
 import { iaOfSkin } from "../ia";
-import { hrefForDevelopKind, hrefForPhotoCatalog } from "../ia/workTree";
+import { framesForPhotoDoor, hrefForDevelopKind, hrefForPhotoDoor } from "../ia/workTree";
 import { assetUrl } from "../lib/assets";
+import { comboRelay3s, fixedDraw, uniqueDraws, type DrawSrc } from "../lib/comboCycle";
+import { useComboRelay, useComboShown } from "../lib/useComboRelay";
+import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 import { usePrefs } from "../prefs/PrefsProvider";
 import "../styles/placeholder.css";
 
@@ -63,11 +67,7 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
         </>
       ) : null}
       {isPhoto ? (
-        <div className="card-grid" data-count={category.collections.length}>
-          {category.collections.map((collection) => (
-            <PhotoDoorCard collection={collection} key={collection.id} />
-          ))}
-        </div>
+        <PhotoDoorGrid collections={category.collections} />
       ) : (
         category.collections.map((collection) => (
           <section key={collection.id} className="category-block" data-theme={collection.theme}>
@@ -135,23 +135,62 @@ export function CategoryPage({ categoryId }: CategoryPageProps) {
   );
 }
 
+/**
+ * 层境摄影五门：与显影同一套 3 秒换格规则。
+ */
+function PhotoDoorGrid({ collections }: { collections: WorkCollection[] }) {
+  const reduced = usePrefersReducedMotion();
+  const pools = collections.map((collection) =>
+    uniqueDraws(framesForPhotoDoor(collection).map((frame) => drawOfImage(frame.media))),
+  );
+  const { advance, bind } = useComboRelay(collections.length, comboRelay3s, reduced, (index) => {
+    return !collections[index]?.comingSoon && (pools[index]?.length ?? 0) >= 2;
+  });
+
+  return (
+    <div className="card-grid" data-count={collections.length}>
+      {collections.map((collection, index) => (
+        <PhotoDoorCard
+          key={collection.id}
+          collection={collection}
+          pool={pools[index] ?? []}
+          advance={advance[index] ?? 0}
+          {...bind(index)}
+        />
+      ))}
+    </div>
+  );
+}
+
 type PhotoDoorCardProps = {
   collection: WorkCollection;
+  pool: DrawSrc[];
+  advance: number;
+  onPointerEnter: (event: PointerEvent<HTMLElement>) => void;
+  onPointerLeave: () => void;
 };
 
 /**
- * 摄影题材门：封面 + 名称，有成片则进总览筛选。
+ * 摄影题材门：封面按本门图池轮换，有成片则进总览筛选。
  */
-function PhotoDoorCard({ collection }: PhotoDoorCardProps) {
-  const works = collection.comingSoon ? [] : listPublishedWorks(collection.id);
-  const cover = works[0] ? workCoverSrc(works[0], 0) : stockPlaceholderSrc(collection.id, 1);
+function PhotoDoorCard({ collection, pool, advance, onPointerEnter, onPointerLeave }: PhotoDoorCardProps) {
+  const srcs = pool.length > 0 ? pool : uniqueDraws([fixedDraw(stockPlaceholderSrc(collection.theme, 1))]);
+  const { shown, stacked, fail } = useComboShown(srcs, advance, comboRelay3s.noRepeat);
   const lead = collection.comingSoon
     ? "位置已留，作品待收录。不进入详情占位。"
     : resolveLead(collection.lead);
   const body = (
     <>
-      <figure className="card-cover">
-        <img src={assetUrl(cover)} alt="" />
+      <figure className="card-cover is-cycling">
+        {stacked.map((src) => (
+          <img
+            key={src}
+            className={src === shown ? "is-on" : undefined}
+            src={assetUrl(src)}
+            alt=""
+            onError={() => fail(src)}
+          />
+        ))}
       </figure>
       <div className="card-body">
         <small>{collection.titleDeco}</small>
@@ -165,14 +204,20 @@ function PhotoDoorCard({ collection }: PhotoDoorCardProps) {
 
   if (collection.comingSoon) {
     return (
-      <div className="card is-soon" data-theme={collection.theme}>
+      <div className="card is-soon" data-theme={collection.theme} onPointerEnter={onPointerEnter} onPointerLeave={onPointerLeave}>
         {body}
       </div>
     );
   }
 
   return (
-    <Link className="card" data-theme={collection.theme} to={hrefForPhotoCatalog(collection.id)}>
+    <Link
+      className="card"
+      data-theme={collection.theme}
+      to={hrefForPhotoDoor(collection)}
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
+    >
       {body}
     </Link>
   );

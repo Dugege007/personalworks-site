@@ -1,20 +1,28 @@
 import { useEffect, useMemo, useRef, useState, type MouseEvent, type PointerEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { lexicon } from "../../content/lexicon";
+import { photoExhibitTag, photoExhibitTitle } from "../../content/photoFacet";
 import { TermText } from "../TermText";
 import { gameProjects, profile } from "../../content/site";
-import { stockPlaceholderSrc, workCoverSrc } from "../../content/stockMedia";
+import { stockPlaceholderSrc } from "../../content/stockMedia";
 import { heroFrameFitsViewport, type PhotoOrientation } from "../../content/photoOrientation";
 import { photoSizes } from "../../content/photoSizes";
 import {
+  drawOfCover,
+  drawOfImage,
   hrefForPhotoWork,
   listLandscapeHeroFrames,
+  listMatchingPhotoFrames,
   listPublishedPhotoWorks,
   listPublishedWorks,
   listWorkImages,
   type HomeHeroFrame,
 } from "../../content/works";
+import { contentDraw, starDrawWeight } from "../../content/stars";
+import { fixedDraw, pickWeightedSrc, uniqueDraws, type DrawSrc, comboRelay3s, comboRelay4s } from "../../lib/comboCycle";
+import { useComboRelay, useComboShown } from "../../lib/useComboRelay";
 import { hrefForWork } from "../../ia/href";
+import { channelStillDraws } from "../../ia/workTree";
 import { queryNotes, queryWorks } from "../../ia/query";
 import type { HomeBlock, IaRecord } from "../../ia/types";
 import { assetUrl } from "../../lib/assets";
@@ -31,10 +39,6 @@ const HERO_INTERVAL_MS = 5000;
 const HERO_ENTER_MS = 3000;
 const HERO_HINT = "再次点击进入该相册";
 const HERO_NOREPEAT = 10;
-const FRAME_NOREPEAT = 10;
-const FRAME_IDLE_MIN_MS = 3000;
-const FRAME_IDLE_MAX_MS = 10000;
-const FRAME_FXS = ["fade", "rise", "zoom", "wipe"] as const;
 
 type DevelopHomeProps = {
   ia: IaRecord;
@@ -93,11 +97,9 @@ function HeroBleed({ block }: { block: HomeBlock }) {
   const startRef = useRef("");
   const upcomingStartRef = useRef("");
   if (!startRef.current) {
-    startRef.current = pickHeroStartSrc(frames, viewport);
-    upcomingStartRef.current = pickFreshSrc(
-      frames.filter((frame) => heroFrameFitsViewport(frame, viewport)).map((frame) => frame.src),
-      [startRef.current],
-    );
+    const draws = heroDraws(frames, viewport, {});
+    startRef.current = pickWeightedSrc(draws, [], HERO_NOREPEAT);
+    upcomingStartRef.current = pickWeightedSrc(draws, [startRef.current], HERO_NOREPEAT);
   }
   const [currentSrc, setCurrentSrc] = useState(startRef.current);
   const [upcomingSrc, setUpcomingSrc] = useState(upcomingStartRef.current);
@@ -120,13 +122,11 @@ function HeroBleed({ block }: { block: HomeBlock }) {
       }),
     [frames, measured],
   );
-  const eligibleSrcs = useMemo(
-    () =>
-      sizedFrames
-        .filter((frame) => !failed[frame.src] && heroFrameFitsViewport(frame, viewport))
-        .map((frame) => frame.src),
+  const eligibleDraws = useMemo(
+    () => heroDraws(sizedFrames, viewport, failed),
     [failed, sizedFrames, viewport],
   );
+  const eligibleSrcs = useMemo(() => eligibleDraws.map((item) => item.src), [eligibleDraws]);
   const pool = sizedFrames.filter((frame) => !failed[frame.src]);
   const selected = pool.find((frame) => frame.src === currentSrc) ?? null;
   const current = selected ?? pool.find((frame) => frame.src === eligibleSrcs[0]) ?? null;
@@ -173,22 +173,22 @@ function HeroBleed({ block }: { block: HomeBlock }) {
     const cur = currentSrc;
     if (cur && eligibleSrcs.includes(cur)) {
       if (upcomingRef.current && !eligibleSrcs.includes(upcomingRef.current)) {
-        const upcoming = pickFreshSrc(eligibleSrcs, [cur, ...recentRef.current]);
+        const upcoming = pickWeightedSrc(eligibleDraws, [cur, ...recentRef.current], HERO_NOREPEAT);
         upcomingRef.current = upcoming;
         setUpcomingSrc(upcoming);
       }
       return;
     }
-    const next = pickFreshSrc(eligibleSrcs, [cur, ...recentRef.current]);
+    const next = pickWeightedSrc(eligibleDraws, [cur, ...recentRef.current], HERO_NOREPEAT);
     if (cur) {
       setLastSrc(cur);
     }
     setCurrentSrc(next);
     currentRef.current = next;
-    const upcoming = pickFreshSrc(eligibleSrcs, [next, ...recentRef.current]);
+    const upcoming = pickWeightedSrc(eligibleDraws, [next, ...recentRef.current], HERO_NOREPEAT);
     upcomingRef.current = upcoming;
     setUpcomingSrc(upcoming);
-  }, [currentSrc, eligibleSrcs]);
+  }, [currentSrc, eligibleDraws, eligibleSrcs]);
 
   useEffect(() => {
     if (reduced || paused || eligibleSrcs.length < 2) {
@@ -201,18 +201,18 @@ function HeroBleed({ block }: { block: HomeBlock }) {
         return;
       }
       timer = window.setInterval(() => {
-        const available = eligibleSrcs.filter((item) => !failedRef.current[item]);
+        const available = eligibleDraws.filter((item) => !failedRef.current[item.src]);
         const cur = currentRef.current;
         const reserved = upcomingRef.current;
         const next =
-          reserved && reserved !== cur && available.includes(reserved)
+          reserved && reserved !== cur && available.some((item) => item.src === reserved)
             ? reserved
-            : pickFreshSrc(available, [cur, ...recentRef.current]);
+            : pickWeightedSrc(available, [cur, ...recentRef.current], HERO_NOREPEAT);
         recentRef.current = [...recentRef.current, cur].slice(-(HERO_NOREPEAT - 1));
         setLastSrc(cur);
         setCurrentSrc(next);
         currentRef.current = next;
-        const upcoming = pickFreshSrc(available, [next, ...recentRef.current]);
+        const upcoming = pickWeightedSrc(available, [next, ...recentRef.current], HERO_NOREPEAT);
         upcomingRef.current = upcoming;
         setUpcomingSrc(upcoming);
       }, HERO_INTERVAL_MS);
@@ -221,7 +221,7 @@ function HeroBleed({ block }: { block: HomeBlock }) {
       cancelled = true;
       window.clearInterval(timer);
     };
-  }, [eligibleSrcs, paused, reduced]);
+  }, [eligibleDraws, paused, reduced]);
 
   useEffect(() => {
     return () => window.clearTimeout(hintTimerRef.current);
@@ -331,8 +331,9 @@ function HeroBleed({ block }: { block: HomeBlock }) {
  * 头图优先用已发布风光摄影；缺图时回退到块上钉死的一张。
  */
 function collectHeroFrames(block: HomeBlock): HomeHeroFrame[] {
-  const fromWorks =
-    block.query?.source === "works" ? listLandscapeHeroFrames() : [];
+  const fromWorks = (block.query?.source === "works" ? listLandscapeHeroFrames() : []).filter(
+    (frame) => starDrawWeight(frame.stars ?? 0) > 0,
+  );
   if (fromWorks.length > 0) {
     return fromWorks;
   }
@@ -345,10 +346,28 @@ function collectHeroFrames(block: HomeBlock): HomeHeroFrame[] {
         href: hrefForHeroSrc(block.heroSrc),
         width: size?.width,
         height: size?.height,
+        fixed: true,
       },
     ];
   }
   return [];
+}
+
+/**
+ * 视口内可抽的头图。回退图权重为 1，内容层按星级。
+ */
+function heroDraws(
+  frames: HomeHeroFrame[],
+  viewport: PhotoOrientation,
+  failed: Record<string, true>,
+): DrawSrc[] {
+  return frames
+    .filter((frame) => !failed[frame.src] && heroFrameFitsViewport(frame, viewport))
+    .map((frame) => ({
+      src: frame.src,
+      weight: frame.fixed ? 1 : starDrawWeight(frame.stars ?? 0),
+    }))
+    .filter((item) => item.weight > 0);
 }
 
 /**
@@ -363,56 +382,30 @@ function hrefForHeroSrc(src: string): string | undefined {
   return undefined;
 }
 
-/**
- * 打开首页时从当前视口可抽池随机首张，不钉死可抽池第一张。
- */
-function pickHeroStartSrc(frames: HomeHeroFrame[], viewport: PhotoOrientation): string {
-  return pickFreshSrc(
-    frames.filter((frame) => heroFrameFitsViewport(frame, viewport)).map((frame) => frame.src),
-    [],
-  );
-}
-
-/**
- * 从图池随机取一张；最近若干张（含当前）不重复，图池不足时窗口收窄。
- */
-function pickFreshSrc(pool: string[], recent: string[], windowSize = HERO_NOREPEAT): string {
-  if (pool.length === 0) {
-    return "";
-  }
-  if (pool.length === 1) {
-    return pool[0] ?? "";
-  }
-  const limit = Math.min(windowSize, pool.length - 1);
-  const forbidden = new Set(recent.filter(Boolean).slice(-limit));
-  const candidates = pool.filter((src) => !forbidden.has(src));
-  const last = recent[recent.length - 1];
-  const bag = candidates.length > 0 ? candidates : pool.filter((src) => src !== last);
-  return bag[Math.floor(Math.random() * bag.length)] ?? pool[0] ?? "";
-}
-
 function WaypointSlices() {
   const reduced = usePrefersReducedMotion();
-  const workSrcs = uniqueSrcs(queryWorks({ source: "works" }).map((work) => workCoverSrc(work)));
+  const workSrcs = uniqueDraws(queryWorks({ source: "works" }).map((work) => drawOfCover(work)));
   const slices = [
     {
       id: lexicon.profileResume.key,
       label: lexicon.profileResume.zh,
       deco: lexicon.profileResume.deco,
       to: `/${lexicon.profileResume.key}`,
-      srcs: uniqueSrcs(profile.portraitSrcs),
+      srcs: uniqueDraws(profile.portraitSrcs.map((src) => fixedDraw(src))),
     },
     {
       id: lexicon.profileSkills.key,
       label: lexicon.profileSkills.zh,
       deco: lexicon.profileSkills.deco,
       to: `/${lexicon.profileSkills.key}`,
-      srcs: uniqueSrcs([
-        "profile-skills/skills.webp",
-        stockPlaceholderSrc("landscape-cds", 1),
-        stockPlaceholderSrc("landscape-cds", 2),
-        stockPlaceholderSrc("landscape-cds", 3),
-      ]),
+      srcs: uniqueDraws(
+        [
+          "profile-skills/skills.webp",
+          stockPlaceholderSrc("landscape-cds", 1),
+          stockPlaceholderSrc("landscape-cds", 2),
+          stockPlaceholderSrc("landscape-cds", 3),
+        ].map((src) => fixedDraw(src)),
+      ),
     },
     {
       id: lexicon.workIndex.key,
@@ -426,74 +419,17 @@ function WaypointSlices() {
       label: lexicon.notes.zh,
       deco: lexicon.notes.deco,
       to: `/${lexicon.notes.key}`,
-      srcs: uniqueSrcs(["notes/cover.webp"]),
+      srcs: uniqueDraws([fixedDraw("notes/cover.webp")]),
     },
   ];
-  const [advance, setAdvance] = useState(() => slices.map(() => 0));
-  const turnRef = useRef(0);
-  const hoverRef = useRef(false);
-  const timerRef = useRef(0);
-
-  useEffect(() => {
-    let cancelled = false;
-    void whenSiteBootReleased().then(() => {
-      if (!cancelled) {
-        scheduleSliceTurn();
-      }
-    });
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timerRef.current);
-    };
-  }, [reduced]);
-
-  /**
-   * 共用一个 3–10 秒倒计时；到点只切当前栏，再轮到下一栏。
-   */
-  function scheduleSliceTurn() {
-    window.clearTimeout(timerRef.current);
-    timerRef.current = 0;
-    if (reduced || hoverRef.current) {
-      return;
-    }
-    const delay = SLICE_IDLE_MIN_MS + Math.random() * (SLICE_IDLE_MAX_MS - SLICE_IDLE_MIN_MS);
-    timerRef.current = window.setTimeout(() => {
-      const index = turnRef.current;
-      turnRef.current = (index + 1) % slices.length;
-      setAdvance((prev) => prev.map((value, itemIndex) => (itemIndex === index ? value + 1 : value)));
-      scheduleSliceTurn();
-    }, delay);
-  }
-
-  /**
-   * 鼠标停在任一切片上时停表；离开后重新倒计时。
-   */
-  function handlePointerEnter(event: PointerEvent<HTMLElement>) {
-    if (event.pointerType !== "mouse" || hoverRef.current) {
-      return;
-    }
-    hoverRef.current = true;
-    window.clearTimeout(timerRef.current);
-    timerRef.current = 0;
-  }
-
-  function handlePointerLeave() {
-    if (!hoverRef.current) {
-      return;
-    }
-    hoverRef.current = false;
-    scheduleSliceTurn();
-  }
+  const { advance, bind } = useComboRelay(slices.length, comboRelay4s, reduced, (index) => {
+    return (slices[index]?.srcs.length ?? 0) >= 2;
+  });
 
   return (
-    <section
-      className="develop-slices"
-      id="waypoint-slices"
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
-    >
+    <section className="develop-slices" id="waypoint-slices">
       {slices.map((item, index) => (
-        <SliceCard key={item.id} {...item} advance={advance[index] ?? 0} />
+        <SliceCard key={item.id} {...item} advance={advance[index] ?? 0} {...bind(index)} />
       ))}
     </section>
   );
@@ -504,54 +440,35 @@ type SliceCardProps = {
   label: string;
   deco: string;
   to: string;
-  srcs: string[];
+  srcs: DrawSrc[];
   advance: number;
+  onPointerEnter: (event: PointerEvent<HTMLElement>) => void;
+  onPointerLeave: () => void;
 };
 
-const SLICE_IDLE_MIN_MS = 3000;
-const SLICE_IDLE_MAX_MS = 10000;
-
 /**
- * 切片图卡：由四栏共用计时器点名换图；本栏最近五张不重复。
+ * 切片图卡：四栏点名换图。本栏近 5 张不重复。换张为 0.9s 淡入。
+ * 只挂刚离开的一张、当前张和已抽好的下一张，换上当前张后再抽下下一张。
  */
-function SliceCard({ id, label, deco, to, srcs, advance }: SliceCardProps) {
-  const [failed, setFailed] = useState<Record<string, true>>({});
-  const [current, setCurrent] = useState(srcs[0] ?? "");
-  const recentRef = useRef<string[]>([]);
-  const currentRef = useRef(current);
-  const poolRef = useRef<string[]>([]);
-
-  const pool = srcs.filter((src) => !failed[src]);
-  const shown = pool.includes(current) ? current : (pool[0] ?? "");
-  poolRef.current = pool;
-  currentRef.current = shown;
-
-  useEffect(() => {
-    if (advance < 1) {
-      return;
-    }
-    const next = pickNextSliceSrc(poolRef.current, currentRef.current, recentRef.current);
-    if (!next || next === currentRef.current) {
-      return;
-    }
-    recentRef.current = [...recentRef.current, currentRef.current].slice(-4);
-    setCurrent(next);
-  }, [advance]);
+function SliceCard({ id, label, deco, to, srcs, advance, onPointerEnter, onPointerLeave }: SliceCardProps) {
+  const { shown, stacked, fail } = useComboShown(srcs, advance, comboRelay4s.noRepeat);
 
   return (
     <Link
       className="develop-slice"
       to={to}
       data-slice={id}
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
     >
-      {pool.length > 0 ? (
-        pool.map((src) => (
+      {stacked.length > 0 ? (
+        stacked.map((src) => (
           <img
             key={src}
             className={src === shown ? "is-on" : undefined}
             src={assetUrl(src)}
             alt=""
-            onError={() => setFailed((prev) => ({ ...prev, [src]: true }))}
+            onError={() => fail(src)}
           />
         ))
       ) : (
@@ -566,39 +483,13 @@ function SliceCard({ id, label, deco, to, srcs, advance }: SliceCardProps) {
 }
 
 /**
- * 从图池取下一张：最近四张加当前共五张不重复；池不足时窗口收窄。
- */
-function pickNextSliceSrc(pool: string[], current: string, recent: string[]): string {
-  if (pool.length < 2) {
-    return current;
-  }
-  const windowSize = Math.min(4, pool.length - 1);
-  const forbidden = new Set([...recent, current].slice(-windowSize));
-  const candidates = pool.filter((src) => !forbidden.has(src));
-  const bag = candidates.length > 0 ? candidates : pool.filter((src) => src !== current);
-  return bag[Math.floor(Math.random() * bag.length)] ?? current;
-}
-
-/**
  * 去掉空值和重复路径，保持首次出现的顺序。
  */
-function uniqueSrcs(items: Array<string | undefined>): string[] {
-  const seen = new Set<string>();
-  const list: string[] = [];
-  for (const item of items) {
-    if (!item || seen.has(item)) {
-      continue;
-    }
-    seen.add(item);
-    list.push(item);
-  }
-  return list;
-}
-
 type FrameShot = {
   src: string;
   title: string;
   href: string;
+  weight: number;
 };
 
 type FrameLane = {
@@ -611,78 +502,22 @@ type FrameLane = {
 function SelectedFrames({ ia }: { block: HomeBlock; ia: IaRecord }) {
   const reduced = usePrefersReducedMotion();
   const lanes = useMemo(() => collectHomeFrameLanes(ia.id), [ia.id]);
-  const [advance, setAdvance] = useState(() => lanes.map(() => 0));
-  const turnRef = useRef(0);
-  const hoverRef = useRef(false);
-  const timerRef = useRef(0);
-
-  useEffect(() => {
-    let cancelled = false;
-    void whenSiteBootReleased().then(() => {
-      if (!cancelled) {
-        scheduleFrameTurn();
-      }
-    });
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timerRef.current);
-    };
-  }, [reduced]);
-
-  /**
-   * 共用一个 3–10 秒倒计时；到点只切当前格，再按左到右轮到下一格。
-   */
-  function scheduleFrameTurn() {
-    window.clearTimeout(timerRef.current);
-    timerRef.current = 0;
-    if (reduced || hoverRef.current) {
-      return;
-    }
-    const delay = FRAME_IDLE_MIN_MS + Math.random() * (FRAME_IDLE_MAX_MS - FRAME_IDLE_MIN_MS);
-    timerRef.current = window.setTimeout(() => {
-      const index = turnRef.current;
-      turnRef.current = (index + 1) % lanes.length;
-      setAdvance((prev) => prev.map((value, itemIndex) => (itemIndex === index ? value + 1 : value)));
-      scheduleFrameTurn();
-    }, delay);
-  }
-
-  /**
-   * 鼠标停在任一预览格上时停表；离开后重新倒计时。
-   */
-  function handlePointerEnter(event: PointerEvent<HTMLElement>) {
-    if (event.pointerType !== "mouse" || hoverRef.current) {
-      return;
-    }
-    hoverRef.current = true;
-    window.clearTimeout(timerRef.current);
-    timerRef.current = 0;
-  }
-
-  function handlePointerLeave() {
-    if (!hoverRef.current) {
-      return;
-    }
-    hoverRef.current = false;
-    scheduleFrameTurn();
-  }
+  const { advance, bind } = useComboRelay(lanes.length, comboRelay3s, reduced, (index) => {
+    return (lanes[index]?.shots.length ?? 0) >= 2;
+  });
 
   return (
-    <section
-      className="develop-frames"
-      id="selected-frames"
-      onPointerEnter={handlePointerEnter}
-      onPointerLeave={handlePointerLeave}
-    >
+    <section className="develop-frames" id="selected-frames">
       {lanes.map((lane, index) => (
-        <FrameLaneCard key={lane.id} lane={lane} advance={advance[index] ?? 0} />
+        <FrameLaneCard key={lane.id} lane={lane} advance={advance[index] ?? 0} {...bind(index)} />
       ))}
     </section>
   );
 }
 
 /**
- * 精选五格：风光、人文、数字孪生、景观效果图、游戏开发，各从本类图池抽。
+ * 精选五格：风光、展馆、数字孪生、景观效果图、游戏开发。
+ * 摄影两格按类型或自由标签筛静帧，不再按旧栏目夹。
  */
 function collectHomeFrameLanes(iaId: string): FrameLane[] {
   return [
@@ -690,13 +525,13 @@ function collectHomeFrameLanes(iaId: string): FrameLane[] {
       id: lexicon.landscapePhoto.key,
       caption: lexicon.landscapePhoto.zh,
       featured: true,
-      shots: shotsOfChannel(lexicon.landscapePhoto.key, iaId),
+      shots: shotsOfPhotoFacet({ themes: [lexicon.landscapePhoto.key] }),
     },
     {
-      id: lexicon.humanistPhoto.key,
-      caption: lexicon.humanistPhoto.zh,
+      id: photoExhibitTag,
+      caption: photoExhibitTitle,
       featured: false,
-      shots: shotsOfChannel(lexicon.humanistPhoto.key, iaId),
+      shots: shotsOfPhotoFacet({ tags: [photoExhibitTag] }),
     },
     {
       id: lexicon.digitalTwin.key,
@@ -719,15 +554,37 @@ function collectHomeFrameLanes(iaId: string): FrameLane[] {
   ];
 }
 
-function shotsOfChannel(channel: string, iaId: string): FrameShot[] {
+function shotsOfPhotoFacet(partial: { themes?: string[]; tags?: string[] }): FrameShot[] {
   const shots: FrameShot[] = [];
+  for (const frame of listMatchingPhotoFrames(partial)) {
+    const draw = drawOfImage(frame.media);
+    if (!draw) {
+      continue;
+    }
+    shots.push({
+      src: draw.src,
+      title: frame.work.title,
+      href: hrefForPhotoWork(frame.work),
+      weight: draw.weight,
+    });
+  }
+  return shots;
+}
+
+function shotsOfChannel(channel: string, iaId: string): FrameShot[] {
+  const weightOf = new Map(channelStillDraws(channel).map((item) => [item.src, item.weight]));
+  const shots: FrameShot[] = [];
+  const seen = new Set<string>();
   for (const work of listPublishedWorks(channel)) {
     const href = hrefForWork(work, iaId);
-    for (const media of listWorkImages(work)) {
-      if (!media.src) {
+    for (const media of work.media) {
+      const src = media.kind === "video" ? media.poster : media.src;
+      const weight = src ? weightOf.get(src) : undefined;
+      if (!src || weight == null || seen.has(src)) {
         continue;
       }
-      shots.push({ src: media.src, title: work.title, href });
+      seen.add(src);
+      shots.push({ src, title: work.title, href, weight });
     }
   }
   return shots;
@@ -741,59 +598,38 @@ function shotsOfGames(): FrameShot[] {
       if (!shot.src || shot.kind === "video") {
         continue;
       }
-      shots.push({ src: shot.src, title: game.title, href });
+      const draw = contentDraw(shot.src, shot);
+      if (!draw) {
+        continue;
+      }
+      shots.push({ src: draw.src, title: game.title, href, weight: draw.weight });
     }
   }
   return shots;
 }
 
-function FrameLaneCard({ lane, advance }: { lane: FrameLane; advance: number }) {
-  const srcs = lane.shots.map((shot) => shot.src);
-  const startRef = useRef("");
-  if (!startRef.current && srcs.length > 0) {
-    startRef.current = pickFreshSrc(srcs, [], FRAME_NOREPEAT);
-  }
-  const [failed, setFailed] = useState<Record<string, true>>({});
-  const [currentSrc, setCurrentSrc] = useState(startRef.current);
-  const [lastSrc, setLastSrc] = useState("");
-  const [fx, setFx] = useState<(typeof FRAME_FXS)[number]>("fade");
-  const recentRef = useRef<string[]>([]);
-  const currentRef = useRef(currentSrc);
-  const srcsRef = useRef(srcs);
-  const failedRef = useRef(failed);
-  srcsRef.current = srcs;
-  failedRef.current = failed;
-  const pool = srcs.filter((src) => !failed[src]);
-  const shown = pool.includes(currentSrc) ? currentSrc : (pool[0] ?? "");
-  currentRef.current = shown;
+function FrameLaneCard({
+  lane,
+  advance,
+  onPointerEnter,
+  onPointerLeave,
+}: {
+  lane: FrameLane;
+  advance: number;
+  onPointerEnter: (event: PointerEvent<HTMLElement>) => void;
+  onPointerLeave: () => void;
+}) {
+  const srcs = lane.shots.map((shot) => ({ src: shot.src, weight: shot.weight }));
+  const { shown, stacked, fail } = useComboShown(srcs, advance, comboRelay3s.noRepeat);
   const shot = lane.shots.find((item) => item.src === shown);
-  const shownSrcs = [lastSrc, shown].filter(
-    (item, index, list): item is string => Boolean(item) && !failed[item] && list.indexOf(item) === index,
-  );
-
-  useEffect(() => {
-    if (advance < 1) {
-      return;
-    }
-    const available = srcsRef.current.filter((src) => !failedRef.current[src]);
-    if (available.length < 2) {
-      return;
-    }
-    const cur = currentRef.current;
-    const next = pickFreshSrc(available, [cur, ...recentRef.current], FRAME_NOREPEAT);
-    if (!next || next === cur) {
-      return;
-    }
-    recentRef.current = [...recentRef.current, cur].slice(-(FRAME_NOREPEAT - 1));
-    setLastSrc(cur);
-    setFx(FRAME_FXS[Math.floor(Math.random() * FRAME_FXS.length)] ?? "fade");
-    setCurrentSrc(next);
-    currentRef.current = next;
-  }, [advance]);
 
   if (!shown || !shot) {
     return (
-      <div className={`develop-frame${lane.featured ? " is-featured" : ""}`}>
+      <div
+        className={`develop-frame${lane.featured ? " is-featured" : ""}`}
+        onPointerEnter={onPointerEnter}
+        onPointerLeave={onPointerLeave}
+      >
         <span className="develop-frame-copy">
           <strong>{lane.caption}</strong>
         </span>
@@ -805,15 +641,16 @@ function FrameLaneCard({ lane, advance }: { lane: FrameLane; advance: number }) 
     <Link
       className={`develop-frame${lane.featured ? " is-featured" : ""}`}
       to={shot.href}
-      data-fx={fx}
+      onPointerEnter={onPointerEnter}
+      onPointerLeave={onPointerLeave}
     >
-      {shownSrcs.map((item) => (
+      {stacked.map((item) => (
         <img
           key={item}
           className={item === shown ? "is-on" : undefined}
           src={assetUrl(item)}
           alt=""
-          onError={() => setFailed((prev) => ({ ...prev, [item]: true }))}
+          onError={() => fail(item)}
         />
       ))}
       <span className="develop-frame-copy">

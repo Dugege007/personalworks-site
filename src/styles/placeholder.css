@@ -69,6 +69,21 @@
   display: block;
 }
 
+.card-cover.is-cycling {
+  position: relative;
+}
+
+.card-cover.is-cycling img {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.card-cover.is-cycling img.is-on {
+  opacity: 1;
+}
+
 .card-body {
   padding: 14px 18px 0;
   display: flex;
@@ -316,6 +331,66 @@
 .filter-count {
   color: var(--muted);
   font-size: 13px;
+}
+
+.filter-sort-wrap {
+  position: relative;
+}
+
+.filter-sort-pop {
+  position: absolute;
+  z-index: 3;
+  top: calc(100% + 4px);
+  left: 0;
+  width: max-content;
+  min-width: 100%;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  padding: 4px 0;
+}
+
+.filter-sort-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 32px;
+  align-items: center;
+}
+
+.filter-sort-name,
+.filter-sort-arrow {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+}
+
+.filter-sort-name {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: center;
+  padding: 6px 0;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.filter-sort-priority {
+  text-align: center;
+}
+
+.filter-sort-arrow {
+  width: 32px;
+  padding: 6px 0;
+  text-align: center;
+}
+
+button.filter-sort-arrow {
+  cursor: pointer;
+}
+
+.filter-sort-name:hover,
+button.filter-sort-arrow:hover {
+  background: var(--accent-soft);
 }
 
 @media (max-width: 860px) {

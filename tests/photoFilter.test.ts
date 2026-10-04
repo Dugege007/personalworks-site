@@ -7,6 +7,7 @@ import {
   occupiedPhotoFacetsFromFrames,
   orderPhotoCustomTags,
   photoTagResourceCounts,
+  primaryFacetValues,
   type PhotoCatalogQuery,
 } from "../src/content/photoFacet.ts";
 
@@ -270,6 +271,18 @@ test("单张自由标签进入筛选，未打标签的照片可单独筛出", ()
   assert.equal(occupied.tags.has("展馆"), true);
   assert.equal(occupied.tags.has("夜色"), true);
   assert.equal(occupied.untagged, true);
+});
+
+test("类型第一行顺序为风光、展馆、人像、人文、随拍、游戏、AI", () => {
+  assert.deepEqual(primaryFacetValues(false), [
+    "landscape-photo",
+    "展馆",
+    "portrait-photo",
+    "humanist-photo",
+    "随拍",
+    "game-photo",
+    "ai-photo",
+  ]);
 });
 
 test("类型第二行按筛选前的照片数量从多到少", () => {

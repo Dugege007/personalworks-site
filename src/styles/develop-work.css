@@ -231,6 +231,15 @@
   z-index: 1;
 }
 
+.develop-kind-door.is-cycling img {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.develop-kind-door.is-cycling img.is-on {
+  opacity: 1;
+}
+
 .develop-work-gate-cell::after,
 .develop-kind-door::after,
 .develop-channel-cell::after {
@@ -441,6 +450,10 @@
   .develop-kind-doors[data-count="3"] .develop-kind-door:hover,
   .develop-kind-doors[data-count="4"] .develop-kind-door:hover {
     flex-grow: 2.15;
+  }
+
+  .develop-kind-door.is-cycling img {
+    transition: opacity 0.9s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
   }
 }
 

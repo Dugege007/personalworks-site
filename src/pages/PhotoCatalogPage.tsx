@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ChannelHead } from "../components/work/ChannelHead";
 import { FilterRow } from "../components/work/FilterRow";
@@ -27,8 +27,18 @@ import {
   sortPhotoFrames,
   type PhotoCatalogQuery,
 } from "../content/works";
-import { hrefForKind, hrefForWork } from "../ia/href";
+import {
+  flipPhotoFrameTime,
+  parsePhotoFrameSort,
+  photoFrameSortCaption,
+  togglePhotoFrameSort,
+  writePhotoFrameSort,
+  type PhotoFrameSortDir,
+  type PhotoFrameSortKey,
+  type PhotoFrameSortRule,
+} from "../content/photoFrameSort";
 import { iaOfSkin } from "../ia";
+import { hrefForKind, hrefForWork } from "../ia/href";
 import { assetUrl } from "../lib/assets";
 import { usePrefs } from "../prefs/PrefsProvider";
 import "../styles/develop-work.css";
@@ -95,13 +105,17 @@ export function PhotoCatalogPage() {
   const [params, setParams] = useSearchParams();
   const filterSignature = params.toString();
   const query = useMemo(() => parseQuery(new URLSearchParams(filterSignature)), [filterSignature]);
+  const sortRules = useMemo(
+    () => parsePhotoFrameSort(new URLSearchParams(filterSignature).get("sort")),
+    [filterSignature],
+  );
   const catalogFrom = filterSignature ? `${catalogPath}?${filterSignature}` : catalogPath;
   const publishedWorks = useMemo(() => listPublishedPhotoWorks(), []);
   const published = useMemo(() => listPublishedPhotoFrames(), []);
   const facets = useMemo(() => collectPhotoFacets(publishedWorks), [publishedWorks]);
   const visible = useMemo(
-    () => sortPhotoFrames(filterPhotoFrames(published, query), query.sort),
-    [published, query],
+    () => sortPhotoFrames(filterPhotoFrames(published, query), sortRules),
+    [published, query, sortRules],
   );
   const occupied = useMemo(() => occupiedPhotoFacetsFromFrames(visible), [visible]);
   const catalogOccupied = useMemo(() => occupiedPhotoFacetsFromFrames(published), [published]);
@@ -180,11 +194,16 @@ export function PhotoCatalogPage() {
   }
 
   /**
-   * 在从前到后与从后到前之间切换。
+   * 写入排序查询。缺省时间倒序不带参数。
    */
-  function handleSortToggle() {
+  function commitSort(rules: PhotoFrameSortRule[]) {
     const next = new URLSearchParams(params);
-    next.set("sort", query.sort === "asc" ? "desc" : "asc");
+    const encoded = writePhotoFrameSort(rules);
+    if (encoded) {
+      next.set("sort", encoded);
+    } else {
+      next.delete("sort");
+    }
     setParams(next, { replace: true });
   }
 
@@ -193,8 +212,9 @@ export function PhotoCatalogPage() {
    */
   function handleClear() {
     const next = new URLSearchParams();
-    if (query.sort === "asc") {
-      next.set("sort", "asc");
+    const encoded = writePhotoFrameSort(sortRules);
+    if (encoded) {
+      next.set("sort", encoded);
     }
     setParams(next, { replace: true });
   }
@@ -261,9 +281,10 @@ export function PhotoCatalogPage() {
           onToggle={(value) => handleToggle("place", value)}
         />
         <div className="filter-toolbar">
-          <button type="button" className="filter-sort" onClick={handleSortToggle}>
-            时间：{query.sort === "asc" ? "从前到后" : "从后到前"}
-          </button>
+          <PhotoFrameSort
+            rules={sortRules}
+            onChange={commitSort}
+          />
           <span className="filter-count">{visible.length} 张</span>
           {hasFilter ? (
             <button type="button" className="filter-clear" onClick={handleClear}>
@@ -317,6 +338,105 @@ export function PhotoCatalogPage() {
           onPrev={() => step(-1)}
           onNext={() => step(1)}
         />
+      ) : null}
+    </div>
+  );
+}
+
+const sortKeys: PhotoFrameSortKey[] = ["time", "stars"];
+
+/**
+ * 总览排序：优先级、时间可升降，星级只有从高到低。
+ */
+function PhotoFrameSort({
+  rules,
+  onChange,
+}: {
+  rules: PhotoFrameSortRule[];
+  onChange: (rules: PhotoFrameSortRule[]) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [timeLatent, setTimeLatent] = useState<PhotoFrameSortDir>("desc");
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const timeRule = rules.find((rule) => rule.key === "time");
+  const timeDir = timeRule?.dir ?? timeLatent;
+
+  useEffect(() => {
+    if (timeRule) {
+      setTimeLatent(timeRule.dir);
+    }
+  }, [timeRule]);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+    function onPointer(event: PointerEvent) {
+      if (!wrapRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("pointerdown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  return (
+    <div className="filter-sort-wrap" ref={wrapRef}>
+      <button
+        type="button"
+        className="filter-sort"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        onClick={() => setOpen((value) => !value)}
+      >
+        {photoFrameSortCaption(rules)}
+      </button>
+      {open ? (
+        <div className="filter-sort-pop" role="listbox">
+          {sortKeys.map((key) => {
+            const priority = rules.findIndex((rule) => rule.key === key) + 1;
+            const label = key === "time" ? "按时间" : "按星级";
+            return (
+              <div className="filter-sort-row" key={key}>
+                <button
+                  type="button"
+                  className="filter-sort-name"
+                  onClick={() => onChange(togglePhotoFrameSort(rules, key, timeDir))}
+                >
+                  <span className="filter-sort-priority">{priority > 0 ? priority : ""}</span>
+                  <span>{label}</span>
+                </button>
+                {key === "time" ? (
+                  <button
+                    type="button"
+                    className="filter-sort-arrow"
+                    aria-label={timeDir === "asc" ? "从前到后" : "从后到前"}
+                    onClick={() => {
+                      if (timeRule) {
+                        onChange(flipPhotoFrameTime(rules));
+                        return;
+                      }
+                      setTimeLatent(timeDir === "asc" ? "desc" : "asc");
+                    }}
+                  >
+                    {timeDir === "asc" ? "▲" : "▼"}
+                  </button>
+                ) : (
+                  <span className="filter-sort-arrow" aria-hidden="true" />
+                )}
+              </div>
+            );
+          })}
+        </div>
       ) : null}
     </div>
   );

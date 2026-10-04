@@ -13,10 +13,12 @@ export const initialGameProjects = [
         "game-dev/antigravity/01.webp",
         "反重力_帮助界面 02"
       ],
-      [
-        "game-dev/antigravity/02.webp",
-        "反重力_开始界面 01"
-      ],
+      {
+  "kind": "image",
+  "label": "反重力_开始界面 01",
+  "src": "game-dev/antigravity/02.webp",
+  "stars": 4
+},
       [
         "game-dev/antigravity/03.webp",
         "反重力_排行榜界面 01"
@@ -25,10 +27,12 @@ export const initialGameProjects = [
         "game-dev/antigravity/04.webp",
         "反重力_设置界面"
       ],
-      [
-        "game-dev/antigravity/05.webp",
-        "反重力_升级界面 01"
-      ],
+      {
+  "kind": "image",
+  "label": "反重力_升级界面 01",
+  "src": "game-dev/antigravity/05.webp",
+  "stars": 3
+},
       [
         "game-dev/antigravity/06.webp",
         "反重力_通关界面 01"
@@ -71,14 +75,18 @@ export const initialGameProjects = [
     "lead": "M.Studio的《3DRPG》项目练习。",
     "playable": false,
     "screenshots": [
-    [
-      "game-dev/3d-rpg/01.webp",
-      "3DRPG_练习 01"
-    ],
-    [
-      "game-dev/3d-rpg/02.webp",
-      "3DRPG_练习 02"
-    ],
+    {
+  "kind": "image",
+  "label": "3DRPG_练习 01",
+  "src": "game-dev/3d-rpg/01.webp",
+  "stars": 4
+},
+    {
+  "kind": "image",
+  "label": "3DRPG_练习 02",
+  "src": "game-dev/3d-rpg/02.webp",
+  "stars": 3
+},
     [
       "game-dev/3d-rpg/03.webp",
       "3DRPG_练习 03"
@@ -116,14 +124,18 @@ export const initialGameProjects = [
     "lead": "Siki学院的《黑暗女王的复活》项目练习。",
     "playable": false,
     "screenshots": [
-      [
-        "game-dev/dark-queen-3d-action/01.webp",
-        "暗黑女王_练习 1"
-      ],
-      [
-        "game-dev/dark-queen-3d-action/02.webp",
-        "暗黑女王_练习 2"
-      ],
+      {
+  "kind": "image",
+  "label": "暗黑女王_练习 1",
+  "src": "game-dev/dark-queen-3d-action/01.webp",
+  "stars": 3
+},
+      {
+  "kind": "image",
+  "label": "暗黑女王_练习 2",
+  "src": "game-dev/dark-queen-3d-action/02.webp",
+  "stars": 5
+},
       [
         "game-dev/dark-queen-3d-action/03.webp",
         "暗黑女王_练习 3"
@@ -137,10 +149,12 @@ export const initialGameProjects = [
     "lead": "贪吃蛇、俄罗斯方块、愤怒的小鸟、捕鱼达人等小游戏项目练习。",
     "playable": false,
     "screenshots": [
-      [
-        "game-dev/classic-games/01.webp",
-        "捕鱼达人_练习 1"
-      ],
+      {
+  "kind": "image",
+  "label": "捕鱼达人_练习 1",
+  "src": "game-dev/classic-games/01.webp",
+  "stars": 1
+},
       [
         "game-dev/classic-games/02.webp",
         "俄罗斯方块_练习 1"
@@ -208,10 +222,12 @@ export const initialGameProjects = [
         "game-dev/unity-official-tutorial/01.webp",
         "官方教程_练习 1"
       ],
-      [
-        "game-dev/unity-official-tutorial/02.webp",
-        "官方教程_练习 2"
-      ]
+      {
+  "kind": "image",
+  "label": "官方教程_练习 2",
+  "src": "game-dev/unity-official-tutorial/02.webp",
+  "stars": 2
+}
     ]
   }
 ] as const;
@@ -226,6 +242,8 @@ export const registeredGames: Array<{
   consent?: string;
   stageFolder?: string;
   screenshots: Array<[string, string]>;
+  /** 已隐藏截图的星级。不进访客选单，不进随机展示。 */
+  hiddenStars?: Readonly<Record<string, 1 | 2 | 3 | 4 | 5>>;
 }> = [
   {
     id: "squirmeal",

@@ -6399,7 +6399,7 @@
     {
       "object": "photo/real-world-photo/20260926 南京 凡人展/04.webp",
       "stageRel": "摄影（photo）/现实摄影（real-world-photo）/2026/20260926 南京 凡人展/.site-ready/20260926 南京 凡人展/04.webp",
-      "status": "published",
+      "status": "withdrawn",
       "sourceStageRel": "摄影（photo）/现实摄影（real-world-photo）/2026/20260926 南京 凡人展/DSC07446_2026-09-27-14-18-59-568_创意图.jpg"
     },
     {
@@ -7283,6 +7283,30 @@
       "stageRel": "摄影（photo）/现实摄影（real-world-photo）/2018/20181229 上海 参观项目/.site-ready/20181229 上海 参观项目/17.webp",
       "status": "published",
       "sourceStageRel": "摄影（photo）/现实摄影（real-world-photo）/2018/20181229 上海 参观项目/P1290885.jpg"
+    },
+    {
+      "object": "photo/real-world-photo/20260926 南京 凡人展/09.webp",
+      "stageRel": "摄影（photo）/现实摄影（real-world-photo）/2026/20260926 南京 凡人展/.site-ready/20260926 南京 凡人展/09.webp",
+      "status": "published",
+      "sourceStageRel": "摄影（photo）/现实摄影（real-world-photo）/2026/20260926 南京 凡人展/DSC07446_2026-09-27-14-18-59-568_创意图_(2).jpg"
+    },
+    {
+      "object": "photo/real-world-photo/20260627 南京 JK室外 糖次/15.webp",
+      "stageRel": "摄影（photo）/现实摄影（real-world-photo）/2026/20260627 南京 JK室外 糖次/.site-ready/20260627 南京 JK室外 糖次/15.webp",
+      "status": "published",
+      "sourceStageRel": "摄影（photo）/现实摄影（real-world-photo）/2026/20260627 南京 JK室外 糖次/DSC04022.jpg"
+    },
+    {
+      "object": "photo/real-world-photo/20181229 上海 参观项目/18.webp",
+      "stageRel": "摄影（photo）/现实摄影（real-world-photo）/2018/20181229 上海 参观项目/.site-ready/20181229 上海 参观项目/18.webp",
+      "status": "published",
+      "sourceStageRel": "摄影（photo）/现实摄影（real-world-photo）/2018/20181229 上海 参观项目/P1290547.jpg"
+    },
+    {
+      "object": "photo/real-world-photo/20260627 南京 JK室外 糖次/16.webp",
+      "stageRel": "摄影（photo）/现实摄影（real-world-photo）/2026/20260627 南京 JK室外 糖次/.site-ready/20260627 南京 JK室外 糖次/16.webp",
+      "status": "published",
+      "sourceStageRel": "摄影（photo）/现实摄影（real-world-photo）/2026/20260627 南京 JK室外 糖次/DSC03929.jpg"
     }
   ]
 }
