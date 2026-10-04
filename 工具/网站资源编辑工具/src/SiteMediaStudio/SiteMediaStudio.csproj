@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>PersonalWorks.SiteMediaStudio</RootNamespace>
+    <AssemblyName>SiteMediaStudio</AssemblyName>
+    <Product>网站资源编辑工具</Product>
+    <Description>本机网站资源看图批处理工作台</Description>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SiteMediaStudio.Core\SiteMediaStudio.Core.csproj" />
+  </ItemGroup>
+</Project>

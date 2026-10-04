@@ -1,0 +1,31 @@
+{
+  "id": "riqing",
+  "zh": "上海日清景观设计有限公司",
+  "pending": false,
+  "notes": "图签签字栏为项目负责人～审核（校准，不是审定）。若图面上方另有一套项目信息，取靠底的那一组。不盖建设单位、项目名称、工程地点、图纸名称、比例、日期、图纸编号。",
+  "path_needles": ["上海日清景观设计有限公司", "日清"],
+  "ocr_needles": ["上海日清", "日清景观"],
+  "fill_rgb": [64, 64, 64],
+  "mask_body": false,
+  "skip_path_needles": ["封面", "说明", "目录"],
+  "skip_ocr_needles": ["景观施工图设计图册"],
+  "title_keep": ["图名", "图纸名称", "DRAWNING TITLE", "DRAWING TITLE"],
+  "signature_cluster": {
+    "prefer": "bottom",
+    "start_keys": ["项目负责人", "PROJIN CHARGE", "FUNCTIONARY"],
+    "end_keys": ["审核", "CHECKED"],
+    "stop_before_keys": ["比例", "SCALE", "日期", "DATE", "图纸编号", "DRAWING NO"],
+    "label_keys": ["项目负责人", "设计", "校准", "审核"],
+    "member_keys": [
+      "项目负责人", "PROJIN CHARGE", "FUNCTIONARY",
+      "设计", "DESIGNED",
+      "校准", "APPROVED",
+      "审核", "CHECKED"
+    ]
+  },
+  "sheet_insets": {
+    "a2_land": {"dx0": 20, "dy0": 8, "dx1": 0, "dy1": 0},
+    "a1_land": {"dx0": 30, "dy0": 12, "dx1": 0, "dy1": 0},
+    "a0_land": {"dx0": 30, "dy0": 12, "dx1": 0, "dy1": 0}
+  }
+}

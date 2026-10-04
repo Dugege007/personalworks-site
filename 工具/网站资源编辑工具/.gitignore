@@ -1,0 +1,10 @@
+bin/
+obj/
+thumbs/
+out/
+*.bak-sitemedia
+.vs/
+*.user
+*.suo
+*.userosscache
+TestResults/

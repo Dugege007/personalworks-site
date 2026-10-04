@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "name": "冻结核对",
+  "channels": [
+    {
+      "key": "digital-twin",
+      "zh": "数字孪生",
+      "en": "Digital Twin",
+      "deco": "DIGITAL TWIN"
+    },
+    {
+      "key": "line-sim",
+      "zh": "产线仿真",
+      "en": "Production Line Simulation",
+      "deco": "LINE SIM"
+    }
+  ]
+}

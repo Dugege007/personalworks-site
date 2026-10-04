@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "name": "PersonalWorks",
+  "root": "../../..",
+  "stageRoot": "作品中转站",
+  "stageFolderPattern": "ZhKey",
+  "placeholdersRoot": "PersonalSite/public/placeholders",
+  "ledgerPath": "PersonalSite/src/content/media-ledger.json",
+  "siteCatalog": {
+    "kind": "personalworks-ts",
+    "path": "PersonalSite/src/content/works.ts",
+    "sitePath": "PersonalSite/src/content/site.ts",
+    "workDataPath": "PersonalSite/src/content/initialWorkProjects.ts",
+    "gameDataPath": "PersonalSite/src/content/initialGameProjects.ts"
+  },
+  "cli": {
+    "sitemedia": "工具/站点媒体生命周期/sitemedia.mjs",
+    "deployCwd": "PersonalSite"
+  },
+  "channels": [
+    { "key": "profile", "zh": "形象照", "en": "Profile", "deco": "PROFILE", "objectKeyPattern": "flat-file", "capabilities": { "catalog": true, "ingest": true, "hide": true, "withdraw": true } },
+    { "key": "digital-twin", "zh": "数字孪生", "en": "Digital Twin", "deco": "DIGITAL TWIN", "capabilities": { "catalog": true, "ingest": true, "hide": true, "withdraw": true } },
+    { "key": "line-sim", "zh": "产线仿真", "en": "Production Line Simulation", "deco": "LINE SIM", "capabilities": { "catalog": true, "ingest": true, "hide": true, "withdraw": true }, "stageContainerFolders": ["FlexSim", "ProdLineSim_自研平台"] },
+    { "key": "game-dev", "zh": "游戏开发", "en": "Game Development", "deco": "GAME DEV", "capabilities": { "catalog": true, "ingest": true, "hide": true, "withdraw": true }, "stageContainerFolders": ["参赛作品", "技术文章", "练习作品"] },
+    { "key": "landscape-rendering", "zh": "景观效果图", "en": "Landscape Rendering", "deco": "L. RENDER", "capabilities": { "catalog": true, "ingest": true, "hide": true, "withdraw": true }, "stageContainerFolders": ["上海道田景观工程咨询有限公司"] },
+    { "key": "landscape-cds", "zh": "景观施工图", "en": "Landscape Construction Drawings", "deco": "L. CDS", "capabilities": { "catalog": true, "ingest": true, "hide": true, "withdraw": true }, "stageContainerFolders": ["洛阳市古建园林设计院", "上海道田景观工程咨询有限公司", "上海日清景观设计有限公司"] },
+    { "key": "real-world-photo", "zh": "现实摄影", "en": "Real-world Photography", "deco": "REAL-WORLD", "capabilities": { "catalog": true, "ingest": true, "hide": true, "withdraw": true }, "yearContainers": true, "stageParent": "摄影（photo）" },
+    { "key": "game-photo", "zh": "游戏摄影", "en": "Game Photography", "deco": "GAME PHOTO", "capabilities": { "catalog": false, "ingest": false, "hide": false, "withdraw": false }, "stageParent": "摄影（photo）" },
+    { "key": "notes", "zh": "心得", "en": "Notes", "deco": "NOTES", "capabilities": { "catalog": true, "ingest": true, "hide": true, "withdraw": true } }
+  ]
+}

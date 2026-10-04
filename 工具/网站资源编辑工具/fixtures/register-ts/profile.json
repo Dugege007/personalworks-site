@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "name": "登记隔离",
+  "stageRoot": "stage",
+  "stageFolderPattern": "Key",
+  "placeholdersRoot": "public/placeholders",
+  "ledgerPath": "content/media-ledger.json",
+  "siteCatalog": {
+    "kind": "personalworks-ts",
+    "path": "works.ts"
+  },
+  "channels": [
+    {
+      "key": "landscape-rendering",
+      "zh": "景观效果图",
+      "en": "Landscape Rendering",
+      "deco": "L. RENDER"
+    },
+    {
+      "key": "game-dev",
+      "zh": "游戏开发",
+      "en": "Game Development",
+      "deco": "GAME DEV"
+    },
+    {
+      "key": "profile",
+      "zh": "形象照",
+      "en": "Profile",
+      "deco": "PROFILE"
+    },
+    {
+      "key": "game-photo",
+      "zh": "游戏摄影",
+      "en": "Game Photography",
+      "deco": "GAME PHOTO"
+    }
+  ]
+}

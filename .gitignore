@@ -1,63 +1,18 @@
-# 依赖与构建产物
-node_modules/
-dist/
-dist-ssr/
-.vite/
-*.local
+# 仓库根在 PersonalWorks。
+# 公开：站点、网站资源编辑工具、站点媒体生命周期、施工图两个小工具、中转站目录骨架。
+# 不入库：文档（含版本记录与运维备忘）、中转站里的媒体、编辑器目录。
 
-# 环境与密钥（保留示例文件）
-.env
-.env.*
-!.env.example
-!.env.deploy.example
+/*
+!/.gitignore
+!/README.md
 
-# 系统与编辑器缓存
-.DS_Store
-Thumbs.db
-Desktop.ini
-*.log
+!/PersonalSite/
 
-# 图片（矢量图标与 favicon 仍入库）
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.webp
-*.avif
-*.bmp
-*.tif
-*.tiff
-*.psd
-*.ico
-!**/favicon.ico
-!**/favicon.svg
-!public/skins/*.png
+!/工具/
+/工具/*
+!/工具/网站资源编辑工具/
+!/工具/站点媒体生命周期/
+!/工具/JPG脱敏_施工图用/
+!/工具/PDF转JPG_施工图用/
 
-# 视频与音频
-*.mp4
-*.mov
-*.avi
-*.mkv
-*.webm
-*.m4v
-*.mp3
-*.wav
-*.flac
-*.aac
-
-# 游戏、Unity WebGL 与安装包（大文件走腾讯云 COS）
-*.unityweb
-*.data
-*.wasm
-*.apk
-*.ipa
-*.exe
-*.unitypackage
-**/Build/
-**/webgl/
-**/WebGL/
-
-# 压缩包
-*.zip
-*.7z
-*.rar
+!/作品中转站/

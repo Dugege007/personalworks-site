@@ -1,0 +1,4 @@
+.env.media
+batches/
+__pycache__/
+*.pyc

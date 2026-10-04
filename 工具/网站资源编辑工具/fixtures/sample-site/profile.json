@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "name": "模拟站点",
+  "stageRoot": "stage",
+  "stageFolderPattern": "Key",
+  "placeholdersRoot": "public/placeholders",
+  "ledgerPath": "content/media-ledger.json",
+  "siteCatalog": {
+    "kind": "json",
+    "path": "content/catalog.json"
+  },
+  "channels": [
+    {
+      "key": "demo-render",
+      "zh": "演示效果图",
+      "en": "Demo Rendering",
+      "deco": "DEMO",
+      "stageContainerFolders": [ "studio-a" ]
+    },
+    {
+      "key": "demo-photo",
+      "zh": "演示摄影",
+      "en": "Demo Photography",
+      "deco": "SHOT"
+    }
+  ]
+}

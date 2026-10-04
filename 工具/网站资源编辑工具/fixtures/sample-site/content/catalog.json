@@ -1,0 +1,67 @@
+{
+  "generatedAt": "2026-09-11T00:00:00Z",
+  "channels": [
+    {
+      "key": "demo-render",
+      "lead": ""
+    },
+    {
+      "key": "demo-photo",
+      "lead": "演示风光栏目。"
+    }
+  ],
+  "works": [
+    {
+      "id": "demo-park",
+      "channel": "demo-render",
+      "title": "演示公园",
+      "summary": "公园项目说明。",
+      "media": [
+        {
+          "kind": "image",
+          "label": "效果图 01",
+          "src": "demo-render/demo-park/01.png",
+          "stars": 4
+        },
+        {
+          "kind": "image",
+          "label": "效果图 02",
+          "src": "demo-render/demo-park/02.png",
+          "stars": 1
+        },
+        {
+          "kind": "image",
+          "label": "效果图 03",
+          "src": "demo-render/demo-park/03.png"
+        }
+      ]
+    },
+    {
+      "id": "demo-yard",
+      "channel": "demo-render",
+      "title": "演示庭院",
+      "summary": "",
+      "media": [
+        {
+          "kind": "image",
+          "label": "效果图 01",
+          "src": "demo-render/demo-yard/01.png",
+          "stars": 3
+        }
+      ]
+    },
+    {
+      "id": "demo-walk",
+      "channel": "demo-photo",
+      "title": "演示步道",
+      "summary": "步道项目说明。",
+      "media": [
+        {
+          "kind": "image",
+          "label": "照片 01",
+          "src": "demo-photo/demo-walk/01.png"
+        }
+      ]
+    }
+  ]
+}

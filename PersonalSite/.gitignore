@@ -1,0 +1,63 @@
+# 依赖与构建产物
+node_modules/
+dist/
+dist-ssr/
+.vite/
+*.local
+
+# 环境与密钥（保留示例文件）
+.env
+.env.*
+!.env.example
+!.env.deploy.example
+
+# 系统与编辑器缓存
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.log
+
+# 图片（矢量图标与 favicon 仍入库）
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.avif
+*.bmp
+*.tif
+*.tiff
+*.psd
+*.ico
+!**/favicon.ico
+!**/favicon.svg
+!public/skins/*.png
+
+# 视频与音频
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
+*.m4v
+*.mp3
+*.wav
+*.flac
+*.aac
+
+# 游戏、Unity WebGL 与安装包（大文件走腾讯云 COS）
+*.unityweb
+*.data
+*.wasm
+*.apk
+*.ipa
+*.exe
+*.unitypackage
+**/Build/
+**/webgl/
+**/WebGL/
+
+# 压缩包
+*.zip
+*.7z
+*.rar

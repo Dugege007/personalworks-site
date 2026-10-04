@@ -1,0 +1,755 @@
+﻿<Window x:Name="StudioWindow" x:Class="PersonalWorks.SiteMediaStudio.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:PersonalWorks.SiteMediaStudio.Controls"
+        mc:Ignorable="d"
+        Title="{Binding WorkspaceTitle}"
+        Height="900" Width="1440"
+        MinHeight="720" MinWidth="980"
+        Background="{StaticResource BgBrush}"
+        PreviewKeyDown="OnPreviewKeyDown"
+        PreviewMouseDown="OnBlankPreviewMouseDown"
+        StateChanged="OnWindowStateChanged">
+    <Grid>
+    <DockPanel x:Name="RootDock" Focusable="True" FocusVisualStyle="{x:Null}" SizeChanged="OnViewportSizeChanged">
+        <Menu DockPanel.Dock="Top" Padding="8,4">
+            <MenuItem Header="工作区">
+                <MenuItem Header="打开配置…" Click="OnOpenProfile"/>
+                <MenuItem Header="打开模拟站" Command="{Binding OpenFixtureCommand}"/>
+                <MenuItem Header="打开 PersonalWorks" Command="{Binding OpenPersonalWorksCommand}"/>
+                <Separator/>
+                <MenuItem Header="刷新编目" Command="{Binding RefreshCommand}"/>
+                <Separator/>
+                <MenuItem Header="设置…" Command="{Binding OpenSettingsCommand}"/>
+            </MenuItem>
+            <MenuItem Header="标记">
+                <MenuItem Header="上页 (I)" Command="{Binding MarkIngestCommand}"/>
+                <MenuItem Header="回收 (R)" Command="{Binding MarkRecycleCommand}"/>
+                <MenuItem Header="隐藏 (H)" Command="{Binding MarkHideCommand}"/>
+                <MenuItem Header="撤下 (W)" Command="{Binding MarkWithdrawCommand}"/>
+                <MenuItem Header="清除选区标记 (Esc)" Command="{Binding ClearMarkCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        <Border DockPanel.Dock="Bottom" Background="{StaticResource SurfaceBrush}"
+                BorderBrush="{StaticResource LineBrush}" BorderThickness="0,1,0,0" Padding="16,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <TextBlock Text="{Binding MarkSummary}" FontSize="13"/>
+                    <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource MutedBrush}" Margin="0,4,0,0"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Style="{StaticResource GhostButton}" Content="预演" Command="{Binding PreviewCommand}"/>
+                    <Button Style="{StaticResource PrimaryButton}" Content="生成提示词"
+                            Command="{Binding CopyPromptCommand}"
+                            Visibility="{Binding IsPromptMode, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <Button Style="{StaticResource DangerButton}" Content="执行" Command="{Binding ExecuteCommand}"/>
+                    <Button Style="{StaticResource PrimaryButton}" Content="发布上线" Command="{Binding PublishCommand}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Grid x:Name="ShellGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="NavColumn" Width="240" MinWidth="180" MaxWidth="360"/>
+                <ColumnDefinition Width="6"/>
+                <ColumnDefinition Width="*" MinWidth="580"/>
+                <ColumnDefinition Width="6"/>
+                <ColumnDefinition x:Name="InspectorColumn" Width="300" MinWidth="180"/>
+            </Grid.ColumnDefinitions>
+
+            <DockPanel Grid.Column="0" Background="{StaticResource PanelBrush}">
+                <TextBlock DockPanel.Dock="Top" Margin="16,16,16,8" FontSize="11"
+                           Foreground="{StaticResource MutedBrush}" Text="栏目 / 项目"/>
+                    <TreeView x:Name="NavTree" ItemsSource="{Binding NavNodes}"
+                          ItemContainerStyle="{StaticResource NavTreeItemStyle}"
+                          SelectedItemChanged="OnNavSelected"
+                          PreviewMouseLeftButtonDown="OnNavPreviewLeftDown"
+                          PreviewMouseRightButtonDown="OnNavPreviewRightDown">
+                    <TreeView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="登记项目"
+                                      Command="{Binding RegisterWorkCommand}"
+                                      Visibility="{Binding ShowRegisterWork, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <MenuItem Header="编辑项目"
+                                      Command="{Binding EditWorkCommand}"
+                                      Visibility="{Binding ShowEditWork, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <MenuItem Header="整项撤下"
+                                      Command="{Binding WithdrawWorkCommand}"
+                                      Visibility="{Binding ShowWithdrawWork, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <MenuItem Header="新建心得"
+                                      Command="{Binding CreateNoteCommand}"
+                                      Visibility="{Binding ShowNoteCreate, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <MenuItem Header="从模板创建"
+                                      IsEnabled="False"
+                                      Visibility="{Binding ShowNoteCreate, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <MenuItem Header="上页心得"
+                                      Command="{Binding PublishNoteCommand}"
+                                      Visibility="{Binding ShowNoteActions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <MenuItem Header="隐藏心得"
+                                      Command="{Binding HideNoteCommand}"
+                                      Visibility="{Binding ShowNoteActions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <MenuItem Header="恢复显示"
+                                      Command="{Binding RestoreNoteCommand}"
+                                      Visibility="{Binding ShowNoteActions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <MenuItem Header="删除心得"
+                                      Command="{Binding RecycleNoteCommand}"
+                                      Visibility="{Binding ShowNoteActions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        </ContextMenu>
+                    </TreeView.ContextMenu>
+                    <TreeView.Resources>
+                        <Style TargetType="TreeViewItem" BasedOn="{StaticResource NavTreeItemStyle}"/>
+                    </TreeView.Resources>
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding Title}" FontSize="13"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <StackPanel Orientation="Horizontal"
+                                            Visibility="{Binding ShowsDetailLine, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <ItemsControl ItemsSource="{Binding MarkCountParts}"
+                                                  Focusable="False" IsHitTestVisible="False">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="{Binding Text}" FontSize="11"
+                                                               Opacity="1"
+                                                               Foreground="{Binding Brush}"/>
+                                                    <TextBlock Text="·" FontSize="11"
+                                                               Opacity="1"
+                                                               Foreground="{StaticResource MutedBrush}"
+                                                               Visibility="{Binding ShowSeparator, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <TextBlock Text="{Binding Subtitle}" FontSize="11"
+                                               Margin="{Binding SubtitleIndent}"
+                                               TextTrimming="CharacterEllipsis"
+                                               Foreground="{StaticResource MutedBrush}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+            </DockPanel>
+
+            <Control Grid.Column="1" Style="{StaticResource PaneSplitter}"
+                     MouseLeftButtonDown="OnNavSplitterDown"
+                     MouseMove="OnSplitterMouseMove"
+                     MouseLeftButtonUp="OnSplitterMouseUp"
+                     LostMouseCapture="OnSplitterLostCapture"/>
+
+            <DockPanel Grid.Column="2" Background="{StaticResource BgBrush}">
+                <Border DockPanel.Dock="Top" Padding="16,12" Background="{StaticResource SurfaceBrush}"
+                        BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="{Binding ChannelCaption}" FontSize="16" FontWeight="SemiBold"/>
+                            <TextBlock Margin="0,4,0,0" Foreground="{StaticResource MutedBrush}" FontSize="12"
+                                       Text="{Binding PaneHintText}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Button Style="{StaticResource StagePaneButton}" Content="投放箱"
+                                    Command="{Binding PaneStageCommand}"/>
+                            <Button Style="{StaticResource SitePaneButton}" Content="站点"
+                                    Command="{Binding PaneSiteCommand}"/>
+                            <Button Style="{StaticResource ComparePaneButton}" Content="对照"
+                                    Command="{Binding PaneCompareCommand}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+                            <Button Content="机械"
+                                    Command="{Binding ModeDirectCommand}"
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,8,0">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource ModeLabelButton}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPromptMode}" Value="False">
+                                                <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                            <ToggleButton Style="{StaticResource ModeSwitch}"
+                                          IsChecked="{Binding IsPromptMode}"
+                                          VerticalAlignment="Center"
+                                          ToolTip="机械执行；拨到右侧为提示词"/>
+                            <Button Content="提示词"
+                                    Command="{Binding ModePromptCommand}"
+                                    VerticalAlignment="Center"
+                                    Margin="8,0,0,0">
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource ModeLabelButton}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsPromptMode}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <Border DockPanel.Dock="Top" Padding="16,8" Background="{StaticResource SurfaceBrush}"
+                        BorderBrush="{StaticResource LineBrush}" BorderThickness="0,0,0,1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="缩放" Foreground="{StaticResource MutedBrush}"
+                                       VerticalAlignment="Center" Margin="0,0,10,0"/>
+                            <Slider Style="{StaticResource ZoomSlider}"
+                                    Value="{Binding ThumbnailPx, Mode=TwoWay}"/>
+                            <TextBlock Text="{Binding ThumbnailPxCaption}" Margin="10,0,0,0"
+                                       Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center"
+                                       FontFamily="Cascadia Mono, Consolas" Width="56"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="排序" Foreground="{StaticResource MutedBrush}"
+                                       VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <ToggleButton x:Name="GridSortBox"
+                                          Width="132"
+                                          Style="{StaticResource GridSortToggle}"
+                                          IsChecked="{Binding IsGridSortOpen, Mode=TwoWay}"
+                                          IsEnabled="{Binding IsGridSortEnabled}"
+                                          Checked="OnGridSortChecked"
+                                          Unchecked="OnGridSortUnchecked"
+                                          ToolTip="{Binding GridSortCaption}"
+                                          VerticalAlignment="Center"
+                                          Margin="0,0,16,0">
+                                <TextBlock Text="{Binding GridSortCaption}"
+                                           TextTrimming="CharacterEllipsis"
+                                           VerticalAlignment="Center"/>
+                            </ToggleButton>
+                            <Popup x:Name="GridSortPopup"
+                                   PlacementTarget="{Binding ElementName=GridSortBox}"
+                                   Placement="Bottom"
+                                   StaysOpen="False"
+                                   AllowsTransparency="True"
+                                   PopupAnimation="Fade"
+                                   Closed="OnGridSortPopupClosed">
+                                <Border Background="{StaticResource SurfaceBrush}"
+                                        BorderBrush="{StaticResource LineBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="2"
+                                        Margin="0,2,0,0"
+                                        Padding="0,4"
+                                        MinWidth="{Binding ActualWidth, ElementName=GridSortBox}"
+                                        SnapsToDevicePixels="True">
+                                    <ItemsControl ItemsSource="{Binding GridSortOptionList}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="32"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Button Grid.Column="0"
+                                                            Command="{Binding ToggleCommand}"
+                                                            Style="{StaticResource GridSortHit}"
+                                                            HorizontalContentAlignment="Stretch">
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="28"/>
+                                                                <ColumnDefinition Width="*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Grid.Column="0"
+                                                                       Text="{Binding PriorityText}"
+                                                                       HorizontalAlignment="Center"
+                                                                       VerticalAlignment="Center"/>
+                                                            <TextBlock Grid.Column="1"
+                                                                       Text="{Binding Label}"
+                                                                       VerticalAlignment="Center"
+                                                                       Margin="4,0,8,0"/>
+                                                        </Grid>
+                                                    </Button>
+                                                    <Button Grid.Column="1"
+                                                            Command="{Binding FlipCommand}"
+                                                            IsEnabled="{Binding HasDirection}"
+                                                            Style="{StaticResource GridSortHit}">
+                                                        <TextBlock Text="{Binding ArrowGlyph}"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center"/>
+                                                    </Button>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Border>
+                            </Popup>
+                            <TextBlock Text="脱敏" Foreground="{StaticResource MutedBrush}"
+                                       VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <ComboBox x:Name="SenseFilterBox" Width="108"
+                                      ItemsSource="{Binding SenseFilterOptionList}"
+                                      SelectedItem="{Binding SelectedSenseFilter, Mode=TwoWay}"
+                                      IsEnabled="{Binding IsSenseFilterEnabled}"
+                                      IsTextSearchEnabled="False">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Label}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <Border DockPanel.Dock="Top" Padding="16,8" Background="#33C4A574"
+                        BorderBrush="{StaticResource GoldBrush}" BorderThickness="0,0,0,1"
+                        Visibility="{Binding HasNotice, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <TextBlock Text="{Binding NoticeText}" Foreground="{StaticResource GoldBrush}"
+                               TextWrapping="Wrap" FontSize="12"/>
+                </Border>
+                <Grid>
+                <ListBox x:Name="CompareList"
+                         ItemsSource="{Binding CompareRows}"
+                         SelectionMode="Single"
+                         Padding="8"
+                         PreviewMouseLeftButtonDown="OnContentListPreviewLeftDown"
+                         ContextMenuOpening="OnContentListContextMenuOpening"
+                         Visibility="{Binding IsComparePane, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="全选" Command="{Binding SelectAllCommand}"/>
+                            <MenuItem Header="重新选择" Command="{Binding RestoreSelectionCommand}"/>
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="0,0,0,10"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Margin="4"
+                                        BorderThickness="2"
+                                        BorderBrush="{Binding Left.MarkBrush}"
+                                        MouseLeftButtonDown="OnCompareLeftDown"
+                                        MouseLeftButtonUp="OnCompareLeftUp">
+                                    <Grid>
+                                        <Border Background="{StaticResource InkBrush}"
+                                                Opacity="{Binding Left.ChromeOpacity}">
+                                            <StackPanel>
+                                                <Grid Height="{Binding DataContext.CardImageHeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                      Background="{StaticResource WellBrush}">
+                                                    <Image Source="{Binding Left.Thumbnail}" Stretch="Uniform"/>
+                                                    <ContentControl Style="{StaticResource VideoPlayHint}"
+                                                                    Visibility="{Binding LeftIsVideo, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed, TargetNullValue=Collapsed}"/>
+                                                </Grid>
+                                                <ContentPresenter Margin="8,8,8,2" Content="{Binding Left}"
+                                                                  ContentTemplate="{StaticResource StickyExtCaptionTemplate}"/>
+                                                <ContentPresenter Margin="8,0,8,8" Content="{Binding Left}"
+                                                                  ContentTemplate="{StaticResource StickyExtSubtitleTemplate}"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Style="{StaticResource MarkBadgeBorder}"
+                                                Background="{Binding Left.MarkBrush}"
+                                                Visibility="{Binding Left.HasMark, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <TextBlock Text="{Binding Left.MarkLabel}" FontSize="11"/>
+                                        </Border>
+                                        <ItemsControl Style="{StaticResource StarDots}" ItemsSource="{Binding Left.StarDots}"/>
+                                    </Grid>
+                                </Border>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="{Binding StatusLabel}" FontSize="11"
+                                               Foreground="{StaticResource GoldBrush}" TextAlignment="Center"
+                                               TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <Border Grid.Column="2" Margin="4"
+                                        BorderThickness="2"
+                                        BorderBrush="{Binding Right.MarkBrush}"
+                                        MouseLeftButtonDown="OnCompareRightDown"
+                                        MouseLeftButtonUp="OnCompareRightUp">
+                                    <Grid>
+                                        <Border Background="{StaticResource InkBrush}"
+                                                Opacity="{Binding Right.ChromeOpacity}">
+                                            <StackPanel>
+                                                <Grid Height="{Binding DataContext.CardImageHeight, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                      Background="{StaticResource WellBrush}">
+                                                    <Image Source="{Binding Right.Thumbnail}" Stretch="Uniform"/>
+                                                    <ContentControl Style="{StaticResource VideoPlayHint}"
+                                                                    Visibility="{Binding RightIsVideo, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed, TargetNullValue=Collapsed}"/>
+                                                </Grid>
+                                                <ContentPresenter Margin="8,8,8,2" Content="{Binding Right}"
+                                                                  ContentTemplate="{StaticResource StickyExtCaptionTemplate}"/>
+                                                <ContentPresenter Margin="8,0,8,8" Content="{Binding Right}"
+                                                                  ContentTemplate="{StaticResource StickyExtSubtitleTemplate}"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <Border Style="{StaticResource MarkBadgeBorder}"
+                                                Background="{Binding Right.MarkBrush}"
+                                                Visibility="{Binding Right.HasMark, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <TextBlock Text="{Binding Right.MarkLabel}" FontSize="11"/>
+                                        </Border>
+                                        <ItemsControl Style="{StaticResource StarDots}" ItemsSource="{Binding Right.StarDots}"/>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <ListBox x:Name="CardList"
+                         ItemsSource="{Binding Cards}"
+                         SelectionMode="Extended"
+                         SelectionChanged="OnCardsSelected"
+                         MouseDoubleClick="OnCardDoubleClick"
+                         PreviewMouseLeftButtonDown="OnContentListPreviewLeftDown"
+                         PreviewMouseMove="OnCardListPreviewMouseMove"
+                         PreviewMouseLeftButtonUp="OnCardListPreviewMouseUp"
+                         LostMouseCapture="OnCardListLostCapture"
+                         ContextMenuOpening="OnContentListContextMenuOpening"
+                         Padding="12"
+                         ScrollViewer.CanContentScroll="True"
+                         VirtualizingPanel.IsVirtualizing="True"
+                         VirtualizingPanel.VirtualizationMode="Recycling"
+                         Visibility="{Binding IsComparePane, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=invert}">
+                    <ListBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="全选" Command="{Binding SelectAllCommand}"/>
+                            <MenuItem Header="重新选择" Command="{Binding RestoreSelectionCommand}"/>
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <controls:VirtualizingWrapPanel
+                                ItemWidth="{Binding DataContext.CardCellWidth, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                ItemHeight="{Binding DataContext.CardCellHeight, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="6"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border x:Name="cardBorder" BorderThickness="2" BorderBrush="Transparent"
+                                                Background="Transparent">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="cardBorder" Property="BorderBrush" Value="{StaticResource GoldBrush}"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Width="{Binding DataContext.CardWidth, RelativeSource={RelativeSource AncestorType=Window}}">
+                                <Border Background="{StaticResource InkBrush}"
+                                        Opacity="{Binding ChromeOpacity}">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid Background="{StaticResource WellBrush}"
+                                              Height="{Binding DataContext.CardImageHeight, RelativeSource={RelativeSource AncestorType=Window}}">
+                                            <Image Source="{Binding Thumbnail}" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                            <ContentControl Style="{StaticResource VideoPlayHint}"
+                                                            Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed, TargetNullValue=Collapsed}"/>
+                                        </Grid>
+                                        <StackPanel Grid.Row="1" Margin="8,6,12,6">
+                                            <ContentPresenter Content="{Binding}"
+                                                              ContentTemplate="{StaticResource StickyExtCaptionTemplate}"/>
+                                            <ContentPresenter Content="{Binding}"
+                                                              ContentTemplate="{StaticResource StickyExtSubtitleTemplate}"/>
+                                            <TextBlock Text="{Binding Badge}" Foreground="{Binding BadgeBrush}"
+                                                       FontSize="11" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                                <Border Style="{StaticResource MarkBadgeBorder}"
+                                        Background="{Binding MarkBrush}"
+                                        Visibility="{Binding HasMark, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <TextBlock Text="{Binding MarkLabel}" FontSize="11"/>
+                                </Border>
+                                <!-- 卡片网格按整卡宽布局，外层 2px 边框把可见区收进 4px，网格左对齐后右缘落在可见区外。右边距多出这 4px，圆心才与上沿等距。 -->
+                                <ItemsControl Style="{StaticResource StarDots}" Margin="0,6,10,0" ItemsSource="{Binding StarDots}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Canvas x:Name="MarqueeHost" IsHitTestVisible="False"
+                        Visibility="{Binding IsComparePane, Converter={StaticResource BooleanToVisibilityConverter}, ConverterParameter=invert}">
+                    <Rectangle x:Name="MarqueeRect"
+                               Stroke="{StaticResource GoldBrush}"
+                               StrokeThickness="1"
+                               Fill="#33C4A574"
+                               Visibility="Collapsed"/>
+                    <Rectangle x:Name="ReorderInsert"
+                               Fill="{StaticResource PineBrush}"
+                               Width="2"
+                               Visibility="Collapsed"/>
+                </Canvas>
+                <Border Background="Transparent"
+                        Visibility="{Binding IsCatalogLoading, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        IsHitTestVisible="False">
+                    <TextBlock Text="正在加载栏目…"
+                               FontSize="16" FontWeight="SemiBold"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                </Grid>
+            </DockPanel>
+
+            <Control Grid.Column="3" Style="{StaticResource PaneSplitter}"
+                     MouseLeftButtonDown="OnInspectorSplitterDown"
+                     MouseMove="OnSplitterMouseMove"
+                     MouseLeftButtonUp="OnSplitterMouseUp"
+                     LostMouseCapture="OnSplitterLostCapture"/>
+
+            <DockPanel x:Name="InspectorPane" Grid.Column="4" Background="{StaticResource PanelBrush}">
+                <TextBlock DockPanel.Dock="Top" Margin="16,16,16,8" FontSize="11"
+                           Foreground="{StaticResource MutedBrush}" Text="检视"/>
+                <Border x:Name="InspectorPreviewHost" DockPanel.Dock="Top" Margin="16,0,16,12"
+                        Background="{StaticResource InkBrush}" HorizontalAlignment="Left"
+                        Width="{Binding ElementName=InspectorColumn, Path=Width.Value,
+                                        Converter={StaticResource InspectorPreviewWidthConverter}}">
+                    <Border.Height>
+                        <MultiBinding Converter="{StaticResource InspectorPreviewHeightConverter}">
+                            <Binding ElementName="InspectorColumn" Path="Width.Value"/>
+                            <Binding ElementName="RootDock" Path="ActualHeight"/>
+                            <Binding Path="InspectorImage"/>
+                        </MultiBinding>
+                    </Border.Height>
+                    <Image x:Name="InspectorPreviewImage" Source="{Binding InspectorImage}"
+                           Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Border>
+                <StackPanel DockPanel.Dock="Top" Margin="16,0,16,12"
+                            Visibility="{Binding ShowVideoScrub, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Slider Minimum="0"
+                            Maximum="{Binding VideoSliderMaximum}"
+                            Value="{Binding VideoPositionSec, Mode=TwoWay}"
+                            IsEnabled="{Binding CanScrubVideo}"
+                            IsMoveToPointEnabled="True"
+                            Margin="0,0,0,6"/>
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Style="{StaticResource GhostButton}"
+                                Content="设为封面"
+                                Command="{Binding SetCoverCommand}"
+                                Margin="8,0,0,0"/>
+                        <TextBlock Text="{Binding VideoPositionCaption}"
+                                   Foreground="{StaticResource MutedBrush}"
+                                   VerticalAlignment="Center"/>
+                    </DockPanel>
+                </StackPanel>
+                <StackPanel DockPanel.Dock="Bottom" Margin="16,8,16,16">
+                    <Button Style="{StaticResource GhostButton}" Content="重挂"
+                            Command="{Binding RelocateCommand}"
+                            HorizontalAlignment="Left"
+                            Margin="0,0,0,8"
+                            Visibility="{Binding ShowRelocate, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <StackPanel Margin="0,0,0,8"
+                                Visibility="{Binding ShowRegisterWork, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Button Style="{StaticResource GhostButton}" Content="登记项目"
+                                Command="{Binding RegisterWorkCommand}" Margin="0,0,0,8"/>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,0,8"
+                                Visibility="{Binding ShowIngestTarget, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock Foreground="{StaticResource MutedBrush}" Text="写入作品" Margin="0,0,0,4"/>
+                        <ComboBox ItemsSource="{Binding IngestWorkList}"
+                                  SelectedValue="{Binding IngestTargetWorkId, Mode=TwoWay}"
+                                  SelectedValuePath="Id">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Title}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,0,8"
+                                Visibility="{Binding ShowResourceTags, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock Foreground="{StaticResource MutedBrush}" Text="{Binding ResourceTagCaption}"
+                                   Margin="0,0,0,8"
+                                   Visibility="{Binding ShowResourceTagBatch, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        <Grid Margin="0,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Foreground="{StaticResource MutedBrush}" Text="标签" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1"
+                                       Margin="8,0,0,0"
+                                       VerticalAlignment="Center"
+                                       Foreground="{StaticResource OxideBrush}"
+                                       FontSize="12"
+                                       TextWrapping="Wrap"
+                                       Text="{Binding NoticeText, ElementName=ResourceTagEditor}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <Trigger Property="Text" Value="">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+                        <controls:TagEditor x:Name="ResourceTagEditor"
+                                            Suggestions="{Binding ResourceTagSuggestions}"
+                                            SelectedItems="{Binding ResourceTagSelected}"
+                                            IsEditingEnabled="{Binding ResourceTagEditable}"
+                                            TextCommitRequested="OnResourceTagCommit"
+                                            SuggestionPicked="OnResourceTagPick"
+                                            ChipRemoveRequested="OnResourceTagRemove"
+                                            PresetDeleteRequested="OnResourceTagPresetDelete"/>
+                        <TextBlock Foreground="{StaticResource MutedBrush}" Text="{Binding ResourceTagHint}"
+                                   Margin="0,8,0,0" TextWrapping="Wrap"
+                                   Visibility="{Binding ShowResourceTagHint, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,0,8"
+                                Visibility="{Binding ShowCopyName, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock Foreground="{StaticResource MutedBrush}" Text="名称" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding CopyName, UpdateSourceTrigger=PropertyChanged}"
+                                 PreviewKeyDown="OnCopyNameKeyDown"
+                                 LostFocus="OnCopyFieldLostFocus"/>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,0,8"
+                                Visibility="{Binding ShowProjectTags, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock Foreground="{StaticResource MutedBrush}" Text="标签" Margin="0,0,0,4"/>
+                        <controls:TagEditor SelectedItems="{Binding ProjectTagList}"
+                                            ShowsComposer="False"
+                                            IsEditingEnabled="False"
+                                            ChipChosen="OnProjectTagChosen"/>
+                    </StackPanel>
+                    <StackPanel Visibility="{Binding ShowCopyDescription, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock Foreground="{StaticResource MutedBrush}" Text="描述" Margin="0,0,0,4"/>
+                        <TextBox Height="72"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 VerticalScrollBarVisibility="Auto"
+                                 Text="{Binding CopyDescription, UpdateSourceTrigger=PropertyChanged}"
+                                 LostFocus="OnCopyFieldLostFocus"/>
+                    </StackPanel>
+                </StackPanel>
+                <ScrollViewer Margin="16,0,16,0" HorizontalScrollBarVisibility="Disabled">
+                    <TextBlock Text="{Binding InspectorMeta}" TextWrapping="Wrap" FontFamily="Cascadia Mono, Consolas"/>
+                </ScrollViewer>
+            </DockPanel>
+        </Grid>
+    </DockPanel>
+    <Grid x:Name="LightboxHost"
+          Background="#F20B0D10"
+          Visibility="{Binding IsLightboxOpen, Converter={StaticResource BooleanToVisibilityConverter}}"
+          PreviewMouseWheel="OnLightboxWheel"
+          MouseLeftButtonDown="OnLightboxBackdropDown">
+        <Border BorderThickness="3" BorderBrush="{Binding LightboxPublishBrush}"
+                SnapsToDevicePixels="True">
+        <Border BorderThickness="3" BorderBrush="{Binding LightboxMarkBrush}"
+                SnapsToDevicePixels="True">
+        <DockPanel>
+            <Border x:Name="LightboxChrome" DockPanel.Dock="Top"
+                    Background="{StaticResource SurfaceBrush}"
+                    BorderBrush="{StaticResource LineBrush}"
+                    BorderThickness="0,0,0,1"
+                    Padding="20,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding LightboxCaption}" FontSize="14" FontWeight="SemiBold"
+                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,16,0"/>
+                    <Border Grid.Column="1" Style="{StaticResource MarkBadgeBorder}" Margin="0,0,12,0"
+                            VerticalAlignment="Center" HorizontalAlignment="Left"
+                            Background="{Binding LightboxPublishBrush}">
+                        <TextBlock Text="{Binding LightboxPublishLabel}" FontSize="11"/>
+                    </Border>
+                    <Border Grid.Column="2" Style="{StaticResource MarkBadgeBorder}" Margin="0,0,16,0"
+                            VerticalAlignment="Center" HorizontalAlignment="Left"
+                            Background="{Binding LightboxMarkBrush}">
+                        <TextBlock Text="{Binding LightboxMarkLabel}" FontSize="11"/>
+                    </Border>
+                    <ComboBox x:Name="LightboxZoomBox" Grid.Column="3" Margin="0,0,16,0"
+                              Style="{StaticResource LightboxZoomCombo}"
+                              VerticalAlignment="Center"
+                              ItemsSource="{Binding LightboxZoomOptionList}"
+                              SelectedItem="{Binding SelectedLightboxZoom, Mode=TwoWay}"
+                              DisplayMemberPath="Label"/>
+                    <TextBlock Grid.Column="4" Text="Esc 关闭 · ← → 翻页 · 滚轮缩放"
+                               Foreground="{StaticResource MutedBrush}" VerticalAlignment="Center"/>
+                    <ItemsControl Grid.ColumnSpan="5"
+                                  Style="{StaticResource LightboxStars}"
+                                  ItemsSource="{Binding FocusCard.StarSlots}"/>
+                </Grid>
+            </Border>
+            <Canvas x:Name="LightboxViewport" Margin="24,0,24,24" ClipToBounds="True"
+                    Background="Transparent"
+                    Cursor="Arrow"
+                    SizeChanged="OnLightboxViewportSizeChanged"
+                    PreviewMouseLeftButtonDown="OnLightboxImageDown"
+                    PreviewMouseMove="OnLightboxImageMove"
+                    PreviewMouseLeftButtonUp="OnLightboxImageUp">
+                <Image x:Name="LightboxImage"
+                       Source="{Binding InspectorImage}"
+                       Width="{Binding LightboxDisplayWidth}"
+                       Height="{Binding LightboxDisplayHeight}"
+                       Stretch="Uniform"
+                       Canvas.Left="{Binding LightboxImageLeft}"
+                       Canvas.Top="{Binding LightboxImageTop}"
+                       Cursor="Arrow"
+                       RenderOptions.BitmapScalingMode="HighQuality"/>
+                <Border x:Name="LightboxMinimapHost"
+                        Canvas.Right="8" Canvas.Bottom="8"
+                        Width="{Binding LightboxMiniWidth}" Height="{Binding LightboxMiniHeight}"
+                        Background="#14181C" BorderBrush="#E8E6E1" BorderThickness="1"
+                        Opacity="0.6"
+                        Visibility="{Binding ShowLightboxMinimap, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        PreviewMouseLeftButtonDown="OnLightboxMinimapDown"
+                        PreviewMouseMove="OnLightboxMinimapMove"
+                        PreviewMouseLeftButtonUp="OnLightboxMinimapUp">
+                    <Grid>
+                        <Image Source="{Binding InspectorImage}" Stretch="Fill" IsHitTestVisible="False"/>
+                        <Border HorizontalAlignment="Left" VerticalAlignment="Top"
+                                Margin="{Binding LightboxMiniViewMargin}"
+                                Width="{Binding LightboxMiniViewWidth}"
+                                Height="{Binding LightboxMiniViewHeight}"
+                                BorderBrush="{StaticResource MinimapViewStrokeBrush}" BorderThickness="1"
+                                Background="{StaticResource MinimapViewFillBrush}" IsHitTestVisible="False"/>
+                    </Grid>
+                </Border>
+            </Canvas>
+        </DockPanel>
+        </Border>
+        </Border>
+    </Grid>
+    </Grid>
+</Window>

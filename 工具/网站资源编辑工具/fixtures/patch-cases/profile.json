@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "name": "补丁样例",
+  "stageRoot": "stage",
+  "stageFolderPattern": "Key",
+  "placeholdersRoot": "placeholders",
+  "siteCatalog": {
+    "kind": "personalworks-ts",
+    "path": "works.ts",
+    "sitePath": "site.ts"
+  },
+  "channels": [
+    {
+      "key": "landscape-rendering",
+      "zh": "景观效果图",
+      "en": "Landscape Rendering",
+      "deco": "L. RENDER"
+    },
+    {
+      "key": "digital-twin",
+      "zh": "数字孪生",
+      "en": "Digital Twin",
+      "deco": "DIGITAL TWIN"
+    },
+    {
+      "key": "landscape-photo",
+      "zh": "风光摄影",
+      "en": "Landscape Photography",
+      "deco": "L. PHOTO"
+    },
+    {
+      "key": "profile",
+      "zh": "形象",
+      "en": "Profile",
+      "deco": "PROFILE",
+      "objectKeyPattern": "flat-file"
+    },
+    {
+      "key": "game-dev",
+      "zh": "游戏开发",
+      "en": "Game Development",
+      "deco": "GAME DEV"
+    }
+  ]
+}

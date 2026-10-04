@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "records": [
+    {
+      "object": "demo-render/demo-park/01.png",
+      "stageRel": "demo-render/demo-park/01.png",
+      "status": "published"
+    },
+    {
+      "object": "demo-render/demo-park/02.png",
+      "stageRel": "demo-render/demo-park/02.png",
+      "status": "published"
+    },
+    {
+      "object": "demo-render/demo-yard/01.png",
+      "stageRel": "demo-render/demo-yard/01.png",
+      "status": "published"
+    },
+    {
+      "object": "demo-photo/demo-walk/01.png",
+      "stageRel": "demo-photo/demo-walk/01.png",
+      "status": "published"
+    },
+    {
+      "object": "demo-render/demo-park/old.png",
+      "stageRel": "demo-render/demo-park/old.png",
+      "status": "withdrawn"
+    },
+    {
+      "object": "demo-render/demo-park/03.png",
+      "stageRel": "demo-render/demo-park/04.png",
+      "status": "published"
+    },
+    {
+      "object": "demo-render/new-folder/01.png",
+      "stageRel": "demo-render/new-folder/01.png",
+      "status": "published"
+    },
+    {
+      "object": "demo-render/leftover/01.png",
+      "stageRel": "demo-render/leftover/unused.png",
+      "status": "published"
+    }
+  ]
+}

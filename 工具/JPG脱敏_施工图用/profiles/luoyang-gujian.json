@@ -1,0 +1,27 @@
+{
+  "id": "luoyang-gujian",
+  "zh": "洛阳市古建园林设计院",
+  "pending": true,
+  "notes": "中转站尚无该院 JPG。签字栏暂用道田参考（审定～设计一框）；图签分栏若不同须按实测改 signature_cluster。",
+  "path_needles": ["洛阳市古建园林设计院", "古建园林"],
+  "ocr_needles": ["洛阳市古建", "古建园林设计院"],
+  "fill_rgb": [64, 64, 64],
+  "mask_body": false,
+  "skip_path_needles": ["封面", "说明", "目录"],
+  "skip_ocr_needles": ["景观施工图设计图册"],
+  "title_keep": ["图名", "DRAWNING TITLE", "DRAWING TITLE"],
+  "signature_cluster": {
+    "start_keys": ["审定", "APPROVAL"],
+    "end_keys": ["设计", "DESIGNED BY"],
+    "stop_before_keys": ["绘图", "DRAWN BY", "日期", "DATE", "SEAL", "图签"],
+    "label_keys": ["审定", "审核", "校对", "工程负责人", "专业负责人", "设计"],
+    "member_keys": [
+      "审定", "APPROVAL",
+      "审核", "EXAMINATION",
+      "校对", "CHECKED",
+      "工程负责人", "PROJECT DIRECTOR",
+      "专业负责人", "DISCIPLINE RESPONSIBLE",
+      "设计", "DESIGNED BY"
+    ]
+  }
+}

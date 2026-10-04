@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>PersonalWorks.SiteMediaStudio.Cli</RootNamespace>
+    <AssemblyName>SiteMediaStudio.Cli</AssemblyName>
+    <Product>网站资源编辑工具</Product>
+    <Description>对话与脚本调用同一套意图预演 / 执行器</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SiteMediaStudio.Core\SiteMediaStudio.Core.csproj" />
+  </ItemGroup>
+</Project>

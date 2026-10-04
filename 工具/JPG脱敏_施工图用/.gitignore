@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+*.log
+*.jpg
+_live_test/
+.live_stash/
+_preview/
+_work_paths.txt
+_riqing_all.txt
+_riqing_pdfs.txt
+samples/live/
+
+# 仓库内只保留小样张，便于直接跑校验
+!samples/*.jpg
+!samples/nested/*.jpg
+!samples/dry/*.jpg
