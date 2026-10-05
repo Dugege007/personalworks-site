@@ -87,6 +87,33 @@ public static class PublishStatus
     }
 
     /// <summary>
+    /// 投放箱是否因媒体台账已发布而拒绝再标上页或回收。
+    /// 心得索引已收录但不写台账时，角标虽为已发布，仍允许。待发布撤下只改角标，台账仍为 published，仍然拒绝。整篇隐藏只改角标，不因此加锁。
+    /// </summary>
+    public static bool IsStageRemarkLocked(StageItem stage)
+    {
+        if (stage.IsNoteListed && !IsLedgerPublished(stage.LedgerStatus))
+        {
+            return false;
+        }
+
+        if (ForStage(stage) == Published)
+        {
+            return true;
+        }
+
+        return stage.IsPendingWithdraw && IsLedgerPublished(stage.LedgerStatus);
+    }
+
+    /// <summary>
+    /// 台账英文字段是否为 published。
+    /// </summary>
+    public static bool IsLedgerPublished(string? ledgerStatus)
+    {
+        return string.Equals(ledgerStatus, "published", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
     /// 站点卡片与灯箱外圈用的发布状态。
     /// </summary>
     public static string ForSite(SiteItem site)

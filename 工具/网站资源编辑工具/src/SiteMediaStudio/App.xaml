@@ -40,6 +40,7 @@
         <SolidColorBrush x:Key="MinimapViewFillBrush" Color="#334A9FE0"/>
 
         <Style TargetType="Window">
+            <Setter Property="Icon" Value="pack://application:,,,/Assets/SiteMediaStudio.ico"/>
             <Setter Property="Background" Value="{StaticResource BgBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
             <Setter Property="FontFamily" Value="Segoe UI, 微软雅黑 UI, 微软雅黑"/>

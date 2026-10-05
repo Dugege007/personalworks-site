@@ -1348,7 +1348,7 @@ public sealed class ShellViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// 投放箱已发布资源不再接受上页或回收标记。
+    /// 投放箱媒体台账已发布时不再接受上页或回收。心得索引只改角标，不锁。
     /// </summary>
     private static bool IsPublishedStageLocked(MediaCardViewModel card, MediaIntent resolved)
     {

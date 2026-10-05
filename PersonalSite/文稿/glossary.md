@@ -82,6 +82,13 @@
 英文解释：A Unity plugin with several chart tools and flexible setup. [View site](https://bitsplash.io/graph-and-chart).
 
 
+### Unreal
+
+别名：虚幻引擎、虚幻、UE
+解释：Epic Games 的实时三维引擎，常与 Unity 并列，用于游戏和数字孪生场景。脚本主要用 C++ 和蓝图。[查看官网](https://www.unrealengine.com)。
+英文解释：Epic Games' realtime 3D engine, often listed alongside Unity, for games and digital-twin scenes. Scripting is mainly C++ and Blueprints. [View site](https://www.unrealengine.com).
+
+
 ## 编程
 
 ### C#
@@ -173,6 +180,11 @@
 
 解释：3D 渲染软件。出建筑、景观等效果图和动画漫游。[查看官网](https://lumion.com)。
 英文解释：3D rendering software for architectural and landscape stills and animated walkthroughs. [View site](https://lumion.com).
+
+### 点云
+
+解释：三维空间里的大量离散点，每个点带坐标，有的还带颜色或反射强度。多由激光扫描或摄影测量得到，用来重建物体和场景。[查看百科](https://zh.wikipedia.org/wiki/%E9%BB%9E%E9%9B%B2)。
+英文解释：A set of discrete points in 3D space. Each point has coordinates, and some also carry color or return intensity. Usually captured by laser scanning or photogrammetry, and used to reconstruct objects and scenes. [View entry](https://zh.wikipedia.org/wiki/%E9%BB%9E%E9%9B%B2).
 
 
 ## Adobe 全家桶
@@ -270,6 +282,12 @@
 
 
 ## AI 技术
+
+### Vibe Coding
+
+别名：氛围编程
+解释：用自然语言说明想做的功能，由 AI 编程工具写出并修改代码。本站页面按这种方式开发。[查看百科](https://zh.wikipedia.org/zh-cn/Vibe_coding)。
+英文解释：A way of building software by describing the intended behavior in natural language and letting an AI coding tool write and revise the code. This site was built that way. [View entry](https://zh.wikipedia.org/zh-cn/Vibe_coding).
 
 ### Agent 开发
 

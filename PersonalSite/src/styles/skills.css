@@ -79,13 +79,6 @@
   font-weight: 600;
 }
 
-.skills-domain-deco {
-  font-family: var(--font-display-en);
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  color: var(--muted);
-}
-
 .skills-domain-preview {
   display: flex;
   flex-shrink: 0;
@@ -123,6 +116,12 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 5px;
+}
+
+.skill-copy > .term-wrap {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .skill-name {

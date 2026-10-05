@@ -83,6 +83,85 @@ public sealed class PublishStatusTests
         };
 
         Assert.Equal("未上页", PublishStatus.ForStage(stage));
+        Assert.False(PublishStatus.IsStageRemarkLocked(stage));
+    }
+
+    [Fact]
+    public void IsStageRemarkLocked_NoteListedWithoutLedger_StaysOpen()
+    {
+        var stage = new StageItem
+        {
+            ChannelKey = "notes",
+            StageRel = "心得（notes）/20261005_021341/正文.md",
+            FullPath = "x",
+            IsNoteListed = true
+        };
+
+        Assert.Equal("已发布", PublishStatus.ForStage(stage));
+        Assert.False(PublishStatus.IsStageRemarkLocked(stage));
+    }
+
+    [Fact]
+    public void IsStageRemarkLocked_NoteListedWithLedger_StaysLocked()
+    {
+        var stage = new StageItem
+        {
+            ChannelKey = "notes",
+            StageRel = "心得（notes）/20261005_021341/shot.jpg",
+            FullPath = "x",
+            LedgerStatus = "published",
+            IsNoteListed = true
+        };
+
+        Assert.Equal("已发布", PublishStatus.ForStage(stage));
+        Assert.True(PublishStatus.IsStageRemarkLocked(stage));
+    }
+
+    [Fact]
+    public void IsStageRemarkLocked_LedgerPublished_IsLocked()
+    {
+        var stage = new StageItem
+        {
+            ChannelKey = "demo-render",
+            StageRel = "demo-render/demo-park/01.png",
+            FullPath = "x",
+            LedgerStatus = "published"
+        };
+
+        Assert.True(PublishStatus.IsStageRemarkLocked(stage));
+    }
+
+    [Fact]
+    public void IsStageRemarkLocked_PendingWithdraw_StaysLocked()
+    {
+        var stage = new StageItem
+        {
+            ChannelKey = "real-world-photo",
+            StageRel = "real-world-photo/04.webp",
+            FullPath = "x",
+            LedgerStatus = "published",
+            IsPendingWithdraw = true
+        };
+
+        Assert.Equal("已撤下", PublishStatus.ForStage(stage));
+        Assert.True(PublishStatus.IsStageRemarkLocked(stage));
+    }
+
+    [Fact]
+    public void IsStageRemarkLocked_NoteHiddenWithLedger_DoesNotAddLock()
+    {
+        var stage = new StageItem
+        {
+            ChannelKey = "notes",
+            StageRel = "心得（notes）/20261005_021341/shot.jpg",
+            FullPath = "x",
+            LedgerStatus = "published",
+            IsNoteListed = true,
+            IsNoteHidden = true
+        };
+
+        Assert.Equal("已隐藏", PublishStatus.ForStage(stage));
+        Assert.False(PublishStatus.IsStageRemarkLocked(stage));
     }
 
     [Fact]

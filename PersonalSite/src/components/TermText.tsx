@@ -1,8 +1,9 @@
 import { Fragment, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
-import { glossaryBook } from "../content/glossaryDoc";
+import { JumpLinkIcon } from "./JumpLinkIcon";
 import { annotateTerms, tipParts, type GlossaryEntry, type TipPart } from "../content/glossary";
+import { glossaryBook } from "../content/glossaryDoc";
 import { usePrefs } from "../prefs/PrefsProvider";
 import "../styles/term-tip.css";
 
@@ -250,13 +251,15 @@ function TipFragment({ part }: { part: TipPart }) {
     if (part.href.startsWith("/") && !part.href.startsWith("//")) {
       return (
         <Link className="term-tip-link" to={part.href}>
-          {part.text}
+          <span className="jump-link-label">{part.text}</span>
+          <JumpLinkIcon />
         </Link>
       );
     }
     return (
       <a className="term-tip-link" href={part.href} target="_blank" rel="noopener noreferrer">
-        {part.text}
+        <span className="jump-link-label">{part.text}</span>
+        <JumpLinkIcon />
       </a>
     );
   }

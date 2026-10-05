@@ -57,7 +57,6 @@ export function SkillsPage() {
           const open = openIds.includes(domain.id);
           const rows = toolsOfDomain(domain);
           const domainName = tx(domain.name, locale);
-          const showDeco = domain.deco.toLowerCase() !== domainName.toLowerCase();
 
           return (
             <section key={domain.id} className={`skills-domain${open ? " is-open" : ""}`}>
@@ -65,7 +64,6 @@ export function SkillsPage() {
                 <button type="button" aria-expanded={open} onClick={() => toggle(domain.id)}>
                   <span className="skills-domain-titles">
                     <span className="skills-domain-name">{domainName}</span>
-                    {showDeco ? <span className="skills-domain-deco">{domain.deco}</span> : null}
                   </span>
                   {open ? null : (
                     <span className="skills-domain-preview" aria-hidden="true">

@@ -116,6 +116,24 @@ id：csharp
 描述：面向对象语言，主要用于 Unity 脚本与工具开发。
 英文描述：Object-oriented language used mainly for Unity scripts and tools.
 
+### Unreal
+
+id：unreal
+英文：Unreal Engine
+图标：unreal.svg
+官网：https://www.unrealengine.com
+描述：三维引擎。仅了解大致功能，了解和 Unity 的主要区别。
+英文描述：3D engine. Awareness only; shipped scenes stay in Unity.
+
+### C++
+
+id：cpp
+英文：C++
+图标：cpp.svg
+官网：https://isocpp.org
+描述：以前系统学习过 C++，现在能看和改少量代码，业务场景主要使用 C#。
+英文描述：Has used C++ enough to read and change small pieces. C# remains the main language.
+
 ### Blender
 
 id：blender
@@ -162,6 +180,15 @@ id：python
 官网：https://www.python.org
 描述：通用脚本语言，用于仿真数据处理与小工具。
 英文描述：General-purpose scripting for sim data and small tools.
+
+### WebGL
+
+id：webgl
+英文：WebGL
+图标：webgl.svg
+官网：https://www.khronos.org/webgl/
+描述：正在学习中。网页上的三维目前是 Unity 打出的 WebGL 包。
+英文描述：Awareness only. A web page currently loads a Unity WebGL build, not hand-written WebGL.
 
 ### three.js
 
@@ -292,6 +319,14 @@ id：cursor
 描述：AI 辅助编程编辑器，用于日常开发。
 英文描述：AI-assisted editor used in daily development.
 
+### Grok Bot
+
+id：grokbot
+图标：grokbot.svg
+官网：https://grok.com
+描述：xAI 的 AI 助手，用于问答、写稿和改代码。
+英文描述：xAI's assistant for questions, writing, and editing code.
+
 ### CodeX
 
 id：codex
@@ -324,12 +359,13 @@ id：ai-train
 描述：模型训练与微调流程的基本操作。
 英文描述：Basic operations in model training and fine-tuning.
 
+
 ## 领域
 
 三级标题是栏目中文名。`展开：是` 进入页面时打开；未写或 `否` 则折叠。
 技能行格式：`- 工具名 分值`，名称须与「工具」里的标题或 id 一致。
 
-### 数字孪生
+### 数字孪生 / 3D可视化
 
 id：skill-digital-twin
 英文：Digital Twin
@@ -340,7 +376,10 @@ id：skill-digital-twin
 - C# 80
 - Blender 80
 - Substance 3D Painter 60
-- three.js 40
+- three.js 35
+- WebGL 30
+- Unreal 20
+- C++ 40
 
 ### 产线仿真
 
@@ -355,18 +394,19 @@ id：skill-line-sim
 - Python 60
 - SimPy 50
 
-### 景观设计
+### AI 工具
 
-id：skill-landscape-arch
-英文：Landscape Architecture
-短写：LANDSCAPE ARCH
-展开：否
+id：skill-ai
+英文：Artificial Intelligence
+短写：AI
+展开：是
 
-- AutoCAD 95
-- SketchUp 95
-- Lumion 80
-- Photoshop 60
-- 3ds Max 30
+- Cursor 80
+- Grok Bot 75
+- CodeX 75
+- WorkBuddy 60
+- AI训练 30
+- Agent开发 20
 
 ### 游戏开发
 
@@ -380,6 +420,21 @@ id：skill-game-dev
 - Blender 60
 - Substance 3D Painter 60
 - GitHub 60
+- Unreal 20
+- C++ 40
+
+### 景观设计
+
+id：skill-landscape-arch
+英文：Landscape Architecture
+短写：LANDSCAPE ARCH
+展开：否
+
+- AutoCAD 95
+- SketchUp 95
+- Lumion 80
+- Photoshop 60
+- 3ds Max 30
 
 ### 影像
 
@@ -404,16 +459,3 @@ id：skill-office
 - Word 90
 - Excel 90
 - PowerPoint 70
-
-### AI
-
-id：skill-ai
-英文：Artificial Intelligence
-短写：AI
-展开：否
-
-- Cursor 80
-- CodeX 75
-- WorkBuddy 80
-- AI训练 30
-- Agent开发 20

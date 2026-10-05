@@ -10,7 +10,11 @@
     <Product>网站资源编辑工具</Product>
     <Description>本机网站资源看图批处理工作台</Description>
     <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\SiteMediaStudio.ico</ApplicationIcon>
   </PropertyGroup>
+  <ItemGroup>
+    <Resource Include="Assets\SiteMediaStudio.ico" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SiteMediaStudio.Core\SiteMediaStudio.Core.csproj" />
   </ItemGroup>

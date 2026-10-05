@@ -2,66 +2,63 @@
  * 风光摄影网图像素。供首页头图按构图过滤；缺项运行时探测补上。
  */
 export const photoSizes: Record<string, { width: number; height: number }> = {
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  "landscape-photo/zhoushan-dongfushan/01.webp": { width: 2560, height: 1707 },
-  "landscape-photo/zhoushan-dongfushan/02.webp": { width: 1706, height: 2560 },
-  "landscape-photo/zhoushan-dongfushan/03.webp": { width: 2074, height: 1383 },
-  "landscape-photo/zhoushan-dongfushan/04.webp": { width: 1706, height: 2560 },
-  "landscape-photo/zhoushan-dongfushan/05.webp": { width: 1706, height: 2560 },
-  "landscape-photo/zhoushan-dongfushan/06.webp": { width: 2560, height: 1707 },
-  "landscape-photo/zhoushan-dongfushan/07.webp": { width: 1707, height: 2560 },
-  "landscape-photo/zhoushan-dongfushan/08.webp": { width: 1707, height: 2560 },
-  "landscape-photo/zhoushan-miaozihu/01.webp": { width: 2560, height: 1707 },
-  "landscape-photo/zhoushan-miaozihu/02.webp": { width: 2560, height: 1707 },
-  "landscape-photo/zhoushan-miaozihu/03.webp": { width: 1707, height: 2560 },
-  "landscape-photo/zhoushan-miaozihu/04.webp": { width: 1707, height: 2560 },
-  "landscape-photo/zhoushan-miaozihu/05.webp": { width: 1707, height: 2560 },
-  
-  
-  
-  
-  
-  
-  
-  
+  "photo/real-world-photo/20180323 武汉/05.webp": { width: 2560, height: 1920 },
+  "photo/real-world-photo/20180323 武汉/07.webp": { width: 2560, height: 1920 },
+  "photo/real-world-photo/20180323 武汉/09.webp": { width: 2560, height: 1920 },
+  "photo/real-world-photo/20180406 上海 外滩/01.webp": { width: 1920, height: 2560 },
+  "photo/real-world-photo/20191125 新加坡/05.webp": { width: 2560, height: 1272 },
+  "photo/real-world-photo/20191125 新加坡/06.webp": { width: 1920, height: 2560 },
+  "photo/real-world-photo/20191125 新加坡/07.webp": { width: 2560, height: 1440 },
+  "photo/real-world-photo/20191125 新加坡/08.webp": { width: 2560, height: 1440 },
+  "photo/real-world-photo/20211119 南京/04.webp": { width: 2560, height: 1920 },
+  "photo/real-world-photo/20220912 鹤壁 星空/02.webp": { width: 2560, height: 1922 },
+  "photo/real-world-photo/20230903 苏州 大阳山/05.webp": { width: 1920, height: 2560 },
+  "photo/real-world-photo/20230903 苏州 大阳山/06.webp": { width: 2560, height: 1440 },
+  "photo/real-world-photo/20230903 苏州 大阳山/07.webp": { width: 2560, height: 1440 },
+  "photo/real-world-photo/20231115 南昌 滕王阁/06.webp": { width: 1920, height: 2560 },
+  "photo/real-world-photo/20241002 鹤壁 星空/02.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20250413 上海 静安寺/05.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20250413 上海 静安寺/06.webp": { width: 2560, height: 1707 },
+  "photo/real-world-photo/20250413 上海 静安寺/07.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20250413 上海 静安寺/08.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20250519 安阳 殷墟博物馆/22.webp": { width: 2560, height: 1707 },
+  "photo/real-world-photo/20251004 杭州 九溪十八涧/04.webp": { width: 1536, height: 2304 },
+  "photo/real-world-photo/20251004 杭州 九溪十八涧/05.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20251004 杭州 九溪十八涧/06.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20251008 重庆 渝中区/06.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20251008 重庆 渝中区/07.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20251008 重庆 渝中区/08.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20251008 重庆 渝中区/09.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20251008 重庆 渝中区/10.webp": { width: 2560, height: 1707 },
+  "photo/real-world-photo/20260504 舟山 普陀山/09.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20260504 舟山 普陀山/10.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20260504 舟山 普陀山/11.webp": { width: 2560, height: 1707 },
+  "photo/real-world-photo/20260504 舟山 普陀山/12.webp": { width: 1706, height: 2560 },
+  "photo/real-world-photo/20260504 舟山 普陀山/13.webp": { width: 2560, height: 1440 },
+  "photo/real-world-photo/20260504 舟山 普陀山/15.webp": { width: 2560, height: 1707 },
+  "photo/real-world-photo/20260504 舟山 普陀山/16.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20260517 兴义 马岭古道/08.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20260517 兴义 马岭古道/09.webp": { width: 2560, height: 1440 },
+  "photo/real-world-photo/20260517 兴义 马岭古道/10.webp": { width: 2560, height: 1440 },
+  "photo/real-world-photo/20260517 兴义 马岭古道/11.webp": { width: 2560, height: 1707 },
+  "photo/real-world-photo/20260517 兴义 马岭古道/12.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20260618 上海 萤火虫基地/05.webp": { width: 2560, height: 1707 },
+  "photo/real-world-photo/20260618 上海 萤火虫基地/06.webp": { width: 2560, height: 1707 },
+  "photo/real-world-photo/20260618 上海 萤火虫基地/08.webp": { width: 2560, height: 1440 },
+  "photo/real-world-photo/20260814 舟山 东极岛 东福山/01.webp": { width: 2560, height: 1707 },
+  "photo/real-world-photo/20260814 舟山 东极岛 东福山/02.webp": { width: 1706, height: 2560 },
+  "photo/real-world-photo/20260814 舟山 东极岛 东福山/03.webp": { width: 2074, height: 1383 },
+  "photo/real-world-photo/20260814 舟山 东极岛 东福山/04.webp": { width: 1706, height: 2560 },
+  "photo/real-world-photo/20260814 舟山 东极岛 东福山/05.webp": { width: 1706, height: 2560 },
+  "photo/real-world-photo/20260814 舟山 东极岛 东福山/06.webp": { width: 2560, height: 1707 },
+  "photo/real-world-photo/20260814 舟山 东极岛 东福山/07.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20260814 舟山 东极岛 东福山/08.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20260815 舟山 东极岛 庙子湖/01.webp": { width: 2560, height: 1707 },
+  "photo/real-world-photo/20260815 舟山 东极岛 庙子湖/02.webp": { width: 2560, height: 1707 },
+  "photo/real-world-photo/20260815 舟山 东极岛 庙子湖/03.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20260815 舟山 东极岛 庙子湖/04.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20260815 舟山 东极岛 庙子湖/05.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20260926 南京 牛首山 佛顶宫/15.webp": { width: 1707, height: 2560 },
+  "photo/real-world-photo/20260926 南京 牛首山 佛顶宫/16.webp": { width: 2560, height: 1440 },
+  "photo/real-world-photo/20260926 南京 牛首山 佛顶宫/17.webp": { width: 2560, height: 1440 },
 };

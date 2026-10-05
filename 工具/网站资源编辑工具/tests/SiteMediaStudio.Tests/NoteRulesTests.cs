@@ -225,7 +225,9 @@ public sealed class NoteRulesTests
         NoteCatalog.ApplyPublishState(new[] { body, extra }, index, "心得（notes）");
 
         Assert.Equal("已发布", PublishStatus.ForStage(body));
+        Assert.False(PublishStatus.IsStageRemarkLocked(body));
         Assert.Equal("未上页", PublishStatus.ForStage(extra));
+        Assert.False(PublishStatus.IsStageRemarkLocked(extra));
     }
 
     [Fact]

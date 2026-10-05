@@ -110,8 +110,30 @@
   font-weight: 650;
 }
 
+.jump-link-icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin: 0 0 0 0.15em;
+  vertical-align: -0.15em;
+  line-height: 0;
+}
+
+.resume-text-link,
 .term-tip-link {
-  color: inherit;
+  line-height: inherit;
+}
+
+.term-tip-link {
+  color: #2b4c7e;
+  text-decoration: none;
+}
+
+.term-tip-link .jump-link-label {
   text-decoration: underline;
   text-underline-offset: 0.15em;
+}
+
+[data-skin="strata"] .term-tip-link {
+  color: #8eb4e6;
 }

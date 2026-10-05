@@ -3,6 +3,7 @@ import resumeMd from "../../文稿/resume.md?raw";
 import type { LocalizedString } from "../prefs/types";
 import {
   MD_ENTRY,
+  MD_FIELD,
   MD_SECTION,
   emptyToUndef,
   firstParagraph,
@@ -32,12 +33,24 @@ export type ResumeSchool = {
   note?: LocalizedString;
 };
 
+export type ResumeSkillGroup = {
+  id: string;
+  title: string;
+  items: string[];
+};
+
+export type ResumeLink = {
+  text: string;
+  href: string;
+};
+
 export type ResumeRecord = {
   summary: LocalizedString;
   jobs: ResumeJob[];
   schools: ResumeSchool[];
   languages: LocalizedString[];
-  skills: string[];
+  skills: ResumeSkillGroup[];
+  skillLinks: ResumeLink[];
   blogHref?: string;
   blogLabel?: LocalizedString;
 };
@@ -75,7 +88,7 @@ export function parseResumeMd(source: string): ResumeRecord {
       };
     }),
     languages: parseResumeList(sectionBody(sections, "语言")),
-    skills: parseSkillNames(sectionBody(sections, "技能") || sectionBody(sections, "工具")),
+    ...parseSkillSection(sectionBody(sections, "技能") || sectionBody(sections, "工具")),
     blogHref: emptyToUndef(extras.fields["博客"]),
     blogLabel: emptyToUndef(extras.fields["博客名"]),
   };
@@ -117,6 +130,78 @@ function parseResumeList(body: string): string[] {
 }
 
 /**
+ * 技能栏。有三级标题时按方向分组；没有时，以「- 」开头的能力描述仍整句显示。
+ * 单独成行的 `[文字](地址)` 不进条目，排在条目之后。
+ * 两种都没有时，才按顿号、逗号拆成短名。
+ */
+function parseSkillSection(body: string): { skills: ResumeSkillGroup[]; skillLinks: ResumeLink[] } {
+  const { prose, links } = splitSkillLinks(body);
+  const entries = splitByHeading(prose, MD_ENTRY);
+  if (entries.length > 0) {
+    return {
+      skills: entries
+        .map((entry, index) => ({
+          id: `skill-${index + 1}`,
+          title: entry.title,
+          items: parseSkillItems(entry.body),
+        }))
+        .filter((group) => group.items.length > 0),
+      skillLinks: links,
+    };
+  }
+
+  const items = parseSkillItems(skillListLines(prose));
+  if (items.length > 0) {
+    return { skills: [{ id: "skill-1", title: "", items }], skillLinks: links };
+  }
+
+  const names = parseSkillNames(prose);
+  if (names.length === 0) {
+    return { skills: [], skillLinks: links };
+  }
+  return { skills: [{ id: "skill-1", title: "", items: names }], skillLinks: links };
+}
+
+/**
+ * 抽出整行都是链接的句子。其余正文留给条目。
+ */
+function splitSkillLinks(body: string): { prose: string; links: ResumeLink[] } {
+  const linkLine = /^\[([^\]\n]+)\]\(([^)\s]+)\)$/;
+  const links: ResumeLink[] = [];
+  const kept: string[] = [];
+
+  for (const line of body.split(/\r?\n/)) {
+    const match = line.trim().match(linkLine);
+    const text = match?.[1]?.trim() ?? "";
+    const href = match?.[2]?.trim() ?? "";
+    if (text && isResumeHref(href)) {
+      links.push({ text, href });
+      continue;
+    }
+    kept.push(line);
+  }
+
+  return { prose: kept.join("\n"), links };
+}
+
+/**
+ * 没有三级标题时，只收列表行，说明句不进页面。
+ */
+function skillListLines(body: string): string {
+  return body
+    .split(/\r?\n/)
+    .filter((line) => /^[-*]\s+/.test(line))
+    .join("\n");
+}
+
+/**
+ * 方向下的能力条目。只保留列表行，跳过「键：值」。
+ */
+function parseSkillItems(body: string): string[] {
+  return parseList(body).filter((item) => !MD_FIELD.test(item));
+}
+
+/**
  * 技能短名：顿号、逗号或换行均可。
  */
 function parseSkillNames(body: string): string[] {
@@ -129,11 +214,45 @@ function parseSkillNames(body: string): string[] {
 export type ResumeMark = {
   text: string;
   bold?: boolean;
+  href?: string;
 };
 
+const RESUME_LINK = /\[([^\]\n]+)\]\(([^)\s]+)\)/g;
+
 /**
- * 把 `**加粗**` 收成可渲染片段，其它标记仍作原文。
+ * 把 `**加粗**` 与 `[文字](地址)` 收成可渲染片段。没有地址的方括号仍作原文。
  */
 export function parseResumeMarks(source: string): ResumeMark[] {
-  return parseInlineMarks(source);
+  const list: ResumeMark[] = [];
+  let cursor = 0;
+
+  for (const match of source.matchAll(RESUME_LINK)) {
+    const index = match.index ?? 0;
+    if (index > cursor) {
+      list.push(...parseInlineMarks(source.slice(cursor, index)));
+    }
+    const label = (match[1] ?? "").trim();
+    const href = (match[2] ?? "").trim();
+    if (label && isResumeHref(href)) {
+      list.push({ text: label, href });
+    } else {
+      list.push(...parseInlineMarks(match[0]));
+    }
+    cursor = index + match[0].length;
+  }
+
+  if (cursor < source.length) {
+    list.push(...parseInlineMarks(source.slice(cursor)));
+  }
+  return list;
+}
+
+/**
+ * 站内路径或 http(s) 地址。拒绝协议相对地址。
+ */
+function isResumeHref(href: string): boolean {
+  if (href.startsWith("/") && !href.startsWith("//")) {
+    return true;
+  }
+  return href.startsWith("https://") || href.startsWith("http://");
 }

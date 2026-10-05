@@ -117,12 +117,21 @@ public sealed class MediaCardViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// 投放箱台账为已发布。待发布撤下只改角标，仍锁定上页和回收。
+    /// 是否按已发布锁定上页和回收。投放箱看媒体台账，不含仅由心得索引打上的已发布角标。
+    /// 待发布撤下只改角标，台账仍为 published，仍然锁定。站点看角标是否为已发布。
     /// </summary>
     public bool IsPublished =>
+        Stage != null
+            ? PublishStatus.IsStageRemarkLocked(Stage)
+            : PublishLabel == PublishStatus.Published;
+
+    /// <summary>
+    /// 投放箱置灰看角标。心得索引收录显示已发布时同样置灰，不参与上页锁定。
+    /// </summary>
+    private bool IsStagePublishedChrome =>
         PublishLabel == PublishStatus.Published
         || (Stage?.IsPendingWithdraw == true
-            && string.Equals(Stage.LedgerStatus, "published", StringComparison.OrdinalIgnoreCase));
+            && PublishStatus.IsLedgerPublished(Stage.LedgerStatus));
 
     /// <summary>
     /// 站点条目已从页面去掉引用，台账尚未撤下。
@@ -163,7 +172,11 @@ public sealed class MediaCardViewModel : ViewModelBase
     /// 是否套用共用置灰。
     /// </summary>
     public bool NeedsChromeDim =>
-        CatalogNotice.NeedsChromeDim(Kind == CardKind.Site, IsHidden, IsPublished, IsUnsigned);
+        CatalogNotice.NeedsChromeDim(
+            Kind == CardKind.Site,
+            IsHidden,
+            Kind == CardKind.Stage ? IsStagePublishedChrome : IsPublished,
+            IsUnsigned);
 
     public string? PreviewPath
     {
