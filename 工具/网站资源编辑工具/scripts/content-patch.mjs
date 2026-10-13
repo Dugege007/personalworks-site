@@ -12,6 +12,7 @@ import { copyFile, mkdtemp, readFile, readdir, rename, rm, unlink, writeFile } f
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { retryTransientFsLock } from "./fs-lock-retry.mjs";
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 const PHOTO_EXIF_CHANNELS = new Set([
@@ -2834,31 +2835,31 @@ async function writeAllAtomically(fileList, failAfterWrite = false) {
   try {
     for (const state of stateList) {
       await writeFile(state.tempPath, state.nextText, "utf8");
-      await copyFile(state.targetPath, state.backupPath);
+      await retryTransientFsLock(() => copyFile(state.targetPath, state.backupPath));
     }
     for (let i = 0; i < stateList.length; i += 1) {
       const state = stateList[i];
-      await unlink(state.targetPath);
-      await rename(state.tempPath, state.targetPath);
+      await retryTransientFsLock(() => unlink(state.targetPath));
+      await retryTransientFsLock(() => rename(state.tempPath, state.targetPath));
       state.committed = true;
       if (failAfterWrite && i === 0) {
         throw new Error("回归注入：首个文件写盘后失败。");
       }
     }
     for (const state of stateList) {
-      await unlink(state.backupPath);
+      await retryTransientFsLock(() => unlink(state.backupPath));
     }
     return { restored: false };
   } catch (error) {
     let restored = true;
     for (const state of stateList) {
       try {
-        await copyFile(state.backupPath, state.targetPath);
+        await retryTransientFsLock(() => copyFile(state.backupPath, state.targetPath));
       } catch {
         restored = false;
       }
-      await unlink(state.tempPath).catch(() => {});
-      if (restored) await unlink(state.backupPath).catch(() => {});
+      await retryTransientFsLock(() => unlink(state.tempPath)).catch(() => {});
+      if (restored) await retryTransientFsLock(() => unlink(state.backupPath)).catch(() => {});
     }
     const reason = error instanceof Error ? error.message : String(error);
     throw new Error(`写盘失败，${restored ? "已还原" : "未能完整还原"}内容层：${reason}`);
