@@ -47,6 +47,41 @@ public sealed class AppSettings
     public string? MediaCoderPath { get; set; }
 
     /// <summary>
+    /// 压缩心得配图时是否去掉全球定位系统位置。缺省视为开启。
+    /// </summary>
+    public bool? StripGps { get; set; }
+
+    /// <summary>
+    /// 缺省或设置里没有这一项时，压缩会去掉全球定位系统位置。
+    /// </summary>
+    public bool StripGpsEnabled => StripGps != false;
+
+    /// <summary>
+    /// 压缩心得配图时是否保留拍摄参数、拍摄时间和方向信息。缺省视为开启。全球定位系统位置由 <see cref="StripGps"/> 单独控制。
+    /// </summary>
+    public bool? KeepCaptureParams { get; set; }
+
+    /// <summary>
+    /// 缺省或设置里没有这一项时，压缩会保留拍摄参数。
+    /// </summary>
+    public bool KeepCaptureParamsEnabled => KeepCaptureParams != false;
+
+    /// <summary>
+    /// pngquant 可执行文件的路径。空表示本机尚未指定。
+    /// </summary>
+    public string? PngquantPath { get; set; }
+
+    /// <summary>
+    /// oxipng 可执行文件的路径。空表示本机尚未指定。
+    /// </summary>
+    public string? OxipngPath { get; set; }
+
+    /// <summary>
+    /// gifsicle 可执行文件的路径。空表示本机尚未指定。
+    /// </summary>
+    public string? GifsiclePath { get; set; }
+
+    /// <summary>
     /// 视频上页音频码率，128～192。
     /// </summary>
     public int VideoAudioBitrateKbps { get; set; } = 128;
@@ -78,11 +113,18 @@ public static class AppSettingsStore
     }
 
     /// <summary>
-    /// 读取设置；缺失时返回默认值。
+    /// 读取本机设置。文件不存在时返回默认值。
     /// </summary>
     public static AppSettings Load()
     {
-        var path = FilePath;
+        return Load(FilePath);
+    }
+
+    /// <summary>
+    /// 读取指定设置文件。文件不存在时返回默认值。
+    /// </summary>
+    public static AppSettings Load(string path)
+    {
         if (!File.Exists(path))
         {
             return new AppSettings();
@@ -100,10 +142,18 @@ public static class AppSettingsStore
     }
 
     /// <summary>
-    /// 写回本机设置。
+    /// 写回本机设置。先写同目录临时文件，再替换原文件。
     /// </summary>
     public static void Save(AppSettings settings)
     {
-        File.WriteAllText(FilePath, JsonSerializer.Serialize(settings, JsonUtil.Options));
+        Save(settings, FilePath);
+    }
+
+    /// <summary>
+    /// 把设置写到指定路径。先写同目录临时文件，再替换原文件。
+    /// </summary>
+    public static void Save(AppSettings settings, string path)
+    {
+        AtomicTextFile.Write(path, JsonSerializer.Serialize(settings, JsonUtil.Options));
     }
 }
