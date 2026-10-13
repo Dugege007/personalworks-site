@@ -2401,11 +2401,20 @@ public sealed class ShellViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// 打开设置窗。
+    /// 打开设置窗。保存共享阈值后立即重新计算超限状态。
     /// </summary>
     private void OpenSettings()
     {
-        SettingsWindow.Show(ClearThumbCache, mSettings, AttachStageWatcher);
+        SettingsWindow.Show(ClearThumbCache, mSettings, AttachStageWatcher, RecalculateNoteImageLimits, mSession?.Profile);
+    }
+
+    /// <summary>
+    /// 共享阈值已经保存，立即重新计算心得配图是否超限。
+    /// 检视栏警告、网格角标和底栏提示以后写在这个方法里。现在先刷新检视栏，让保存动作有一个立刻会执行的入口。
+    /// </summary>
+    private void RecalculateNoteImageLimits()
+    {
+        UpdateInspector();
     }
 
     /// <summary>
