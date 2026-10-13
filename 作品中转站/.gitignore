@@ -4,3 +4,9 @@
 !README.md
 !**/.gitkeep
 !**/
+
+# notes source text (md/json/txt) syncs via Git; images stay local
+!*notes*/**/*.md
+!*notes*/**/*.json
+!*notes*/*.txt
+*notes*/**/.site-ready/**

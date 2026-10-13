@@ -1,0 +1,5 @@
+键：notes
+中文：心得
+正式英文：Notes
+装饰短写：NOTES
+说明：一篇一夹，夹名 `yyyyMMdd_HHmmss`，夹内固定 `正文.md` 与 `.site-ready/`。URL 用 frontmatter 的 slug，不用夹名。手绘纸纹只看 slug `sketches`，不把 sketches 当夹名。栏目英文不用 Blog。流程见 Docs/页面模块/心得/心得-稿件与上页.md。
