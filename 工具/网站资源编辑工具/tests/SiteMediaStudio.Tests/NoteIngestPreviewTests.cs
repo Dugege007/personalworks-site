@@ -23,7 +23,12 @@ public sealed class NoteIngestPreviewTests
         Assert.Contains("[拒绝]", text, StringComparison.Ordinal);
         Assert.DoesNotContain("[允许]", text, StringComparison.Ordinal);
         Assert.Contains(NoteRules.GifPublishRejectedMessage, text, StringComparison.Ordinal);
-        Assert.Contains(bullets, line => line.Contains("ok.png", StringComparison.Ordinal));
+        var rejected = bullets.Where(line => line.Contains("[拒绝]", StringComparison.Ordinal)).ToList();
+        Assert.Single(rejected);
+        Assert.Contains("anim.gif", rejected[0], StringComparison.Ordinal);
+        Assert.DoesNotContain("ok.png", rejected[0], StringComparison.Ordinal);
+        Assert.Contains("这个文件导致整篇被拒绝", text, StringComparison.Ordinal);
+        Assert.Contains("ok.png 本身没问题，因整篇被拒绝而不会上页。", text, StringComparison.Ordinal);
         Assert.DoesNotContain(bullets, line => line.Contains("正文", StringComparison.Ordinal));
         Assert.DoesNotContain("正文.webp", text, StringComparison.Ordinal);
         Assert.Contains(report.Document.Items, item => item.StageRel != null && item.StageRel.EndsWith("正文.md", StringComparison.Ordinal));
@@ -47,6 +52,65 @@ public sealed class NoteIngestPreviewTests
         Assert.DoesNotContain(bullets, line => line.Contains("正文", StringComparison.Ordinal));
         Assert.DoesNotContain("正文.webp", text, StringComparison.Ordinal);
         Assert.Contains(report.Lines, line => line.Item.StageRel != null && line.Item.StageRel.EndsWith("ok.png", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Preview_RejectsNestedGif_NamesGifAndKeepsOtherImagesInnocent()
+    {
+        using var fixture = new NotePreviewFixture("29990101_000005");
+        fixture.WriteBody("# 一篇\n\n文字\n");
+        fixture.WriteFile("ok.png");
+        fixture.WriteFile("图/b.jpg");
+        fixture.WriteFile("图/anim.gif");
+
+        var report = fixture.PreviewMarkedBody();
+        var text = PromptRenderer.RenderPreview(report);
+        var rejected = Bullets(text).Where(line => line.Contains("[拒绝]", StringComparison.Ordinal)).ToList();
+
+        Assert.True(report.HasHardError);
+        Assert.Single(rejected);
+        Assert.Contains("anim.gif", rejected[0], StringComparison.Ordinal);
+        Assert.DoesNotContain("ok.png", rejected[0], StringComparison.Ordinal);
+        Assert.DoesNotContain("b.jpg", rejected[0], StringComparison.Ordinal);
+        Assert.EndsWith("图/anim.gif", report.Lines[0].Item.StageRel, StringComparison.Ordinal);
+        Assert.Equal(
+            "GIF 配图暂不支持上页：图/anim.gif。这个文件导致整篇被拒绝。ok.png、图/b.jpg 本身没问题，因整篇被拒绝而不会上页。",
+            report.Lines[0].Decision.Message);
+    }
+
+    [Fact]
+    public void Preview_RejectsGifWithoutOtherImages_DoesNotCallItInnocent()
+    {
+        using var fixture = new NotePreviewFixture("29990101_000006");
+        fixture.WriteBody("# 一篇\n\n文字\n");
+        fixture.WriteFile("anim.gif");
+
+        var text = PromptRenderer.RenderPreview(fixture.PreviewMarkedBody());
+        var rejected = Bullets(text).Where(line => line.Contains("[拒绝]", StringComparison.Ordinal)).ToList();
+
+        Assert.Single(rejected);
+        Assert.Contains("anim.gif", rejected[0], StringComparison.Ordinal);
+        Assert.Contains("这个文件导致整篇被拒绝", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("本身没问题", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("正文.webp", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Preview_RejectsBlockedVideo_NamesVideoNotPng()
+    {
+        using var fixture = new NotePreviewFixture("29990101_000007");
+        fixture.WriteBody("# 一篇\n\n文字\n");
+        fixture.WriteFile("ok.png");
+        fixture.WriteFile("clip.mp4");
+
+        var text = PromptRenderer.RenderPreview(fixture.PreviewMarkedBody());
+        var rejected = Bullets(text).Where(line => line.Contains("[拒绝]", StringComparison.Ordinal)).ToList();
+
+        Assert.Single(rejected);
+        Assert.Contains("clip.mp4", rejected[0], StringComparison.Ordinal);
+        Assert.DoesNotContain("ok.png", rejected[0], StringComparison.Ordinal);
+        Assert.Contains("夹内有不能上页的文件：clip.mp4", text, StringComparison.Ordinal);
+        Assert.Contains("ok.png 本身没问题，因整篇被拒绝而不会上页。", text, StringComparison.Ordinal);
     }
 
     [Fact]

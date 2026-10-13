@@ -234,7 +234,7 @@ public static class PreviewReporter
     }
 
     /// <summary>
-    /// 用上页计划替换这一夹的预演行。成功时每张配图一行；失败时仍列出可上页的配图，并带上拒绝原因。
+    /// 用上页计划替换这一夹的预演行。成功时每张配图一行。失败且原因指向某个文件时，拒绝行改用该文件，其余配图只在原因里标明本身没问题。
     /// </summary>
     private static List<PreviewLine> BuildNotePublishLines(
         WorkspaceSession session,
@@ -270,6 +270,17 @@ public static class PreviewReporter
         }
 
         var plan = NoteRules.Plan(folderFull, stageRoot, index, marked.Count == 0 ? null : marked, null);
+        if (!plan.Ok && TryReadBlockingReference(plan.Error, out var blocking))
+        {
+            return NoteLinesForBlockingFile(
+                body,
+                folderName,
+                channelFolder,
+                blocking,
+                NoteRules.ListPublishImageStageRels(folderFull, stageRoot),
+                plan.Error);
+        }
+
         var decision = plan.Ok
             ? GateDecision.Allow("将上页整篇心得，与右键「上页心得」相同。")
             : GateDecision.Reject(plan.Error);
@@ -277,6 +288,102 @@ public static class PreviewReporter
             ? Array.Empty<string>()
             : NoteRules.ListPublishImageStageRels(folderFull, stageRoot);
         return NoteLinesFor(body, folderName, plan.Images, fallback, decision);
+    }
+
+    /// <summary>
+    /// 整篇因某一个文件被拒绝时，拒绝行指向这个文件。可上页的配图不单独占一行，只在原因里说明本身没问题。
+    /// </summary>
+    private static List<PreviewLine> NoteLinesForBlockingFile(
+        PreviewLine body,
+        string folderName,
+        string channelFolder,
+        string blockingReference,
+        IReadOnlyList<string> innocentStageRels,
+        string error)
+    {
+        var innocentNames = innocentStageRels
+            .Select(item => NoteRelativeName(item, channelFolder, folderName))
+            .Where(name => name.Length > 0)
+            .ToList();
+        var message = error + "。这个文件导致整篇被拒绝。";
+        if (innocentNames.Count > 0)
+        {
+            message += string.Join("、", innocentNames) + " 本身没问题，因整篇被拒绝而不会上页。";
+        }
+
+        return new List<PreviewLine>
+        {
+            NoteImageLine(body, folderName, BlockingStageRel(channelFolder, folderName, blockingReference), null, GateDecision.Reject(message))
+        };
+    }
+
+    /// <summary>
+    /// 上页计划用来指出「是哪一个文件导致整篇不能上页」的原因前缀。
+    /// </summary>
+    private static readonly string[] BlockingReferencePrefixes =
+    {
+        NoteRules.GifPublishRejectedMessage + "：",
+        "夹内有不能上页的文件：",
+        "正文引用了不能上页的文件：",
+        "找不到引用的图片：",
+        "图片落在心得夹外：",
+        "正文引用了这次没有上页的图片："
+    };
+
+    /// <summary>
+    /// 从整篇拒绝原因里取出导致拒绝的文件或引用。原因不是这种格式时返回假。
+    /// </summary>
+    private static bool TryReadBlockingReference(string? error, out string reference)
+    {
+        reference = "";
+        if (string.IsNullOrWhiteSpace(error))
+        {
+            return false;
+        }
+
+        foreach (var prefix in BlockingReferencePrefixes)
+        {
+            if (!error.StartsWith(prefix, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            reference = error[prefix.Length..].Trim();
+            return reference.Length > 0;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 把导致拒绝的引用写成投放路径，供预演行显示文件名。网址保持原样。
+    /// </summary>
+    private static string BlockingStageRel(string channelFolder, string folderName, string reference)
+    {
+        var text = reference.Trim();
+        if (text.Contains("://", StringComparison.Ordinal))
+        {
+            return text;
+        }
+
+        var relative = text.Replace('\\', '/').TrimStart('/');
+        return JsonUtil.ToRel(channelFolder + "/" + folderName + "/" + relative);
+    }
+
+    /// <summary>
+    /// 配图路径相对这篇笔记文件夹，用来在原因里区分同名文件。
+    /// </summary>
+    private static string NoteRelativeName(string stageRel, string channelFolder, string folderName)
+    {
+        var prefix = JsonUtil.ToRel(channelFolder + "/" + folderName) + "/";
+        var rel = JsonUtil.ToRel(stageRel);
+        if (rel.StartsWith(prefix, StringComparison.Ordinal))
+        {
+            return rel[prefix.Length..];
+        }
+
+        var name = Path.GetFileName(rel);
+        return string.IsNullOrWhiteSpace(name) ? rel : name;
     }
 
     /// <summary>
