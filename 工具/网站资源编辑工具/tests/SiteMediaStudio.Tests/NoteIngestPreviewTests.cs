@@ -1,0 +1,190 @@
+using PersonalWorks.SiteMediaStudio.Core;
+
+namespace PersonalWorks.SiteMediaStudio.Tests;
+
+/// <summary>
+/// 界面「预演」走 IntentDocumentBuilder、PreviewReporter 与 PromptRenderer，不走 NotePublisher。
+/// </summary>
+public sealed class NoteIngestPreviewTests
+{
+    [Fact]
+    public void Preview_RejectsGifInFolder_AndListsPngNotBodyWebp()
+    {
+        using var fixture = new NotePreviewFixture("29990101_000002");
+        fixture.WriteBody("# 一篇\n\n文字\n");
+        fixture.WriteFile("ok.png");
+        fixture.WriteFile("anim.gif");
+
+        var report = fixture.PreviewMarkedBody();
+        var text = PromptRenderer.RenderPreview(report);
+        var bullets = Bullets(text);
+
+        Assert.True(report.HasHardError);
+        Assert.Contains("[拒绝]", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("[允许]", text, StringComparison.Ordinal);
+        Assert.Contains(NoteRules.GifPublishRejectedMessage, text, StringComparison.Ordinal);
+        Assert.Contains(bullets, line => line.Contains("ok.png", StringComparison.Ordinal));
+        Assert.DoesNotContain(bullets, line => line.Contains("正文", StringComparison.Ordinal));
+        Assert.DoesNotContain("正文.webp", text, StringComparison.Ordinal);
+        Assert.Contains(report.Document.Items, item => item.StageRel != null && item.StageRel.EndsWith("正文.md", StringComparison.Ordinal));
+        Assert.All(report.Document.Items, item => Assert.DoesNotContain("正文.webp", item.Object ?? "", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Preview_AllowsPublishablePng_AndDoesNotTreatBodyAsImage()
+    {
+        using var fixture = new NotePreviewFixture("29990101_000001");
+        fixture.WriteBody("# 一篇\n\n文字\n");
+        fixture.WriteFile("ok.png");
+
+        var report = fixture.PreviewMarkedBody();
+        var text = PromptRenderer.RenderPreview(report);
+        var bullets = Bullets(text);
+
+        Assert.False(report.HasHardError, text);
+        Assert.Contains("[允许]", text, StringComparison.Ordinal);
+        Assert.Contains(bullets, line => line.Contains("ok.png", StringComparison.Ordinal));
+        Assert.DoesNotContain(bullets, line => line.Contains("正文", StringComparison.Ordinal));
+        Assert.DoesNotContain("正文.webp", text, StringComparison.Ordinal);
+        Assert.Contains(report.Lines, line => line.Item.StageRel != null && line.Item.StageRel.EndsWith("ok.png", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Preview_IgnoresGifInsideOriginals()
+    {
+        using var fixture = new NotePreviewFixture("29990101_000003");
+        fixture.WriteBody("# 一篇\n\n文字\n");
+        fixture.WriteFile("ok.png");
+        fixture.WriteFile(Path.Combine(".originals", "anim.gif"));
+
+        var text = PromptRenderer.RenderPreview(fixture.PreviewMarkedBody());
+
+        Assert.Contains("[允许]", text, StringComparison.Ordinal);
+        Assert.DoesNotContain(NoteRules.GifPublishRejectedMessage, text, StringComparison.Ordinal);
+        Assert.Contains("ok.png", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("正文.webp", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Preview_RejectsImageOnlyMark_WithoutInventingBodyWebp()
+    {
+        using var fixture = new NotePreviewFixture("29990101_000004");
+        fixture.WriteBody("# 一篇\n\n文字\n");
+        fixture.WriteFile("ok.png");
+
+        var stage = fixture.Stage("ok.png");
+        var text = PromptRenderer.RenderPreview(fixture.Preview(stage));
+
+        Assert.Contains("[拒绝]", text, StringComparison.Ordinal);
+        Assert.Contains("须标记正文.md", text, StringComparison.Ordinal);
+        Assert.Contains("ok.png", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("正文.webp", text, StringComparison.Ordinal);
+    }
+
+    private static List<string> Bullets(string text)
+    {
+        return text.Split('\n').Where(line => line.StartsWith("- [", StringComparison.Ordinal)).ToList();
+    }
+
+    /// <summary>
+    /// 临时心得夹与最小工作区。预演调用顺序与主窗口 BuildPreview 相同。
+    /// </summary>
+    private sealed class NotePreviewFixture : IDisposable
+    {
+        private readonly string mRoot;
+        private readonly WorkspaceSession mSession;
+        private readonly string mFolderRel;
+
+        public NotePreviewFixture(string folderName)
+        {
+            mRoot = Path.Combine(Path.GetTempPath(), "sms-note-preview-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(mRoot);
+            var channel = new ChannelProfile
+            {
+                Key = NoteRules.ChannelKey,
+                Zh = "心得",
+                Capabilities = new ChannelCapabilities { Catalog = true, Ingest = true }
+            };
+            var profile = new WorkspaceProfile
+            {
+                Name = "预演",
+                ProfilePath = Path.Combine(mRoot, "profile.json"),
+                ResolvedRoot = mRoot,
+                StageRoot = "stage",
+                StageFolderPattern = "ZhKey",
+                SiteCatalog = new SiteCatalogConfig
+                {
+                    Kind = "personalworks-ts",
+                    Path = "missing-works.ts"
+                },
+                Channels = new List<ChannelProfile> { channel }
+            };
+            mFolderRel = WorkspaceProfileLoader.ChannelStageRelative(profile, channel) + "/" + folderName;
+            Folder = Path.Combine(
+                WorkspaceProfileLoader.ResolveUnderRoot(profile, profile.StageRoot),
+                mFolderRel.Replace('/', Path.DirectorySeparatorChar));
+            Directory.CreateDirectory(Folder);
+            mSession = new WorkspaceSession { Profile = profile };
+        }
+
+        private string Folder { get; }
+
+        public void WriteBody(string markdown)
+        {
+            File.WriteAllText(Path.Combine(Folder, NoteRules.BodyFileName), markdown);
+            NoteConfigStore.Save(Folder, new NoteConfig
+            {
+                CreatedAt = "2999-01-01 00:00:02",
+                Slug = "sample",
+                Title = "一篇"
+            });
+        }
+
+        public void WriteFile(string relative)
+        {
+            var path = Path.Combine(Folder, relative.Replace('/', Path.DirectorySeparatorChar));
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.WriteAllBytes(path, new byte[] { 0 });
+        }
+
+        public StageItem Stage(string fileName)
+        {
+            var rel = JsonUtil.ToRel(mFolderRel + "/" + fileName);
+            return new StageItem
+            {
+                ChannelKey = NoteRules.ChannelKey,
+                StageRel = rel,
+                FullPath = Path.Combine(Folder, fileName.Replace('/', Path.DirectorySeparatorChar)),
+                WorkIdGuess = Path.GetFileName(mFolderRel)
+            };
+        }
+
+        public PreviewReport PreviewMarkedBody()
+        {
+            return Preview(Stage(NoteRules.BodyFileName));
+        }
+
+        public PreviewReport Preview(StageItem stage)
+        {
+            var session = new WorkspaceSession
+            {
+                Profile = mSession.Profile,
+                StageItems = new[] { stage }
+            };
+            var document = IntentDocumentBuilder.Build(
+                session,
+                ExecutionMode.Direct,
+                new[] { new MarkedMedia(MediaIntent.StageIngest, stage, null, stage.WorkIdGuess) },
+                stage.WorkIdGuess);
+            return PreviewReporter.BuildFromDocument(session, document);
+        }
+
+        public void Dispose()
+        {
+            if (Directory.Exists(mRoot))
+            {
+                Directory.Delete(mRoot, recursive: true);
+            }
+        }
+    }
+}

@@ -36,7 +36,9 @@ public static class PromptRenderer
                         ? $"{line.Item.Channel}/{line.Item.WorkId}  {line.Item.ObjectList?.Count ?? 0} 条".Trim()
                     : line.Item.Intent is MediaIntentCodes.WorkRegister or MediaIntentCodes.WorkUpdate
                         ? $"{line.Item.Channel}/{line.Item.WorkId}  {line.Item.Title}  {line.Item.StartedOn}  {line.Item.Place}".Trim()
-                        : line.Item.Object ?? line.Item.StageFolder ?? line.Item.StageRel ?? line.Item.WorkId;
+                        : line.Item.Intent == MediaIntentCodes.StageIngest && NoteRules.IsNotesChannel(line.Item.Channel)
+                            ? NoteIngestTarget(line.Item)
+                            : line.Item.Object ?? line.Item.StageFolder ?? line.Item.StageRel ?? line.Item.WorkId;
             builder.AppendLine($"- [{mark}] {line.Item.Intent}  {target}");
             if (!string.IsNullOrWhiteSpace(line.Decision.Message))
             {
@@ -58,6 +60,23 @@ public static class PromptRenderer
         }
 
         return builder.ToString();
+    }
+
+    /// <summary>
+    /// 心得上页的列表目标。配图写出原文件名，正文不显示成图片对象键。
+    /// </summary>
+    private static string NoteIngestTarget(IntentItem item)
+    {
+        if (!NoteRules.IsBodyStageRel(item.StageRel))
+        {
+            var name = Path.GetFileName((item.SourceStageRel ?? item.StageRel)?.Replace('\\', '/'));
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                return string.IsNullOrWhiteSpace(item.Object) ? name : name + "  " + item.Object;
+            }
+        }
+
+        return item.WorkId ?? item.StageFolder ?? item.StageRel ?? item.Object ?? "";
     }
 
     /// <summary>

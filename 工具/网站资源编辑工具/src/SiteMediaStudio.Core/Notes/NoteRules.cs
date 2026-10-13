@@ -469,6 +469,21 @@ public static class NoteRules
         return null;
     }
 
+    /// <summary>
+    /// 列出夹内允许上页的配图，路径相对投放箱根。不含正文、GIF 与附属文件夹。
+    /// </summary>
+    public static IReadOnlyList<string> ListPublishImageStageRels(string folderFullPath, string stageRoot)
+    {
+        if (string.IsNullOrWhiteSpace(folderFullPath) || !Directory.Exists(folderFullPath))
+        {
+            return Array.Empty<string>();
+        }
+
+        return ListLocalImages(folderFullPath)
+            .Select(image => JsonUtil.ToRel(Path.GetRelativePath(stageRoot, image.FullPath)))
+            .ToList();
+    }
+
     private static List<(string FullPath, string Extension)> ListLocalImages(string folderFullPath)
     {
         var list = new List<(string, string)>();

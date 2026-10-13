@@ -196,6 +196,7 @@ public static class PreviewReporter
 
     /// <summary>
     /// 心得配图必须和正文.md 同一批上页。只标记配图则整批拒绝。
+    /// 标记了正文时按上页计划展开配图：GIF 明确拒绝，正文本身不作为配图列出。
     /// </summary>
     private static void ApplyNoteIngestBatch(WorkspaceSession session, List<PreviewLine> lineList)
     {
@@ -213,16 +214,180 @@ public static class PreviewReporter
         var groups = noteLines.GroupBy(line => NoteRules.NoteFolderFromStageRel(line.Item.StageRel, folder) ?? "");
         foreach (var group in groups)
         {
-            var hasBody = group.Any(line => NoteRules.IsBodyStageRel(line.Item.StageRel));
-            var decision = hasBody
-                ? GateDecision.Allow("将上页整篇心得，与右键「上页心得」相同。")
-                : GateDecision.Reject("须标记正文.md 才能上页这篇心得，不能只标记配图。");
-            foreach (var line in group)
+            var members = group.ToList();
+            var hasBody = members.Any(line => NoteRules.IsBodyStageRel(line.Item.StageRel));
+            if (!hasBody)
             {
-                var index = lineList.IndexOf(line);
-                lineList[index] = new PreviewLine { Item = line.Item, Decision = decision };
+                ReplaceNoteDecisions(lineList, members, GateDecision.Reject("须标记正文.md 才能上页这篇心得，不能只标记配图。"));
+                continue;
             }
+
+            if (string.IsNullOrWhiteSpace(group.Key))
+            {
+                ReplaceNoteDecisions(lineList, members, GateDecision.Reject("找不到这篇心得的夹。"));
+                continue;
+            }
+
+            var replacement = BuildNotePublishLines(session, folder, group.Key, members);
+            ReplaceNoteLines(lineList, members, replacement);
         }
+    }
+
+    /// <summary>
+    /// 用上页计划替换这一夹的预演行。成功时每张配图一行；失败时仍列出可上页的配图，并带上拒绝原因。
+    /// </summary>
+    private static List<PreviewLine> BuildNotePublishLines(
+        WorkspaceSession session,
+        string channelFolder,
+        string folderName,
+        List<PreviewLine> members)
+    {
+        var stageRoot = WorkspaceProfileLoader.ResolveUnderRoot(session.Profile, session.Profile.StageRoot);
+        var folderFull = Path.Combine(
+            stageRoot,
+            channelFolder.Replace('/', Path.DirectorySeparatorChar),
+            folderName);
+        var body = members.First(line => NoteRules.IsBodyStageRel(line.Item.StageRel));
+        NoteIndexFile index;
+        try
+        {
+            index = NoteIndexStore.Load(session.Profile);
+        }
+        catch (NoteIndexCorruptException ex)
+        {
+            return NoteLinesFor(body, folderName, Array.Empty<NoteImageJob>(), NoteRules.ListPublishImageStageRels(folderFull, stageRoot), GateDecision.Reject(ex.Message));
+        }
+
+        var marked = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var line in members)
+        {
+            if (string.IsNullOrWhiteSpace(line.Item.StageRel) || NoteRules.IsBodyStageRel(line.Item.StageRel))
+            {
+                continue;
+            }
+
+            marked.Add(JsonUtil.ToRel(line.Item.StageRel));
+        }
+
+        var plan = NoteRules.Plan(folderFull, stageRoot, index, marked.Count == 0 ? null : marked, null);
+        var decision = plan.Ok
+            ? GateDecision.Allow("将上页整篇心得，与右键「上页心得」相同。")
+            : GateDecision.Reject(plan.Error);
+        var fallback = plan.Ok
+            ? Array.Empty<string>()
+            : NoteRules.ListPublishImageStageRels(folderFull, stageRoot);
+        return NoteLinesFor(body, folderName, plan.Images, fallback, decision);
+    }
+
+    /// <summary>
+    /// 把计划中的配图写成预演行。没有配图时保留一篇的结论，目标用夹名，不用正文的图片对象键。
+    /// </summary>
+    private static List<PreviewLine> NoteLinesFor(
+        PreviewLine body,
+        string folderName,
+        IReadOnlyList<NoteImageJob> images,
+        IReadOnlyList<string> fallbackStageRels,
+        GateDecision decision)
+    {
+        var lineList = new List<PreviewLine>();
+        if (images.Count > 0)
+        {
+            foreach (var image in images)
+            {
+                lineList.Add(NoteImageLine(body, folderName, image.SourceStageRel, image.ObjectKey, decision));
+            }
+
+            return lineList;
+        }
+
+        foreach (var stageRel in fallbackStageRels)
+        {
+            lineList.Add(NoteImageLine(body, folderName, stageRel, null, decision));
+        }
+
+        if (lineList.Count > 0)
+        {
+            return lineList;
+        }
+
+        lineList.Add(new PreviewLine
+        {
+            Item = new IntentItem
+            {
+                Intent = body.Item.Intent,
+                Channel = body.Item.Channel,
+                WorkId = string.IsNullOrWhiteSpace(body.Item.WorkId) ? folderName : body.Item.WorkId,
+                StageRel = body.Item.StageRel
+            },
+            Decision = decision
+        });
+        return lineList;
+    }
+
+    /// <summary>
+    /// 一张配图的预演行。对象键用上页计划的正式键；投放路径保留原文件名，供界面列出 ok.png 而不是正文。
+    /// </summary>
+    private static PreviewLine NoteImageLine(
+        PreviewLine body,
+        string folderName,
+        string stageRel,
+        string? objectKey,
+        GateDecision decision)
+    {
+        return new PreviewLine
+        {
+            Item = new IntentItem
+            {
+                Intent = body.Item.Intent,
+                Channel = body.Item.Channel ?? NoteRules.ChannelKey,
+                WorkId = string.IsNullOrWhiteSpace(body.Item.WorkId) ? folderName : body.Item.WorkId,
+                StageRel = stageRel,
+                SourceStageRel = stageRel,
+                Object = string.IsNullOrWhiteSpace(objectKey) ? null : objectKey
+            },
+            Decision = decision
+        };
+    }
+
+    /// <summary>
+    /// 同一夹的原预演行改成同一条结论，条目本身不动。
+    /// </summary>
+    private static void ReplaceNoteDecisions(List<PreviewLine> lineList, List<PreviewLine> members, GateDecision decision)
+    {
+        foreach (var line in members)
+        {
+            var index = lineList.IndexOf(line);
+            if (index < 0)
+            {
+                continue;
+            }
+
+            lineList[index] = new PreviewLine { Item = line.Item, Decision = decision };
+        }
+    }
+
+    /// <summary>
+    /// 用展开后的配图行换掉这一夹原来的标记行，其它栏目的行保持原位。
+    /// </summary>
+    private static void ReplaceNoteLines(List<PreviewLine> lineList, List<PreviewLine> members, List<PreviewLine> replacement)
+    {
+        var indexes = members
+            .Select(line => lineList.IndexOf(line))
+            .Where(index => index >= 0)
+            .OrderBy(index => index)
+            .ToList();
+        if (indexes.Count == 0)
+        {
+            return;
+        }
+
+        var insertAt = indexes[0];
+        for (var i = indexes.Count - 1; i >= 0; i--)
+        {
+            lineList.RemoveAt(indexes[i]);
+        }
+
+        lineList.InsertRange(insertAt, replacement);
     }
 
     /// <summary>
