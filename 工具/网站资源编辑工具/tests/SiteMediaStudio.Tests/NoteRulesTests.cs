@@ -108,6 +108,39 @@ public sealed class NoteRulesTests
     }
 
     [Fact]
+    public void Plan_RewritesMarkdownAndHtmlImageSources()
+    {
+        var stage = TempDir();
+        var folder = Path.Combine(stage, "心得（notes）", "20261005_125603");
+        Directory.CreateDirectory(folder);
+        File.WriteAllBytes(Path.Combine(folder, "used.png"), TinyPng);
+        File.WriteAllBytes(Path.Combine(folder, "inline.png"), TinyPng);
+        var source = "# 一篇\n\n见 ![用](used.png)\n\n<img alt=\"旁\" src=\"inline.png\">\n";
+        WriteNote(folder, "hello", source);
+        var plan = NoteRules.Plan(folder, stage, new NoteIndexFile(), null, null);
+        Assert.True(plan.Ok, plan.Error);
+        Assert.Contains("见 ![用](notes/hello/used.webp)", plan.RewrittenMarkdown, StringComparison.Ordinal);
+        Assert.Contains("<img alt=\"旁\" src=\"notes/hello/inline.webp\">", plan.RewrittenMarkdown, StringComparison.Ordinal);
+        Assert.DoesNotContain("used.png", plan.RewrittenMarkdown, StringComparison.Ordinal);
+        Assert.DoesNotContain("inline.png", plan.RewrittenMarkdown, StringComparison.Ordinal);
+        Assert.Equal(source, File.ReadAllText(Path.Combine(folder, "正文.md")));
+    }
+
+    [Fact]
+    public void Plan_StillStopsAtTheFirstMissingImage()
+    {
+        var stage = TempDir();
+        var folder = Path.Combine(stage, "心得（notes）", "20261005_125603");
+        Directory.CreateDirectory(folder);
+        WriteNote(folder, "hello", "# 一篇\n\n![一](gone-a.png)\n![二](gone-b.png)\n");
+        var plan = NoteRules.Plan(folder, stage, new NoteIndexFile(), null, null);
+        Assert.False(plan.Ok);
+        Assert.Equal(NoteRules.MissingImagePrefix + "gone-a.png", plan.Error);
+        Assert.Equal("gone-a.png", plan.BlockingReference);
+        Assert.DoesNotContain("gone-b.png", plan.Error, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void Plan_KeepsStarsAcrossRepublish()
     {
         var stage = TempDir();
