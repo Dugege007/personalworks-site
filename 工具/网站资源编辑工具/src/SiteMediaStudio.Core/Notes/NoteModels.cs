@@ -70,6 +70,11 @@ public sealed class NotePublishPlan
 {
     public bool Ok { get; init; }
     public string Error { get; init; } = "";
+
+    /// <summary>
+    /// 导致整篇不能上页的文件或引用。相对心得夹，或正文里的原始引用。没有具体文件时为空。
+    /// </summary>
+    public string BlockingReference { get; init; } = "";
     public string FolderName { get; init; } = "";
     public string Slug { get; init; } = "";
     public string Title { get; init; } = "";

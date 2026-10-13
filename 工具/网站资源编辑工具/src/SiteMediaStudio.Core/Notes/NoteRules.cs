@@ -25,6 +25,36 @@ public static class NoteRules
     /// </summary>
     public const string GifPublishRejectedMessage = "GIF 配图暂不支持上页";
 
+    /// <summary>
+    /// GIF 拒绝说明后面接具体文件时使用的前缀，含中文冒号。
+    /// </summary>
+    public const string GifPublishRejectedPrefix = GifPublishRejectedMessage + "：";
+
+    /// <summary>
+    /// 夹内有禁止上页的文件时，原因文字的前缀。
+    /// </summary>
+    public const string BlockedInFolderPrefix = "夹内有不能上页的文件：";
+
+    /// <summary>
+    /// 正文引用落到心得夹外时，原因文字的前缀。
+    /// </summary>
+    public const string OutsideFolderPrefix = "图片落在心得夹外：";
+
+    /// <summary>
+    /// 正文引用的图片不存在时，原因文字的前缀。
+    /// </summary>
+    public const string MissingImagePrefix = "找不到引用的图片：";
+
+    /// <summary>
+    /// 正文引用了不允许上页的文件时，原因文字的前缀。
+    /// </summary>
+    public const string UnpublishableReferencePrefix = "正文引用了不能上页的文件：";
+
+    /// <summary>
+    /// 正文引用了这次没有选中的图片时，原因文字的前缀。
+    /// </summary>
+    public const string NotChosenPrefix = "正文引用了这次没有上页的图片：";
+
     private static readonly Regex SlugRegex = new(
         @"^[a-z0-9]+(?:-[a-z0-9]+)*$",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
@@ -95,6 +125,36 @@ public static class NoteRules
         }
 
         return rest[..slash];
+    }
+
+    /// <summary>
+    /// 从投放路径取出相对这篇笔记文件夹的路径。子文件夹里的文件保留目录，例如 <c>sub/deep.gif</c>。
+    /// 夹名对不上时退回文件名。网址保持原样。
+    /// </summary>
+    public static string RelativeToNoteFolder(string? stageRel, string? folderName)
+    {
+        var rel = JsonUtil.ToRel(stageRel ?? "");
+        if (rel.Contains("://", StringComparison.Ordinal))
+        {
+            return stageRel?.Trim() ?? "";
+        }
+
+        if (!string.IsNullOrWhiteSpace(folderName))
+        {
+            var marker = "/" + JsonUtil.ToRel(folderName) + "/";
+            var index = rel.LastIndexOf(marker, StringComparison.Ordinal);
+            if (index >= 0)
+            {
+                var rest = rel[(index + marker.Length)..];
+                if (rest.Length > 0)
+                {
+                    return rest;
+                }
+            }
+        }
+
+        var name = Path.GetFileName(rel.Replace('/', Path.DirectorySeparatorChar));
+        return string.IsNullOrWhiteSpace(name) ? rel : name;
     }
 
     /// <summary>
@@ -261,13 +321,13 @@ public static class NoteRules
         var blocked = FindBlockedFile(folderFullPath);
         if (blocked != null)
         {
-            return Fail("夹内有不能上页的文件：" + blocked);
+            return Fail(BlockedInFolderPrefix + blocked, blocked);
         }
 
         var gif = FindGifFile(folderFullPath);
         if (gif != null)
         {
-            return Fail(GifPublishRejectedMessage + "：" + gif);
+            return Fail(GifPublishRejectedPrefix + gif, gif);
         }
 
         List<NoteImageRef> referenced;
@@ -277,7 +337,7 @@ public static class NoteRules
         }
         catch (InvalidOperationException ex)
         {
-            return Fail(ex.Message);
+            return Fail(ex);
         }
 
         var locals = ListLocalImages(folderFullPath);
@@ -333,7 +393,7 @@ public static class NoteRules
         }
         catch (InvalidOperationException ex)
         {
-            return Fail(ex.Message);
+            return Fail(ex);
         }
 
         var retired = new List<string>();
@@ -445,9 +505,27 @@ public static class NoteRules
         return (isoDate ?? "").Replace('-', '.');
     }
 
-    private static NotePublishPlan Fail(string error)
+    private static NotePublishPlan Fail(string error, string? blockingReference = null)
     {
-        return new NotePublishPlan { Ok = false, Error = error };
+        return new NotePublishPlan
+        {
+            Ok = false,
+            Error = error,
+            BlockingReference = blockingReference ?? ""
+        };
+    }
+
+    /// <summary>
+    /// 把带有具体文件的拒绝异常写进上页计划。其它异常只保留说明。
+    /// </summary>
+    private static NotePublishPlan Fail(InvalidOperationException exception)
+    {
+        if (exception is BlockingFileException blocking)
+        {
+            return Fail(blocking.Message, blocking.Reference);
+        }
+
+        return Fail(exception.Message);
     }
 
     private static string? FindBlockedFile(string folderFullPath)
@@ -565,7 +643,7 @@ public static class NoteRules
         {
             if (IsGifExtension(target))
             {
-                throw new InvalidOperationException(GifPublishRejectedMessage + "：" + target);
+                throw new BlockingFileException(GifPublishRejectedPrefix + target, target);
             }
 
             return new NoteImageRef(target, true, "");
@@ -577,23 +655,23 @@ public static class NoteRules
         if (!full.StartsWith(folder + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
             && !string.Equals(full, folder, StringComparison.OrdinalIgnoreCase))
         {
-            throw new InvalidOperationException("图片落在心得夹外：" + target);
+            throw new BlockingFileException(OutsideFolderPrefix + target, target);
         }
 
         if (IsGifExtension(full))
         {
-            throw new InvalidOperationException(GifPublishRejectedMessage + "：" + target);
+            throw new BlockingFileException(GifPublishRejectedPrefix + target, target);
         }
 
         if (!File.Exists(full))
         {
-            throw new InvalidOperationException("找不到引用的图片：" + target);
+            throw new BlockingFileException(MissingImagePrefix + target, target);
         }
 
         var ext = Path.GetExtension(full);
         if (!PublishImageExtSet.Contains(ext))
         {
-            throw new InvalidOperationException("正文引用了不能上页的文件：" + target);
+            throw new BlockingFileException(UnpublishableReferencePrefix + target, target);
         }
 
         return new NoteImageRef(target, false, full);
@@ -639,7 +717,7 @@ public static class NoteRules
             Uri.UnescapeDataString(raw).Replace('/', Path.DirectorySeparatorChar)));
         if (!objectBySource.TryGetValue(full, out var objectKey))
         {
-            throw new InvalidOperationException("正文引用了这次没有上页的图片：" + raw);
+            throw new BlockingFileException(NotChosenPrefix + raw, raw);
         }
 
         preview.Add(objectKey);
@@ -691,4 +769,18 @@ public static class NoteRules
     }
 
     private readonly record struct NoteImageRef(string Raw, bool Remote, string FullPath);
+
+    /// <summary>
+    /// 上页计划因某一个文件被拒绝。引用随异常一起返回，不再从原因文字里反推。
+    /// </summary>
+    private sealed class BlockingFileException : InvalidOperationException
+    {
+        public BlockingFileException(string message, string reference)
+            : base(message)
+        {
+            Reference = reference;
+        }
+
+        public string Reference { get; }
+    }
 }
