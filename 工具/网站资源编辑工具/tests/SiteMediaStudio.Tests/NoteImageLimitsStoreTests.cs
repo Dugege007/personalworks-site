@@ -159,7 +159,16 @@ public sealed class NoteImageLimitsStoreTests
         Assert.Equal(NoteImageThreshold.DefaultImageMaxBytes, limits.ImageMaxBytes);
         Assert.Equal(NoteImageThreshold.DefaultGifMaxBytes, limits.GifMaxBytes);
         var expected = JsonSerializer.Serialize(NoteImageLimits.CreateDefault(), JsonUtil.Options) + "\n";
-        Assert.Equal(expected, File.ReadAllText(path));
+        // Windows 签出文件时会把换行写成回车加换行，比较时忽略这种差异。
+        Assert.Equal(WithNormalizedLineEndings(expected), WithNormalizedLineEndings(File.ReadAllText(path)));
+    }
+
+    /// <summary>
+    /// 把回车换行和单个回车都看成单个换行，便于比较仓库里签出的文本。
+    /// </summary>
+    private static string WithNormalizedLineEndings(string text)
+    {
+        return text.Replace("\r\n", "\n", StringComparison.Ordinal).Replace("\r", "\n", StringComparison.Ordinal);
     }
 
     private static string TempDir()

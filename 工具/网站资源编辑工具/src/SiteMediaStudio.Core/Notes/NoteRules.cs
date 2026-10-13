@@ -55,6 +55,22 @@ public static class NoteRules
     /// </summary>
     public const string NotChosenPrefix = "正文引用了这次没有上页的图片：";
 
+    /// <summary>
+    /// 正文里的 Markdown 图片。第 1 组是说明文字，第 2 组是地址。
+    /// 读取引用和上页改写共用这一条，避免两处规则各写一遍。
+    /// </summary>
+    public static readonly Regex MarkdownImageRegex = new(
+        @"!\[([^\]]*)\]\(([^)\s]+)\)",
+        RegexOptions.Compiled);
+
+    /// <summary>
+    /// 正文里的 HTML 图片。第 1 组是地址前面的原文，第 2 组是地址，第 3 组是结束引号。比较时不区分大小写。
+    /// 读取引用和上页改写共用这一条，避免两处规则各写一遍。
+    /// </summary>
+    public static readonly Regex HtmlImageRegex = new(
+        "(<img[^>]+src=[\"'])([^\"']+)([\"'])",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
     private static readonly Regex SlugRegex = new(
         @"^[a-z0-9]+(?:-[a-z0-9]+)*$",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
@@ -505,6 +521,26 @@ public static class NoteRules
         return (isoDate ?? "").Replace('-', '.');
     }
 
+    /// <summary>
+    /// 按正文出现顺序取出图片地址。先收集 Markdown 图片，再收集 HTML 图片，与原来的上页预演相同。
+    /// 不检查文件是否存在。同一地址出现多次时，按出现次数返回多次。
+    /// </summary>
+    public static IReadOnlyList<string> ListImageTargets(string body)
+    {
+        var targetList = new List<string>();
+        foreach (Match match in MarkdownImageRegex.Matches(body))
+        {
+            targetList.Add(match.Groups[2].Value);
+        }
+
+        foreach (Match match in HtmlImageRegex.Matches(body))
+        {
+            targetList.Add(match.Groups[2].Value);
+        }
+
+        return targetList;
+    }
+
     private static NotePublishPlan Fail(string error, string? blockingReference = null)
     {
         return new NotePublishPlan
@@ -622,14 +658,9 @@ public static class NoteRules
     private static List<NoteImageRef> ReadImageRefs(string folderFullPath, string body)
     {
         var list = new List<NoteImageRef>();
-        foreach (Match match in Regex.Matches(body, @"!\[[^\]]*\]\(([^)\s]+)\)"))
+        foreach (var raw in ListImageTargets(body))
         {
-            list.Add(ResolveRef(folderFullPath, match.Groups[1].Value));
-        }
-
-        foreach (Match match in Regex.Matches(body, "<img[^>]+src=[\"']([^\"']+)[\"']", RegexOptions.IgnoreCase))
-        {
-            list.Add(ResolveRef(folderFullPath, match.Groups[1].Value));
+            list.Add(ResolveRef(folderFullPath, raw));
         }
 
         return list;
@@ -684,18 +715,18 @@ public static class NoteRules
         out List<string> preview)
     {
         var found = new List<string>();
-        var rewritten = Regex.Replace(body, @"!\[([^\]]*)\]\(([^)\s]+)\)", match =>
+        var rewritten = MarkdownImageRegex.Replace(body, match =>
         {
             var alt = match.Groups[1].Value;
             var raw = match.Groups[2].Value;
             var next = RewriteOne(folderFullPath, raw, objectBySource, found);
             return "![" + alt + "](" + next + ")";
         });
-        rewritten = Regex.Replace(rewritten, "(<img[^>]+src=[\"'])([^\"']+)([\"'])", match =>
+        rewritten = HtmlImageRegex.Replace(rewritten, match =>
         {
             var next = RewriteOne(folderFullPath, match.Groups[2].Value, objectBySource, found);
             return match.Groups[1].Value + next + match.Groups[3].Value;
-        }, RegexOptions.IgnoreCase);
+        });
         preview = found;
         return rewritten;
     }
