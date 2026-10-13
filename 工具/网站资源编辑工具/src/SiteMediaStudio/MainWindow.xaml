@@ -42,6 +42,12 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel>
                     <TextBlock Text="{Binding MarkSummary}" FontSize="13"/>
+                    <TextBlock Text="{Binding NoteImageFooter}"
+                               Foreground="{StaticResource OxideBrush}"
+                               FontSize="13"
+                               TextWrapping="Wrap"
+                               Margin="0,4,0,0"
+                               Visibility="{Binding ShowNoteImageFooter, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                     <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource MutedBrush}" Margin="0,4,0,0"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
@@ -362,6 +368,12 @@
                                                 <Grid Height="{Binding DataContext.CardImageHeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                                       Background="{StaticResource WellBrush}">
                                                     <Image Source="{Binding Left.Thumbnail}" Stretch="Uniform"/>
+                                                    <Border Style="{StaticResource OverLimitBadgeBorder}"
+                                                            Visibility="{Binding Left.ShowLimitBadge, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                        <TextBlock Text="{Binding Left.LimitBadge}"
+                                                                   FontSize="11"
+                                                                   Foreground="{StaticResource TextBrush}"/>
+                                                    </Border>
                                                     <ContentControl Style="{StaticResource VideoPlayHint}"
                                                                     Visibility="{Binding LeftIsVideo, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed, TargetNullValue=Collapsed}"/>
                                                 </Grid>
@@ -396,6 +408,12 @@
                                                 <Grid Height="{Binding DataContext.CardImageHeight, RelativeSource={RelativeSource AncestorType=Window}}"
                                                       Background="{StaticResource WellBrush}">
                                                     <Image Source="{Binding Right.Thumbnail}" Stretch="Uniform"/>
+                                                    <Border Style="{StaticResource OverLimitBadgeBorder}"
+                                                            Visibility="{Binding Right.ShowLimitBadge, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                        <TextBlock Text="{Binding Right.LimitBadge}"
+                                                                   FontSize="11"
+                                                                   Foreground="{StaticResource TextBrush}"/>
+                                                    </Border>
                                                     <ContentControl Style="{StaticResource VideoPlayHint}"
                                                                     Visibility="{Binding RightIsVideo, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed, TargetNullValue=Collapsed}"/>
                                                 </Grid>
@@ -480,6 +498,12 @@
                                         <Grid Background="{StaticResource WellBrush}"
                                               Height="{Binding DataContext.CardImageHeight, RelativeSource={RelativeSource AncestorType=Window}}">
                                             <Image Source="{Binding Thumbnail}" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                            <Border Style="{StaticResource OverLimitBadgeBorder}"
+                                                    Visibility="{Binding ShowLimitBadge, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                <TextBlock Text="{Binding LimitBadge}"
+                                                           FontSize="11"
+                                                           Foreground="{StaticResource TextBrush}"/>
+                                            </Border>
                                             <ContentControl Style="{StaticResource VideoPlayHint}"
                                                             Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}, FallbackValue=Collapsed, TargetNullValue=Collapsed}"/>
                                         </Grid>
@@ -658,7 +682,35 @@
                     </StackPanel>
                 </StackPanel>
                 <ScrollViewer Margin="16,0,16,0" HorizontalScrollBarVisibility="Disabled">
-                    <TextBlock Text="{Binding InspectorMeta}" TextWrapping="Wrap" FontFamily="Cascadia Mono, Consolas"/>
+                    <StackPanel>
+                        <DockPanel Margin="0,0,0,8"
+                                   LastChildFill="True"
+                                   Visibility="{Binding ShowNoteImageFileRow, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <TextBlock DockPanel.Dock="Left"
+                                       Text="{Binding NoteImageSizeText}"
+                                       FontFamily="Cascadia Mono, Consolas"
+                                       VerticalAlignment="Center"/>
+                            <Border DockPanel.Dock="Right"
+                                    Style="{StaticResource NoteCompressedBadgeBorder}"
+                                    Visibility="{Binding ShowNoteImageCompressed, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                <TextBlock Text="{Binding NoteImageCompressedText}"
+                                           FontSize="11"
+                                           Foreground="{StaticResource TextBrush}"/>
+                            </Border>
+                            <TextBlock Text="{Binding NoteImageWarning}"
+                                       Foreground="{StaticResource OxideBrush}"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap"
+                                       Margin="8,0,8,0"
+                                       VerticalAlignment="Center"/>
+                        </DockPanel>
+                        <TextBlock Text="{Binding NoteImageIssueText}"
+                                   Foreground="{StaticResource OxideBrush}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,8"
+                                   Visibility="{Binding ShowNoteImageIssue, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        <TextBlock Text="{Binding InspectorMeta}" TextWrapping="Wrap" FontFamily="Cascadia Mono, Consolas"/>
+                    </StackPanel>
                 </ScrollViewer>
             </DockPanel>
         </Grid>

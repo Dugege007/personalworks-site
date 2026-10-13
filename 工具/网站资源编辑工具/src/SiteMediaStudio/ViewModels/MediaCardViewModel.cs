@@ -23,6 +23,7 @@ public sealed class MediaCardViewModel : ViewModelBase
     private string mSubtitleStem = "";
     private string mSubtitleExtension = "";
     private string mBadge = "";
+    private string mLimitBadge = "";
     private string mPublishLabel = "";
     private bool mIsUnsigned;
     private string? mPreviewPath;
@@ -100,6 +101,26 @@ public sealed class MediaCardViewModel : ViewModelBase
         get => mBadge;
         private set => SetField(ref mBadge, value);
     }
+
+    /// <summary>
+    /// 超限角标。空字符串表示这张配图没有超过上限。
+    /// </summary>
+    public string LimitBadge
+    {
+        get => mLimitBadge;
+        set
+        {
+            if (SetField(ref mLimitBadge, value))
+            {
+                Raise(nameof(ShowLimitBadge));
+            }
+        }
+    }
+
+    /// <summary>
+    /// 网格是否显示超限角标。
+    /// </summary>
+    public bool ShowLimitBadge => mLimitBadge.Length > 0;
 
     public string PublishLabel
     {

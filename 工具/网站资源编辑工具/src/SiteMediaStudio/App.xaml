@@ -776,6 +776,22 @@
             <Setter Property="CornerRadius" Value="2"/>
             <Setter Property="SnapsToDevicePixels" Value="True"/>
         </Style>
+        <Style x:Key="OverLimitBadgeBorder" TargetType="Border" BasedOn="{StaticResource MarkBadgeBorder}">
+            <Setter Property="Margin" Value="8,0,0,8"/>
+            <Setter Property="VerticalAlignment" Value="Bottom"/>
+            <Setter Property="Background" Value="{StaticResource OxideBrush}"/>
+        </Style>
+        <Style x:Key="NoteCompressedBadgeBorder" TargetType="Border">
+            <Setter Property="Padding" Value="6,2"/>
+            <Setter Property="Margin" Value="8,0,0,0"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Background" Value="{StaticResource PineBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#E8E6E1"/>
+            <Setter Property="CornerRadius" Value="2"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+        </Style>
         <Style x:Key="ZoomSlider" TargetType="Slider">
             <Setter Property="Minimum" Value="120"/>
             <Setter Property="Maximum" Value="480"/>

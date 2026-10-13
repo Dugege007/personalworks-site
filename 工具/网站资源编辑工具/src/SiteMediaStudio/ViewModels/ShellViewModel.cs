@@ -39,6 +39,15 @@ public sealed class ShellViewModel : ViewModelBase
     private string mWorkspaceTitle = "网站资源编辑工具";
     private string mChannelCaption = "";
     private string mInspectorMeta = "";
+    private string mNoteImageFooter = "";
+    private string mNoteImageIssueText = "";
+    private string mNoteImageSizeText = "";
+    private string mNoteImageWarning = "";
+    private string mNoteImageCompressedText = "";
+    private bool mShowNoteImageFileRow;
+    private bool mShowNoteImageCompressed;
+    private NoteImageAuditReport? mNoteAudit;
+    private string mNoteAuditError = "";
     private string mPreviewHint = "选择一张图查看详情。";
     private string mNoticeText = "";
     private ImageSource? mInspectorImage;
@@ -166,7 +175,7 @@ public sealed class ShellViewModel : ViewModelBase
         TagCommand = new RelayCommand(OpenTags, CanTag);
         WithdrawWorkCommand = new RelayCommand(WithdrawSelectedWork, CanWithdrawWork);
         CreateNoteCommand = new RelayCommand(CreateNote, CanCreateNote);
-        PublishNoteCommand = new RelayCommand(PublishSelectedNote, CanPublishNote);
+        PublishNoteCommand = new RelayCommand(PublishSelectedNote, CanPublishSelectedNote);
         HideNoteCommand = new RelayCommand(HideSelectedNote, CanHideNote);
         RestoreNoteCommand = new RelayCommand(RestoreSelectedNote, CanRestoreNote);
         RecycleNoteCommand = new RelayCommand(RecycleSelectedNote, CanRecycleNote);
@@ -285,6 +294,91 @@ public sealed class ShellViewModel : ViewModelBase
     {
         get => mInspectorMeta;
         private set => SetField(ref mInspectorMeta, value);
+    }
+
+    /// <summary>
+    /// 底栏上的超限、缺失和文件夹外引用提示。没有问题时为空。
+    /// </summary>
+    public string NoteImageFooter
+    {
+        get => mNoteImageFooter;
+        private set
+        {
+            if (SetField(ref mNoteImageFooter, value))
+            {
+                Raise(nameof(ShowNoteImageFooter));
+            }
+        }
+    }
+
+    /// <summary>
+    /// 底栏是否显示配图提示。
+    /// </summary>
+    public bool ShowNoteImageFooter => mNoteImageFooter.Length > 0;
+
+    /// <summary>
+    /// 检视栏列出的缺失配图和文件夹外引用。
+    /// </summary>
+    public string NoteImageIssueText
+    {
+        get => mNoteImageIssueText;
+        private set
+        {
+            if (SetField(ref mNoteImageIssueText, value))
+            {
+                Raise(nameof(ShowNoteImageIssue));
+            }
+        }
+    }
+
+    /// <summary>
+    /// 检视栏是否列出缺失配图或文件夹外引用。
+    /// </summary>
+    public bool ShowNoteImageIssue => mNoteImageIssueText.Length > 0;
+
+    /// <summary>
+    /// 选中配图的大小。超限或已压缩时单独显示，以便警告紧挨着它。
+    /// </summary>
+    public string NoteImageSizeText
+    {
+        get => mNoteImageSizeText;
+        private set => SetField(ref mNoteImageSizeText, value);
+    }
+
+    /// <summary>
+    /// 选中配图超过上限时的警告。未超限时为空。
+    /// </summary>
+    public string NoteImageWarning
+    {
+        get => mNoteImageWarning;
+        private set => SetField(ref mNoteImageWarning, value);
+    }
+
+    /// <summary>
+    /// 选中配图在原图备份里有一份时显示「已压缩」。
+    /// </summary>
+    public string NoteImageCompressedText
+    {
+        get => mNoteImageCompressedText;
+        private set => SetField(ref mNoteImageCompressedText, value);
+    }
+
+    /// <summary>
+    /// 检视栏是否把大小、超限警告和已压缩标记排在同一行。
+    /// </summary>
+    public bool ShowNoteImageFileRow
+    {
+        get => mShowNoteImageFileRow;
+        private set => SetField(ref mShowNoteImageFileRow, value);
+    }
+
+    /// <summary>
+    /// 选中配图是否显示已压缩标记。
+    /// </summary>
+    public bool ShowNoteImageCompressed
+    {
+        get => mShowNoteImageCompressed;
+        private set => SetField(ref mShowNoteImageCompressed, value);
     }
 
     public string PreviewHint
@@ -606,6 +700,9 @@ public sealed class ShellViewModel : ViewModelBase
                 RememberLastNav();
                 ResetSelectionHistoryForScope();
                 ScheduleRebuildCards();
+                RefreshNoteImageAudit();
+                ApplyNoteImageBadges();
+                UpdateInspector();
             }
         }
     }
@@ -2440,12 +2537,94 @@ public sealed class ShellViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// 共享阈值已经保存，立即重新计算心得配图是否超限。
-    /// 检视栏警告、网格角标和底栏提示以后写在这个方法里。现在先刷新检视栏，让保存动作有一个立刻会执行的入口。
+    /// 共享阈值已经保存，立即重新计算心得配图是否超限，并刷新检视栏、网格角标和底栏。
     /// </summary>
     private void RecalculateNoteImageLimits()
     {
+        RefreshNoteImageAudit();
+        ApplyNoteImageBadges();
         UpdateInspector();
+    }
+
+    /// <summary>
+    /// 按当前笔记重新体检。配置损坏时把说明留在底栏和检视栏，并禁止上页。
+    /// </summary>
+    private void RefreshNoteImageAudit()
+    {
+        mNoteAudit = null;
+        mNoteAuditError = "";
+        if (mSession == null || mSelectedNav?.Work is not { SourceKind: "note" } work)
+        {
+            NoteImageFooter = "";
+            NoteImageIssueText = "";
+            PublishNoteCommand.RaiseCanExecute();
+            return;
+        }
+
+        try
+        {
+            mNoteAudit = NoteImageAudit.Inspect(NoteFolderPath(work.Id), mSession.Profile);
+            NoteImageFooter = NoteImagePrompt.FormatFooter(mNoteAudit);
+            NoteImageIssueText = NoteImagePrompt.FormatIssueText(mNoteAudit);
+        }
+        catch (NoteImageLimitsException ex)
+        {
+            mNoteAuditError = ex.Message;
+            NoteImageFooter = ex.Message;
+            NoteImageIssueText = ex.Message;
+        }
+
+        PublishNoteCommand.RaiseCanExecute();
+    }
+
+    /// <summary>
+    /// 把超限角标写到当前网格和对照行。没有体检结果时清掉角标。
+    /// </summary>
+    private void ApplyNoteImageBadges()
+    {
+        var folderName = mSelectedNav?.Work is { SourceKind: "note" } work ? work.Id : null;
+        foreach (var card in Cards)
+        {
+            card.LimitBadge = NoteImagePrompt.LimitBadgeFor(mNoteAudit, card.Stage?.StageRel, folderName);
+        }
+
+        foreach (var row in CompareRows)
+        {
+            if (row.Left != null)
+            {
+                row.Left.LimitBadge = NoteImagePrompt.LimitBadgeFor(mNoteAudit, row.Left.Stage?.StageRel, folderName);
+            }
+
+            if (row.Right != null)
+            {
+                row.Right.LimitBadge = NoteImagePrompt.LimitBadgeFor(mNoteAudit, row.Right.Stage?.StageRel, folderName);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 当前选中的笔记是否因为缺失配图或文件夹外引用而不能上页。
+    /// </summary>
+    private bool CanPublishSelectedNote()
+    {
+        return CanPublishNote()
+            && mNoteAuditError.Length == 0
+            && NoteImagePrompt.PublishBlockReason(mNoteAudit).Length == 0;
+    }
+
+    /// <summary>
+    /// 重新体检指定夹，返回不能上页的说明。可以上页时返回空。
+    /// </summary>
+    private static string DescribePublishBlock(string folderFullPath, WorkspaceProfile profile)
+    {
+        try
+        {
+            return NoteImagePrompt.PublishBlockReason(NoteImageAudit.Inspect(folderFullPath, profile));
+        }
+        catch (NoteImageLimitsException ex)
+        {
+            return ex.Message;
+        }
     }
 
     /// <summary>
@@ -2590,6 +2769,16 @@ public sealed class ShellViewModel : ViewModelBase
             return;
         }
 
+        var block = DescribePublishBlock(NoteFolderPath(work.Id), mSession.Profile);
+        if (block.Length > 0)
+        {
+            TextDialog.Show("无法上页", block);
+            RefreshNoteImageAudit();
+            ApplyNoteImageBadges();
+            UpdateInspector();
+            return;
+        }
+
         if (!ConfirmIntentDialog.Show(
                 "将上页「" + work.Title + "」。未逐张标记配图时，夹内允许的图片全部压图入库。中转站正文仍用相对路径。",
                 requireAck: false,
@@ -2627,6 +2816,12 @@ public sealed class ShellViewModel : ViewModelBase
 
         var profile = mSession.Profile;
         var folder = NoteFolderPath(folderId);
+        var block = DescribePublishBlock(folder, profile);
+        if (block.Length > 0)
+        {
+            return block;
+        }
+
         var marked = MarkedNoteIngest(folderId);
         var stars = StarDraftsForFolder(folderId);
         mIsExecuting = true;
@@ -2659,6 +2854,7 @@ public sealed class ShellViewModel : ViewModelBase
         {
             mIsExecuting = false;
             ExecuteCommand.RaiseCanExecute();
+            PublishNoteCommand.RaiseCanExecute();
         }
 
         if (!batch.Ok || !string.IsNullOrWhiteSpace(outcome.Error))
@@ -4080,6 +4276,8 @@ public sealed class ShellViewModel : ViewModelBase
     /// </summary>
     private void ApplyCardSurfaceChrome(bool scrollToFocus)
     {
+        RefreshNoteImageAudit();
+        ApplyNoteImageBadges();
         ApplyPersistedMarks();
         RefreshIngestWorks();
         RefreshNotice();
@@ -4910,12 +5108,55 @@ public sealed class ShellViewModel : ViewModelBase
     }
 
     /// <summary>
+    /// 收起检视栏里紧挨大小的超限警告和已压缩标记。
+    /// </summary>
+    private void ClearNoteImageFileRow()
+    {
+        ShowNoteImageFileRow = false;
+        ShowNoteImageCompressed = false;
+        NoteImageSizeText = "";
+        NoteImageWarning = "";
+        NoteImageCompressedText = "";
+    }
+
+    /// <summary>
+    /// 心得配图超限或已有原图备份时，大小改到警告那一行，元数据里不再重复。其余情况仍写在元数据里。
+    /// </summary>
+    private string NoteImageFileSizeLine(StageItem stage, string sizeText)
+    {
+        var warning = "";
+        var compressed = false;
+        if (mNoteAudit != null
+            && mSession != null
+            && mSelectedNav?.Work is { SourceKind: "note" } work
+            && string.Equals(stage.ChannelKey, NoteRules.ChannelKey, StringComparison.Ordinal))
+        {
+            var relativePath = NoteRules.RelativeToNoteFolder(stage.StageRel, work.Id);
+            warning = NoteImagePrompt.WarningFor(mNoteAudit, relativePath);
+            compressed = NoteImagePrompt.HasOriginalBackup(NoteFolderPath(work.Id), relativePath);
+        }
+
+        if (warning.Length == 0 && !compressed)
+        {
+            return sizeText;
+        }
+
+        NoteImageSizeText = sizeText;
+        NoteImageWarning = warning;
+        NoteImageCompressedText = compressed ? NoteImagePrompt.CompressedMark : "";
+        ShowNoteImageCompressed = compressed;
+        ShowNoteImageFileRow = true;
+        return "";
+    }
+
+    /// <summary>
     /// 刷新右侧检视，并异步载入清晰预览。
     /// </summary>
     private void UpdateInspector()
     {
         var card = mFocusCard;
         mInspectorCts?.Cancel();
+        ClearNoteImageFileRow();
         if (card == null)
         {
             InspectorMeta = mSelectedNav?.IsUnregistered == true ? "未入编，不可上页。" : "";
@@ -4942,7 +5183,7 @@ public sealed class ShellViewModel : ViewModelBase
                 unregistered ? "未入编，不可上页。" : "",
                 card.UsesWebPreview ? "预览 网页图" : "预览 原片",
                 card.IsVideo ? "视频 双击外部播放" : "",
-                FileSizeFormat.Format(stage.Length));
+                NoteImageFileSizeLine(stage, FileSizeFormat.Format(stage.Length)));
             PreviewHint = unregistered
                 ? "未入编，不可上页。先登记或改选已有作品。"
                 : card.IsVideo
