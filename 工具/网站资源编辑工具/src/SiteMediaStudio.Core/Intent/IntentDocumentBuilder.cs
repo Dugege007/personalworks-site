@@ -64,10 +64,12 @@ public static class IntentDocumentBuilder
             var workId = site?.WorkId ?? marked.WorkId ?? ingestTargetWorkId ?? stage?.WorkIdGuess;
             var objectKey = site?.ObjectKey ?? stage?.MatchedObject;
             // 已上页只保留原键，不占新序号，避免内容补丁写成空槽。
+            // 心得正文不是配图，不能按图片规格分配对象键，否则预演会出现正文.webp。
             if (intent == MediaIntent.StageIngest
                 && stage != null
                 && !string.IsNullOrWhiteSpace(workId)
-                && !IntentGate.IsRedundantIngest(stage, ingestContext))
+                && !IntentGate.IsRedundantIngest(stage, ingestContext)
+                && !IsNoteBody(stage))
             {
                 objectKey = ObjectKeyAllocator.Allocate(
                     session,
@@ -91,6 +93,14 @@ public static class IntentDocumentBuilder
         }
 
         return document;
+    }
+
+    /// <summary>
+    /// 心得正文只作为整篇上页的标记，不参与配图对象键分配。
+    /// </summary>
+    private static bool IsNoteBody(StageItem stage)
+    {
+        return NoteRules.IsNotesChannel(stage.ChannelKey) && NoteRules.IsBodyStageRel(stage.StageRel);
     }
 
     /// <summary>

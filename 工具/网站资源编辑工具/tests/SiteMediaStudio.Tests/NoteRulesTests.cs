@@ -202,6 +202,66 @@ public sealed class NoteRulesTests
     }
 
     [Fact]
+    public void ExtensionSets_StoreGifButDoNotPublishIt()
+    {
+        Assert.Equal(".originals", NoteRules.OriginalsDirName);
+        Assert.Contains(".gif", NoteRules.StoredImageExtSet);
+        Assert.Contains(".GIF", NoteRules.StoredImageExtSet);
+        Assert.DoesNotContain(".gif", NoteRules.PublishImageExtSet);
+        Assert.Contains(".jpg", NoteRules.PublishImageExtSet);
+        Assert.Contains(".jpeg", NoteRules.PublishImageExtSet);
+        Assert.Contains(".png", NoteRules.PublishImageExtSet);
+        Assert.Contains(".webp", NoteRules.PublishImageExtSet);
+        Assert.DoesNotContain(".bmp", NoteRules.StoredImageExtSet);
+        Assert.DoesNotContain(".bmp", NoteRules.PublishImageExtSet);
+    }
+
+    [Fact]
+    public void Plan_RejectsGifInFolderOrBody_AndSkipsOriginals()
+    {
+        var stage = TempDir();
+        var folder = Path.Combine(stage, "心得（notes）", "20261005_125603");
+        Directory.CreateDirectory(folder);
+        File.WriteAllBytes(Path.Combine(folder, "shot.GIF"), TinyPng);
+        WriteNote(folder, "hello", "# 一篇\n\n文字\n");
+        var inFolder = NoteRules.Plan(folder, stage, new NoteIndexFile(), null, null);
+        Assert.False(inFolder.Ok);
+        Assert.Contains(NoteRules.GifPublishRejectedMessage, inFolder.Error, StringComparison.Ordinal);
+        Assert.DoesNotContain("不能上页的文件", inFolder.Error, StringComparison.Ordinal);
+
+        File.Delete(Path.Combine(folder, "shot.GIF"));
+        WriteNote(folder, "hello", "# 一篇\n\n![动图](missing.GIF)\n");
+        var missing = NoteRules.Plan(folder, stage, new NoteIndexFile(), null, null);
+        Assert.False(missing.Ok);
+        Assert.Contains(NoteRules.GifPublishRejectedMessage, missing.Error, StringComparison.Ordinal);
+
+        WriteNote(folder, "hello", "# 一篇\n\n![外链](https://example.com/a.gif?v=1)\n");
+        var remote = NoteRules.Plan(folder, stage, new NoteIndexFile(), null, null);
+        Assert.False(remote.Ok);
+        Assert.Contains(NoteRules.GifPublishRejectedMessage, remote.Error, StringComparison.Ordinal);
+
+        var originals = Path.Combine(folder, NoteRules.OriginalsDirName, "图");
+        var upperOriginals = Path.Combine(folder, ".Originals");
+        Directory.CreateDirectory(originals);
+        Directory.CreateDirectory(upperOriginals);
+        Directory.CreateDirectory(Path.Combine(folder, NoteRules.ReadyDirName));
+        File.WriteAllBytes(Path.Combine(originals, "backup.png"), TinyPng);
+        File.WriteAllBytes(Path.Combine(originals, "backup.gif"), TinyPng);
+        File.WriteAllBytes(Path.Combine(originals, "clip.mp4"), new byte[] { 0 });
+        File.WriteAllBytes(Path.Combine(upperOriginals, "legacy.png"), TinyPng);
+        File.WriteAllBytes(Path.Combine(folder, NoteRules.ReadyDirName, "ready.gif"), TinyPng);
+        File.WriteAllBytes(Path.Combine(folder, "used.PNG"), TinyPng);
+        File.WriteAllBytes(Path.Combine(folder, "ignore.bmp"), TinyPng);
+        WriteNote(folder, "hello", "# 一篇\n\n![用](used.PNG)\n");
+        var plan = NoteRules.Plan(folder, stage, new NoteIndexFile(), null, null);
+        Assert.True(plan.Ok, plan.Error);
+        Assert.Single(plan.Images);
+        Assert.EndsWith("used.PNG", plan.Images[0].SourceStageRel, StringComparison.Ordinal);
+        Assert.DoesNotContain(plan.Images, item => item.ObjectKey.Contains(".originals", StringComparison.OrdinalIgnoreCase));
+        Assert.DoesNotContain(plan.Images, item => item.SourceStageRel.Contains(".originals", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
     public void ApplyPublishState_ListedBodyWithoutLedger_ShowsPublished()
     {
         var body = Stage("心得（notes）/20261005_021341/正文.md");

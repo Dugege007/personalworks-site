@@ -16,9 +16,18 @@ public static class BatchExecutor
         IProgress<PublishProgress>? progress = null,
         string? marksPath = null)
     {
-        if (NoteCommands.PullMeta(session.Profile, document) && File.Exists(intentPath))
+        try
         {
-            File.WriteAllText(intentPath, IntentDocumentBuilder.ToJson(document), JsonUtil.Utf8NoBom);
+            if (NoteCommands.PullMeta(session.Profile, document) && File.Exists(intentPath))
+            {
+                File.WriteAllText(intentPath, IntentDocumentBuilder.ToJson(document), JsonUtil.Utf8NoBom);
+            }
+        }
+        catch (NoteIndexCorruptException ex)
+        {
+            var rejected = Fail("心得索引", ex.Message, Array.Empty<string>());
+            RunLog.AppendOutcome("执行", rejected);
+            return rejected;
         }
 
         if (document.Options.Deploy != "none")

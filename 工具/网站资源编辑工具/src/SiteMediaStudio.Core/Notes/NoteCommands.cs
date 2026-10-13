@@ -1,7 +1,7 @@
 namespace PersonalWorks.SiteMediaStudio.Core;
 
 /// <summary>
-/// 隐藏、恢复与未上页回收。已上页整篇删除不在本阶段。
+/// 隐藏、恢复与未上页回收。已上页整篇删除不在本阶段。索引损坏时拒绝写入。
 /// </summary>
 public static class NoteCommands
 {
@@ -10,7 +10,12 @@ public static class NoteCommands
     /// </summary>
     public static string? Hide(WorkspaceProfile profile, string folderName)
     {
-        var index = NoteIndexStore.Load(profile);
+        var index = TryReadIndex(profile, out var readError);
+        if (index == null)
+        {
+            return readError;
+        }
+
         var entry = index.Notes.FirstOrDefault(item =>
             string.Equals(item.Folder, folderName, StringComparison.Ordinal));
         if (entry == null || entry.Draft || string.IsNullOrWhiteSpace(entry.Slug))
@@ -33,7 +38,12 @@ public static class NoteCommands
     /// </summary>
     public static string? Restore(WorkspaceProfile profile, string folderName)
     {
-        var index = NoteIndexStore.Load(profile);
+        var index = TryReadIndex(profile, out var readError);
+        if (index == null)
+        {
+            return readError;
+        }
+
         var entry = index.Notes.FirstOrDefault(item =>
             string.Equals(item.Folder, folderName, StringComparison.Ordinal));
         if (entry == null || !entry.Hidden)
@@ -57,7 +67,13 @@ public static class NoteCommands
     public static string? RecycleFolder(WorkspaceProfile profile, string folderFullPath)
     {
         var folderName = Path.GetFileName(folderFullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
-        var reason = NoteRules.RecycleBlockReason(NoteIndexStore.Load(profile), folderName);
+        var index = TryReadIndex(profile, out var readError);
+        if (index == null)
+        {
+            return readError;
+        }
+
+        var reason = NoteRules.RecycleBlockReason(index, folderName);
         if (reason != null)
         {
             return reason;
@@ -197,5 +213,22 @@ public static class NoteCommands
     {
         var rel = item.StageRel ?? item.Object ?? "";
         return rel.EndsWith(NoteRules.BodyFileName, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// 读取心得索引。损坏时返回空，调用方必须停止写入并把说明交给界面。
+    /// </summary>
+    private static NoteIndexFile? TryReadIndex(WorkspaceProfile profile, out string? error)
+    {
+        try
+        {
+            error = null;
+            return NoteIndexStore.Load(profile);
+        }
+        catch (NoteIndexCorruptException ex)
+        {
+            error = ex.Message;
+            return null;
+        }
     }
 }
