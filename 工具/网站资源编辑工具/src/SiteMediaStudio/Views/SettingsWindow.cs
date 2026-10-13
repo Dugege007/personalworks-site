@@ -23,7 +23,9 @@ public sealed class SettingsWindow : Window
     private readonly Action? mWatchChanged;
     private readonly Action? mThresholdsChanged;
     private readonly WorkspaceProfile? mProfile;
+    private readonly TextBlock mSettingsStatus = new();
     private bool mThresholdSaveBlocked;
+    private bool mSettingsSaveBlocked;
 
     private SettingsWindow(
         Action clearCache,
@@ -84,6 +86,11 @@ public sealed class SettingsWindow : Window
         root.Children.Add(buttons);
 
         var body = new StackPanel();
+        mSettingsStatus.TextWrapping = TextWrapping.Wrap;
+        mSettingsStatus.Margin = new Thickness(0, 0, 0, 12);
+        mSettingsStatus.Visibility = Visibility.Collapsed;
+        body.Children.Add(mSettingsStatus);
+        WarnIfSettingsFileCorrupt();
         AddThumbnailSection(body);
         AddNoteImageSection(body);
         AddExternalProgramSection(body);
@@ -149,7 +156,8 @@ public sealed class SettingsWindow : Window
             Content = "投放箱变更时自动刷新编目",
             IsChecked = mSettings.WatchStageEnabled,
             Margin = new Thickness(0, 8, 0, 0),
-            Foreground = BrushCache.Text
+            Foreground = BrushCache.Text,
+            IsEnabled = !mSettingsSaveBlocked
         };
         watchBox.Checked += (_, _) => SetWatch(true);
         watchBox.Unchecked += (_, _) => SetWatch(false);
@@ -190,7 +198,8 @@ public sealed class SettingsWindow : Window
             Content = "压缩时去掉 GPS 位置（默认开）",
             IsChecked = mSettings.StripGpsEnabled,
             Margin = new Thickness(0, 8, 0, 0),
-            Foreground = BrushCache.Text
+            Foreground = BrushCache.Text,
+            IsEnabled = !mSettingsSaveBlocked
         };
         stripGps.Checked += (_, _) => SetStripGps(true);
         stripGps.Unchecked += (_, _) => SetStripGps(false);
@@ -200,7 +209,8 @@ public sealed class SettingsWindow : Window
             Content = "压缩时保留拍摄参数（默认开）",
             IsChecked = mSettings.KeepCaptureParamsEnabled,
             Margin = new Thickness(0, 8, 0, 0),
-            Foreground = BrushCache.Text
+            Foreground = BrushCache.Text,
+            IsEnabled = !mSettingsSaveBlocked
         };
         keepParams.Checked += (_, _) => SetKeepCaptureParams(true);
         keepParams.Unchecked += (_, _) => SetKeepCaptureParams(false);
@@ -344,12 +354,70 @@ public sealed class SettingsWindow : Window
     }
 
     /// <summary>
+    /// 本机设置无法解析时提示用户，并禁止把内存里的值写回原文件。
+    /// </summary>
+    private void WarnIfSettingsFileCorrupt()
+    {
+        try
+        {
+            AppSettingsStore.Load();
+        }
+        catch (AppSettingsException ex)
+        {
+            mSettingsSaveBlocked = true;
+            ShowSettingsStatus(ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// 在窗口顶部显示本机设置错误。
+    /// </summary>
+    private void ShowSettingsStatus(string message)
+    {
+        mSettingsStatus.Text = message;
+        mSettingsStatus.Foreground = BrushCache.Oxide;
+        mSettingsStatus.Visibility = Visibility.Visible;
+    }
+
+    /// <summary>
+    /// 写回本机设置。文件损坏时提示并拒绝覆盖。
+    /// </summary>
+    private bool TrySaveSettings()
+    {
+        if (mSettingsSaveBlocked)
+        {
+            return false;
+        }
+
+        try
+        {
+            AppSettingsStore.Save(mSettings);
+            return true;
+        }
+        catch (AppSettingsException ex)
+        {
+            mSettingsSaveBlocked = true;
+            ShowSettingsStatus(ex.Message);
+            return false;
+        }
+    }
+
+    /// <summary>
     /// 写入自动刷新开关并立即套用监视。
     /// </summary>
     private void SetWatch(bool enabled)
     {
+        if (mSettingsSaveBlocked)
+        {
+            return;
+        }
+
         mSettings.WatchStageChanges = enabled;
-        AppSettingsStore.Save(mSettings);
+        if (!TrySaveSettings())
+        {
+            return;
+        }
+
         mWatchChanged?.Invoke();
     }
 
@@ -358,8 +426,13 @@ public sealed class SettingsWindow : Window
     /// </summary>
     private void SetStripGps(bool enabled)
     {
+        if (mSettingsSaveBlocked)
+        {
+            return;
+        }
+
         mSettings.StripGps = enabled;
-        AppSettingsStore.Save(mSettings);
+        TrySaveSettings();
     }
 
     /// <summary>
@@ -367,8 +440,13 @@ public sealed class SettingsWindow : Window
     /// </summary>
     private void SetKeepCaptureParams(bool enabled)
     {
+        if (mSettingsSaveBlocked)
+        {
+            return;
+        }
+
         mSettings.KeepCaptureParams = enabled;
-        AppSettingsStore.Save(mSettings);
+        TrySaveSettings();
     }
 
     /// <summary>
@@ -377,6 +455,11 @@ public sealed class SettingsWindow : Window
     private void BindToolPath(TextBox box, Func<string?> read, Action<string?> write)
     {
         box.Text = read() ?? "";
+        if (mSettingsSaveBlocked)
+        {
+            box.IsEnabled = false;
+        }
+
         box.LostFocus += (_, _) =>
         {
             var next = box.Text.Trim();
@@ -387,7 +470,7 @@ public sealed class SettingsWindow : Window
             }
 
             write(value);
-            AppSettingsStore.Save(mSettings);
+            TrySaveSettings();
         };
     }
 

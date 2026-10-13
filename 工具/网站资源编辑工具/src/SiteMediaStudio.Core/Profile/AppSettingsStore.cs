@@ -113,7 +113,7 @@ public static class AppSettingsStore
     }
 
     /// <summary>
-    /// 读取本机设置。文件不存在时返回默认值。
+    /// 读取本机设置。文件不存在时返回默认值。文件存在但无法解析时抛出异常。
     /// </summary>
     public static AppSettings Load()
     {
@@ -121,7 +121,7 @@ public static class AppSettingsStore
     }
 
     /// <summary>
-    /// 读取指定设置文件。文件不存在时返回默认值。
+    /// 读取指定设置文件。文件不存在时返回默认值。内容无法解析时抛出带路径的异常。
     /// </summary>
     public static AppSettings Load(string path)
     {
@@ -132,17 +132,22 @@ public static class AppSettingsStore
 
         try
         {
-            return JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(path), JsonUtil.Options)
-                ?? new AppSettings();
+            var settings = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(path), JsonUtil.Options);
+            if (settings == null)
+            {
+                throw new AppSettingsException(path, "文件内容不是一份设置对象。");
+            }
+
+            return settings;
         }
-        catch (JsonException)
+        catch (JsonException ex)
         {
-            return new AppSettings();
+            throw new AppSettingsException(path, "文件内容不是合法的 JSON。", ex);
         }
     }
 
     /// <summary>
-    /// 写回本机设置。先写同目录临时文件，再替换原文件。
+    /// 写回本机设置。原文件无法解析时拒绝写入。先写同目录临时文件，再替换原文件。
     /// </summary>
     public static void Save(AppSettings settings)
     {
@@ -150,10 +155,40 @@ public static class AppSettingsStore
     }
 
     /// <summary>
-    /// 把设置写到指定路径。先写同目录临时文件，再替换原文件。
+    /// 把设置写到指定路径。原文件无法解析时拒绝写入，避免用新内容覆盖损坏的设置。
     /// </summary>
     public static void Save(AppSettings settings, string path)
     {
+        if (File.Exists(path))
+        {
+            Load(path);
+        }
+
         AtomicTextFile.Write(path, JsonSerializer.Serialize(settings, JsonUtil.Options));
+    }
+}
+
+/// <summary>
+/// 本机设置文件存在，但内容无法解析。此时禁止写入，以免损坏的设置被覆盖。
+/// </summary>
+public sealed class AppSettingsException : InvalidOperationException
+{
+    /// <summary>
+    /// 界面展示的固定说明。完整异常信息在此之后附上文件路径和原因。
+    /// </summary>
+    public const string DisplayText = "本机设置损坏，请先修复，工具不会用默认值覆盖它";
+
+    /// <summary>
+    /// 无法解析的设置文件路径。
+    /// </summary>
+    public string ConfigPath { get; }
+
+    /// <summary>
+    /// 用文件路径和原因说明本机设置已损坏。
+    /// </summary>
+    public AppSettingsException(string configPath, string reason, Exception? inner = null)
+        : base(DisplayText + "：" + configPath + "。" + reason, inner)
+    {
+        ConfigPath = configPath;
     }
 }

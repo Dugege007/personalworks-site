@@ -25,6 +25,11 @@ public sealed class ShellViewModel : ViewModelBase
     private ObservableCollection<MediaCardViewModel> mCards = new();
     private ObservableCollection<CompareRowViewModel> mCompareRows = new();
     private readonly AppSettings mSettings;
+
+    /// <summary>
+    /// 本机设置文件无法解析时的完整说明。文件不存在或可以解析时为空。
+    /// </summary>
+    public string? SettingsFileError { get; private set; }
     private WorkspaceSession? mSession;
     private NavNodeViewModel? mSelectedNav;
     private NavNodeViewModel? mNavSelectAnchor;
@@ -117,7 +122,17 @@ public sealed class ShellViewModel : ViewModelBase
 
     public ShellViewModel()
     {
-        mSettings = AppSettingsStore.Load();
+        try
+        {
+            mSettings = AppSettingsStore.Load();
+        }
+        catch (AppSettingsException ex)
+        {
+            mSettings = new AppSettings();
+            SettingsFileError = ex.Message;
+            StatusText = ex.Message;
+        }
+
         ToolExeStore.FillKnown(mSettings);
         mGridSort = GridSortState.FromPreferences(mSettings.GridSort);
         mThumbnailPx = mSettings.ThumbnailPx > 0 ? Math.Clamp(mSettings.ThumbnailPx, 120, 480) : 240;
@@ -358,7 +373,7 @@ public sealed class ShellViewModel : ViewModelBase
 
             mMode = mode;
             mSettings.ExecutionMode = mode == ExecutionMode.Direct ? "direct" : "prompt";
-            AppSettingsStore.Save(mSettings);
+            TrySaveSettings();
             Raise(nameof(IsPromptMode));
             Raise(nameof(ModeCaption));
             ExecuteCommand.RaiseCanExecute();
@@ -713,7 +728,7 @@ public sealed class ShellViewModel : ViewModelBase
             }
 
             mSettings.ThumbnailPx = clamped;
-            AppSettingsStore.Save(mSettings);
+            TrySaveSettings();
             Raise(nameof(CardWidth));
             Raise(nameof(CardImageHeight));
             Raise(nameof(CardCellWidth));
@@ -1517,7 +1532,7 @@ public sealed class ShellViewModel : ViewModelBase
 
             mSession = session;
             mSettings.LastProfilePath = mSession.Profile.ProfilePath;
-            AppSettingsStore.Save(mSettings);
+            TrySaveSettings();
             MarkDraftStore.PruneMissing(mSession.Profile, mSession);
             WorkspaceTitle = $"网站资源编辑工具  ·  {mSession.Profile.Name}";
             mDeferCardFill = false;
@@ -1669,7 +1684,7 @@ public sealed class ShellViewModel : ViewModelBase
         }
 
         NavExpandStore.WriteCollapsed(mSettings, mSession.Profile.ProfilePath, NavTreeSync.CaptureCollapsed(NavNodes));
-        AppSettingsStore.Save(mSettings);
+        TrySaveSettings();
     }
 
     /// <summary>
@@ -2178,7 +2193,7 @@ public sealed class ShellViewModel : ViewModelBase
     private void CommitGridSort()
     {
         mSettings.GridSort = mGridSort.ToPreferences();
-        AppSettingsStore.Save(mSettings);
+        TrySaveSettings();
         SyncGridSortOptions();
         ApplyGridSort();
         RequestViewportThumbnails();
@@ -2398,6 +2413,22 @@ public sealed class ShellViewModel : ViewModelBase
             new(GridSortKey.Stars, () => ToggleGridSort(GridSortKey.Stars), () => FlipGridSort(GridSortKey.Stars)),
             new(GridSortKey.Size, () => ToggleGridSort(GridSortKey.Size), () => FlipGridSort(GridSortKey.Size))
         };
+    }
+
+    /// <summary>
+    /// 写回本机设置。文件损坏时拒绝覆盖，并把说明留在底栏，避免设置操作把程序打断。
+    /// </summary>
+    private void TrySaveSettings()
+    {
+        try
+        {
+            AppSettingsStore.Save(mSettings);
+        }
+        catch (AppSettingsException ex)
+        {
+            SettingsFileError = ex.Message;
+            StatusText = ex.Message;
+        }
     }
 
     /// <summary>
@@ -3896,7 +3927,7 @@ public sealed class ShellViewModel : ViewModelBase
         mSettings.LastChannel = mSelectedNav.Channel.Key;
         mSettings.LastWorkId = mSelectedNav.Work?.Id;
         mSettings.LastUnregisteredGroup = mSelectedNav.IsUnregisteredGroup;
-        AppSettingsStore.Save(mSettings);
+        TrySaveSettings();
     }
 
     /// <summary>

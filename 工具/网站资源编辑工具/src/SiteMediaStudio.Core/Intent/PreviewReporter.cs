@@ -144,14 +144,21 @@ public static class PreviewReporter
                 && stage != null
                 && VideoEncodeRules.NeedsEncode(stage, session.Profile))
             {
-                var settings = AppSettingsStore.Load();
-                if (!VideoEncodeRules.TryAudioBitrate(settings.VideoAudioBitrateKbps, out _, out var bitrateText))
+                try
                 {
-                    decision = GateDecision.Reject(bitrateText ?? "音频码率不在允许范围。");
+                    var settings = AppSettingsStore.Load();
+                    if (!VideoEncodeRules.TryAudioBitrate(settings.VideoAudioBitrateKbps, out _, out var bitrateText))
+                    {
+                        decision = GateDecision.Reject(bitrateText ?? "音频码率不在允许范围。");
+                    }
+                    else if (!VideoEncoderHost.CanEncode(settings))
+                    {
+                        decision = GateDecision.Reject(VideoEncodeRules.MissingEncoderMessage);
+                    }
                 }
-                else if (!VideoEncoderHost.CanEncode(settings))
+                catch (AppSettingsException ex)
                 {
-                    decision = GateDecision.Reject(VideoEncodeRules.MissingEncoderMessage);
+                    decision = GateDecision.Reject(ex.Message);
                 }
             }
 

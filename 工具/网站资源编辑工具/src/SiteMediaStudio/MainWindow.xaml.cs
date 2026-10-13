@@ -137,6 +137,11 @@ public partial class MainWindow : Window
     {
         mViewModel.Start(App.ProfileArg);
         SelectLoadedNav();
+        var settingsError = mViewModel.SettingsFileError;
+        if (!string.IsNullOrEmpty(settingsError))
+        {
+            Dispatcher.BeginInvoke(() => TextDialog.Show(AppSettingsException.DisplayText, settingsError));
+        }
     }
 
     /// <summary>
