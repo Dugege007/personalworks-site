@@ -143,6 +143,60 @@ public sealed class NoteImageAuditTests
     }
 
     [Fact]
+    public void Inspect_ListsReferencesOutsideTheNoteFolder()
+    {
+        var folder = CreateNoteFolder();
+        var sibling = Path.Combine(Path.GetDirectoryName(folder)!, "other");
+        Directory.CreateDirectory(sibling);
+        WriteSized(Path.Combine(sibling, "a.png"), 1);
+        WriteSized(Path.Combine(folder, "kept.png"), 1);
+        WriteBody(folder, """
+            # 一篇
+
+            ![外](../other/a.png)
+            ![根](/other/a.png)
+            ![折](图/../gone.png)
+            ![有](kept.png)
+            """);
+
+        var report = NoteImageAudit.Inspect(folder, NoteImageLimits.CreateDefault());
+
+        Assert.Equal(new[] { "../other/a.png", "/other/a.png" }, report.OutsideList.Select(item => item.Reference).ToArray());
+        Assert.Equal(new[] { "gone.png" }, report.MissingList.Select(item => item.RelativePath).ToArray());
+        Assert.Equal(2, report.OutsideCount);
+        Assert.True(report.BlocksPublish);
+        Assert.Equal("图/../gone.png", Assert.Single(report.MissingList).Reference);
+    }
+
+    [Fact]
+    public void Inspect_KeepsIncompletePercentEncodingAsALiteralName()
+    {
+        var folder = CreateNoteFolder();
+        WriteSized(Path.Combine(folder, "a%2.png"), 1);
+        WriteBody(folder, """
+            # 一篇
+
+            ![坏](a%2.png)
+            ![缺](gone.png)
+            ![再坏](b%2.png)
+            """);
+
+        var present = NoteImageAudit.Inspect(folder, NoteImageLimits.CreateDefault());
+
+        Assert.Equal(new[] { "gone.png", "b%2.png" }, present.MissingList.Select(item => item.RelativePath).ToArray());
+        Assert.Equal(new[] { "gone.png", "b%2.png" }, present.MissingList.Select(item => item.Reference).ToArray());
+        Assert.DoesNotContain(present.MissingList, item => item.Reference == "a%2.png");
+        Assert.Empty(present.OutsideList);
+
+        File.Delete(Path.Combine(folder, "a%2.png"));
+        var absent = NoteImageAudit.Inspect(folder, NoteImageLimits.CreateDefault());
+        Assert.Equal(
+            new[] { "a%2.png", "gone.png", "b%2.png" },
+            absent.MissingList.Select(item => item.RelativePath).ToArray());
+        Assert.Equal(3, absent.MissingCount);
+    }
+
+    [Fact]
     public void Inspect_ReadsThresholdsFromSharedLimitsFile()
     {
         var directory = TempDir();

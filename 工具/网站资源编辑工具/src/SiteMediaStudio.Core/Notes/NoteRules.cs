@@ -668,9 +668,9 @@ public static class NoteRules
 
     private static NoteImageRef ResolveRef(string folderFullPath, string raw)
     {
-        var target = raw.Trim();
-        if (target.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
-            || target.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        var location = NoteImageLocation.Resolve(folderFullPath, raw);
+        var target = location.Reference;
+        if (location.Kind == NoteImageLocationKind.Remote)
         {
             if (IsGifExtension(target))
             {
@@ -680,32 +680,28 @@ public static class NoteRules
             return new NoteImageRef(target, true, "");
         }
 
-        var decoded = Uri.UnescapeDataString(target);
-        var full = Path.GetFullPath(Path.Combine(folderFullPath, decoded.Replace('/', Path.DirectorySeparatorChar)));
-        var folder = Path.GetFullPath(folderFullPath);
-        if (!full.StartsWith(folder + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
-            && !string.Equals(full, folder, StringComparison.OrdinalIgnoreCase))
+        if (location.Kind == NoteImageLocationKind.Outside)
         {
             throw new BlockingFileException(OutsideFolderPrefix + target, target);
         }
 
-        if (IsGifExtension(full))
+        if (IsGifExtension(location.FullPath))
         {
             throw new BlockingFileException(GifPublishRejectedPrefix + target, target);
         }
 
-        if (!File.Exists(full))
+        if (!File.Exists(location.FullPath))
         {
             throw new BlockingFileException(MissingImagePrefix + target, target);
         }
 
-        var ext = Path.GetExtension(full);
+        var ext = Path.GetExtension(location.FullPath);
         if (!PublishImageExtSet.Contains(ext))
         {
             throw new BlockingFileException(UnpublishableReferencePrefix + target, target);
         }
 
-        return new NoteImageRef(target, false, full);
+        return new NoteImageRef(target, false, location.FullPath);
     }
 
     private static string RewriteBody(
@@ -737,16 +733,14 @@ public static class NoteRules
         Dictionary<string, string> objectBySource,
         List<string> preview)
     {
-        if (raw.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
-            || raw.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        var location = NoteImageLocation.Resolve(folderFullPath, raw);
+        if (location.Kind == NoteImageLocationKind.Remote)
         {
             return raw;
         }
 
-        var full = Path.GetFullPath(Path.Combine(
-            folderFullPath,
-            Uri.UnescapeDataString(raw).Replace('/', Path.DirectorySeparatorChar)));
-        if (!objectBySource.TryGetValue(full, out var objectKey))
+        if (location.Kind != NoteImageLocationKind.Inside
+            || !objectBySource.TryGetValue(location.FullPath, out var objectKey))
         {
             throw new BlockingFileException(NotChosenPrefix + raw, raw);
         }

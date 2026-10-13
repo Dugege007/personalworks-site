@@ -1,7 +1,7 @@
 namespace PersonalWorks.SiteMediaStudio.Core;
 
 /// <summary>
-/// 只读检查一篇心得的配图：哪些超过大小上限，哪些被正文引用但文件不存在。
+/// 只读检查一篇心得的配图：哪些超过大小上限，哪些被正文引用但文件不存在，哪些引用落到笔记文件夹外面。
 /// 不修改投放箱，也不改变上页预演。上页预演仍然在第一张有问题的引用处停止。
 /// </summary>
 public static class NoteImageAudit
@@ -35,10 +35,12 @@ public static class NoteImageAudit
         }
 
         var folder = Path.GetFullPath(folderFullPath);
+        var references = ListReferences(folder, ReadBody(folder));
         return new NoteImageAuditReport
         {
             OverLimitList = ListOverLimit(folder, limits),
-            MissingList = ListMissing(folder, ReadBody(folder))
+            MissingList = references.MissingList,
+            OutsideList = references.OutsideList
         };
     }
 
@@ -86,42 +88,59 @@ public static class NoteImageAudit
     }
 
     /// <summary>
-    /// 列出正文引用了但文件不存在的全部配图。遇到缺失不会停，远程地址不算缺失。
+    /// 列出正文里的缺失配图，以及落到笔记文件夹外面的引用。
+    /// 遇到问题不会停。远程地址两者都不算。文件夹外的引用即使文件不存在，也不再记成缺失。
     /// </summary>
-    private static List<NoteMissingImage> ListMissing(string folderFullPath, string body)
+    private static (List<NoteMissingImage> MissingList, List<NoteOutsideReference> OutsideList) ListReferences(
+        string folderFullPath,
+        string body)
     {
         var missingList = new List<NoteMissingImage>();
-        var seenFullPathSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var outsideList = new List<NoteOutsideReference>();
+        var seenMissingSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var seenOutsideSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var raw in NoteRules.ListImageTargets(body))
         {
-            if (!TryResolveStoredImage(folderFullPath, raw, out var reference, out var fullPath, out var relativePath))
+            NoteImageLocation location;
+            try
+            {
+                location = NoteImageLocation.Resolve(folderFullPath, raw);
+            }
+            catch (Exception exception) when (exception is ArgumentException or NotSupportedException)
             {
                 continue;
             }
 
-            if (MediaPathRules.IsNoteAuxiliaryRel(relativePath))
+            if (location.Kind == NoteImageLocationKind.Outside)
             {
+                if (seenOutsideSet.Add(location.FullPath))
+                {
+                    outsideList.Add(new NoteOutsideReference
+                    {
+                        Reference = location.Reference
+                    });
+                }
+
                 continue;
             }
 
-            if (File.Exists(fullPath))
-            {
-                continue;
-            }
-
-            if (!seenFullPathSet.Add(fullPath))
+            if (location.Kind != NoteImageLocationKind.Inside
+                || MediaPathRules.IsNoteAuxiliaryRel(location.RelativePath)
+                || !IsStoredImageReference(location.Reference)
+                || File.Exists(location.FullPath)
+                || !seenMissingSet.Add(location.FullPath))
             {
                 continue;
             }
 
             missingList.Add(new NoteMissingImage
             {
-                Reference = reference,
-                RelativePath = relativePath
+                Reference = location.Reference,
+                RelativePath = location.RelativePath
             });
         }
 
-        return missingList;
+        return (missingList, outsideList);
     }
 
     /// <summary>
@@ -145,49 +164,6 @@ public static class NoteImageAudit
     }
 
     /// <summary>
-    /// 把正文里的一个地址解析成笔记文件夹内的配图。远程地址，以及不是配图的地址，返回假。
-    /// </summary>
-    private static bool TryResolveStoredImage(
-        string folderFullPath,
-        string raw,
-        out string reference,
-        out string fullPath,
-        out string relativePath)
-    {
-        reference = raw.Trim();
-        fullPath = "";
-        relativePath = "";
-        if (reference.Length == 0 || IsRemote(reference) || !IsStoredImageReference(reference))
-        {
-            return false;
-        }
-
-        var decoded = DecodeReference(reference);
-        try
-        {
-            fullPath = Path.GetFullPath(Path.Combine(
-                folderFullPath,
-                decoded.Replace('/', Path.DirectorySeparatorChar)));
-        }
-        catch (Exception exception) when (exception is ArgumentException or NotSupportedException)
-        {
-            return false;
-        }
-
-        relativePath = JsonUtil.ToRel(Path.GetRelativePath(folderFullPath, fullPath));
-        return true;
-    }
-
-    /// <summary>
-    /// 地址是否为网页链接。这类地址不在本机查找文件。
-    /// </summary>
-    private static bool IsRemote(string reference)
-    {
-        return reference.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
-            || reference.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
-    }
-
-    /// <summary>
     /// 地址是否属于心得允许存放的配图。判断扩展名时去掉网址里的查询参数和片段，并且不区分大小写。
     /// </summary>
     private static bool IsStoredImageReference(string reference)
@@ -202,21 +178,6 @@ public static class NoteImageAudit
         }
 
         return NoteRules.StoredImageExtSet.Contains(Path.GetExtension(text));
-    }
-
-    /// <summary>
-    /// 还原地址里的百分号编码。编码不完整时保留原文，避免一张坏引用挡住后面的缺失配图。
-    /// </summary>
-    private static string DecodeReference(string reference)
-    {
-        try
-        {
-            return Uri.UnescapeDataString(reference);
-        }
-        catch (UriFormatException)
-        {
-            return reference;
-        }
     }
 }
 
@@ -236,6 +197,11 @@ public sealed class NoteImageAuditReport
     public IReadOnlyList<NoteMissingImage> MissingList { get; init; } = Array.Empty<NoteMissingImage>();
 
     /// <summary>
+    /// 正文引用落到笔记文件夹外面的地址，按正文中第一次出现的顺序排列。同一路径只列一次。
+    /// </summary>
+    public IReadOnlyList<NoteOutsideReference> OutsideList { get; init; } = Array.Empty<NoteOutsideReference>();
+
+    /// <summary>
     /// 超限配图的张数。
     /// </summary>
     public int OverLimitCount => OverLimitList.Count;
@@ -244,6 +210,16 @@ public sealed class NoteImageAuditReport
     /// 缺失配图的张数。
     /// </summary>
     public int MissingCount => MissingList.Count;
+
+    /// <summary>
+    /// 落到笔记文件夹外面的引用条数。
+    /// </summary>
+    public int OutsideCount => OutsideList.Count;
+
+    /// <summary>
+    /// 有缺失配图或文件夹外引用时，这篇笔记不能上页。超限本身不禁止上页。
+    /// </summary>
+    public bool BlocksPublish => MissingCount > 0 || OutsideCount > 0;
 }
 
 /// <summary>
@@ -286,4 +262,15 @@ public sealed class NoteMissingImage
     /// 相对这篇笔记文件夹的路径。子文件夹会保留，供界面列出文件名。
     /// </summary>
     public string RelativePath { get; init; } = "";
+}
+
+/// <summary>
+/// 正文引用了笔记文件夹外面的一张图片。文件是否存在都不改变这一分类。
+/// </summary>
+public sealed class NoteOutsideReference
+{
+    /// <summary>
+    /// 正文里写下的地址。
+    /// </summary>
+    public string Reference { get; init; } = "";
 }

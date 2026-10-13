@@ -127,6 +127,47 @@ public sealed class NoteRulesTests
     }
 
     [Fact]
+    public void Plan_RejectsAbsoluteReferenceOutsideTheNoteFolder()
+    {
+        var stage = TempDir();
+        var folder = Path.Combine(stage, "心得（notes）", "20261005_125603");
+        Directory.CreateDirectory(folder);
+        WriteNote(folder, "hello", "# 一篇\n\n![外](/other/a.png)\n");
+
+        var plan = NoteRules.Plan(folder, stage, new NoteIndexFile(), null, null);
+
+        Assert.False(plan.Ok);
+        Assert.Equal(NoteRules.OutsideFolderPrefix + "/other/a.png", plan.Error);
+        Assert.Equal("/other/a.png", plan.BlockingReference);
+    }
+
+    [Fact]
+    public void Plan_TreatsIncompletePercentEncodingAsTheLiteralFileName()
+    {
+        var stage = TempDir();
+        var folder = Path.Combine(stage, "心得（notes）", "20261005_125603");
+        Directory.CreateDirectory(folder);
+        WriteNote(folder, "hello", "# 一篇\n\n![坏](a%2.png)\n![缺](gone.png)\n");
+
+        var missing = NoteRules.Plan(folder, stage, new NoteIndexFile(), null, null);
+
+        Assert.False(missing.Ok);
+        Assert.Equal(NoteRules.MissingImagePrefix + "a%2.png", missing.Error);
+        Assert.Equal("a%2.png", missing.BlockingReference);
+        Assert.DoesNotContain("gone.png", missing.Error, StringComparison.Ordinal);
+
+        File.WriteAllBytes(Path.Combine(folder, "a%2.png"), TinyPng);
+        File.WriteAllBytes(Path.Combine(folder, "a b.png"), TinyPng);
+        WriteNote(folder, "hello", "# 一篇\n\n见 ![用](a%20b.png)\n![坏](a%2.png)\n");
+        var plan = NoteRules.Plan(folder, stage, new NoteIndexFile(), null, null);
+        Assert.True(plan.Ok, plan.Error);
+        Assert.Contains("![用](notes/hello/a b.webp)", plan.RewrittenMarkdown, StringComparison.Ordinal);
+        Assert.Contains("![坏](notes/hello/a%2.webp)", plan.RewrittenMarkdown, StringComparison.Ordinal);
+        Assert.DoesNotContain("a%20b.png", plan.RewrittenMarkdown, StringComparison.Ordinal);
+        Assert.DoesNotContain("%2.png)", plan.RewrittenMarkdown, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void Plan_StillStopsAtTheFirstMissingImage()
     {
         var stage = TempDir();
