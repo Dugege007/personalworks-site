@@ -25,7 +25,22 @@ internal sealed class VideoFrameGrabber : IDisposable
         !string.IsNullOrWhiteSpace(mSourcePath)
         && DurationSec > 0
         && ((mPlayer != null && NaturalWidth > 0)
-            || FfmpegFrameExtractor.ResolveFfmpeg(AppSettingsStore.Load().FfmpegPath) != null);
+            || FfmpegFrameExtractor.ResolveFfmpeg(ReadFfmpegPath()) != null);
+
+    /// <summary>
+    /// 读取本机设置中的 FFmpeg 路径。设置文件损坏时返回空，避免取帧把窗口打断，也不会改写损坏的文件。
+    /// </summary>
+    private static string? ReadFfmpegPath()
+    {
+        try
+        {
+            return AppSettingsStore.Load().FfmpegPath;
+        }
+        catch (AppSettingsException)
+        {
+            return null;
+        }
+    }
 
     /// <summary>
     /// 打开片源并读取时长。失败返回 false。
@@ -45,7 +60,7 @@ internal sealed class VideoFrameGrabber : IDisposable
         }
 
         var duration = VideoEncodeClient.TryReadDurationSec(path);
-        if (duration is > 0 && FfmpegFrameExtractor.ResolveFfmpeg(AppSettingsStore.Load().FfmpegPath) != null)
+        if (duration is > 0 && FfmpegFrameExtractor.ResolveFfmpeg(ReadFfmpegPath()) != null)
         {
             DurationSec = duration.Value;
             return CanSeek;
@@ -68,7 +83,7 @@ internal sealed class VideoFrameGrabber : IDisposable
         var clamped = Math.Clamp(positionSec, 0, DurationSec);
         var generation = Interlocked.Increment(ref mGrabGeneration);
         var path = mSourcePath;
-        var ffmpegPath = AppSettingsStore.Load().FfmpegPath;
+        var ffmpegPath = ReadFfmpegPath();
         byte[]? jpegBytes = null;
         try
         {

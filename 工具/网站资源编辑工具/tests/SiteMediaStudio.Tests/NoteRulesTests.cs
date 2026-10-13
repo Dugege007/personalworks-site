@@ -228,17 +228,21 @@ public sealed class NoteRulesTests
         Assert.False(inFolder.Ok);
         Assert.Contains(NoteRules.GifPublishRejectedMessage, inFolder.Error, StringComparison.Ordinal);
         Assert.DoesNotContain("不能上页的文件", inFolder.Error, StringComparison.Ordinal);
+        Assert.Equal("shot.GIF", inFolder.BlockingReference);
+        Assert.StartsWith(NoteRules.GifPublishRejectedPrefix, inFolder.Error, StringComparison.Ordinal);
 
         File.Delete(Path.Combine(folder, "shot.GIF"));
         WriteNote(folder, "hello", "# 一篇\n\n![动图](missing.GIF)\n");
         var missing = NoteRules.Plan(folder, stage, new NoteIndexFile(), null, null);
         Assert.False(missing.Ok);
         Assert.Contains(NoteRules.GifPublishRejectedMessage, missing.Error, StringComparison.Ordinal);
+        Assert.Equal("missing.GIF", missing.BlockingReference);
 
         WriteNote(folder, "hello", "# 一篇\n\n![外链](https://example.com/a.gif?v=1)\n");
         var remote = NoteRules.Plan(folder, stage, new NoteIndexFile(), null, null);
         Assert.False(remote.Ok);
         Assert.Contains(NoteRules.GifPublishRejectedMessage, remote.Error, StringComparison.Ordinal);
+        Assert.Equal("https://example.com/a.gif?v=1", remote.BlockingReference);
 
         var originals = Path.Combine(folder, NoteRules.OriginalsDirName, "图");
         var upperOriginals = Path.Combine(folder, ".Originals");
@@ -255,10 +259,58 @@ public sealed class NoteRulesTests
         WriteNote(folder, "hello", "# 一篇\n\n![用](used.PNG)\n");
         var plan = NoteRules.Plan(folder, stage, new NoteIndexFile(), null, null);
         Assert.True(plan.Ok, plan.Error);
+        Assert.Equal("", plan.BlockingReference);
         Assert.Single(plan.Images);
         Assert.EndsWith("used.PNG", plan.Images[0].SourceStageRel, StringComparison.Ordinal);
         Assert.DoesNotContain(plan.Images, item => item.ObjectKey.Contains(".originals", StringComparison.OrdinalIgnoreCase));
         Assert.DoesNotContain(plan.Images, item => item.SourceStageRel.Contains(".originals", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Plan_ReturnsRelativeBlockingReference_ForNestedGifAndVideo()
+    {
+        var stage = TempDir();
+        var folder = Path.Combine(stage, "心得（notes）", "20261005_125603");
+        Directory.CreateDirectory(Path.Combine(folder, "sub"));
+        File.WriteAllBytes(Path.Combine(folder, "sub", "deep.gif"), TinyPng);
+        WriteNote(folder, "hello", "# 一篇\n\n文字\n");
+
+        var gif = NoteRules.Plan(folder, stage, new NoteIndexFile(), null, null);
+        Assert.False(gif.Ok);
+        Assert.Equal("sub/deep.gif", gif.BlockingReference);
+        Assert.Equal(NoteRules.GifPublishRejectedPrefix + "sub/deep.gif", gif.Error);
+
+        File.Delete(Path.Combine(folder, "sub", "deep.gif"));
+        File.WriteAllBytes(Path.Combine(folder, "sub", "clip.mp4"), new byte[] { 0 });
+        var video = NoteRules.Plan(folder, stage, new NoteIndexFile(), null, null);
+        Assert.Equal("sub/clip.mp4", video.BlockingReference);
+        Assert.Equal(NoteRules.BlockedInFolderPrefix + "sub/clip.mp4", video.Error);
+    }
+
+    [Fact]
+    public void Plan_BlockingReference_IsEmptyWhenRejectionIsNotAFile()
+    {
+        var stage = TempDir();
+        var folder = Path.Combine(stage, "心得（notes）", "20261005_125603");
+        Directory.CreateDirectory(folder);
+        var plan = NoteRules.Plan(folder, stage, new NoteIndexFile(), null, null);
+        Assert.False(plan.Ok);
+        Assert.Equal("", plan.BlockingReference);
+    }
+
+    [Fact]
+    public void RelativeToNoteFolder_KeepsSubdirectory()
+    {
+        Assert.Equal(
+            "sub/deep.gif",
+            NoteRules.RelativeToNoteFolder("心得（notes）/20261005_125603/sub/deep.gif", "20261005_125603"));
+        Assert.Equal(
+            "deep.gif",
+            NoteRules.RelativeToNoteFolder("心得（notes）/20261005_125603/deep.gif", "20261005_125603"));
+        Assert.Equal("deep.gif", NoteRules.RelativeToNoteFolder("sub/deep.gif", null));
+        Assert.Equal(
+            "https://example.com/a.gif?v=1",
+            NoteRules.RelativeToNoteFolder("https://example.com/a.gif?v=1", "20261005_125603"));
     }
 
     [Fact]

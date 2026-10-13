@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "imageMaxBytes": 512000,
+  "gifMaxBytes": 2097152
+}

@@ -144,14 +144,21 @@ public static class PreviewReporter
                 && stage != null
                 && VideoEncodeRules.NeedsEncode(stage, session.Profile))
             {
-                var settings = AppSettingsStore.Load();
-                if (!VideoEncodeRules.TryAudioBitrate(settings.VideoAudioBitrateKbps, out _, out var bitrateText))
+                try
                 {
-                    decision = GateDecision.Reject(bitrateText ?? "音频码率不在允许范围。");
+                    var settings = AppSettingsStore.Load();
+                    if (!VideoEncodeRules.TryAudioBitrate(settings.VideoAudioBitrateKbps, out _, out var bitrateText))
+                    {
+                        decision = GateDecision.Reject(bitrateText ?? "音频码率不在允许范围。");
+                    }
+                    else if (!VideoEncoderHost.CanEncode(settings))
+                    {
+                        decision = GateDecision.Reject(VideoEncodeRules.MissingEncoderMessage);
+                    }
                 }
-                else if (!VideoEncoderHost.CanEncode(settings))
+                catch (AppSettingsException ex)
                 {
-                    decision = GateDecision.Reject(VideoEncodeRules.MissingEncoderMessage);
+                    decision = GateDecision.Reject(ex.Message);
                 }
             }
 
@@ -234,7 +241,7 @@ public static class PreviewReporter
     }
 
     /// <summary>
-    /// 用上页计划替换这一夹的预演行。成功时每张配图一行。失败且原因指向某个文件时，拒绝行改用该文件，其余配图只在原因里标明本身没问题。
+    /// 用上页计划替换这一夹的预演行。成功时每张配图一行。失败且计划返回了导致拒绝的文件时，拒绝行改用该文件，其余配图只在原因里标明本身没问题。
     /// </summary>
     private static List<PreviewLine> BuildNotePublishLines(
         WorkspaceSession session,
@@ -270,13 +277,13 @@ public static class PreviewReporter
         }
 
         var plan = NoteRules.Plan(folderFull, stageRoot, index, marked.Count == 0 ? null : marked, null);
-        if (!plan.Ok && TryReadBlockingReference(plan.Error, out var blocking))
+        if (!plan.Ok && !string.IsNullOrWhiteSpace(plan.BlockingReference))
         {
             return NoteLinesForBlockingFile(
                 body,
                 folderName,
                 channelFolder,
-                blocking,
+                plan.BlockingReference,
                 NoteRules.ListPublishImageStageRels(folderFull, stageRoot),
                 plan.Error);
         }
@@ -318,45 +325,7 @@ public static class PreviewReporter
     }
 
     /// <summary>
-    /// 上页计划用来指出「是哪一个文件导致整篇不能上页」的原因前缀。
-    /// </summary>
-    private static readonly string[] BlockingReferencePrefixes =
-    {
-        NoteRules.GifPublishRejectedMessage + "：",
-        "夹内有不能上页的文件：",
-        "正文引用了不能上页的文件：",
-        "找不到引用的图片：",
-        "图片落在心得夹外：",
-        "正文引用了这次没有上页的图片："
-    };
-
-    /// <summary>
-    /// 从整篇拒绝原因里取出导致拒绝的文件或引用。原因不是这种格式时返回假。
-    /// </summary>
-    private static bool TryReadBlockingReference(string? error, out string reference)
-    {
-        reference = "";
-        if (string.IsNullOrWhiteSpace(error))
-        {
-            return false;
-        }
-
-        foreach (var prefix in BlockingReferencePrefixes)
-        {
-            if (!error.StartsWith(prefix, StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            reference = error[prefix.Length..].Trim();
-            return reference.Length > 0;
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    /// 把导致拒绝的引用写成投放路径，供预演行显示文件名。网址保持原样。
+    /// 把导致拒绝的引用写成投放路径，供预演行显示相对路径。网址保持原样。
     /// </summary>
     private static string BlockingStageRel(string channelFolder, string folderName, string reference)
     {

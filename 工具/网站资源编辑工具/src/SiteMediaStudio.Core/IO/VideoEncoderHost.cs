@@ -46,7 +46,17 @@ public static class VideoEncoderHost
     /// </summary>
     public static VideoEncoderHit? Resolve(AppSettings? settings = null)
     {
-        settings ??= AppSettingsStore.Load();
+        if (settings == null)
+        {
+            try
+            {
+                settings = AppSettingsStore.Load();
+            }
+            catch (AppSettingsException)
+            {
+                return null;
+            }
+        }
         var mediaCoder = ResolveConfiguredCli(settings.MediaCoderPath)
             ?? ResolveExisting(MediaCoderCliPathList)
             ?? FindOnPath(MediaCoderCliNameList);

@@ -63,13 +63,13 @@ public static class PromptRenderer
     }
 
     /// <summary>
-    /// 心得上页的列表目标。配图写出原文件名，正文不显示成图片对象键。
+    /// 心得上页的列表目标。配图写出相对这篇笔记文件夹的路径，子文件夹里的文件带上目录。正文不显示成图片对象键。
     /// </summary>
     private static string NoteIngestTarget(IntentItem item)
     {
         if (!NoteRules.IsBodyStageRel(item.StageRel))
         {
-            var name = Path.GetFileName((item.SourceStageRel ?? item.StageRel)?.Replace('\\', '/'));
+            var name = NoteRules.RelativeToNoteFolder(item.SourceStageRel ?? item.StageRel, item.WorkId);
             if (!string.IsNullOrWhiteSpace(name))
             {
                 return string.IsNullOrWhiteSpace(item.Object) ? name : name + "  " + item.Object;

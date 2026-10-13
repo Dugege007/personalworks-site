@@ -69,13 +69,56 @@ public sealed class NoteIngestPreviewTests
 
         Assert.True(report.HasHardError);
         Assert.Single(rejected);
-        Assert.Contains("anim.gif", rejected[0], StringComparison.Ordinal);
+        Assert.EndsWith("图/anim.gif", rejected[0].TrimEnd(), StringComparison.Ordinal);
+        Assert.DoesNotContain(" anim.gif", rejected[0], StringComparison.Ordinal);
         Assert.DoesNotContain("ok.png", rejected[0], StringComparison.Ordinal);
         Assert.DoesNotContain("b.jpg", rejected[0], StringComparison.Ordinal);
         Assert.EndsWith("图/anim.gif", report.Lines[0].Item.StageRel, StringComparison.Ordinal);
         Assert.Equal(
             "GIF 配图暂不支持上页：图/anim.gif。这个文件导致整篇被拒绝。ok.png、图/b.jpg 本身没问题，因整篇被拒绝而不会上页。",
             report.Lines[0].Decision.Message);
+    }
+
+    [Fact]
+    public void Preview_RejectsGifInSubfolder_ShowsRelativePathOnTheRejectedLine()
+    {
+        using var fixture = new NotePreviewFixture("29990101_000008");
+        fixture.WriteBody("# 一篇\n\n文字\n");
+        fixture.WriteFile("ok.png");
+        fixture.WriteFile("sub/deep.gif");
+
+        var report = fixture.PreviewMarkedBody();
+        var text = PromptRenderer.RenderPreview(report);
+        var rejected = Bullets(text).Where(line => line.Contains("[拒绝]", StringComparison.Ordinal)).ToList();
+
+        Assert.True(report.HasHardError);
+        Assert.Single(rejected);
+        Assert.EndsWith("sub/deep.gif", rejected[0].TrimEnd(), StringComparison.Ordinal);
+        Assert.DoesNotContain(" deep.gif", rejected[0], StringComparison.Ordinal);
+        Assert.DoesNotContain("ok.png", rejected[0], StringComparison.Ordinal);
+        Assert.Contains(NoteRules.GifPublishRejectedMessage, text, StringComparison.Ordinal);
+        Assert.Contains("sub/deep.gif", report.Lines[0].Decision.Message, StringComparison.Ordinal);
+        Assert.EndsWith("sub/deep.gif", report.Lines[0].Item.StageRel, StringComparison.Ordinal);
+        Assert.Contains("ok.png 本身没问题", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Preview_RejectsNestedVideo_ShowsRelativePathNotOnlyFileName()
+    {
+        using var fixture = new NotePreviewFixture("29990101_000009");
+        fixture.WriteBody("# 一篇\n\n文字\n");
+        fixture.WriteFile("ok.png");
+        fixture.WriteFile("sub/clip.mp4");
+
+        var report = fixture.PreviewMarkedBody();
+        var rejected = Bullets(PromptRenderer.RenderPreview(report))
+            .Where(line => line.Contains("[拒绝]", StringComparison.Ordinal))
+            .ToList();
+
+        Assert.Single(rejected);
+        Assert.EndsWith("sub/clip.mp4", rejected[0].TrimEnd(), StringComparison.Ordinal);
+        Assert.DoesNotContain(" clip.mp4", rejected[0], StringComparison.Ordinal);
+        Assert.Contains(NoteRules.BlockedInFolderPrefix + "sub/clip.mp4", report.Lines[0].Decision.Message, StringComparison.Ordinal);
     }
 
     [Fact]

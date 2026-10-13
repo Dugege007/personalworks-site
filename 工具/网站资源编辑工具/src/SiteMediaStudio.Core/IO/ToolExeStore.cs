@@ -27,7 +27,7 @@ public static class ToolExeStore
             value => settings.ExternalPlayerPath = value);
         if (changed)
         {
-            AppSettingsStore.Save(settings);
+            TrySave(settings);
         }
     }
 
@@ -96,7 +96,22 @@ public static class ToolExeStore
     {
         if (Remember(settings, current, found, assign))
         {
+            TrySave(settings);
+        }
+    }
+
+    /// <summary>
+    /// 写回本机设置。文件损坏时拒绝覆盖，避免启动或搜索程序时把窗口打断。
+    /// </summary>
+    private static void TrySave(AppSettings settings)
+    {
+        try
+        {
             AppSettingsStore.Save(settings);
+        }
+        catch (AppSettingsException)
+        {
+            // 设置文件损坏时拒绝覆盖。调用方会提示用户，这里不能把启动或搜索中断。
         }
     }
 }

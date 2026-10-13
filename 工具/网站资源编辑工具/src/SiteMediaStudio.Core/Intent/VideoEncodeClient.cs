@@ -20,7 +20,18 @@ public static class VideoEncodeClient
         AppSettings? settings = null,
         Action<double, string>? onProgress = null)
     {
-        settings ??= AppSettingsStore.Load();
+        if (settings == null)
+        {
+            try
+            {
+                settings = AppSettingsStore.Load();
+            }
+            catch (AppSettingsException ex)
+            {
+                return Fail(ex.Message);
+            }
+        }
+
         if (!VideoEncodeRules.TryAudioBitrate(settings.VideoAudioBitrateKbps, out var audioKbps, out var bitrateText))
         {
             return Fail(bitrateText ?? VideoEncodeRules.MissingEncoderMessage);
