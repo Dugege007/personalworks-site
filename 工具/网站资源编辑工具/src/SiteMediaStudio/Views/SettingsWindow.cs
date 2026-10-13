@@ -310,7 +310,7 @@ public sealed class SettingsWindow : Window
             return;
         }
 
-        ShowThresholdStatus("已写入仓库里的共享配置，并开始重新计算超限状态。", error: false);
+        ShowThresholdStatus("已写入仓库里的共享配置，并开始重新计算超限状态。请记得提交并推送。", error: false);
         mThresholdsChanged?.Invoke();
     }
 
