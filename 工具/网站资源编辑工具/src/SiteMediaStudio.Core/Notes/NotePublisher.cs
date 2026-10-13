@@ -16,7 +16,7 @@ public static class NotePublisher
     public delegate bool IngestImage(string readyStageRel, string objectKey, string sourceStageRel);
 
     /// <summary>
-    /// 执行上页。失败时不改发布索引。
+    /// 执行上页。失败时不改发布索引。索引损坏时直接拒绝，不压图、不入库、不覆盖索引。
     /// </summary>
     public static NotePublishOutcome Publish(
         WorkspaceProfile profile,
@@ -26,8 +26,17 @@ public static class NotePublisher
         PrepareImage prepare,
         IngestImage ingest)
     {
+        NoteIndexFile index;
+        try
+        {
+            index = NoteIndexStore.Load(profile);
+        }
+        catch (NoteIndexCorruptException ex)
+        {
+            return NotePublishOutcome.Fail(ex.Message);
+        }
+
         var stageRoot = WorkspaceProfileLoader.ResolveUnderRoot(profile, profile.StageRoot);
-        var index = NoteIndexStore.Load(profile);
         var plan = NoteRules.Plan(folderFullPath, stageRoot, index, markedStageRels, starByStageRel);
         if (!plan.Ok)
         {

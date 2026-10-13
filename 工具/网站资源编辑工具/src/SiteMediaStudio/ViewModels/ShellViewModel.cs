@@ -1481,8 +1481,7 @@ public sealed class ShellViewModel : ViewModelBase
                     return false;
                 }
 
-                IsCatalogLoading = false;
-                StatusText = "加载失败：" + ex.Message;
+                ReportCatalogLoadFailure(ex, coverGrid);
                 return false;
             }
 
@@ -1540,8 +1539,7 @@ public sealed class ShellViewModel : ViewModelBase
                 return false;
             }
 
-            IsCatalogLoading = false;
-            StatusText = "加载失败：" + ex.Message;
+            ReportCatalogLoadFailure(ex, coverGrid);
             return false;
         }
         finally
@@ -1551,6 +1549,21 @@ public sealed class ShellViewModel : ViewModelBase
                 mDeferCardFill = false;
             }
         }
+    }
+
+    /// <summary>
+    /// 编目失败时写到底栏。打开工作区时若心得索引损坏，再弹出说明，避免只留一行状态。
+    /// </summary>
+    private void ReportCatalogLoadFailure(Exception ex, bool showDialog)
+    {
+        IsCatalogLoading = false;
+        StatusText = "加载失败：" + ex.Message;
+        if (!showDialog || ex is not NoteIndexCorruptException)
+        {
+            return;
+        }
+
+        TextDialog.Show(NoteIndexCorruptException.DisplayText, ex.Message);
     }
 
     /// <summary>
@@ -2627,7 +2640,17 @@ public sealed class ShellViewModel : ViewModelBase
             return;
         }
 
-        var error = NoteCommands.Hide(mSession.Profile, work.Id);
+        string? error;
+        try
+        {
+            error = NoteCommands.Hide(mSession.Profile, work.Id);
+        }
+        catch (NoteIndexCorruptException ex)
+        {
+            TextDialog.Show("无法隐藏", ex.Message);
+            return;
+        }
+
         if (error != null)
         {
             TextDialog.Show("无法隐藏", error);
@@ -2654,7 +2677,17 @@ public sealed class ShellViewModel : ViewModelBase
             return;
         }
 
-        var error = NoteCommands.Restore(mSession.Profile, work.Id);
+        string? error;
+        try
+        {
+            error = NoteCommands.Restore(mSession.Profile, work.Id);
+        }
+        catch (NoteIndexCorruptException ex)
+        {
+            TextDialog.Show("无法恢复", ex.Message);
+            return;
+        }
+
         if (error != null)
         {
             TextDialog.Show("无法恢复", error);
@@ -2681,7 +2714,18 @@ public sealed class ShellViewModel : ViewModelBase
             return;
         }
 
-        var block = NoteRules.RecycleBlockReason(NoteIndexStore.Load(mSession.Profile), work.Id);
+        NoteIndexFile index;
+        try
+        {
+            index = NoteIndexStore.Load(mSession.Profile);
+        }
+        catch (NoteIndexCorruptException ex)
+        {
+            TextDialog.Show("无法删除", ex.Message);
+            return;
+        }
+
+        var block = NoteRules.RecycleBlockReason(index, work.Id);
         if (block != null)
         {
             TextDialog.Show("无法删除", block);
