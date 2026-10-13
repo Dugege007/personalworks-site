@@ -5,8 +5,16 @@
 !**/.gitkeep
 !**/
 
-# notes source text (md/json/txt) syncs via Git; images stay local
+# 心得栏目的正文、配置和栏目根目录下的纯文本通过 Git 同步。
 !*notes*/**/*.md
 !*notes*/**/*.json
 !*notes*/*.txt
+# 心得栏目的配图也进入 Git。只放行笔记文件夹内的图片，大写和小写扩展名都放行。栏目根目录下的配图不放行。
+!*notes*/*/**/*.[jJ][pP][gG]
+!*notes*/*/**/*.[jJ][pP][eE][gG]
+!*notes*/*/**/*.[pP][nN][gG]
+!*notes*/*/**/*.[wW][eE][bB][pP]
+!*notes*/*/**/*.[gG][iI][fF]
+# 网页成品和原图备份不进入 Git。这两条必须写在配图放行规则之后，否则放行规则会把它们重新纳入版本库。
 *notes*/**/.site-ready/**
+*notes*/**/.originals/**
