@@ -41,8 +41,15 @@ public sealed class StageCatalogTests
     [InlineData(".site-ready/id/01.webp", true)]
     [InlineData("数字孪生（digital-twin）/foo/01.png", false)]
     [InlineData("clip.mp4", false)]
+    [InlineData("心得（notes）/20261005_021341/.originals/a.png", true)]
+    [InlineData("心得（notes）/20261005_021341/.originals/图/b.jpg", true)]
+    [InlineData(".originals/a.png", true)]
+    [InlineData("心得（notes）/20261005_021341/.Originals/a.PNG", true)]
+    [InlineData("心得（notes）\\20261005_021341\\.originals\\图\\b.jpg", true)]
+    [InlineData("心得（notes）/20261005_021341/a.png", false)]
     public void PathRules_SkipSiteReadyDerived(string rel, bool derived)
     {
+        Assert.Equal(derived, MediaPathRules.IsNoteAuxiliaryRel(rel));
         Assert.Equal(derived, MediaPathRules.IsDerivedStageRel(rel));
         if (derived)
         {

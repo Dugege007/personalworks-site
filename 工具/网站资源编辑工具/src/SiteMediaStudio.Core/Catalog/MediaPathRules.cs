@@ -140,9 +140,26 @@ public static class MediaPathRules
     }
 
     /// <summary>
-    /// 是否为压码输出目录，不当作独立投放箱条目。
+    /// 是否为压码输出或原图备份目录，不当作独立投放箱条目。
     /// </summary>
     public static bool IsDerivedStageRel(string? pathOrRel)
+    {
+        return IsNoteAuxiliaryRel(pathOrRel);
+    }
+
+    /// <summary>
+    /// 路径是否落在心得的附属文件夹里。网页成品与原图备份都不进入编目，也不参与上页。
+    /// </summary>
+    public static bool IsNoteAuxiliaryRel(string? pathOrRel)
+    {
+        return ContainsDirectoryName(pathOrRel, NoteRules.ReadyDirName)
+            || ContainsDirectoryName(pathOrRel, NoteRules.OriginalsDirName);
+    }
+
+    /// <summary>
+    /// 路径的某一段是否为指定文件夹名。比较时不区分大小写。
+    /// </summary>
+    private static bool ContainsDirectoryName(string? pathOrRel, string directoryName)
     {
         if (string.IsNullOrWhiteSpace(pathOrRel))
         {
@@ -150,9 +167,10 @@ public static class MediaPathRules
         }
 
         var normalized = JsonUtil.ToRel(pathOrRel);
-        return normalized.Contains("/.site-ready/", StringComparison.OrdinalIgnoreCase)
-            || normalized.StartsWith(".site-ready/", StringComparison.OrdinalIgnoreCase)
-            || normalized.EndsWith("/.site-ready", StringComparison.OrdinalIgnoreCase);
+        return string.Equals(normalized, directoryName, StringComparison.OrdinalIgnoreCase)
+            || normalized.StartsWith(directoryName + "/", StringComparison.OrdinalIgnoreCase)
+            || normalized.EndsWith("/" + directoryName, StringComparison.OrdinalIgnoreCase)
+            || normalized.Contains("/" + directoryName + "/", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

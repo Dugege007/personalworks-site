@@ -12,20 +12,42 @@ public static class NoteRules
     public const string ChannelKey = "notes";
     public const string BodyFileName = "正文.md";
     public const string ReadyDirName = ".site-ready";
+
+    /// <summary>
+    /// 原图备份文件夹名。不进入编目，也不参与上页。
+    /// </summary>
+    public const string OriginalsDirName = ".originals";
+
     public const string SketchesSlug = "sketches";
+
+    /// <summary>
+    /// 上页预演遇到 GIF 配图时返回的说明。
+    /// </summary>
+    public const string GifPublishRejectedMessage = "GIF 配图暂不支持上页";
 
     private static readonly Regex SlugRegex = new(
         @"^[a-z0-9]+(?:-[a-z0-9]+)*$",
         RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-    private static readonly HashSet<string> ImageExtSet = new(StringComparer.OrdinalIgnoreCase)
+    /// <summary>
+    /// 心得夹内允许存放的配图扩展名。包含 GIF。比较时不区分大小写。
+    /// </summary>
+    public static readonly HashSet<string> StoredImageExtSet = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".jpg", ".jpeg", ".png", ".webp", ".gif"
+    };
+
+    /// <summary>
+    /// 心得允许上页的配图扩展名。不含 GIF。比较时不区分大小写。
+    /// </summary>
+    public static readonly HashSet<string> PublishImageExtSet = new(StringComparer.OrdinalIgnoreCase)
     {
         ".jpg", ".jpeg", ".png", ".webp"
     };
 
     private static readonly HashSet<string> BlockedExtSet = new(StringComparer.OrdinalIgnoreCase)
     {
-        ".mp4", ".mov", ".webm", ".mp3", ".wav", ".gif", ".svg"
+        ".mp4", ".mov", ".webm", ".mp3", ".wav", ".svg"
     };
 
     /// <summary>
@@ -242,6 +264,12 @@ public static class NoteRules
             return Fail("夹内有不能上页的文件：" + blocked);
         }
 
+        var gif = FindGifFile(folderFullPath);
+        if (gif != null)
+        {
+            return Fail(GifPublishRejectedMessage + "：" + gif);
+        }
+
         List<NoteImageRef> referenced;
         try
         {
@@ -422,26 +450,12 @@ public static class NoteRules
         return new NotePublishPlan { Ok = false, Error = error };
     }
 
-    private static string Field(Dictionary<string, string> fields, string key)
-    {
-        return fields.TryGetValue(key, out var value) ? value.Trim() : "";
-    }
-
-    private static bool IsDraft(Dictionary<string, string> fields)
-    {
-        var value = Field(fields, "draft");
-        return value.Equals("true", StringComparison.OrdinalIgnoreCase)
-            || value == "yes"
-            || value == "1";
-    }
-
     private static string? FindBlockedFile(string folderFullPath)
     {
         foreach (var file in Directory.EnumerateFiles(folderFullPath, "*", SearchOption.AllDirectories))
         {
             var rel = JsonUtil.ToRel(Path.GetRelativePath(folderFullPath, file));
-            if (rel.Contains("/" + ReadyDirName + "/", StringComparison.OrdinalIgnoreCase)
-                || rel.StartsWith(ReadyDirName + "/", StringComparison.OrdinalIgnoreCase))
+            if (MediaPathRules.IsNoteAuxiliaryRel(rel))
             {
                 continue;
             }
@@ -461,14 +475,13 @@ public static class NoteRules
         foreach (var file in Directory.EnumerateFiles(folderFullPath, "*", SearchOption.AllDirectories))
         {
             var rel = JsonUtil.ToRel(Path.GetRelativePath(folderFullPath, file));
-            if (rel.Contains("/" + ReadyDirName + "/", StringComparison.OrdinalIgnoreCase)
-                || rel.StartsWith(ReadyDirName + "/", StringComparison.OrdinalIgnoreCase))
+            if (MediaPathRules.IsNoteAuxiliaryRel(rel))
             {
                 continue;
             }
 
             var ext = Path.GetExtension(file);
-            if (ImageExtSet.Contains(ext))
+            if (PublishImageExtSet.Contains(ext))
             {
                 list.Add((file, ext));
             }
@@ -535,6 +548,11 @@ public static class NoteRules
         if (target.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
             || target.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
         {
+            if (IsGifExtension(target))
+            {
+                throw new InvalidOperationException(GifPublishRejectedMessage + "：" + target);
+            }
+
             return new NoteImageRef(target, true, "");
         }
 
@@ -547,13 +565,18 @@ public static class NoteRules
             throw new InvalidOperationException("图片落在心得夹外：" + target);
         }
 
+        if (IsGifExtension(full))
+        {
+            throw new InvalidOperationException(GifPublishRejectedMessage + "：" + target);
+        }
+
         if (!File.Exists(full))
         {
             throw new InvalidOperationException("找不到引用的图片：" + target);
         }
 
         var ext = Path.GetExtension(full);
-        if (!ImageExtSet.Contains(ext))
+        if (!PublishImageExtSet.Contains(ext))
         {
             throw new InvalidOperationException("正文引用了不能上页的文件：" + target);
         }
@@ -608,44 +631,48 @@ public static class NoteRules
         return objectKey;
     }
 
-    private static string ComposeMarkdown(
-        Dictionary<string, string> fields,
-        string title,
-        string date,
-        string summary,
-        string slug,
-        string body)
+    /// <summary>
+    /// 找出夹内第一张 GIF。附属文件夹里的备份不算。
+    /// </summary>
+    private static string? FindGifFile(string folderFullPath)
     {
-        var builder = new StringBuilder();
-        builder.Append("---\n");
-        builder.Append("title: ").Append(Quote(title)).Append('\n');
-        builder.Append("date: ").Append(date).Append('\n');
-        builder.Append("summary: ").Append(Quote(summary)).Append('\n');
-        builder.Append("slug: ").Append(slug).Append('\n');
-        builder.Append("draft: false\n");
-        foreach (var pair in fields)
+        foreach (var file in Directory.EnumerateFiles(folderFullPath, "*", SearchOption.AllDirectories))
         {
-            if (pair.Key is "title" or "date" or "summary" or "slug" or "draft")
+            var rel = JsonUtil.ToRel(Path.GetRelativePath(folderFullPath, file));
+            if (MediaPathRules.IsNoteAuxiliaryRel(rel) || !IsGifExtension(file))
             {
                 continue;
             }
 
-            builder.Append(pair.Key).Append(": ").Append(pair.Value).Append('\n');
+            return rel;
         }
 
-        builder.Append("---\n\n");
-        builder.Append(body);
-        if (!body.EndsWith('\n'))
-        {
-            builder.Append('\n');
-        }
-
-        return builder.ToString();
+        return null;
     }
 
-    private static string Quote(string value)
+    /// <summary>
+    /// 扩展名或路径是否为 GIF。不区分大小写，并忽略网址里的查询参数。
+    /// </summary>
+    private static bool IsGifExtension(string? pathOrExtension)
     {
-        return "\"" + value.Replace("\\", "\\\\").Replace("\"", "\\\"") + "\"";
+        if (string.IsNullOrWhiteSpace(pathOrExtension))
+        {
+            return false;
+        }
+
+        var text = pathOrExtension.Trim();
+        var query = text.IndexOf('?');
+        var hash = text.IndexOf('#');
+        var cut = query < 0 ? hash : hash < 0 ? query : Math.Min(query, hash);
+        if (cut >= 0)
+        {
+            text = text[..cut];
+        }
+
+        var extension = text.StartsWith('.') && text.IndexOf('/') < 0 && text.IndexOf('\\') < 0
+            ? text
+            : Path.GetExtension(text);
+        return string.Equals(extension, ".gif", StringComparison.OrdinalIgnoreCase);
     }
 
     private readonly record struct NoteImageRef(string Raw, bool Remote, string FullPath);
