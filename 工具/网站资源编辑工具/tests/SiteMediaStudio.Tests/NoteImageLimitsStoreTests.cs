@@ -99,8 +99,8 @@ public sealed class NoteImageLimitsStoreTests
             File.SetUnixFileMode(dir, UnixFileMode.UserRead | UnixFileMode.UserExecute);
             var error = Record.Exception(() => NoteImageLimitsStore.SaveFile(path, new NoteImageLimits
             {
-                ImageMaxBytes = 1,
-                GifMaxBytes = 1
+                ImageMaxBytes = 2 * 1024,
+                GifMaxBytes = 2 * 1024
             }));
             Assert.NotNull(error);
         }
@@ -111,6 +111,40 @@ public sealed class NoteImageLimitsStoreTests
 
         Assert.Equal(original, File.ReadAllText(path));
         Assert.DoesNotContain(Directory.GetFiles(dir), file => Path.GetFileName(file).Contains(".tmp-", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Save_RejectsThresholdBelowOneKilobyte()
+    {
+        var dir = TempDir();
+        var path = Path.Combine(dir, NoteImageLimitsStore.FileName);
+        var imageTooSmall = new NoteImageLimits
+        {
+            ImageMaxBytes = NoteImageThreshold.BytesPerKilobyte - 1,
+            GifMaxBytes = NoteImageThreshold.DefaultGifMaxBytes
+        };
+        var imageError = Assert.Throws<ArgumentOutOfRangeException>(() => NoteImageLimitsStore.SaveFile(path, imageTooSmall));
+        Assert.Contains("1 KB", imageError.Message, StringComparison.Ordinal);
+        Assert.False(File.Exists(path));
+
+        var gifTooSmall = new NoteImageLimits
+        {
+            ImageMaxBytes = NoteImageThreshold.BytesPerKilobyte,
+            GifMaxBytes = 0
+        };
+        var gifError = Assert.Throws<ArgumentOutOfRangeException>(() => NoteImageLimitsStore.SaveFile(path, gifTooSmall));
+        Assert.Contains("1 KB", gifError.Message, StringComparison.Ordinal);
+        Assert.False(File.Exists(path));
+
+        var minimum = new NoteImageLimits
+        {
+            ImageMaxBytes = NoteImageThreshold.BytesPerKilobyte,
+            GifMaxBytes = NoteImageThreshold.BytesPerKilobyte
+        };
+        NoteImageLimitsStore.SaveFile(path, minimum);
+        var loaded = NoteImageLimitsStore.LoadFile(path);
+        Assert.Equal(NoteImageThreshold.BytesPerKilobyte, loaded.ImageMaxBytes);
+        Assert.Equal(NoteImageThreshold.BytesPerKilobyte, loaded.GifMaxBytes);
     }
 
     [Fact]

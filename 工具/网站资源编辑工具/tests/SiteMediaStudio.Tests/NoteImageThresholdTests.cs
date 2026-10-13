@@ -43,14 +43,15 @@ public sealed class NoteImageThresholdTests
     }
 
     [Theory]
+    [InlineData("1", 1024L, NoteImageKilobyteParseFailure.None)]
     [InlineData("500", 500 * 1024L, NoteImageKilobyteParseFailure.None)]
-    [InlineData("0", 0L, NoteImageKilobyteParseFailure.None)]
+    [InlineData("0", 0L, NoteImageKilobyteParseFailure.BelowMinimum)]
     [InlineData("2048", 2048 * 1024L, NoteImageKilobyteParseFailure.None)]
     [InlineData("", 0L, NoteImageKilobyteParseFailure.NotInteger)]
     [InlineData("500.5", 0L, NoteImageKilobyteParseFailure.NotInteger)]
     [InlineData("-1", 0L, NoteImageKilobyteParseFailure.NotInteger)]
     [InlineData("9223372036854775807", 0L, NoteImageKilobyteParseFailure.Overflow)]
-    public void TryParseWholeKilobytes_AcceptsOnlyNonNegativeIntegers(string text, long bytes, NoteImageKilobyteParseFailure failure)
+    public void TryParseWholeKilobytes_AcceptsOnlyIntegersOfAtLeastOneKilobyte(string text, long bytes, NoteImageKilobyteParseFailure failure)
     {
         var ok = NoteImageThreshold.TryParseWholeKilobytes(text, out var parsed, out var actual);
         Assert.Equal(failure == NoteImageKilobyteParseFailure.None, ok);

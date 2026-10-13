@@ -162,7 +162,7 @@ public sealed class SettingsWindow : Window
     private void AddNoteImageSection(StackPanel body)
     {
         body.Children.Add(SectionTitle("心得配图", first: false));
-        body.Children.Add(Muted("普通配图和 GIF 的上限保存在仓库里的共享配置中，不写进本机设置。填写整数 KB（1 KB = 1024 字节）后点击「保存阈值」，配置会写入下面的文件，并立即重新计算超限状态。修改后需要和其他文件一样提交并推送，另一台电脑拉取后使用相同阈值。文件大小严格大于阈值才算超限。"));
+        body.Children.Add(Muted("普通配图和 GIF 的上限保存在仓库里的共享配置中，不写进本机设置。填写不小于 1 的整数 KB（1 KB = 1024 字节）后点击「保存阈值」，配置会写入下面的文件，并立即重新计算超限状态。修改后需要和其他文件一样提交并推送，另一台电脑拉取后使用相同阈值。文件大小严格大于阈值才算超限。"));
         body.Children.Add(Muted("共享配置路径"));
         ConfigureReadOnly(mConfigPathBox);
         body.Children.Add(mConfigPathBox);
@@ -254,10 +254,13 @@ public sealed class SettingsWindow : Window
             return;
         }
 
-        if (!NoteImageThreshold.TryParseWholeKilobytes(mImageKbBox.Text, out _, out _)
-            || !NoteImageThreshold.TryParseWholeKilobytes(mGifKbBox.Text, out _, out _))
+        if (!NoteImageThreshold.TryParseWholeKilobytes(mImageKbBox.Text, out _, out var imageFailure))
         {
-            ShowThresholdStatus("当前阈值不是整数 KB，请改成整数后再保存。", error: true);
+            ShowThresholdStatus(KilobyteError("普通配图上限", imageFailure), error: true);
+        }
+        else if (!NoteImageThreshold.TryParseWholeKilobytes(mGifKbBox.Text, out _, out var gifFailure))
+        {
+            ShowThresholdStatus(KilobyteError("GIF 上限", gifFailure), error: true);
         }
     }
 
@@ -323,7 +326,12 @@ public sealed class SettingsWindow : Window
             return label + "太大，无法换算成字节。";
         }
 
-        return label + "请填写不小于 0 的整数，单位是 KB。";
+        if (failure == NoteImageKilobyteParseFailure.BelowMinimum)
+        {
+            return label + "不能小于 1 KB。";
+        }
+
+        return label + "请填写不小于 1 的整数，单位是 KB。";
     }
 
     /// <summary>

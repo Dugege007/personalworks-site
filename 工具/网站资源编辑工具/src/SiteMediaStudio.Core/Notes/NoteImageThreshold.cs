@@ -104,7 +104,7 @@ public static class NoteImageThreshold
     }
 
     /// <summary>
-    /// 把设置框里的整数 KB 换算成字节。空文本、小数和负数都不接受。
+    /// 把设置框里的整数 KB 换算成字节。空文本、小数、负数和小于 1 KB 的值都不接受。
     /// </summary>
     public static bool TryParseWholeKilobytes(string? text, out long bytes, out NoteImageKilobyteParseFailure failure)
     {
@@ -114,6 +114,12 @@ public static class NoteImageThreshold
             || !long.TryParse(text.Trim(), NumberStyles.None, CultureInfo.InvariantCulture, out var kilobytes))
         {
             failure = NoteImageKilobyteParseFailure.NotInteger;
+            return false;
+        }
+
+        if (kilobytes < 1)
+        {
+            failure = NoteImageKilobyteParseFailure.BelowMinimum;
             return false;
         }
 
@@ -142,9 +148,14 @@ public enum NoteImageKilobyteParseFailure
     None = 0,
 
     /// <summary>
-    /// 不是不小于 0 的整数。
+    /// 不是整数。
     /// </summary>
     NotInteger,
+
+    /// <summary>
+    /// 整数小于 1 KB。
+    /// </summary>
+    BelowMinimum,
 
     /// <summary>
     /// 整数太大，乘以 1024 后超出长整数范围。

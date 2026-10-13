@@ -140,13 +140,14 @@ public static class NoteImageLimitsStore
     }
 
     /// <summary>
-    /// 把阈值写到指定路径。原文件无法解析时拒绝写入，避免用新内容覆盖损坏的配置。
+    /// 把阈值写到指定路径。小于 1 KB 时拒绝写入。原文件无法解析时也拒绝写入，避免用新内容覆盖损坏的配置。
     /// </summary>
     public static void SaveFile(string path, NoteImageLimits limits)
     {
-        if (limits.ImageMaxBytes < 0 || limits.GifMaxBytes < 0)
+        if (limits.ImageMaxBytes < NoteImageThreshold.BytesPerKilobyte
+            || limits.GifMaxBytes < NoteImageThreshold.BytesPerKilobyte)
         {
-            throw new ArgumentOutOfRangeException(nameof(limits), "心得配图阈值不能为负数。");
+            throw new ArgumentOutOfRangeException(nameof(limits), "心得配图阈值不能小于 1 KB。");
         }
 
         if (File.Exists(path))
