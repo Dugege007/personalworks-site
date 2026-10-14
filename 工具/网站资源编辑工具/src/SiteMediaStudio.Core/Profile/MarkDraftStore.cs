@@ -457,10 +457,19 @@ public static class MarkDraftStore
     public static void Delete(string? path = null)
     {
         var file = path ?? FilePath;
-        if (File.Exists(file))
+        if (!File.Exists(file))
         {
-            File.Delete(file);
+            return;
         }
+
+        // 隐藏成功后会立刻删标记。Windows 上杀毒软件可能还占着刚写完的文件。
+        FileLockRetry.Invoke(() =>
+        {
+            if (File.Exists(file))
+            {
+                File.Delete(file);
+            }
+        });
     }
 
     /// <summary>
@@ -513,14 +522,7 @@ public static class MarkDraftStore
         File.WriteAllText(tempPath, json, JsonUtil.Utf8NoBom);
         try
         {
-            if (File.Exists(path))
-            {
-                File.Replace(tempPath, path, destinationBackupFileName: null);
-            }
-            else
-            {
-                File.Move(tempPath, path);
-            }
+            FileLockRetry.Invoke(() => ReplaceOrMove(tempPath, path));
         }
         catch
         {
@@ -530,6 +532,31 @@ public static class MarkDraftStore
             }
 
             throw;
+        }
+    }
+
+    /// <summary>
+    /// 用临时文件换上正式标记。替换报 1175 且临时文件已经不在时，视为已经写上。
+    /// </summary>
+    private static void ReplaceOrMove(string tempPath, string path)
+    {
+        if (!File.Exists(tempPath))
+        {
+            if (File.Exists(path))
+            {
+                return;
+            }
+
+            throw new FileNotFoundException("临时标记文件已不存在。", tempPath);
+        }
+
+        if (File.Exists(path))
+        {
+            File.Replace(tempPath, path, destinationBackupFileName: null);
+        }
+        else
+        {
+            File.Move(tempPath, path);
         }
     }
 }
