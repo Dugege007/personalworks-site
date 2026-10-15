@@ -64,4 +64,38 @@ public static class NotePublishBatch
 
         return string.Join(Environment.NewLine, lineList);
     }
+
+    /// <summary>
+    /// 检查已经全部通过、开始逐篇写盘之后，某一篇失败时的说明。
+    /// 前面已经上页的笔记不会撤回。还没有任何一篇上页时，只说明失败的这一篇和原因。
+    /// </summary>
+    public static string ExecutionFailure(
+        IReadOnlyList<string> publishedNameList,
+        string failedName,
+        string reason)
+    {
+        if (publishedNameList == null)
+        {
+            throw new ArgumentNullException(nameof(publishedNameList));
+        }
+
+        var lineList = new List<string>();
+        if (publishedNameList.Count > 0)
+        {
+            var published = string.Join("、", publishedNameList.Select(DisplayName).Select(name => "「" + name + "」"));
+            lineList.Add(published + "已经上页，不会自动撤回。");
+        }
+
+        var detail = string.IsNullOrWhiteSpace(reason) ? "没有说明原因。" : reason.Trim();
+        lineList.Add("「" + DisplayName(failedName) + "」上页失败：" + detail);
+        return string.Join(Environment.NewLine, lineList);
+    }
+
+    /// <summary>
+    /// 提示里使用的笔记名称。空白时用固定说法，避免出现空书名号。
+    /// </summary>
+    private static string DisplayName(string? name)
+    {
+        return string.IsNullOrWhiteSpace(name) ? "未识别的笔记" : name.Trim();
+    }
 }

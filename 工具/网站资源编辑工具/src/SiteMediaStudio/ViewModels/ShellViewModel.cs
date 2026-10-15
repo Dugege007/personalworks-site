@@ -2730,6 +2730,7 @@ public sealed class ShellViewModel : ViewModelBase
 
     /// <summary>
     /// 标记了正文才上页整篇。先检查全部选中笔记的正文标记、缺失配图和文件夹外引用，有任何一篇不通过就一篇都不上页，并列出原因。
+    /// 全部通过之后按顺序逐篇写盘。后面某一篇写盘失败时，前面已经上页的笔记不会撤回，失败提示写明已经上页的笔记、失败的笔记和原因。
     /// 成功后这些标记不再走作品上页。
     /// </summary>
     private bool PublishMarkedNotes(IReadOnlyList<IntentItem> noteIngestList, out string error)
@@ -2773,14 +2774,17 @@ public sealed class ShellViewModel : ViewModelBase
             return false;
         }
 
+        var publishedNameList = new List<string>();
         foreach (var group in groupList)
         {
             var failure = PublishNoteFolder(group.Key, imageAuditPassed: true);
             if (failure != null)
             {
-                error = failure;
+                error = NotePublishBatch.ExecutionFailure(publishedNameList, NotePublishName(group.Key), failure);
                 return false;
             }
+
+            publishedNameList.Add(NotePublishName(group.Key));
         }
 
         return true;

@@ -80,4 +80,40 @@ public sealed class NotePublishBatchTests
 
         Assert.Equal("「未识别的笔记」有标记无法对应到笔记文件夹，不能上页。", reason);
     }
+
+    [Fact]
+    public void ExecutionFailure_NamesPublishedNotesAndTheFailedNote()
+    {
+        var reason = NotePublishBatch.ExecutionFailure(
+            new[] { "清晨散步", "夜读" },
+            "控制图",
+            "压图失败：心得（notes）/控制图/a.png");
+
+        Assert.Equal(
+            "「清晨散步」、「夜读」已经上页，不会自动撤回。\n「控制图」上页失败：压图失败：心得（notes）/控制图/a.png",
+            reason.Replace("\r\n", "\n"));
+    }
+
+    [Fact]
+    public void ExecutionFailure_WhenNothingWasPublished_OnlyNamesTheFailure()
+    {
+        var reason = NotePublishBatch.ExecutionFailure(
+            Array.Empty<string>(),
+            "清晨散步",
+            "入库失败：notes/walk/a.webp");
+
+        Assert.Equal("「清晨散步」上页失败：入库失败：notes/walk/a.webp", reason);
+        Assert.DoesNotContain("已经上页", reason, StringComparison.Ordinal);
+        Assert.DoesNotContain("撤回", reason, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void ExecutionFailure_BlankReasonStillExplainsWhichNoteFailed()
+    {
+        var reason = NotePublishBatch.ExecutionFailure(new[] { "  清晨散步  " }, "  ", "  ");
+
+        Assert.Equal(
+            "「清晨散步」已经上页，不会自动撤回。\n「未识别的笔记」上页失败：没有说明原因。",
+            reason.Replace("\r\n", "\n"));
+    }
 }
