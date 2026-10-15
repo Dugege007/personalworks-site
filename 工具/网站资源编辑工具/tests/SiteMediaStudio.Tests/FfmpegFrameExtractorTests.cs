@@ -35,4 +35,25 @@ public sealed class FfmpegFrameExtractorTests
         Assert.Contains("-ss", args);
         Assert.Contains("1", args);
     }
+
+    [Fact]
+    public void ResolveFfmpeg_ReturnsConfiguredFileWithoutStartingIt()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "sms-ffmpeg-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(dir);
+        var path = Path.Combine(dir, "ffmpeg");
+        try
+        {
+            File.WriteAllText(path, "not a program");
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            var resolved = FfmpegFrameExtractor.ResolveFfmpeg(path);
+            watch.Stop();
+            Assert.Equal(path, resolved);
+            Assert.True(watch.Elapsed < TimeSpan.FromSeconds(2));
+        }
+        finally
+        {
+            Directory.Delete(dir, recursive: true);
+        }
+    }
 }
