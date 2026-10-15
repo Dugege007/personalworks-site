@@ -15,22 +15,12 @@ public sealed class VideoEncoderHit
 public static class VideoEncoderHost
 {
     private static readonly string[] MediaCoderCliNameList = { "mc.exe", "mc" };
-    private static readonly string[] FfmpegNameList = { "ffmpeg.exe", "ffmpeg" };
     private static readonly string[] FfprobeNameList = { "ffprobe.exe", "ffprobe" };
 
     private static readonly string[] MediaCoderCliPathList =
     {
         @"C:\Program Files\MediaCoder\mc.exe",
         @"C:\Program Files (x86)\MediaCoder\mc.exe"
-    };
-
-    private static readonly string[] FfmpegPathList =
-    {
-        @"C:\ffmpeg\bin\ffmpeg.exe",
-        @"C:\Program Files\ffmpeg\bin\ffmpeg.exe",
-        @"C:\Program Files\MediaCoder\ffmpeg.exe",
-        @"C:\Program Files\MediaCoder\tools\ffmpeg.exe",
-        @"C:\Program Files\MediaCoder\tools64\ffmpeg.exe"
     };
 
     /// <summary>
@@ -65,8 +55,10 @@ public static class VideoEncoderHost
             return new VideoEncoderHit { Kind = "mediacoder", FileName = mediaCoder };
         }
 
-        var ffmpeg = FfmpegFrameExtractor.ResolveFfmpeg(settings.FfmpegPath)
-            ?? ResolveExisting(FfmpegPathList);
+        var ffmpeg = ExternalToolLocator.ResolvePath(
+            settings.FfmpegPath,
+            ExternalToolLocator.FfmpegCommonPathList,
+            ExternalToolLocator.FfmpegFileNameList);
         if (ffmpeg != null)
         {
             return new VideoEncoderHit { Kind = "ffmpeg", FileName = ffmpeg };

@@ -51,6 +51,7 @@ public sealed class NoteIngestPreviewTests
         Assert.Contains(bullets, line => line.Contains("ok.png", StringComparison.Ordinal));
         Assert.DoesNotContain(bullets, line => line.Contains("正文", StringComparison.Ordinal));
         Assert.DoesNotContain("正文.webp", text, StringComparison.Ordinal);
+        Assert.DoesNotContain("「一篇」", text, StringComparison.Ordinal);
         Assert.Contains(report.Lines, line => line.Item.StageRel != null && line.Item.StageRel.EndsWith("ok.png", StringComparison.Ordinal));
     }
 
@@ -185,7 +186,52 @@ public sealed class NoteIngestPreviewTests
         Assert.Contains("[拒绝]", text, StringComparison.Ordinal);
         Assert.Contains("须标记正文.md", text, StringComparison.Ordinal);
         Assert.Contains("ok.png", text, StringComparison.Ordinal);
+        Assert.Contains("「一篇」", text, StringComparison.Ordinal);
         Assert.DoesNotContain("正文.webp", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Preview_RejectionLines_IncludeEachNoteTitle()
+    {
+        using var fixture = new NotePreviewFixture("29990101_000010");
+        var morning = fixture.StageOf(fixture.WriteNote("29990101_000010", "清晨散步", "anim.gif"));
+        var chart = fixture.StageOf(fixture.WriteNote("29990101_000011", "控制图", "anim.gif"));
+
+        var text = PromptRenderer.RenderPreview(fixture.PreviewStages(new[] { morning, chart }));
+        var rejected = Bullets(text).Where(line => line.Contains("[拒绝]", StringComparison.Ordinal)).ToList();
+
+        Assert.Equal(2, rejected.Count);
+        Assert.Contains(rejected, line => line.Contains("「清晨散步」", StringComparison.Ordinal) && line.Contains("anim.gif", StringComparison.Ordinal));
+        Assert.Contains(rejected, line => line.Contains("「控制图」", StringComparison.Ordinal) && line.Contains("anim.gif", StringComparison.Ordinal));
+        Assert.DoesNotContain(rejected, line =>
+            line.Contains("「清晨散步」", StringComparison.Ordinal)
+            && line.Contains("「控制图」", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void Preview_RejectionLine_PrefersCatalogTitleOverHeading()
+    {
+        using var fixture = new NotePreviewFixture("29990101_000012");
+        var folder = fixture.WriteNote("29990101_000012", "正文标题", "anim.gif");
+        var stage = fixture.StageOf(folder);
+        var works = new[]
+        {
+            new WorkCatalogItem
+            {
+                Id = "29990101_000012",
+                Channel = NoteRules.ChannelKey,
+                Title = "目录里的清晨",
+                SourceKind = "note"
+            }
+        };
+
+        var text = PromptRenderer.RenderPreview(fixture.PreviewStages(new[] { stage }, works));
+        var rejected = Bullets(text).Where(line => line.Contains("[拒绝]", StringComparison.Ordinal)).ToList();
+
+        Assert.Single(rejected);
+        Assert.Contains("「目录里的清晨」", rejected[0], StringComparison.Ordinal);
+        Assert.Contains("anim.gif", rejected[0], StringComparison.Ordinal);
+        Assert.DoesNotContain("正文标题", rejected[0], StringComparison.Ordinal);
     }
 
     private static List<string> Bullets(string text)
@@ -264,6 +310,74 @@ public sealed class NoteIngestPreviewTests
                 FullPath = Path.Combine(Folder, fileName.Replace('/', Path.DirectorySeparatorChar)),
                 WorkIdGuess = Path.GetFileName(mFolderRel)
             };
+        }
+
+        /// <summary>
+        /// 在同一栏目下再写一篇笔记，返回这篇的文件夹。标题来自正文一级标题。
+        /// </summary>
+        public string WriteNote(string folderName, string heading, params string[] relativeFiles)
+        {
+            var channel = mSession.Profile.Channels[0];
+            var rel = WorkspaceProfileLoader.ChannelStageRelative(mSession.Profile, channel) + "/" + folderName;
+            var full = Path.Combine(
+                WorkspaceProfileLoader.ResolveUnderRoot(mSession.Profile, mSession.Profile.StageRoot),
+                rel.Replace('/', Path.DirectorySeparatorChar));
+            Directory.CreateDirectory(full);
+            File.WriteAllText(Path.Combine(full, NoteRules.BodyFileName), "# " + heading + "\n\n文字\n");
+            NoteConfigStore.Save(full, new NoteConfig
+            {
+                CreatedAt = "2999-01-01 00:00:02",
+                Slug = NoteConfigStore.DefaultSlug(folderName),
+                Title = heading
+            });
+            foreach (var relative in relativeFiles)
+            {
+                var path = Path.Combine(full, relative.Replace('/', Path.DirectorySeparatorChar));
+                Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+                File.WriteAllBytes(path, new byte[] { 0 });
+            }
+
+            return full;
+        }
+
+        /// <summary>
+        /// 用笔记文件夹里的正文做成预演用的投放条目。
+        /// </summary>
+        public StageItem StageOf(string folderFull)
+        {
+            var channel = mSession.Profile.Channels[0];
+            var channelFull = Path.Combine(
+                WorkspaceProfileLoader.ResolveUnderRoot(mSession.Profile, mSession.Profile.StageRoot),
+                WorkspaceProfileLoader.ChannelStageRelative(mSession.Profile, channel).Replace('/', Path.DirectorySeparatorChar));
+            var rel = WorkspaceProfileLoader.ChannelStageRelative(mSession.Profile, channel)
+                + "/"
+                + Path.GetRelativePath(channelFull, folderFull).Replace('\\', '/');
+            return new StageItem
+            {
+                ChannelKey = NoteRules.ChannelKey,
+                StageRel = JsonUtil.ToRel(rel + "/" + NoteRules.BodyFileName),
+                FullPath = Path.Combine(folderFull, NoteRules.BodyFileName),
+                WorkIdGuess = Path.GetFileName(folderFull)
+            };
+        }
+
+        /// <summary>
+        /// 一次预演多篇笔记的正文标记。works 用来提供项目栏标题。
+        /// </summary>
+        public PreviewReport PreviewStages(IReadOnlyList<StageItem> stages, IReadOnlyList<WorkCatalogItem>? works = null)
+        {
+            var session = new WorkspaceSession
+            {
+                Profile = mSession.Profile,
+                StageItems = stages,
+                Works = works ?? Array.Empty<WorkCatalogItem>()
+            };
+            var document = IntentDocumentBuilder.Build(
+                session,
+                ExecutionMode.Direct,
+                stages.Select(stage => new MarkedMedia(MediaIntent.StageIngest, stage, null, stage.WorkIdGuess)),
+                stages[0].WorkIdGuess);
+            return PreviewReporter.BuildFromDocument(session, document);
         }
 
         public PreviewReport PreviewMarkedBody()

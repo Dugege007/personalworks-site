@@ -26,6 +26,9 @@ public sealed class SettingsWindow : Window
     private readonly TextBlock mSettingsStatus = new();
     private bool mThresholdSaveBlocked;
     private bool mSettingsSaveBlocked;
+    private int mPngquantProbeGeneration;
+    private int mOxipngProbeGeneration;
+    private int mGifsicleProbeGeneration;
 
     private SettingsWindow(
         Action clearCache,
@@ -218,24 +221,163 @@ public sealed class SettingsWindow : Window
     }
 
     /// <summary>
-    /// pngquant、oxipng 和 gifsicle 的本机路径。
+    /// pngquant、oxipng 和 gifsicle 的本机路径，以及后台检测到的版本。
     /// </summary>
     private void AddExternalProgramSection(StackPanel body)
     {
         body.Children.Add(SectionTitle("外部程序", first: false));
-        body.Children.Add(Muted("下面三个路径只保存在本机设置里。留空表示尚未指定。"));
-        body.Children.Add(Muted("pngquant 路径"));
-        var pngquant = EditorBox();
-        body.Children.Add(pngquant);
-        BindToolPath(pngquant, () => mSettings.PngquantPath, value => mSettings.PngquantPath = value);
-        body.Children.Add(Muted("oxipng 路径"));
-        var oxipng = EditorBox();
-        body.Children.Add(oxipng);
-        BindToolPath(oxipng, () => mSettings.OxipngPath, value => mSettings.OxipngPath = value);
-        body.Children.Add(Muted("gifsicle 路径"));
-        var gifsicle = EditorBox();
-        body.Children.Add(gifsicle);
-        BindToolPath(gifsicle, () => mSettings.GifsiclePath, value => mSettings.GifsiclePath = value);
+        body.Children.Add(Muted("下面三个路径只保存在本机设置里。留空时继续查找常见安装位置和系统 PATH。每一行右侧是检测到的版本；找不到时显示「未找到」。"));
+        var pngquantVersion = AddToolPathRow(body, "pngquant 路径", out var pngquant);
+        BindToolPath(
+            pngquant,
+            () => mSettings.PngquantPath,
+            value => mSettings.PngquantPath = value,
+            value => BeginPngquantProbe(pngquantVersion, value));
+        BeginPngquantProbe(pngquantVersion, mSettings.PngquantPath);
+        var oxipngVersion = AddToolPathRow(body, "oxipng 路径", out var oxipng);
+        BindToolPath(
+            oxipng,
+            () => mSettings.OxipngPath,
+            value => mSettings.OxipngPath = value,
+            value => BeginOxipngProbe(oxipngVersion, value));
+        BeginOxipngProbe(oxipngVersion, mSettings.OxipngPath);
+        var gifsicleVersion = AddToolPathRow(body, "gifsicle 路径", out var gifsicle);
+        BindToolPath(
+            gifsicle,
+            () => mSettings.GifsiclePath,
+            value => mSettings.GifsiclePath = value,
+            value => BeginGifsicleProbe(gifsicleVersion, value));
+        BeginGifsicleProbe(gifsicleVersion, mSettings.GifsiclePath);
+    }
+
+    /// <summary>
+    /// 路径输入框和右侧的版本文字。版本探测还没回来时先显示「正在检测…」。
+    /// </summary>
+    private static TextBlock AddToolPathRow(StackPanel body, string label, out TextBox pathBox)
+    {
+        body.Children.Add(Muted(label));
+        var row = new Grid { Margin = new Thickness(0, 4, 0, 12) };
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        pathBox = EditorBox();
+        pathBox.Margin = new Thickness(0, 0, 12, 0);
+        var version = new TextBlock
+        {
+            Text = "正在检测…",
+            VerticalAlignment = VerticalAlignment.Center,
+            TextAlignment = TextAlignment.Right,
+            TextWrapping = TextWrapping.Wrap,
+            MaxWidth = 180,
+            Foreground = BrushCache.Muted
+        };
+        Grid.SetColumn(version, 1);
+        row.Children.Add(pathBox);
+        row.Children.Add(version);
+        body.Children.Add(row);
+        return version;
+    }
+
+    /// <summary>
+    /// 窗口关闭后，进行中的版本探测不再改文字。
+    /// </summary>
+    protected override void OnClosed(EventArgs e)
+    {
+        mPngquantProbeGeneration++;
+        mOxipngProbeGeneration++;
+        mGifsicleProbeGeneration++;
+        base.OnClosed(e);
+    }
+
+    /// <summary>
+    /// 在后台查找 pngquant 并读取版本。
+    /// </summary>
+    private void BeginPngquantProbe(TextBlock target, string? configuredPath)
+    {
+        var generation = ++mPngquantProbeGeneration;
+        BeginVersionProbe(
+            target,
+            generation,
+            () => mPngquantProbeGeneration,
+            () => ExternalToolLocator.LocatePngquant(configuredPath));
+    }
+
+    /// <summary>
+    /// 在后台查找 oxipng 并读取版本。
+    /// </summary>
+    private void BeginOxipngProbe(TextBlock target, string? configuredPath)
+    {
+        var generation = ++mOxipngProbeGeneration;
+        BeginVersionProbe(
+            target,
+            generation,
+            () => mOxipngProbeGeneration,
+            () => ExternalToolLocator.LocateOxipng(configuredPath));
+    }
+
+    /// <summary>
+    /// 在后台查找 gifsicle 并读取版本。
+    /// </summary>
+    private void BeginGifsicleProbe(TextBlock target, string? configuredPath)
+    {
+        var generation = ++mGifsicleProbeGeneration;
+        BeginVersionProbe(
+            target,
+            generation,
+            () => mGifsicleProbeGeneration,
+            () => ExternalToolLocator.LocateGifsicle(configuredPath));
+    }
+
+    /// <summary>
+    /// 版本探测放在后台线程。完成后回到界面线程更新文字，过期结果直接丢掉。
+    /// </summary>
+    private void BeginVersionProbe(
+        TextBlock target,
+        int generation,
+        Func<int> readGeneration,
+        Func<ExternalToolStatus> locate)
+    {
+        target.Text = "正在检测…";
+        target.Foreground = BrushCache.Muted;
+        var dispatcher = Dispatcher;
+        System.Threading.Tasks.Task.Run(locate).ContinueWith(task =>
+        {
+            void Apply()
+            {
+                if (generation != readGeneration())
+                {
+                    return;
+                }
+
+                if (task.IsFaulted || task.IsCanceled)
+                {
+                    _ = task.Exception;
+                    target.Text = ExternalToolStatus.NotFoundText;
+                    target.Foreground = BrushCache.Muted;
+                    return;
+                }
+
+                var status = task.Result;
+                target.Text = status.DisplayText;
+                target.Foreground = status.Found && !string.IsNullOrWhiteSpace(status.Version)
+                    ? BrushCache.Text
+                    : BrushCache.Muted;
+            }
+
+            try
+            {
+                if (dispatcher.CheckAccess())
+                {
+                    Apply();
+                }
+                else
+                {
+                    dispatcher.BeginInvoke(Apply);
+                }
+            }
+            catch (InvalidOperationException)
+            {
+            }
+        });
     }
 
     /// <summary>
@@ -450,9 +592,9 @@ public sealed class SettingsWindow : Window
     }
 
     /// <summary>
-    /// 路径框失去焦点时，把有变化的路径写进本机设置。
+    /// 路径框失去焦点时，把有变化的路径写进本机设置，并重新检测版本。
     /// </summary>
-    private void BindToolPath(TextBox box, Func<string?> read, Action<string?> write)
+    private void BindToolPath(TextBox box, Func<string?> read, Action<string?> write, Action<string?> changed)
     {
         box.Text = read() ?? "";
         if (mSettingsSaveBlocked)
@@ -471,6 +613,7 @@ public sealed class SettingsWindow : Window
 
             write(value);
             TrySaveSettings();
+            changed(value);
         };
     }
 

@@ -37,7 +37,7 @@ public static class PromptRenderer
                     : line.Item.Intent is MediaIntentCodes.WorkRegister or MediaIntentCodes.WorkUpdate
                         ? $"{line.Item.Channel}/{line.Item.WorkId}  {line.Item.Title}  {line.Item.StartedOn}  {line.Item.Place}".Trim()
                         : line.Item.Intent == MediaIntentCodes.StageIngest && NoteRules.IsNotesChannel(line.Item.Channel)
-                            ? NoteIngestTarget(line.Item)
+                            ? NoteIngestTarget(line.Item, line.Decision)
                             : line.Item.Object ?? line.Item.StageFolder ?? line.Item.StageRel ?? line.Item.WorkId;
             builder.AppendLine($"- [{mark}] {line.Item.Intent}  {target}");
             if (!string.IsNullOrWhiteSpace(line.Decision.Message))
@@ -64,8 +64,23 @@ public static class PromptRenderer
 
     /// <summary>
     /// 心得上页的列表目标。配图写出相对这篇笔记文件夹的路径，子文件夹里的文件带上目录。正文不显示成图片对象键。
+    /// 拒绝行在路径前写上笔记标题，多篇一起预演时能分清是哪一篇。
     /// </summary>
-    private static string NoteIngestTarget(IntentItem item)
+    private static string NoteIngestTarget(IntentItem item, GateDecision decision)
+    {
+        var target = NoteIngestPath(item);
+        if (!decision.Allowed && !string.IsNullOrWhiteSpace(item.Title))
+        {
+            return "「" + item.Title.Trim() + "」 " + target;
+        }
+
+        return target;
+    }
+
+    /// <summary>
+    /// 心得上页行里的路径或夹名，不含笔记标题。
+    /// </summary>
+    private static string NoteIngestPath(IntentItem item)
     {
         if (!NoteRules.IsBodyStageRel(item.StageRel))
         {

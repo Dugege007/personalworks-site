@@ -222,22 +222,166 @@ public static class PreviewReporter
         foreach (var group in groups)
         {
             var members = group.ToList();
+            var title = NoteDisplayTitle(session, folder, group.Key);
             var hasBody = members.Any(line => NoteRules.IsBodyStageRel(line.Item.StageRel));
             if (!hasBody)
             {
-                ReplaceNoteDecisions(lineList, members, GateDecision.Reject("须标记正文.md 才能上页这篇心得，不能只标记配图。"));
+                ReplaceNoteDecisions(lineList, members, GateDecision.Reject("须标记正文.md 才能上页这篇心得，不能只标记配图。"), title);
                 continue;
             }
 
             if (string.IsNullOrWhiteSpace(group.Key))
             {
-                ReplaceNoteDecisions(lineList, members, GateDecision.Reject("找不到这篇心得的夹。"));
+                ReplaceNoteDecisions(lineList, members, GateDecision.Reject("找不到这篇心得的夹。"), title);
                 continue;
             }
 
             var replacement = BuildNotePublishLines(session, folder, group.Key, members);
-            ReplaceNoteLines(lineList, members, replacement);
+            ReplaceNoteLines(lineList, members, StampRejectedNoteTitle(replacement, title));
         }
+    }
+
+    /// <summary>
+    /// 预演拒绝行使用的笔记标题。优先用项目栏里的标题，和批量上页检查的名称一致；项目栏没有时读正文一级标题，再读心得配置，最后用文件夹名。
+    /// </summary>
+    private static string NoteDisplayTitle(WorkspaceSession session, string channelFolder, string folderName)
+    {
+        if (string.IsNullOrWhiteSpace(folderName))
+        {
+            return "未识别的笔记";
+        }
+
+        var listed = session.Works.FirstOrDefault(item =>
+            string.Equals(item.SourceKind, "note", StringComparison.Ordinal)
+            && string.Equals(item.Id, folderName, StringComparison.Ordinal));
+        if (!string.IsNullOrWhiteSpace(listed?.Title))
+        {
+            return listed.Title.Trim();
+        }
+
+        var stageRoot = WorkspaceProfileLoader.ResolveUnderRoot(session.Profile, session.Profile.StageRoot);
+        var folderFull = Path.Combine(
+            stageRoot,
+            channelFolder.Replace('/', Path.DirectorySeparatorChar),
+            folderName);
+        if (!Directory.Exists(folderFull))
+        {
+            return folderName;
+        }
+
+        var heading = ReadNoteHeading(folderFull);
+        if (heading.Length > 0)
+        {
+            return heading;
+        }
+
+        var configTitle = ReadNoteConfigTitle(folderFull);
+        if (configTitle.Length > 0)
+        {
+            return configTitle;
+        }
+
+        return folderName;
+    }
+
+    /// <summary>
+    /// 读取正文第一个一级标题。读不到时返回空，不改文件。
+    /// </summary>
+    private static string ReadNoteHeading(string folderFull)
+    {
+        var bodyPath = Path.Combine(folderFull, NoteRules.BodyFileName);
+        if (!File.Exists(bodyPath))
+        {
+            return "";
+        }
+
+        try
+        {
+            return NoteRules.ReadFirstHeading(File.ReadAllText(bodyPath)).Trim();
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return "";
+        }
+    }
+
+    /// <summary>
+    /// 读取心得配置里的标题。读不到时返回空，不改文件。
+    /// </summary>
+    private static string ReadNoteConfigTitle(string folderFull)
+    {
+        var configPath = Path.Combine(folderFull, NoteConfigStore.FileName);
+        if (!File.Exists(configPath))
+        {
+            return "";
+        }
+
+        try
+        {
+            return NoteConfigStore.Load(configPath).Title.Trim();
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            return "";
+        }
+    }
+
+    /// <summary>
+    /// 给拒绝行写上笔记标题。允许的行保持原样，避免成功预演多出标题。
+    /// </summary>
+    private static List<PreviewLine> StampRejectedNoteTitle(List<PreviewLine> lineList, string title)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+        {
+            return lineList;
+        }
+
+        for (var index = 0; index < lineList.Count; index++)
+        {
+            if (lineList[index].Decision.Allowed)
+            {
+                continue;
+            }
+
+            lineList[index] = CopyLineWithTitle(lineList[index], title.Trim());
+        }
+
+        return lineList;
+    }
+
+    /// <summary>
+    /// 复制预演行并写上标题。不改原来的意图条目，避免标题被写进随后保存的意图文件。
+    /// </summary>
+    private static PreviewLine CopyLineWithTitle(PreviewLine line, string title)
+    {
+        var item = line.Item;
+        return new PreviewLine
+        {
+            Item = new IntentItem
+            {
+                Intent = item.Intent,
+                WorkId = item.WorkId,
+                Channel = item.Channel,
+                Object = item.Object,
+                StageRel = item.StageRel,
+                SourceStageRel = item.SourceStageRel,
+                StageFolder = item.StageFolder,
+                StageRelBefore = item.StageRelBefore,
+                StageRelAfter = item.StageRelAfter,
+                Title = title,
+                StartedOn = item.StartedOn,
+                Place = item.Place,
+                Year = item.Year,
+                Themes = item.Themes,
+                Tags = item.Tags,
+                LabelBefore = item.LabelBefore,
+                Target = item.Target,
+                Description = item.Description,
+                ObjectList = item.ObjectList,
+                Stars = item.Stars
+            },
+            Decision = line.Decision
+        };
     }
 
     /// <summary>
@@ -428,7 +572,11 @@ public static class PreviewReporter
     /// <summary>
     /// 同一夹的原预演行改成同一条结论，条目本身不动。
     /// </summary>
-    private static void ReplaceNoteDecisions(List<PreviewLine> lineList, List<PreviewLine> members, GateDecision decision)
+    private static void ReplaceNoteDecisions(
+        List<PreviewLine> lineList,
+        List<PreviewLine> members,
+        GateDecision decision,
+        string title)
     {
         foreach (var line in members)
         {
@@ -438,7 +586,10 @@ public static class PreviewReporter
                 continue;
             }
 
-            lineList[index] = new PreviewLine { Item = line.Item, Decision = decision };
+            var replaced = new PreviewLine { Item = line.Item, Decision = decision };
+            lineList[index] = decision.Allowed || string.IsNullOrWhiteSpace(title)
+                ? replaced
+                : CopyLineWithTitle(replaced, title.Trim());
         }
     }
 

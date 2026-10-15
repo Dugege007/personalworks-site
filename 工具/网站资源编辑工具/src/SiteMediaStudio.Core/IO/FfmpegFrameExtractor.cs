@@ -8,14 +8,6 @@ namespace PersonalWorks.SiteMediaStudio.Core;
 /// </summary>
 public static class FfmpegFrameExtractor
 {
-    private static readonly string[] CommonFfmpegPathList =
-    {
-        @"C:\ffmpeg\bin\ffmpeg.exe",
-        @"C:\Program Files\ffmpeg\bin\ffmpeg.exe",
-        @"C:\Program Files\MediaCoder\ffmpeg.exe",
-        @"C:\Program Files\MediaCoder\tools\ffmpeg.exe",
-        @"C:\Program Files\MediaCoder\tools64\ffmpeg.exe"
-    };
 
     /// <summary>
     /// 抽帧到字节；失败返回空。
@@ -153,46 +145,13 @@ public static class FfmpegFrameExtractor
     }
 
     /// <summary>
-    /// 设置路径、常见安装位或 PATH 上的 ffmpeg。
+    /// 设置路径、常见安装位或 PATH 上的 ffmpeg。只检查文件是否存在，不启动程序。
     /// </summary>
     public static string? ResolveFfmpeg(string? configuredPath)
     {
-        if (!string.IsNullOrWhiteSpace(configuredPath) && File.Exists(configuredPath))
-        {
-            return configuredPath;
-        }
-
-        foreach (var candidate in CommonFfmpegPathList)
-        {
-            if (File.Exists(candidate))
-            {
-                return candidate;
-            }
-        }
-
-        return FindOnPath("ffmpeg.exe") ?? FindOnPath("ffmpeg");
-    }
-
-    /// <summary>
-    /// 在 PATH 中查找可执行文件。
-    /// </summary>
-    private static string? FindOnPath(string name)
-    {
-        var pathEnv = Environment.GetEnvironmentVariable("PATH");
-        if (string.IsNullOrWhiteSpace(pathEnv))
-        {
-            return null;
-        }
-
-        foreach (var dir in pathEnv.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries))
-        {
-            var candidate = Path.Combine(dir.Trim(), name);
-            if (File.Exists(candidate))
-            {
-                return candidate;
-            }
-        }
-
-        return null;
+        return ExternalToolLocator.ResolvePath(
+            configuredPath,
+            ExternalToolLocator.FfmpegCommonPathList,
+            ExternalToolLocator.FfmpegFileNameList);
     }
 }
