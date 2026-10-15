@@ -48,6 +48,11 @@ public sealed class ShellViewModel : ViewModelBase
     private bool mShowNoteImageCompressed;
     private NoteImageAuditReport? mNoteAudit;
     private string mNoteAuditError = "";
+
+    /// <summary>
+    /// 这次网格重建在切换笔记时已经体检过。完成时只补角标，不再读第二遍磁盘。
+    /// </summary>
+    private int mNoteAuditForRebuildToken;
     private string mPreviewHint = "选择一张图查看详情。";
     private string mNoticeText = "";
     private ImageSource? mInspectorImage;
@@ -701,7 +706,7 @@ public sealed class ShellViewModel : ViewModelBase
                 ResetSelectionHistoryForScope();
                 ScheduleRebuildCards();
                 RefreshNoteImageAudit();
-                ApplyNoteImageBadges();
+                mNoteAuditForRebuildToken = mRebuildToken;
                 UpdateInspector();
             }
         }
@@ -2724,7 +2729,8 @@ public sealed class ShellViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// 标记了正文才上页整篇。只标记配图则失败。成功后这些标记不再走作品上页。
+    /// 标记了正文才上页整篇。先检查全部选中笔记的正文标记、缺失配图和文件夹外引用，有任何一篇不通过就一篇都不上页，并列出原因。
+    /// 成功后这些标记不再走作品上页。
     /// </summary>
     private bool PublishMarkedNotes(IReadOnlyList<IntentItem> noteIngestList, out string error)
     {
@@ -2736,19 +2742,40 @@ public sealed class ShellViewModel : ViewModelBase
 
         var channel = mSession.Profile.Channels.First(item => NoteRules.IsNotesChannel(item.Key));
         var channelFolder = WorkspaceProfileLoader.ChannelStageRelative(mSession.Profile, channel);
-        var groups = noteIngestList.GroupBy(item => NoteRules.NoteFolderFromStageRel(item.StageRel, channelFolder) ?? "");
-        foreach (var group in groups)
+        var groupList = noteIngestList
+            .GroupBy(item => NoteRules.NoteFolderFromStageRel(item.StageRel, channelFolder) ?? "")
+            .ToList();
+        var checkList = new List<NotePublishCheck>();
+        foreach (var group in groupList)
         {
-            if (!group.Any(item => NoteRules.IsBodyStageRel(item.StageRel)))
+            var folderId = group.Key;
+            if (folderId.Length == 0)
             {
-                error = "须标记正文.md 才能上页这篇心得，不能只标记配图。";
-                return false;
+                checkList.Add(new NotePublishCheck
+                {
+                    Name = NotePublishName(folderId),
+                    Recognized = false
+                });
+                continue;
             }
+
+            checkList.Add(new NotePublishCheck
+            {
+                Name = NotePublishName(folderId),
+                HasBodyMark = group.Any(item => NoteRules.IsBodyStageRel(item.StageRel)),
+                ImageBlock = DescribePublishBlock(NoteFolderPath(folderId), mSession.Profile)
+            });
         }
 
-        foreach (var group in groups)
+        error = NotePublishBatch.BlockReason(checkList);
+        if (error.Length > 0)
         {
-            var failure = PublishNoteFolder(group.Key);
+            return false;
+        }
+
+        foreach (var group in groupList)
+        {
+            var failure = PublishNoteFolder(group.Key, imageAuditPassed: true);
             if (failure != null)
             {
                 error = failure;
@@ -2757,6 +2784,22 @@ public sealed class ShellViewModel : ViewModelBase
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// 批量上页提示里使用的笔记名称。没有标题时用文件夹名。
+    /// </summary>
+    private string NotePublishName(string folderId)
+    {
+        if (folderId.Length == 0)
+        {
+            return "未识别的笔记";
+        }
+
+        var title = mSession?.Works.FirstOrDefault(item =>
+            item.SourceKind == "note"
+            && string.Equals(item.Id, folderId, StringComparison.Ordinal))?.Title;
+        return string.IsNullOrWhiteSpace(title) ? folderId : title;
     }
 
     /// <summary>
@@ -2806,8 +2849,9 @@ public sealed class ShellViewModel : ViewModelBase
 
     /// <summary>
     /// 上页指定夹。不弹确认，不刷新界面。
+    /// imageAuditPassed 为真时，调用方已经检查过全部选中笔记的缺失配图和文件夹外引用，这里不再逐篇拦下。
     /// </summary>
-    private string? PublishNoteFolder(string folderId)
+    private string? PublishNoteFolder(string folderId, bool imageAuditPassed = false)
     {
         if (mSession == null)
         {
@@ -2816,10 +2860,13 @@ public sealed class ShellViewModel : ViewModelBase
 
         var profile = mSession.Profile;
         var folder = NoteFolderPath(folderId);
-        var block = DescribePublishBlock(folder, profile);
-        if (block.Length > 0)
+        if (!imageAuditPassed)
         {
-            return block;
+            var block = DescribePublishBlock(folder, profile);
+            if (block.Length > 0)
+            {
+                return block;
+            }
         }
 
         var marked = MarkedNoteIngest(folderId);
@@ -4276,7 +4323,12 @@ public sealed class ShellViewModel : ViewModelBase
     /// </summary>
     private void ApplyCardSurfaceChrome(bool scrollToFocus)
     {
-        RefreshNoteImageAudit();
+        if (mNoteAuditForRebuildToken != mRebuildToken)
+        {
+            RefreshNoteImageAudit();
+        }
+
+        mNoteAuditForRebuildToken = 0;
         ApplyNoteImageBadges();
         ApplyPersistedMarks();
         RefreshIngestWorks();

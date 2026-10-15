@@ -5,19 +5,75 @@ namespace PersonalWorks.SiteMediaStudio.Core;
 /// </summary>
 public static class RunLog
 {
+    private static readonly AsyncLocal<string?> mOverridePath = new();
+    private static Func<string>? mTestPathFactory;
+
     /// <summary>
-    /// %AppData%/SiteMediaStudio/run.log
+    /// 这次调用要写入的日志。测试设置了覆盖路径或测试工厂时，不再使用本机设置文件夹。
     /// </summary>
     public static string FilePath
     {
         get
         {
-            var dir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "SiteMediaStudio");
-            Directory.CreateDirectory(dir);
-            return Path.Combine(dir, "run.log");
+            var path = mOverridePath.Value;
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                return path;
+            }
+
+            var factory = mTestPathFactory;
+            if (factory != null)
+            {
+                path = factory();
+                if (string.IsNullOrWhiteSpace(path))
+                {
+                    throw new InvalidOperationException("测试日志路径不能为空。");
+                }
+
+                EnsureDirectory(path);
+                mOverridePath.Value = path;
+                return path;
+            }
+
+            return MachineFilePath();
         }
+    }
+
+    /// <summary>
+    /// 本机设置文件夹中的运行日志：%AppData%/SiteMediaStudio/run.log。
+    /// </summary>
+    public static string MachineFilePath()
+    {
+        var dir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "SiteMediaStudio");
+        Directory.CreateDirectory(dir);
+        return Path.Combine(dir, "run.log");
+    }
+
+    /// <summary>
+    /// 在当前异步流里改用指定日志文件，直到释放。供测试把日志指到自己的临时文件。
+    /// </summary>
+    public static IDisposable UsePath(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            throw new ArgumentException("日志路径不能为空。", nameof(path));
+        }
+
+        EnsureDirectory(path);
+        var previous = mOverridePath.Value;
+        mOverridePath.Value = path;
+        return new RestoreOverride(previous);
+    }
+
+    /// <summary>
+    /// 测试进程启动时注册。当前异步流还没有覆盖路径时，用工厂生成一个临时日志文件并记住。
+    /// 正式程序不注册，仍然写入本机设置文件夹。
+    /// </summary>
+    public static void SetTestPathFactory(Func<string>? factory)
+    {
+        mTestPathFactory = factory;
     }
 
     /// <summary>
@@ -73,5 +129,36 @@ public static class RunLog
         }
 
         return normalized[..800].Replace('\n', ' ') + "…";
+    }
+
+    private static void EnsureDirectory(string path)
+    {
+        var directory = Path.GetDirectoryName(path);
+        if (!string.IsNullOrWhiteSpace(directory))
+        {
+            Directory.CreateDirectory(directory);
+        }
+    }
+
+    private sealed class RestoreOverride : IDisposable
+    {
+        private readonly string? mPrevious;
+        private bool mDisposed;
+
+        public RestoreOverride(string? previous)
+        {
+            mPrevious = previous;
+        }
+
+        public void Dispose()
+        {
+            if (mDisposed)
+            {
+                return;
+            }
+
+            mDisposed = true;
+            mOverridePath.Value = mPrevious;
+        }
     }
 }

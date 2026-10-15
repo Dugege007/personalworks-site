@@ -46,6 +46,24 @@ public sealed class FileLockRetryTests
         Assert.Equal(FileLockRetry.MaxAttempts, runs);
     }
 
+    [Fact]
+    public void DefaultDelay_TotalsTwoSeconds()
+    {
+        var total = TimeSpan.Zero;
+        for (var attempt = 1; attempt < FileLockRetry.MaxAttempts; attempt++)
+        {
+            total += FileLockRetry.DefaultDelay(attempt);
+        }
+
+        Assert.Equal(TimeSpan.FromSeconds(2), total);
+        Assert.Equal(TimeSpan.FromMilliseconds(100), FileLockRetry.DefaultDelay(1));
+        Assert.Equal(TimeSpan.FromMilliseconds(200), FileLockRetry.DefaultDelay(2));
+        Assert.Equal(TimeSpan.FromMilliseconds(400), FileLockRetry.DefaultDelay(3));
+        Assert.Equal(TimeSpan.FromMilliseconds(800), FileLockRetry.DefaultDelay(4));
+        Assert.Equal(TimeSpan.FromMilliseconds(500), FileLockRetry.DefaultDelay(5));
+        Assert.Equal(TimeSpan.Zero, FileLockRetry.DefaultDelay(FileLockRetry.MaxAttempts));
+    }
+
     private static IOException WithCode(int code)
     {
         var error = new IOException("文件被占用");
