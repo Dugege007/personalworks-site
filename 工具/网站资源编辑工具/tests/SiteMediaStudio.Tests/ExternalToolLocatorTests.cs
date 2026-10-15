@@ -54,17 +54,44 @@ public sealed class ExternalToolLocatorTests
         using var tree = new TempTree();
         var status = ExternalToolLocator.Locate(new ExternalToolRequest
         {
-            ConfiguredPath = tree.Missing("configured"),
+            ConfiguredPath = "   ",
             CommonPathList = new[] { tree.Missing("common") },
             FileNameList = new[] { "pngquant.exe", "pngquant" },
-            PathEnvironment = tree.MakeDirectory("empty")
+            PathEnvironment = tree.MakeDirectory("empty"),
+            PathExt = ""
         });
 
         Assert.False(status.Found);
+        Assert.False(status.ConfiguredPathMissing);
         Assert.Null(status.FilePath);
         Assert.Null(status.Version);
         Assert.False(status.VersionTimedOut);
         Assert.Equal(ExternalToolStatus.NotFoundText, status.DisplayText);
+    }
+
+    [Fact]
+    public void Locate_WhenConfiguredPathDoesNotExist_DoesNotUseAnotherProgram()
+    {
+        using var tree = new TempTree();
+        var common = tree.Touch("common", "pngquant");
+        var pathDir = tree.MakeDirectory("on-path");
+        tree.Touch("on-path", "pngquant.exe");
+
+        var status = ExternalToolLocator.Locate(new ExternalToolRequest
+        {
+            ConfiguredPath = tree.Missing("configured"),
+            CommonPathList = new[] { common },
+            FileNameList = new[] { "pngquant.exe", "pngquant" },
+            PathEnvironment = pathDir,
+            PathExt = ".EXE;.CMD",
+            ProbeVersion = true
+        });
+
+        Assert.False(status.Found);
+        Assert.True(status.ConfiguredPathMissing);
+        Assert.Null(status.FilePath);
+        Assert.Null(status.Version);
+        Assert.Equal(ExternalToolStatus.ConfiguredPathMissingText, status.DisplayText);
     }
 
     [Fact]
@@ -83,7 +110,7 @@ public sealed class ExternalToolLocatorTests
         var names = new[] { "pngquant" };
 
         var fromConfigured = ExternalToolLocator.Locate(Request(configured, new[] { common }, names, pathDir));
-        var fromCommon = ExternalToolLocator.Locate(Request(tree.Missing("nope"), new[] { common }, names, pathDir));
+        var fromCommon = ExternalToolLocator.Locate(Request("   ", new[] { common }, names, pathDir));
         var fromPath = ExternalToolLocator.Locate(Request(null, new[] { tree.Missing("nope") }, names, pathDir));
 
         Assert.Equal("from-configured", fromConfigured.Version);
@@ -116,32 +143,121 @@ public sealed class ExternalToolLocatorTests
     }
 
     [Fact]
+    public void ResolvePath_StripsQuotesAroundPathEntries()
+    {
+        using var tree = new TempTree();
+        var directory = tree.MakeDirectory("program files");
+        var executable = tree.Touch("program files", "pngquant.exe");
+        var quoted = "\"" + directory + "\"";
+
+        var resolved = ExternalToolLocator.ResolvePath(
+            null,
+            Array.Empty<string>(),
+            new[] { "pngquant.exe" },
+            quoted,
+            "");
+
+        Assert.Equal(executable, resolved);
+    }
+
+    [Fact]
+    public void ResolvePath_UsesPathExtForNamesThatHaveNoExtension()
+    {
+        using var tree = new TempTree();
+        var directory = tree.MakeDirectory("bin");
+        var command = tree.Touch("bin", "oxipng.cmd");
+        var batch = tree.Touch("bin", "gifsicle.bat");
+        var executable = tree.Touch("bin", "pngquant.exe");
+        tree.Touch("bin", "pngquant.cmd");
+
+        var fromCmd = ExternalToolLocator.ResolvePath(
+            null,
+            Array.Empty<string>(),
+            new[] { "oxipng" },
+            directory,
+            ".com;.exe;.bat;.cmd");
+        var fromBat = ExternalToolLocator.ResolvePath(
+            null,
+            Array.Empty<string>(),
+            new[] { "gifsicle.exe", "gifsicle" },
+            directory,
+            ".bat");
+        var prefersExe = ExternalToolLocator.ResolvePath(
+            null,
+            Array.Empty<string>(),
+            new[] { "pngquant" },
+            directory,
+            ".exe;.cmd");
+
+        Assert.Equal(command, fromCmd);
+        Assert.Equal(batch, fromBat);
+        Assert.Equal(executable, prefersExe);
+    }
+
+    [Fact]
+    public void ResolvePath_ReadsPathExtFromTheProcessEnvironmentWhenOmitted()
+    {
+        using var tree = new TempTree();
+        var directory = tree.MakeDirectory("bin");
+        var command = tree.Touch("bin", "oxipng.cmd");
+        var previous = Environment.GetEnvironmentVariable("PATHEXT");
+        try
+        {
+            Environment.SetEnvironmentVariable("PATHEXT", ".cmd");
+
+            var resolved = ExternalToolLocator.ResolvePath(
+                null,
+                Array.Empty<string>(),
+                new[] { "oxipng" },
+                directory);
+
+            Assert.Equal(command, resolved);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("PATHEXT", previous);
+        }
+    }
+
+    [Fact]
     public void Locate_WhenProgramHangs_ReturnsBeforeTheTimeoutWindowExpires()
     {
-        if (!CanRunUnixScripts())
-        {
-            return;
-        }
-
-        using var tree = new TempTree();
-        var script = tree.WriteExecutable("bin", "gifsicle", "#!/bin/sh\nsleep 30\n");
+        var (file, args) = HangCommand();
+        Assert.True(File.Exists(file), "找不到用来卡住的命令：" + file);
         var watch = Stopwatch.StartNew();
 
         var status = ExternalToolLocator.Locate(new ExternalToolRequest
         {
-            ConfiguredPath = script,
+            ConfiguredPath = file,
             CommonPathList = Array.Empty<string>(),
-            FileNameList = new[] { "gifsicle" },
-            PathEnvironment = tree.MakeDirectory("empty"),
+            FileNameList = Array.Empty<string>(),
+            PathEnvironment = "",
+            VersionArgumentList = args,
             VersionTimeoutMs = 400
         });
 
         watch.Stop();
         Assert.True(status.Found);
+        Assert.Equal(file, status.FilePath);
         Assert.True(status.VersionTimedOut);
         Assert.Null(status.Version);
         Assert.Equal(ExternalToolStatus.VersionUnreadText, status.DisplayText);
         Assert.True(watch.Elapsed < TimeSpan.FromSeconds(5), "版本探测超时后仍等待了 " + watch.Elapsed);
+    }
+
+    /// <summary>
+    /// Windows 和 Linux 上都会卡住一会儿的命令。超时测试不能在某一边直接返回。
+    /// </summary>
+    private static (string FileName, string[] ArgumentList) HangCommand()
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            return (
+                Path.Combine(Environment.SystemDirectory, "cmd.exe"),
+                new[] { "/d", "/c", "ping -n 30 127.0.0.1" });
+        }
+
+        return ("/bin/sh", new[] { "-c", "sleep 30" });
     }
 
     [Fact]
