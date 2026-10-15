@@ -18,9 +18,19 @@ public sealed class ExternalToolStatus
     public const string VersionUnreadText = "未能读取版本";
 
     /// <summary>
+    /// 设置里填写了路径，但磁盘上没有这个文件时显示的文字。
+    /// </summary>
+    public const string ConfiguredPathMissingText = "填写的路径不存在";
+
+    /// <summary>
     /// 是否找到了可执行文件。
     /// </summary>
     public bool Found { get; init; }
+
+    /// <summary>
+    /// 设置里填写了路径，但该文件不存在。此时不再改用常见安装位置或系统 PATH 里的其他程序。
+    /// </summary>
+    public bool ConfiguredPathMissing { get; init; }
 
     /// <summary>
     /// 找到的可执行文件路径。没找到时为空。
@@ -38,9 +48,22 @@ public sealed class ExternalToolStatus
     public bool VersionTimedOut { get; init; }
 
     /// <summary>
-    /// 设置窗口直接显示的文字：版本原文、「未能读取版本」或「未找到」。
+    /// 设置窗口直接显示的文字：版本原文、「未能读取版本」、「填写的路径不存在」或「未找到」。
     /// </summary>
     public string DisplayText { get; init; } = NotFoundText;
+
+    /// <summary>
+    /// 设置里填写的路径在磁盘上不存在。
+    /// </summary>
+    public static ExternalToolStatus ConfiguredMissing()
+    {
+        return new ExternalToolStatus
+        {
+            Found = false,
+            ConfiguredPathMissing = true,
+            DisplayText = ConfiguredPathMissingText
+        };
+    }
 
     /// <summary>
     /// 三级查找都没有命中。
@@ -102,7 +125,8 @@ public sealed class ExternalToolStatus
 public sealed class ExternalToolRequest
 {
     /// <summary>
-    /// 本机设置里填写的路径。空或文件不存在时继续往下找。
+    /// 本机设置里填写的路径。空白时继续往下找。
+    /// 写了具体路径但文件不存在时，<see cref="ExternalToolLocator.Locate"/> 不再改用其他位置。
     /// </summary>
     public string? ConfiguredPath { get; init; }
 
@@ -120,6 +144,12 @@ public sealed class ExternalToolRequest
     /// 用来搜索的 PATH 文本。null 表示读取当前进程的环境变量。
     /// </summary>
     public string? PathEnvironment { get; init; }
+
+    /// <summary>
+    /// 在 PATH 中给没有扩展名的文件名追加的扩展名列表，分号分隔，例如 <c>.COM;.EXE;.BAT;.CMD</c>。
+    /// null 表示读取当前进程的 PATHEXT。空字符串表示不追加扩展名。
+    /// </summary>
+    public string? PathExt { get; init; }
 
     /// <summary>
     /// 找到文件后是否启动它来读取版本。只解析路径时设为 false，避免把现有 FFmpeg 查找变成会启动程序的操作。
@@ -212,11 +242,17 @@ public static class ExternalToolLocator
             throw new ArgumentNullException(nameof(request));
         }
 
+        if (IsConfiguredPathMissing(request.ConfiguredPath))
+        {
+            return ExternalToolStatus.ConfiguredMissing();
+        }
+
         var filePath = ResolvePath(
             request.ConfiguredPath,
             request.CommonPathList,
             request.FileNameList,
-            request.PathEnvironment);
+            request.PathEnvironment,
+            request.PathExt);
         if (filePath == null)
         {
             return ExternalToolStatus.NotFound();
@@ -231,13 +267,16 @@ public static class ExternalToolLocator
     }
 
     /// <summary>
-    /// 只解析路径，不启动程序。顺序与 <see cref="Locate"/> 相同。
+    /// 只解析路径，不启动程序。
+    /// 设置路径不存在时仍继续查找常见位置和 PATH，供现有 FFmpeg 使用。
+    /// 设置窗口要区分「填写的路径不存在」时，应调用 <see cref="Locate"/>，不要用这个方法。
     /// </summary>
     public static string? ResolvePath(
         string? configuredPath,
         IReadOnlyList<string>? commonPathList,
         IReadOnlyList<string>? fileNameList,
-        string? pathEnvironment = null)
+        string? pathEnvironment = null,
+        string? pathExt = null)
     {
         if (!string.IsNullOrWhiteSpace(configuredPath) && File.Exists(configuredPath))
         {
@@ -255,7 +294,15 @@ public static class ExternalToolLocator
             }
         }
 
-        return FindOnPath(fileNameList, pathEnvironment);
+        return FindOnPath(fileNameList, pathEnvironment, pathExt);
+    }
+
+    /// <summary>
+    /// 设置里写了路径，但对应文件不存在。空白不算填写。
+    /// </summary>
+    private static bool IsConfiguredPathMissing(string? configuredPath)
+    {
+        return !string.IsNullOrWhiteSpace(configuredPath) && !File.Exists(configuredPath);
     }
 
     #region 查找
@@ -311,8 +358,9 @@ public static class ExternalToolLocator
 
     /// <summary>
     /// 在 PATH 的每个目录里查找。一个文件名找完所有目录后，才找下一个文件名。
+    /// 目录两侧的引号会去掉。没有扩展名的文件名再按 PATHEXT 追加扩展名，例如 .cmd 和 .bat。
     /// </summary>
-    private static string? FindOnPath(IReadOnlyList<string>? fileNameList, string? pathEnvironment)
+    private static string? FindOnPath(IReadOnlyList<string>? fileNameList, string? pathEnvironment, string? pathExt)
     {
         if (fileNameList == null || fileNameList.Count == 0)
         {
@@ -325,6 +373,7 @@ public static class ExternalToolLocator
             return null;
         }
 
+        var extensionList = ParsePathExt(pathExt);
         var dirList = pathEnv.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries);
         foreach (var fileName in fileNameList)
         {
@@ -335,21 +384,94 @@ public static class ExternalToolLocator
 
             foreach (var dir in dirList)
             {
-                var trimmed = dir.Trim();
+                var trimmed = UnquotePathEntry(dir);
                 if (trimmed.Length == 0)
                 {
                     continue;
                 }
 
-                var candidate = Path.Combine(trimmed, fileName);
-                if (File.Exists(candidate))
+                var found = FindInDirectory(trimmed, fileName, extensionList);
+                if (found != null)
                 {
-                    return candidate;
+                    return found;
                 }
             }
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// 先找同名文件。文件名本身没有扩展名时，再按 PATHEXT 的顺序追加扩展名。
+    /// </summary>
+    private static string? FindInDirectory(string directory, string fileName, IReadOnlyList<string> extensionList)
+    {
+        var exact = Path.Combine(directory, fileName);
+        if (File.Exists(exact))
+        {
+            return exact;
+        }
+
+        if (Path.HasExtension(fileName) || extensionList.Count == 0)
+        {
+            return null;
+        }
+
+        foreach (var extension in extensionList)
+        {
+            var candidate = exact + extension;
+            if (File.Exists(candidate))
+            {
+                return candidate;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// 去掉 PATH 条目两侧的空格和一对双引号。
+    /// </summary>
+    private static string UnquotePathEntry(string entry)
+    {
+        var trimmed = entry.Trim();
+        if (trimmed.Length >= 2 && trimmed[0] == '"' && trimmed[^1] == '"')
+        {
+            trimmed = trimmed[1..^1].Trim();
+        }
+
+        return trimmed;
+    }
+
+    /// <summary>
+    /// 把 PATHEXT 拆成带点的扩展名。null 时读取当前进程的环境变量。
+    /// </summary>
+    private static IReadOnlyList<string> ParsePathExt(string? pathExt)
+    {
+        var text = pathExt ?? Environment.GetEnvironmentVariable("PATHEXT");
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return Array.Empty<string>();
+        }
+
+        var extensionList = new List<string>();
+        foreach (var part in text.Split(';', StringSplitOptions.RemoveEmptyEntries))
+        {
+            var extension = part.Trim();
+            if (extension.Length == 0 || extension == ".")
+            {
+                continue;
+            }
+
+            if (!extension.StartsWith('.'))
+            {
+                extension = "." + extension;
+            }
+
+            extensionList.Add(extension);
+        }
+
+        return extensionList;
     }
 
     #endregion

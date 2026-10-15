@@ -226,7 +226,7 @@ public sealed class SettingsWindow : Window
     private void AddExternalProgramSection(StackPanel body)
     {
         body.Children.Add(SectionTitle("外部程序", first: false));
-        body.Children.Add(Muted("下面三个路径只保存在本机设置里。留空时继续查找常见安装位置和系统 PATH。每一行右侧是检测到的版本；找不到时显示「未找到」。"));
+        body.Children.Add(Muted("下面三个路径只保存在本机设置里。留空时继续查找常见安装位置和系统 PATH。填写的路径在磁盘上不存在时，右侧显示「填写的路径不存在」，不再改用其他位置上的程序。路径留空而且都没有找到时，显示「未找到」。找到程序时，右侧显示版本。"));
         var pngquantVersion = AddToolPathRow(body, "pngquant 路径", out var pngquant);
         BindToolPath(
             pngquant,
@@ -357,6 +357,13 @@ public sealed class SettingsWindow : Window
                 }
 
                 var status = task.Result;
+                if (status.ConfiguredPathMissing)
+                {
+                    target.Text = ExternalToolStatus.ConfiguredPathMissingText;
+                    target.Foreground = BrushCache.Muted;
+                    return;
+                }
+
                 target.Text = status.DisplayText;
                 target.Foreground = status.Found && !string.IsNullOrWhiteSpace(status.Version)
                     ? BrushCache.Text
