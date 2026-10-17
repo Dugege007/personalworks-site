@@ -142,7 +142,7 @@ export function PhotoCatalogPage() {
           src: frame.src,
           label,
           alt: `${frame.work.title} ${label}`,
-          description: frame.media.description,
+          description: resolveMediaDescription(frame.media, frame.work.summary),
           exif: readPhotoExif(frame.src),
         };
       }),

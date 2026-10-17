@@ -80,11 +80,11 @@ export function ProjectGallery({
         label: image.label,
         kind: image.kind ?? "image",
         poster: image.poster,
-        description: image.description,
+        description: resolveMediaDescription(image, activeProject?.summary),
         alt: `${activeProject?.title ?? ""} ${image.label}`,
         exif: variant === "photo" && image.kind !== "video" ? readPhotoExif(image.src) : undefined,
       })),
-    [activeProject?.title, activeSequence, variant],
+    [activeProject?.title, activeProject?.summary, activeSequence, variant],
   );
 
   const close = useCallback(() => setOpen(null), []);

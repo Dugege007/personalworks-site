@@ -76,7 +76,7 @@ export function LandscapeProjectBoard({ works, showHead = true }: LandscapeProje
                     src: item.src,
                     alt: `${activeWork.title} ${resolveMediaDisplayName(item)}`,
                     label: resolveMediaDisplayName(item),
-                    description: item.description,
+                    description: resolveMediaDescription(item, activeWork.summary),
                     kind: item.kind,
                     poster: item.poster,
                   },
