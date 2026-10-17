@@ -4,4 +4,10 @@
     <RootNamespace>PersonalWorks.SiteMediaStudio.Core</RootNamespace>
     <AssemblyName>SiteMediaStudio.Core</AssemblyName>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="15.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="SiteMediaStudio.Tests" />
+  </ItemGroup>
 </Project>
