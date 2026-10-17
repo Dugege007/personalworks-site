@@ -48,6 +48,12 @@
                                TextWrapping="Wrap"
                                Margin="0,4,0,0"
                                Visibility="{Binding ShowNoteImageFooter, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <Button Style="{StaticResource GhostButton}"
+                            Content="一键压缩超限配图"
+                            Command="{Binding CompressOverLimitCommand}"
+                            HorizontalAlignment="Left"
+                            Margin="0,8,0,0"
+                            Visibility="{Binding ShowNoteCompress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                     <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource MutedBrush}" Margin="0,4,0,0"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
@@ -106,6 +112,12 @@
                                       Visibility="{Binding ShowNoteActions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             <MenuItem Header="删除心得"
                                       Command="{Binding RecycleNoteCommand}"
+                                      Visibility="{Binding ShowNoteActions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <MenuItem Header="一键压缩超限配图"
+                                      Command="{Binding CompressOverLimitCommand}"
+                                      Visibility="{Binding ShowNoteActions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <MenuItem Header="清理本篇原图备份"
+                                      Command="{Binding PurgeNoteBackupsCommand}"
                                       Visibility="{Binding ShowNoteActions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         </ContextMenu>
                     </TreeView.ContextMenu>
@@ -339,6 +351,15 @@
                         <ContextMenu>
                             <MenuItem Header="全选" Command="{Binding SelectAllCommand}"/>
                             <MenuItem Header="重新选择" Command="{Binding RestoreSelectionCommand}"/>
+                            <Separator Visibility="{Binding ShowNoteCompress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <MenuItem Header="压缩所选配图"
+                                      Command="{Binding CompressSelectedCommand}"
+                                      ToolTip="{Binding CompressSelectedToolTip}"
+                                      ToolTipService.ShowOnDisabled="True"
+                                      Visibility="{Binding ShowNoteCompress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <MenuItem Header="清理本篇原图备份"
+                                      Command="{Binding PurgeNoteBackupsCommand}"
+                                      Visibility="{Binding ShowNoteCompress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         </ContextMenu>
                     </ListBox.ContextMenu>
                     <ListBox.ItemContainerStyle>
@@ -454,6 +475,15 @@
                         <ContextMenu>
                             <MenuItem Header="全选" Command="{Binding SelectAllCommand}"/>
                             <MenuItem Header="重新选择" Command="{Binding RestoreSelectionCommand}"/>
+                            <Separator Visibility="{Binding ShowNoteCompress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <MenuItem Header="压缩所选配图"
+                                      Command="{Binding CompressSelectedCommand}"
+                                      ToolTip="{Binding CompressSelectedToolTip}"
+                                      ToolTipService.ShowOnDisabled="True"
+                                      Visibility="{Binding ShowNoteCompress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <MenuItem Header="清理本篇原图备份"
+                                      Command="{Binding PurgeNoteBackupsCommand}"
+                                      Visibility="{Binding ShowNoteCompress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         </ContextMenu>
                     </ListBox.ContextMenu>
                     <ListBox.ItemsPanel>
@@ -683,6 +713,31 @@
                 </StackPanel>
                 <ScrollViewer Margin="16,0,16,0" HorizontalScrollBarVisibility="Disabled">
                     <StackPanel>
+                        <WrapPanel Margin="0,0,0,8"
+                                   Visibility="{Binding ShowNoteCompress, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            <Button Style="{StaticResource GhostButton}"
+                                    Content="一键压缩超限配图"
+                                    Command="{Binding CompressOverLimitCommand}"
+                                    Margin="0,0,8,8"/>
+                            <Button Style="{StaticResource GhostButton}"
+                                    Content="恢复原图"
+                                    Command="{Binding RestoreOriginalCommand}"
+                                    ToolTip="{Binding RestoreOriginalToolTip}"
+                                    ToolTipService.ShowOnDisabled="True"
+                                    Margin="0,0,8,8"/>
+                            <Button Style="{StaticResource GhostButton}"
+                                    Content="重新压缩"
+                                    Command="{Binding RecompressCommand}"
+                                    ToolTip="{Binding RecompressToolTip}"
+                                    ToolTipService.ShowOnDisabled="True"
+                                    Margin="0,0,8,8"/>
+                            <Button Style="{StaticResource GhostButton}"
+                                    Content="重试"
+                                    Command="{Binding RetryNoteImageCommand}"
+                                    ToolTip="只重新处理刚才被占用而跳过的配图。"
+                                    Margin="0,0,8,8"
+                                    Visibility="{Binding ShowRetryNoteImage, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                        </WrapPanel>
                         <DockPanel Margin="0,0,0,8"
                                    LastChildFill="True"
                                    Visibility="{Binding ShowNoteImageFileRow, Converter={StaticResource BooleanToVisibilityConverter}}">

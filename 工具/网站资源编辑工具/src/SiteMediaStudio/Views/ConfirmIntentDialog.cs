@@ -99,11 +99,16 @@ public sealed class ConfirmIntentDialog : Window
     /// <summary>
     /// 确认则返回 true；取消或未勾选则 false。
     /// </summary>
-    public static bool Show(string message, bool requireAck, string title = "确认执行", string okLabel = "执行")
+    public static bool Show(
+        string message,
+        bool requireAck,
+        string title = "确认执行",
+        string okLabel = "执行",
+        Window? owner = null)
     {
         var dialog = new ConfirmIntentDialog(message, requireAck, title, okLabel)
         {
-            Owner = Application.Current?.MainWindow
+            Owner = owner ?? Application.Current?.MainWindow
         };
         return dialog.ShowDialog() == true;
     }

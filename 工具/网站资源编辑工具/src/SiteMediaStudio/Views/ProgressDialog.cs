@@ -118,11 +118,12 @@ public sealed class ProgressDialog : Window
     /// </summary>
     public static BatchRunResult Run(
         string title,
-        Func<IProgress<PublishProgress>, BatchRunResult> work)
+        Func<IProgress<PublishProgress>, BatchRunResult> work,
+        Window? owner = null)
     {
         var dialog = new ProgressDialog(title)
         {
-            Owner = Application.Current?.MainWindow
+            Owner = owner ?? Application.Current?.MainWindow
         };
         var progress = new Progress<PublishProgress>(dialog.Apply);
         var started = false;

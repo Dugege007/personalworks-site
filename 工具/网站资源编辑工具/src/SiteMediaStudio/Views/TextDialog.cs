@@ -69,20 +69,20 @@ public sealed class TextDialog : Window
     /// <summary>
     /// 显示只读文本。
     /// </summary>
-    public static void Show(string title, string body)
+    public static void Show(string title, string body, Window? owner = null)
     {
         var lineList = body.Replace("\r\n", "\n").Split('\n')
             .Select(ParsePlainLine)
             .ToList();
-        Show(title, lineList);
+        Show(title, lineList, owner);
     }
 
     /// <summary>
     /// 显示带色义的执行结果。
     /// </summary>
-    public static void Show(string title, IReadOnlyList<ResultTextLine> lineList)
+    public static void Show(string title, IReadOnlyList<ResultTextLine> lineList, Window? owner = null)
     {
-        var owner = Application.Current?.MainWindow;
+        owner ??= Application.Current?.MainWindow;
         WindowActivation.BringToFront(owner);
         var dialog = new TextDialog(title, lineList)
         {

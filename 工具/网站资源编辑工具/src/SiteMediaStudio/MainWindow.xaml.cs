@@ -1018,14 +1018,29 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
-    /// 选单空白处才弹出右键菜单；点在卡片或滚动条上不拦截系统外的其它菜单。
+    /// 选单空白处弹出右键菜单。心得配图上右键也弹出，并先把未选中的卡片纳入选区，以便压缩所选。
+    /// 其他栏目仍只在空白处弹出，点在卡片或滚动条上不拦截。
     /// </summary>
     private void OnContentListContextMenuOpening(object sender, ContextMenuEventArgs e)
     {
-        if (!IsListBlankHit(e.OriginalSource as DependencyObject))
+        if (IsListBlankHit(e.OriginalSource as DependencyObject))
         {
-            e.Handled = true;
+            return;
         }
+
+        if (mViewModel.ShowNoteCompress && sender is ListBox list)
+        {
+            var card = FindCardFromSource(e.OriginalSource as DependencyObject);
+            if (card != null && !card.IsSelected && ReferenceEquals(list, CardList))
+            {
+                list.SelectedItems.Clear();
+                list.SelectedItems.Add(card);
+            }
+
+            return;
+        }
+
+        e.Handled = true;
     }
 
     /// <summary>
