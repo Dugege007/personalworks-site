@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { NoteMarkdown } from "../components/NoteMarkdown";
-import { loadNote, noteTheme } from "../content/notes/read";
 import { lexicon } from "../content/lexicon";
+import { loadNote, noteTheme } from "../content/notes/read";
+import { displayNoteTimestamp, noteTimestampDateTime } from "../content/notes/select";
+import type { NoteCard } from "../content/site";
 import "../styles/placeholder.css";
 
 export function NoteDetailPage() {
@@ -21,17 +24,70 @@ export function NoteDetailPage() {
     );
   }
 
+  const heading = note.mainTitle?.trim() || note.title;
+  const subtitle = note.subtitle?.trim() ?? "";
+
   return (
     <div className="page" data-theme={theme}>
       <Link className="back" to={`/${lexicon.notes.key}`}>
         ← 返回{lexicon.notes.zh}
       </Link>
-      <div className="page-kicker">
-        {note.slug === lexicon.sketching.key ? lexicon.sketching.deco : note.date}
-      </div>
-      <h1>{note.title}</h1>
+      {note.slug === lexicon.sketching.key ? (
+        <div className="page-kicker">{lexicon.sketching.deco}</div>
+      ) : null}
+      <h1>{heading}</h1>
+      {subtitle ? <p className="note-subtitle">{subtitle}</p> : null}
+      <NoteTimes key={note.slug} note={note} />
       <p className="page-lead">{note.summary}</p>
       <NoteMarkdown markdown={note.body} />
     </div>
+  );
+}
+
+/**
+ * 详情页时间行：创建时间与最近修改时间。点最近修改展开全部修订。
+ */
+function NoteTimes({ note }: { note: NoteCard }) {
+  const [open, setOpen] = useState(false);
+  const createdRaw = note.createdAt?.trim() || note.date;
+  const revisedRaw = note.revisedAt?.trim() || createdRaw;
+  const revisionListId = `note-revisions-${note.slug}`;
+  // 索引按从早到晚追加。展开时最近一条在前，和「最近修改」对得上。
+  const revisions = [...(note.revisions ?? [])].reverse();
+
+  return (
+    <>
+      <div className="note-meta">
+        <span className="note-meta-item">
+          <span className="note-meta-label">创建</span>
+          <time dateTime={noteTimestampDateTime(createdRaw)}>{displayNoteTimestamp(createdRaw)}</time>
+        </span>
+        <button
+          type="button"
+          className="note-revised"
+          aria-expanded={open}
+          aria-controls={revisionListId}
+          onClick={() => setOpen((current) => !current)}
+        >
+          <span className="note-meta-label">最近修改</span>
+          <time dateTime={noteTimestampDateTime(revisedRaw)}>{displayNoteTimestamp(revisedRaw)}</time>
+          <span className="note-visually-hidden">{open ? "，收起修订记录" : "，展开修订记录"}</span>
+        </button>
+      </div>
+      <div className="note-revisions" id={revisionListId} hidden={!open}>
+        <ol>
+          {revisions.length === 0 ? (
+            <li className="note-revision-empty">尚无修订</li>
+          ) : (
+            revisions.map((item, index) => (
+              <li key={`${item.at}-${index}`}>
+                <time dateTime={noteTimestampDateTime(item.at)}>{displayNoteTimestamp(item.at)}</time>
+                <span className={item.summary ? undefined : "is-blank"}>{item.summary || "（无说明）"}</span>
+              </li>
+            ))
+          )}
+        </ol>
+      </div>
+    </>
   );
 }
