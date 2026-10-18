@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { displayNoteDate, noteDisplayMeta, stripNoteFrontmatter, visibleNotes } from "../src/content/notes/select.ts";
+import {
+  displayNoteDate,
+  displayNoteTimestamp,
+  noteDisplayMeta,
+  noteTimestampDateTime,
+  stripNoteFrontmatter,
+  visibleNotes,
+} from "../src/content/notes/select.ts";
 
 test("visible notes skip drafts and hidden entries", () => {
   const list = visibleNotes({
@@ -58,4 +65,13 @@ test("note meta keeps subtitle and treats latest revision as the modified time",
 test("display date uses dots and frontmatter is stripped", () => {
   assert.equal(displayNoteDate("2026-10-05"), "2026.10.05");
   assert.equal(stripNoteFrontmatter("---\ntitle: x\n---\n\n正文\n"), "正文\n");
+});
+
+test("detail timestamps keep seconds and expose a machine-readable value", () => {
+  assert.equal(displayNoteTimestamp("2026-10-05 12:56:03"), "2026.10.05 12:56:03");
+  assert.equal(displayNoteTimestamp("2026-10-05 00:00:00"), "2026.10.05");
+  assert.equal(displayNoteTimestamp("2026-10-07 08:00:00"), "2026.10.07 08:00:00");
+  assert.equal(displayNoteTimestamp(" 2026-10-07 "), "2026.10.07");
+  assert.equal(noteTimestampDateTime("2026-10-05 12:56:03"), "2026-10-05T12:56:03");
+  assert.equal(noteTimestampDateTime("2026-10-05"), "2026-10-05");
 });

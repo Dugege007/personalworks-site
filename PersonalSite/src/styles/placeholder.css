@@ -27,6 +27,148 @@
   margin-bottom: 36px;
 }
 
+.page h1:has(+ .note-subtitle) {
+  margin-bottom: 8px;
+}
+
+.note-subtitle {
+  max-width: 40em;
+  margin: 0 0 16px;
+  font-family: var(--font-serif);
+  font-size: clamp(18px, 2.4vw, 24px);
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.note-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 22px;
+  row-gap: 2px;
+  margin: 2px 0 28px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.note-meta-item,
+.note-revised {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  max-width: 100%;
+}
+
+.note-meta-label {
+  font-family: var(--font-sans);
+  letter-spacing: 0.12em;
+}
+
+.note-meta time {
+  font-family: var(--font-en);
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
+}
+
+.note-revised {
+  position: relative;
+  align-items: center;
+  min-height: 32px;
+  color: var(--muted);
+}
+
+.note-revised time {
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, currentColor 55%, transparent);
+}
+
+.note-revised::after {
+  content: "";
+  width: 0.38em;
+  height: 0.38em;
+  margin-left: 2px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: translateY(-0.12em) rotate(45deg);
+}
+
+.note-revised[aria-expanded="true"] {
+  color: var(--text);
+}
+
+.note-revised[aria-expanded="true"]::after {
+  transform: translateY(0.12em) rotate(225deg);
+}
+
+.note-revised:hover {
+  color: var(--text);
+}
+
+.note-revised:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 4px;
+}
+
+.note-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.note-revisions {
+  max-width: 40em;
+  margin: -16px 0 28px;
+}
+
+.note-revisions[hidden] {
+  display: none;
+}
+
+.note-revisions ol {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0 0;
+  border-top: 1px solid var(--line);
+}
+
+.note-revisions li {
+  display: grid;
+  grid-template-columns: 12.5em minmax(0, 1fr);
+  gap: 8px 16px;
+  align-items: baseline;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.note-revisions time {
+  font-family: var(--font-en);
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.note-revisions .is-blank,
+.note-revisions .note-revision-empty {
+  color: var(--muted);
+}
+
+.note-revisions li.note-revision-empty {
+  display: block;
+}
+
 .card-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -673,6 +815,25 @@ button.media-frame {
   .page-lead {
     margin-bottom: 28px;
     line-height: 1.7;
+  }
+
+  .note-subtitle {
+    font-size: 18px;
+    line-height: 1.5;
+  }
+
+  .note-meta {
+    margin-bottom: 22px;
+  }
+
+  .note-revised {
+    min-height: 44px;
+  }
+
+  .note-revisions li {
+    grid-template-columns: 1fr;
+    gap: 2px;
+    padding: 12px 0;
   }
 
   .back {

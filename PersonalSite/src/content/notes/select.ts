@@ -84,6 +84,26 @@ export function displayNoteDate(isoDate: string): string {
 }
 
 /**
+ * 创建与修订时间显示为间隔点。未知钟点回退成的 `00:00:00` 只保留日期，其余保留到秒。
+ */
+export function displayNoteTimestamp(value: string): string {
+  const shown = value.trim().replaceAll("-", ".");
+  return shown.replace(/ 00:00:00$/, "");
+}
+
+/**
+ * 供 `<time dateTime>` 使用的机器可读时间。只有日期时原样返回。
+ */
+export function noteTimestampDateTime(value: string): string {
+  const trimmed = value.trim();
+  const matched = /^(\d{4}-\d{2}-\d{2})(?:\s+(\d{2}:\d{2}:\d{2}))?$/.exec(trimmed);
+  if (!matched) {
+    return trimmed;
+  }
+  return matched[2] ? `${matched[1]}T${matched[2]}` : matched[1];
+}
+
+/**
  * 去掉正文 frontmatter，供渲染。
  */
 export function stripNoteFrontmatter(markdown: string): string {
