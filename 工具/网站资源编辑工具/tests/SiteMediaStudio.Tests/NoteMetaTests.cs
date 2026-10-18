@@ -286,7 +286,299 @@ public sealed class NoteMetaTests
     }
 
     [Fact]
-    public void AppendModified_AppendsEmptyPublishRevision()
+    public void AppendModified_BodyChange_WritesAssistantSummaryAndSkipsNoOp()
+    {
+        var (profile, channelDir) = CreateNotesWorkspace();
+        var folder = NoteRules.CreateFolder(channelDir, new DateTime(2026, 10, 5, 12, 56, 3));
+        var body = Path.Combine(folder, "正文.md");
+        File.WriteAllText(body, "# 传感器阈值\n\n补了一段说明。\n\n![](图.png)\n");
+        File.WriteAllBytes(Path.Combine(folder, "图.png"), [1, 2, 3]);
+
+        var count = NoteConfigStore.AppendModified(profile, new DateTime(2026, 10, 8, 9, 10, 11));
+
+        Assert.Equal(1, count);
+        var config = NoteConfigStore.Load(Path.Combine(folder, "心得.json"));
+        var revision = Assert.Single(config.Revisions);
+        Assert.Equal("2026-10-08 09:10:11", revision.At);
+        Assert.Equal("新增小节「传感器阈值」，新增 1 张配图，更新了正文。", revision.Summary);
+        Assert.Equal(NoteRevisionSource.Assistant, revision.Source);
+        Assert.DoesNotContain("modifiedAt", File.ReadAllText(Path.Combine(folder, "心得.json")), StringComparison.Ordinal);
+
+        File.WriteAllText(body, "# 传感器阈值\r\n\r\n补了一段说明。  \r\n\r\n![](图.png)\r\n");
+        File.SetLastWriteTime(body, new DateTime(2026, 10, 18, 12, 0, 0));
+        var logPath = Path.Combine(folder, "run.log");
+        int again;
+        using (RunLog.UsePath(logPath))
+        {
+            again = NoteConfigStore.AppendModified(
+                profile,
+                new DateTime(2026, 10, 8, 10, 0, 0),
+                new ThrowingRevisionSummaryGenerator());
+        }
+
+        Assert.Equal(0, again);
+        Assert.False(File.Exists(logPath));
+        var skipped = NoteConfigStore.Load(Path.Combine(folder, "心得.json"));
+        Assert.Single(skipped.Revisions);
+        Assert.Equal("新增小节「传感器阈值」，新增 1 张配图，更新了正文。", skipped.Revisions[0].Summary);
+    }
+
+    [Fact]
+    public void AppendModified_EditedSummary_StaysManualWhenContentChangesAgain()
+    {
+        var (profile, channelDir) = CreateNotesWorkspace();
+        var folder = NoteRules.CreateFolder(channelDir, new DateTime(2026, 10, 5, 12, 56, 3));
+        var body = Path.Combine(folder, "正文.md");
+        File.WriteAllText(body, "第一段。\n");
+        var first = NoteConfigStore.AppendModified(profile, new DateTime(2026, 10, 8, 9, 10, 11));
+        Assert.Equal(1, first);
+
+        var saved = NoteMetaEditor.Save(
+            profile,
+            folder,
+            Path.GetFileName(folder),
+            new[] { "手写的说明" },
+            new DateTime(2026, 10, 8, 9, 30, 0));
+        Assert.True(saved.Ok, saved.Message);
+
+        File.WriteAllText(body, "第一段。\n\n第二段。\n");
+        var second = NoteConfigStore.AppendModified(profile, new DateTime(2026, 10, 8, 11, 0, 0));
+
+        Assert.Equal(1, second);
+        var config = NoteConfigStore.Load(Path.Combine(folder, "心得.json"));
+        Assert.Equal(2, config.Revisions.Count);
+        Assert.Equal("手写的说明", config.Revisions[0].Summary);
+        Assert.Equal(NoteRevisionSource.Manual, config.Revisions[0].Source);
+        Assert.Equal("2026-10-08 09:10:11", config.Revisions[0].At);
+        Assert.Equal("更新了正文。", config.Revisions[1].Summary);
+        Assert.Equal(NoteRevisionSource.Assistant, config.Revisions[1].Source);
+        Assert.Equal("2026-10-08 11:00:00", config.Revisions[1].At);
+    }
+
+    [Fact]
+    public void AppendModified_KeepsEmptyLegacySummary()
+    {
+        var (profile, channelDir) = CreateNotesWorkspace();
+        var folder = NoteRules.CreateFolder(channelDir, new DateTime(2026, 10, 5, 12, 56, 3));
+        var config = NoteConfigStore.Load(Path.Combine(folder, "心得.json"));
+        config.Revisions.Add(new NoteRevision
+        {
+            At = "2026-10-06 01:02:03",
+            Summary = "",
+            Source = NoteRevisionSource.Publish
+        });
+        NoteConfigStore.Save(folder, config);
+        File.WriteAllText(Path.Combine(folder, "正文.md"), "有改动\n");
+
+        var count = NoteConfigStore.AppendModified(profile, new DateTime(2026, 10, 8, 9, 10, 11));
+
+        Assert.Equal(1, count);
+        var stored = NoteConfigStore.Load(Path.Combine(folder, "心得.json"));
+        Assert.Equal("", stored.Revisions[0].Summary);
+        Assert.Equal(NoteRevisionSource.Publish, stored.Revisions[0].Source);
+        Assert.Equal("更新了正文。", stored.Revisions[1].Summary);
+        Assert.Equal(NoteRevisionSource.Assistant, stored.Revisions[1].Source);
+    }
+
+    [Fact]
+    public void AppendModified_WithoutBaseline_UsesFallbackWithoutInventingHeadings()
+    {
+        var (profile, channelDir) = CreateNotesWorkspace();
+        var folder = NoteRules.CreateFolder(channelDir, new DateTime(2026, 10, 5, 12, 56, 3));
+        var config = NoteConfigStore.Load(Path.Combine(folder, "心得.json"));
+        config.RevisionBaseline = null;
+        NoteConfigStore.Save(folder, config);
+        var body = Path.Combine(folder, "正文.md");
+        File.WriteAllText(body, "# 传感器阈值\n\n正文\n");
+        File.SetLastWriteTime(body, new DateTime(2026, 10, 18, 12, 0, 0));
+        var logPath = Path.Combine(folder, "run.log");
+
+        int count;
+        using (RunLog.UsePath(logPath))
+        {
+            count = NoteConfigStore.AppendModified(profile, new DateTime(2026, 10, 8, 9, 10, 11));
+        }
+
+        Assert.Equal(1, count);
+        var stored = NoteConfigStore.Load(Path.Combine(folder, "心得.json"));
+        var revision = Assert.Single(stored.Revisions);
+        Assert.Equal(NoteRevisionSummaries.Fallback, revision.Summary);
+        Assert.Equal(NoteRevisionSource.Assistant, revision.Source);
+        Assert.DoesNotContain("传感器阈值", revision.Summary, StringComparison.Ordinal);
+        Assert.Contains("没有可对照的上一版", File.ReadAllText(logPath), StringComparison.Ordinal);
+        Assert.NotNull(stored.RevisionBaseline);
+    }
+
+    [Fact]
+    public void AppendModified_UnchangedLegacy_SeedsBaselineWithoutRevision()
+    {
+        var (profile, channelDir) = CreateNotesWorkspace();
+        var folder = NoteRules.CreateFolder(channelDir, new DateTime(2026, 10, 5, 12, 56, 3));
+        var body = Path.Combine(folder, "正文.md");
+        File.WriteAllText(body, "原来的正文\n");
+        File.SetLastWriteTime(body, new DateTime(2026, 10, 5, 12, 56, 2));
+        var config = NoteConfigStore.Load(Path.Combine(folder, "心得.json"));
+        config.RevisionBaseline = null;
+        NoteConfigStore.Save(folder, config);
+
+        var seeded = NoteConfigStore.AppendModified(profile, new DateTime(2026, 10, 8, 9, 0, 0));
+
+        Assert.Equal(0, seeded);
+        var baseline = NoteConfigStore.Load(Path.Combine(folder, "心得.json"));
+        Assert.Empty(baseline.Revisions);
+        Assert.Equal("原来的正文", baseline.RevisionBaseline?.Body);
+
+        File.WriteAllText(body, "# 后来的小节\n\n原来的正文\n");
+        var appended = NoteConfigStore.AppendModified(profile, new DateTime(2026, 10, 8, 9, 10, 11));
+
+        Assert.Equal(1, appended);
+        var stored = NoteConfigStore.Load(Path.Combine(folder, "心得.json"));
+        var revision = Assert.Single(stored.Revisions);
+        Assert.Equal("新增小节「后来的小节」。", revision.Summary);
+        Assert.Equal(NoteRevisionSource.Assistant, revision.Source);
+    }
+
+    [Fact]
+    public void AppendModified_GeneratorFailure_StillSavesFallback()
+    {
+        var (profile, channelDir) = CreateNotesWorkspace();
+        var folder = NoteRules.CreateFolder(channelDir, new DateTime(2026, 10, 5, 12, 56, 3));
+        File.WriteAllText(Path.Combine(folder, "正文.md"), "有改动\n");
+        var logPath = Path.Combine(folder, "run.log");
+
+        int count;
+        using (RunLog.UsePath(logPath))
+        {
+            count = NoteConfigStore.AppendModified(
+                profile,
+                new DateTime(2026, 10, 8, 9, 10, 11),
+                new ThrowingRevisionSummaryGenerator());
+        }
+
+        Assert.Equal(1, count);
+        var revision = Assert.Single(NoteConfigStore.Load(Path.Combine(folder, "心得.json")).Revisions);
+        Assert.Equal(NoteRevisionSummaries.Fallback, revision.Summary);
+        Assert.Equal(NoteRevisionSource.Assistant, revision.Source);
+        var log = File.ReadAllText(logPath);
+        Assert.Contains("生成失败", log, StringComparison.Ordinal);
+        Assert.Contains("模型不可用", log, StringComparison.Ordinal);
+
+        File.WriteAllText(Path.Combine(folder, "正文.md"), "又改了一段。\n");
+        using (RunLog.UsePath(logPath))
+        {
+            count = NoteConfigStore.AppendModified(
+                profile,
+                new DateTime(2026, 10, 8, 9, 20, 0),
+                new BlankRevisionSummaryGenerator());
+        }
+
+        Assert.Equal(1, count);
+        var stored = NoteConfigStore.Load(Path.Combine(folder, "心得.json"));
+        Assert.Equal(NoteRevisionSummaries.Fallback, stored.Revisions[1].Summary);
+        Assert.Equal(NoteRevisionSource.Assistant, stored.Revisions[1].Source);
+        Assert.Contains("生成结果为空", File.ReadAllText(logPath), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AppendModified_LongSummary_IsCapped()
+    {
+        var (profile, channelDir) = CreateNotesWorkspace();
+        var folder = NoteRules.CreateFolder(channelDir, new DateTime(2026, 10, 5, 12, 56, 3));
+        File.WriteAllText(Path.Combine(folder, "正文.md"), "有改动\n");
+
+        var count = NoteConfigStore.AppendModified(
+            profile,
+            new DateTime(2026, 10, 8, 9, 10, 11),
+            new LongRevisionSummaryGenerator());
+
+        Assert.Equal(1, count);
+        var revision = Assert.Single(NoteConfigStore.Load(Path.Combine(folder, "心得.json")).Revisions);
+        Assert.Equal(NoteRevisionSummaries.MaxLength, revision.Summary.Length);
+        Assert.EndsWith("…", revision.Summary);
+        Assert.Equal(NoteRevisionSource.Assistant, revision.Source);
+    }
+
+    [Fact]
+    public void AppendModified_UsesReplacementGenerator()
+    {
+        var (profile, channelDir) = CreateNotesWorkspace();
+        var folder = NoteRules.CreateFolder(channelDir, new DateTime(2026, 10, 5, 12, 56, 3));
+        File.WriteAllText(Path.Combine(folder, "正文.md"), "有改动\n");
+        var previous = NoteConfigStore.SummaryGenerator;
+        try
+        {
+            NoteConfigStore.SummaryGenerator = new FixedRevisionSummaryGenerator("换成了另一套生成器。");
+            var count = NoteConfigStore.AppendModified(profile, new DateTime(2026, 10, 8, 9, 10, 11));
+            Assert.Equal(1, count);
+            var revision = Assert.Single(NoteConfigStore.Load(Path.Combine(folder, "心得.json")).Revisions);
+            Assert.Equal("换成了另一套生成器。", revision.Summary);
+            Assert.Equal(NoteRevisionSource.Assistant, revision.Source);
+        }
+        finally
+        {
+            NoteConfigStore.SummaryGenerator = previous;
+        }
+    }
+
+    [Fact]
+    public void Save_TitleRevision_DoesNotDuplicateOnNextPublish()
+    {
+        var (profile, channelDir) = CreateNotesWorkspace();
+        var folder = NoteRules.CreateFolder(channelDir, new DateTime(2026, 10, 5, 12, 56, 3));
+        var config = NoteConfigStore.Load(Path.Combine(folder, "心得.json"));
+        config.Title = "旧题";
+        config.RevisionBaseline!.Title = "旧题";
+        NoteConfigStore.Save(folder, config);
+
+        var saved = NoteMetaEditor.Save(
+            profile,
+            folder,
+            "新题",
+            Array.Empty<string>(),
+            new DateTime(2026, 10, 8, 9, 10, 11));
+
+        Assert.True(saved.Ok, saved.Message);
+        var renamed = NoteConfigStore.Load(Path.Combine(saved.FolderFullPath, "心得.json"));
+        var titleRevision = Assert.Single(renamed.Revisions);
+        Assert.Equal("更新标题", titleRevision.Summary);
+        Assert.Equal(NoteRevisionSource.Manual, titleRevision.Source);
+        Assert.Equal("新题", renamed.RevisionBaseline?.Title);
+
+        var again = NoteConfigStore.AppendModified(profile, new DateTime(2026, 10, 8, 10, 0, 0));
+
+        Assert.Equal(0, again);
+        Assert.Single(NoteConfigStore.Load(Path.Combine(saved.FolderFullPath, "心得.json")).Revisions);
+    }
+
+    [Fact]
+    public void AppendModified_TitleChange_WritesAssistantSummaryOnce()
+    {
+        var (profile, channelDir) = CreateNotesWorkspace();
+        var folder = NoteRules.CreateFolder(channelDir, new DateTime(2026, 10, 5, 12, 56, 3));
+        var config = NoteConfigStore.Load(Path.Combine(folder, "心得.json"));
+        config.Title = "新的标题";
+        NoteConfigStore.Save(folder, config);
+
+        var count = NoteConfigStore.AppendModified(profile, new DateTime(2026, 10, 8, 9, 10, 11));
+        var again = NoteConfigStore.AppendModified(profile, new DateTime(2026, 10, 8, 10, 0, 0));
+
+        Assert.Equal(1, count);
+        Assert.Equal(0, again);
+        var revision = Assert.Single(NoteConfigStore.Load(Path.Combine(folder, "心得.json")).Revisions);
+        Assert.Equal("设置展示标题「新的标题」。", revision.Summary);
+        Assert.Equal(NoteRevisionSource.Assistant, revision.Source);
+    }
+
+    [Fact]
+    public void DefaultSlug_KeepsTimestampShapeAndDoesNotEmbedChinese()
+    {
+        Assert.Equal("n-20261005-125603", NoteConfigStore.DefaultSlug("20261005_125603"));
+        Assert.Equal(
+            "n-20261005-125603",
+            NoteConfigStore.DefaultSlug("甲——乙", "2026-10-05 12:56:03"));
+    }
+
+    private static (WorkspaceProfile Profile, string ChannelDir) CreateNotesWorkspace()
     {
         var root = TempDir();
         var channel = new ChannelProfile { Key = "notes", Zh = "心得" };
@@ -301,29 +593,7 @@ public sealed class NoteMetaTests
         var channelDir = Path.Combine(
             WorkspaceProfileLoader.ResolveUnderRoot(profile, profile.StageRoot),
             WorkspaceProfileLoader.ChannelStageRelative(profile, channel));
-        var folder = NoteRules.CreateFolder(channelDir, new DateTime(2026, 10, 5, 12, 56, 3));
-        var body = Path.Combine(folder, "正文.md");
-        File.WriteAllText(body, "有改动\n");
-        File.SetLastWriteTime(body, new DateTime(2026, 10, 18, 12, 0, 0));
-
-        var count = NoteConfigStore.AppendModified(profile, new DateTime(2026, 10, 8, 9, 10, 11));
-
-        Assert.Equal(1, count);
-        var config = NoteConfigStore.Load(Path.Combine(folder, "心得.json"));
-        var revision = Assert.Single(config.Revisions);
-        Assert.Equal("2026-10-08 09:10:11", revision.At);
-        Assert.Equal("", revision.Summary);
-        Assert.Equal(NoteRevisionSource.Publish, revision.Source);
-        Assert.DoesNotContain("modifiedAt", File.ReadAllText(Path.Combine(folder, "心得.json")), StringComparison.Ordinal);
-    }
-
-    [Fact]
-    public void DefaultSlug_KeepsTimestampShapeAndDoesNotEmbedChinese()
-    {
-        Assert.Equal("n-20261005-125603", NoteConfigStore.DefaultSlug("20261005_125603"));
-        Assert.Equal(
-            "n-20261005-125603",
-            NoteConfigStore.DefaultSlug("甲——乙", "2026-10-05 12:56:03"));
+        return (profile, channelDir);
     }
 
     private static string TempDir()
@@ -331,5 +601,56 @@ public sealed class NoteMetaTests
         var path = Path.Combine(Path.GetTempPath(), "sms-note-meta-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(path);
         return path;
+    }
+
+    /// <summary>
+    /// 用来确认失败不会挡住保存。
+    /// </summary>
+    private sealed class ThrowingRevisionSummaryGenerator : IRevisionSummaryGenerator
+    {
+        public string Generate(NoteRevisionDiff diff)
+        {
+            throw new InvalidOperationException("模型不可用");
+        }
+    }
+
+    /// <summary>
+    /// 返回空白，调用方应改用回退句。无差异时不应被调用。
+    /// </summary>
+    private sealed class BlankRevisionSummaryGenerator : IRevisionSummaryGenerator
+    {
+        public string Generate(NoteRevisionDiff diff)
+        {
+            return "  ";
+        }
+    }
+
+    /// <summary>
+    /// 返回超长说明，调用方应截断。
+    /// </summary>
+    private sealed class LongRevisionSummaryGenerator : IRevisionSummaryGenerator
+    {
+        public string Generate(NoteRevisionDiff diff)
+        {
+            return new string('改', 120);
+        }
+    }
+
+    /// <summary>
+    /// 固定文案，用来确认启动时换上的生成器会接到发布路径。
+    /// </summary>
+    private sealed class FixedRevisionSummaryGenerator : IRevisionSummaryGenerator
+    {
+        private readonly string mSummary;
+
+        public FixedRevisionSummaryGenerator(string summary)
+        {
+            mSummary = summary;
+        }
+
+        public string Generate(NoteRevisionDiff diff)
+        {
+            return mSummary;
+        }
     }
 }

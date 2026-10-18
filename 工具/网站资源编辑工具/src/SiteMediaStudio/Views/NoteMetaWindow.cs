@@ -87,7 +87,7 @@ public sealed class NoteMetaWindow : Window
         heading.Children.Add(mSubText);
         heading.Children.Add(mMessage);
         heading.Children.Add(Label("修订说明"));
-        heading.Children.Add(Help("可改每条摘要。时间保留。手改后这条来源记为手改。没有修订时，上页或发布上线会先记下时间。"));
+        heading.Children.Add(Help("可改每条摘要。时间保留。手改后这条来源记为手改。发布上线时，若正文或配图有实质变化，会追加一条助手写的短说明；没有变化不会重复追加。"));
         body.Children.Add(heading);
 
         var revisions = new StackPanel();

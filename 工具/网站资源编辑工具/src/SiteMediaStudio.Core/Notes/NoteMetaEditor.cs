@@ -69,9 +69,10 @@ public static class NoteMetaEditor
         }
 
         var renamed = !string.Equals(currentName, requested, StringComparison.Ordinal);
-        if (renamed
+        var recordedTitleRevision = renamed
             && !string.IsNullOrWhiteSpace(previousTitle)
-            && !string.Equals(previousTitle, config.Title, StringComparison.Ordinal))
+            && !string.Equals(previousTitle, config.Title, StringComparison.Ordinal);
+        if (recordedTitleRevision)
         {
             config.Revisions.Add(new NoteRevision
             {
@@ -80,6 +81,9 @@ public static class NoteMetaEditor
                 Source = NoteRevisionSource.Manual
             });
         }
+
+        // 手改修订已经说明的标题不再交给下一次发布重复生成。尚未记录的标题变化仍保留在快照里。
+        NoteRevisionBaselineCapture.AcknowledgeDisplayedTitle(config, recordedTitleRevision);
 
         var parent = Path.GetDirectoryName(currentFull);
         if (string.IsNullOrWhiteSpace(parent))

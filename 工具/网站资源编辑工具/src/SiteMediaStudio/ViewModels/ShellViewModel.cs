@@ -6099,6 +6099,7 @@ public sealed partial class ShellViewModel : ViewModelBase
             return;
         }
 
+        // 只在发布上线这条路径记修订，不跟键盘输入走。摘要来自 IRevisionSummaryGenerator，默认是本机启发式。
         NoteConfigStore.AppendModified(profile, DateTime.Now);
 
         StatusText = "已成功发布上线。"
