@@ -632,6 +632,7 @@ public sealed partial class ShellViewModel
     {
         ExecuteCommand.RaiseCanExecute();
         PublishNoteCommand.RaiseCanExecute();
+        EditNoteMetaCommand.RaiseCanExecute();
         HideNoteCommand.RaiseCanExecute();
         RestoreNoteCommand.RaiseCanExecute();
         RecycleNoteCommand.RaiseCanExecute();

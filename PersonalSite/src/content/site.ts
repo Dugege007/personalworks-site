@@ -1,3 +1,4 @@
+import type { NoteRevision } from "./notes/select";
 import { lexicon } from "./lexicon";
 import { photoExhibitTag, photoExhibitTitle } from "./photoFacet";
 import { initialGameProjects, registeredGames } from "./initialGameProjects";
@@ -77,6 +78,12 @@ export type NoteCard = {
   previewImages: string[];
   /** 占位稿不进简历笔记栏；心得页仍可列出。 */
   draft?: boolean;
+  /** 夹名解析出的主标题。缺省时与 title 相同。详情页展示留到下一阶段。 */
+  mainTitle?: string;
+  subtitle?: string;
+  createdAt?: string;
+  revisedAt?: string;
+  revisions?: NoteRevision[];
 };
 
 export type AboutFeature = {

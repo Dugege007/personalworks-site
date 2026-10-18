@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { displayNoteDate, stripNoteFrontmatter, visibleNotes } from "../src/content/notes/select.ts";
+import { displayNoteDate, noteDisplayMeta, stripNoteFrontmatter, visibleNotes } from "../src/content/notes/select.ts";
 
 test("visible notes skip drafts and hidden entries", () => {
   const list = visibleNotes({
@@ -15,6 +15,44 @@ test("visible notes skip drafts and hidden entries", () => {
     list.map((item) => item.slug),
     ["new", "old"],
   );
+});
+
+test("note meta falls back when titles and revisions are absent", () => {
+  const meta = noteDisplayMeta({
+    folder: "20261005_021341",
+    slug: "n-20261005-021341",
+    title: "只有旧标题",
+    date: "2026-10-05",
+    summary: "",
+  });
+  assert.equal(meta.mainTitle, "只有旧标题");
+  assert.equal(meta.subtitle, "");
+  assert.equal(meta.createdAt, "2026-10-05 00:00:00");
+  assert.equal(meta.revisedAt, "2026-10-05 00:00:00");
+  assert.deepEqual(meta.revisions, []);
+});
+
+test("note meta keeps subtitle and treats latest revision as the modified time", () => {
+  const meta = noteDisplayMeta({
+    folder: "甲——乙",
+    slug: "n-20261005-125603",
+    title: "甲——乙",
+    date: "2026-10-05",
+    summary: "",
+    mainTitle: "甲",
+    subtitle: "乙",
+    createdAt: "2026-10-05 12:56:03",
+    revisions: [
+      { at: "2026-10-06 01:02:03", summary: "", source: "publish" },
+      { at: "2026-10-07 08:00:00", summary: "补了一段", source: "manual" },
+    ],
+  });
+  assert.equal(meta.mainTitle, "甲");
+  assert.equal(meta.subtitle, "乙");
+  assert.equal(meta.createdAt, "2026-10-05 12:56:03");
+  assert.equal(meta.revisedAt, "2026-10-07 08:00:00");
+  assert.equal(meta.revisions[0].summary, "");
+  assert.equal(meta.revisions[1].summary, "补了一段");
 });
 
 test("display date uses dots and frontmatter is stripped", () => {

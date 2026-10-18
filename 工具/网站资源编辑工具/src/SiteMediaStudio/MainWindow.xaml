@@ -124,6 +124,11 @@
                                       ToolTip="{Binding SyncWriteToolTip}"
                                       ToolTipService.ShowOnDisabled="True"
                                       Visibility="{Binding ShowNoteActions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            <MenuItem Header="编辑标题与修订"
+                                      Command="{Binding EditNoteMetaCommand}"
+                                      ToolTip="{Binding SyncWriteToolTip}"
+                                      ToolTipService.ShowOnDisabled="True"
+                                      Visibility="{Binding ShowNoteActions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             <MenuItem Header="隐藏心得"
                                       Command="{Binding HideNoteCommand}"
                                       ToolTip="{Binding SyncWriteToolTip}"

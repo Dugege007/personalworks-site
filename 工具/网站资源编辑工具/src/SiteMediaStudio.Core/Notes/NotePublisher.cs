@@ -80,13 +80,23 @@ public static class NotePublisher
         entry.Folder = plan.FolderName;
         entry.Slug = plan.Slug;
         entry.Title = plan.Title;
+        entry.MainTitle = plan.MainTitle;
+        entry.Subtitle = plan.Subtitle;
         entry.Date = plan.Date;
+        entry.CreatedAt = plan.CreatedAt;
+        entry.RevisedAt = plan.RevisedAt;
         entry.Summary = plan.Summary;
+        entry.Revisions = plan.Revisions.Select(NoteConfigStore.CopyRevision).ToList();
         entry.Draft = false;
         entry.Hidden = false;
         entry.PreviewObjects = plan.PreviewObjects;
         entry.Body = plan.Body;
         entry.Images = plan.Images.Select(item => item.Meta).ToList();
+        if (index.Version < NoteIndexFile.CurrentVersion)
+        {
+            index.Version = NoteIndexFile.CurrentVersion;
+        }
+
         NoteIndexStore.Save(profile, index);
         return new NotePublishOutcome
         {
