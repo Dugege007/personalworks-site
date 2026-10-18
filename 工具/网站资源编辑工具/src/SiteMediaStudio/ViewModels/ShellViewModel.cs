@@ -15,7 +15,7 @@ namespace PersonalWorks.SiteMediaStudio;
 /// <summary>
 /// 主窗口状态与命令。
 /// </summary>
-public sealed class ShellViewModel : ViewModelBase
+public sealed partial class ShellViewModel : ViewModelBase
 {
     private readonly ThumbnailService mThumbnails = new();
     private bool mToolExeSearchBusy;
@@ -188,6 +188,13 @@ public sealed class ShellViewModel : ViewModelBase
         SetCoverCommand = new RelayCommand(SetVideoCover, CanSetVideoCover);
         RestoreSelectionCommand = new RelayCommand(RestorePreviousSelection, () => mSelectionHistory.CanRestore);
         SelectAllCommand = new RelayCommand(SelectAllVisibleCards, CanSelectAllVisibleCards);
+        CompressOverLimitCommand = new RelayCommand(CompressOverLimit, CanCompressOverLimit);
+        CompressSelectedCommand = new RelayCommand(CompressSelected, CanCompressSelected);
+        RestoreOriginalCommand = new RelayCommand(RestoreOriginal, CanRestoreOriginal);
+        RecompressCommand = new RelayCommand(Recompress, CanRecompress);
+        RetryNoteImageCommand = new RelayCommand(RetryNoteImage, CanRetryNoteImage);
+        PurgeNoteBackupsCommand = new RelayCommand(PurgeNoteBackups, CanPurgeNoteBackups);
+        mNoteImageCommandsReady = true;
         LightboxZoomOptionList = CreateLightboxZoomOptions();
         mSelectedLightboxZoom = LightboxZoomOptionList[0];
         SenseFilterOptionList = CreateSenseFilterOptions();
@@ -723,6 +730,7 @@ public sealed class ShellViewModel : ViewModelBase
                 RefreshIngestWorks();
                 RefreshCopyEditor();
                 RaiseLightboxChrome();
+                RaiseNoteImageCommands();
             }
         }
     }
@@ -2538,7 +2546,13 @@ public sealed class ShellViewModel : ViewModelBase
     /// </summary>
     private void OpenSettings()
     {
-        SettingsWindow.Show(ClearThumbCache, mSettings, AttachStageWatcher, RecalculateNoteImageLimits, mSession?.Profile);
+        SettingsWindow.Show(
+            ClearThumbCache,
+            mSettings,
+            AttachStageWatcher,
+            RecalculateNoteImageLimits,
+            mSession?.Profile,
+            PurgeAllNoteBackups);
     }
 
     /// <summary>
@@ -2563,6 +2577,8 @@ public sealed class ShellViewModel : ViewModelBase
             NoteImageFooter = "";
             NoteImageIssueText = "";
             PublishNoteCommand.RaiseCanExecute();
+            ClearNoteImageRetryIfFolderChanged();
+            RaiseNoteImageCommands();
             return;
         }
 
@@ -2580,6 +2596,8 @@ public sealed class ShellViewModel : ViewModelBase
         }
 
         PublishNoteCommand.RaiseCanExecute();
+        ClearNoteImageRetryIfFolderChanged();
+        RaiseNoteImageCommands();
     }
 
     /// <summary>
@@ -6315,6 +6333,7 @@ public sealed class ShellViewModel : ViewModelBase
         RelocateCommand.RaiseCanExecute();
         RestoreSelectionCommand.RaiseCanExecute();
         SelectAllCommand.RaiseCanExecute();
+        RaiseNoteImageCommands();
         Raise(nameof(MarkSummary));
         Raise(nameof(ShowIngestTarget));
         Raise(nameof(ShowRelocate));

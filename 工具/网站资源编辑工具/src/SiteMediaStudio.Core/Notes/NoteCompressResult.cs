@@ -143,6 +143,32 @@ public sealed class NoteCompressOptions
             GifsiclePath = settings.GifsiclePath
         };
     }
+
+    /// <summary>
+    /// 复制阈值、照片信息开关和外部程序路径，并换上这一张的发布原因、进度回调和本次任务的质量。
+    /// 手动质量传入 null 表示仍按默认阶梯。发布原因为空白时表示可以压缩。
+    /// </summary>
+    public NoteCompressOptions ForImage(
+        string? publishedReason,
+        Action<NoteCompressProgress>? onProgress,
+        int? manualQuality,
+        bool startFromOriginalBackup)
+    {
+        return new NoteCompressOptions
+        {
+            Limits = Limits,
+            StripGps = StripGps,
+            KeepCaptureParams = KeepCaptureParams,
+            PngquantPath = PngquantPath,
+            OxipngPath = OxipngPath,
+            GifsiclePath = GifsiclePath,
+            ToolPathEnvironment = ToolPathEnvironment,
+            PublishedReason = string.IsNullOrWhiteSpace(publishedReason) ? null : publishedReason.Trim(),
+            ManualQuality = manualQuality,
+            StartFromOriginalBackup = startFromOriginalBackup,
+            OnProgress = onProgress
+        };
+    }
 }
 
 /// <summary>
