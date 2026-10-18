@@ -23,6 +23,7 @@ public sealed class SettingsWindow : Window
     private readonly Action? mWatchChanged;
     private readonly Action? mThresholdsChanged;
     private readonly Action<Window>? mPurgeAll;
+    private readonly Func<string?>? mRefusePurge;
     private readonly WorkspaceProfile? mProfile;
     private readonly TextBlock mSettingsStatus = new();
     private bool mThresholdSaveBlocked;
@@ -37,13 +38,15 @@ public sealed class SettingsWindow : Window
         Action? watchChanged,
         Action? thresholdsChanged,
         WorkspaceProfile? profile,
-        Action<Window>? purgeAllBackups)
+        Action<Window>? purgeAllBackups,
+        Func<string?>? refusePurge)
     {
         mClearCache = clearCache;
         mSettings = settings;
         mWatchChanged = watchChanged;
         mThresholdsChanged = thresholdsChanged;
         mPurgeAll = purgeAllBackups;
+        mRefusePurge = refusePurge;
         mProfile = profile;
         Title = "设置";
         Width = 560;
@@ -129,9 +132,17 @@ public sealed class SettingsWindow : Window
         Action? watchChanged = null,
         Action? thresholdsChanged = null,
         WorkspaceProfile? profile = null,
-        Action<Window>? purgeAllBackups = null)
+        Action<Window>? purgeAllBackups = null,
+        Func<string?>? refusePurge = null)
     {
-        var dialog = new SettingsWindow(clearCache, settings, watchChanged, thresholdsChanged, profile, purgeAllBackups)
+        var dialog = new SettingsWindow(
+            clearCache,
+            settings,
+            watchChanged,
+            thresholdsChanged,
+            profile,
+            purgeAllBackups,
+            refusePurge)
         {
             Owner = Application.Current?.MainWindow
         };
@@ -223,6 +234,7 @@ public sealed class SettingsWindow : Window
         keepParams.Unchecked += (_, _) => SetKeepCaptureParams(false);
         body.Children.Add(keepParams);
         body.Children.Add(Muted("清理会把每一篇笔记里 .originals 中的原图送进回收站。压缩后的配图保持原样。执行前会先说明数量和总大小。"));
+        var purgeBlock = mRefusePurge?.Invoke();
         var purgeAll = new Button
         {
             Content = "清理全部原图备份",
@@ -230,10 +242,26 @@ public sealed class SettingsWindow : Window
             Padding = new Thickness(12, 6, 12, 6),
             HorizontalAlignment = HorizontalAlignment.Left,
             Margin = new Thickness(0, 8, 0, 0),
-            IsEnabled = mProfile != null && mPurgeAll != null
+            IsEnabled = mProfile != null && mPurgeAll != null && string.IsNullOrEmpty(purgeBlock),
+            ToolTip = string.IsNullOrEmpty(purgeBlock) ? null : purgeBlock
         };
+        ToolTipService.SetShowOnDisabled(purgeAll, true);
         BrushCache.ApplyGhostButton(purgeAll);
-        purgeAll.Click += (_, _) => mPurgeAll?.Invoke(this);
+        purgeAll.Click += (_, _) =>
+        {
+            var blocked = mRefusePurge?.Invoke();
+            if (!string.IsNullOrEmpty(blocked))
+            {
+                mSettingsStatus.Text = blocked;
+                mSettingsStatus.Foreground = BrushCache.Oxide;
+                mSettingsStatus.Visibility = Visibility.Visible;
+                purgeAll.IsEnabled = false;
+                purgeAll.ToolTip = blocked;
+                return;
+            }
+
+            mPurgeAll?.Invoke(this);
+        };
         body.Children.Add(purgeAll);
     }
 

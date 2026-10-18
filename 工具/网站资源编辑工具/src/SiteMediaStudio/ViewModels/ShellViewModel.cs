@@ -160,9 +160,13 @@ public sealed partial class ShellViewModel : ViewModelBase
         RefreshCommand = new RelayCommand(
             () => Reload(mSession?.Profile.ProfilePath, coverGrid: false),
             () => mSession != null);
-        MarkIngestCommand = new RelayCommand(() => MarkSelected(MediaIntent.StageIngest), HasIngestSelection);
+        MarkIngestCommand = new RelayCommand(
+            () => MarkSelected(MediaIntent.StageIngest),
+            () => HasIngestSelection() && WorkspaceSyncAllowsWrite);
         MarkRecycleCommand = new RelayCommand(() => MarkSelected(MediaIntent.StageRecycle), HasStageSelection);
-        MarkHideCommand = new RelayCommand(() => MarkSelected(MediaIntent.SiteHide), HasSiteSelection);
+        MarkHideCommand = new RelayCommand(
+            () => MarkSelected(MediaIntent.SiteHide),
+            () => HasSiteSelection() && WorkspaceSyncAllowsWrite);
         MarkWithdrawCommand = new RelayCommand(() => MarkSelected(MediaIntent.SiteWithdraw), HasSiteSelection);
         ClearMarkCommand = new RelayCommand(ClearSelectedMarks, HasAnySelection);
         PreviewCommand = new RelayCommand(ShowPreview, HasRunnableBatch);
@@ -705,6 +709,10 @@ public sealed partial class ShellViewModel : ViewModelBase
                 HideNoteCommand.RaiseCanExecute();
                 RestoreNoteCommand.RaiseCanExecute();
                 RecycleNoteCommand.RaiseCanExecute();
+                if (value?.Work is { SourceKind: "note" })
+                {
+                    RequestWorkspaceSyncCheck();
+                }
                 Raise(nameof(ShowRelocate));
                 Raise(nameof(CanReorderSite));
                 Raise(nameof(PaneHintText));
@@ -1410,6 +1418,12 @@ public sealed partial class ShellViewModel : ViewModelBase
     /// </summary>
     public void MarkSelected(MediaIntent intent)
     {
+        if ((intent is MediaIntent.StageIngest or MediaIntent.SiteHide or MediaIntent.SiteRestore)
+            && RefuseWorkspaceWrite())
+        {
+            return;
+        }
+
         var targetList = SelectedCardList.Count > 0
             ? SelectedCardList.ToList()
             : FocusCard == null ? new List<MediaCardViewModel>() : new List<MediaCardViewModel> { FocusCard };
@@ -1655,6 +1669,12 @@ public sealed partial class ShellViewModel : ViewModelBase
             AttachStageWatcher();
             RefreshCommand.RaiseCanExecute();
             PublishCommand.RaiseCanExecute();
+            if (!string.Equals(mWorkspaceSyncPath, session.Profile.ResolvedRoot, WorkspacePathComparison))
+            {
+                InvalidateWorkspaceSync();
+            }
+
+            RequestWorkspaceSyncCheck();
             return true;
         }
         catch (Exception ex)
@@ -2552,7 +2572,8 @@ public sealed partial class ShellViewModel : ViewModelBase
             AttachStageWatcher,
             RecalculateNoteImageLimits,
             mSession?.Profile,
-            PurgeAllNoteBackups);
+            PurgeAllNoteBackups,
+            WorkspaceSyncBlockReason);
     }
 
     /// <summary>
@@ -2631,6 +2652,7 @@ public sealed partial class ShellViewModel : ViewModelBase
     private bool CanPublishSelectedNote()
     {
         return CanPublishNote()
+            && WorkspaceSyncAllowsWrite
             && mNoteAuditError.Length == 0
             && NoteImagePrompt.PublishBlockReason(mNoteAudit).Length == 0;
     }
@@ -2704,9 +2726,9 @@ public sealed partial class ShellViewModel : ViewModelBase
             && mSelectedNav?.Work is { SourceKind: "note" };
     }
 
-    private bool CanHideNote() => CanPublishNote();
+    private bool CanHideNote() => CanPublishNote() && WorkspaceSyncAllowsWrite;
 
-    private bool CanRestoreNote() => CanPublishNote();
+    private bool CanRestoreNote() => CanPublishNote() && WorkspaceSyncAllowsWrite;
 
     private bool CanRecycleNote() => CanPublishNote();
 
@@ -2757,6 +2779,12 @@ public sealed partial class ShellViewModel : ViewModelBase
         if (noteIngestList.Count == 0 || mSession == null)
         {
             return true;
+        }
+
+        if (!WorkspaceSyncAllowsWrite)
+        {
+            error = WorkspaceSyncGuard.BehindNotice;
+            return false;
         }
 
         var channel = mSession.Profile.Channels.First(item => NoteRules.IsNotesChannel(item.Key));
@@ -2829,6 +2857,11 @@ public sealed partial class ShellViewModel : ViewModelBase
     /// </summary>
     private void PublishSelectedNote()
     {
+        if (RefuseWorkspaceWrite())
+        {
+            return;
+        }
+
         if (mSession == null || mSelectedNav?.Work is not { SourceKind: "note" } work)
         {
             return;
@@ -2875,6 +2908,11 @@ public sealed partial class ShellViewModel : ViewModelBase
     /// </summary>
     private string? PublishNoteFolder(string folderId, bool imageAuditPassed = false)
     {
+        if (!WorkspaceSyncAllowsWrite)
+        {
+            return WorkspaceSyncGuard.BehindNotice;
+        }
+
         if (mSession == null)
         {
             return "工作区未加载。";
@@ -2940,6 +2978,11 @@ public sealed partial class ShellViewModel : ViewModelBase
     /// </summary>
     private void HideSelectedNote()
     {
+        if (RefuseWorkspaceWrite())
+        {
+            return;
+        }
+
         if (mSession == null || mSelectedNav?.Work is not { SourceKind: "note" } work)
         {
             return;
@@ -2977,6 +3020,11 @@ public sealed partial class ShellViewModel : ViewModelBase
     /// </summary>
     private void RestoreSelectedNote()
     {
+        if (RefuseWorkspaceWrite())
+        {
+            return;
+        }
+
         if (mSession == null || mSelectedNav?.Work is not { SourceKind: "note" } work)
         {
             return;
@@ -3147,7 +3195,9 @@ public sealed partial class ShellViewModel : ViewModelBase
                 ArgumentList = { markdownPath },
                 UseShellExecute = false
             });
-            StatusText = "已用 Typora 打开正文。";
+            StatusText = mWorkspaceSyncReport.Notice.Length == 0
+                ? "已用 Typora 打开正文。"
+                : "已用 Typora 打开正文。" + mWorkspaceSyncReport.Notice;
         }
         catch (Exception ex)
         {
@@ -3386,6 +3436,7 @@ public sealed partial class ShellViewModel : ViewModelBase
     private bool CanTag()
     {
         return mSession != null
+            && WorkspaceSyncAllowsWrite
             && mSelectedNav?.Work is { IsUnregistered: false, SourceKind: "works" } work
             && PhotoFactRules.RequiresFacts(work.Channel);
     }
@@ -3395,6 +3446,11 @@ public sealed partial class ShellViewModel : ViewModelBase
     /// </summary>
     private void OpenTags()
     {
+        if (RefuseWorkspaceWrite())
+        {
+            return;
+        }
+
         if (mSession == null || mSelectedNav?.Work is not { IsUnregistered: false, SourceKind: "works" } work)
         {
             return;
@@ -3413,7 +3469,7 @@ public sealed partial class ShellViewModel : ViewModelBase
         var channelKey = work.Channel;
         var workId = work.Id;
         var profilePath = mSession.Profile.ProfilePath;
-        TagWindow.Show(mSession, work, objectKeyList, async () =>
+        TagWindow.Show(mSession, work, objectKeyList, WorkspaceSyncBlockReason, async () =>
         {
             var reloaded = await ReloadAsync(profilePath, coverGrid: true).ConfigureAwait(true);
             if (mSession == null)
@@ -3440,6 +3496,13 @@ public sealed partial class ShellViewModel : ViewModelBase
     /// </summary>
     public void CommitResourceTag(TagEditorCommitEventArgs args)
     {
+        if (RefuseWorkspaceWrite())
+        {
+            args.Notice = WorkspaceSyncGuard.BehindNotice;
+            args.Accepted = false;
+            return;
+        }
+
         if (!TryResourceTagTarget(out var session, out var work, out var frames))
         {
             return;
@@ -3458,6 +3521,12 @@ public sealed partial class ShellViewModel : ViewModelBase
     /// </summary>
     public void RemoveResourceTag(TagEditorItemEventArgs args)
     {
+        if (RefuseWorkspaceWrite())
+        {
+            args.Accepted = false;
+            return;
+        }
+
         if (!TryResourceTagTarget(out var session, out var work, out var frames))
         {
             return;
@@ -3475,6 +3544,13 @@ public sealed partial class ShellViewModel : ViewModelBase
     /// </summary>
     public void PickResourceTag(TagEditorItemEventArgs args)
     {
+        if (RefuseWorkspaceWrite())
+        {
+            args.Notice = WorkspaceSyncGuard.BehindNotice;
+            args.Accepted = false;
+            return;
+        }
+
         if (!TryResourceTagTarget(out var session, out var work, out var frames))
         {
             return;
@@ -3492,6 +3568,11 @@ public sealed partial class ShellViewModel : ViewModelBase
     /// </summary>
     public void DeleteResourceTagPreset(TagEditorItem item)
     {
+        if (RefuseWorkspaceWrite())
+        {
+            return;
+        }
+
         if (mSession == null
             || mSelectedNav == null
             || !PhotoFactRules.RequiresFacts(mSelectedNav.Channel.Key)
@@ -3757,7 +3838,7 @@ public sealed partial class ShellViewModel : ViewModelBase
         ResourceTagCaption = "已选 " + cardList.Count + " 张";
         ShowResourceTagBatch = cardList.Count > 1;
         ShowResourceTagHint = published.Count == 0;
-        ResourceTagEditable = published.Count > 0;
+        ResourceTagEditable = published.Count > 0 && WorkspaceSyncAllowsWrite;
         ResourceTagHint = cardList.Count > 1 ? "上页后写入这些照片。" : "上页后写入这一张。";
         ShowResourceTags = true;
     }
@@ -5593,6 +5674,11 @@ public sealed partial class ShellViewModel : ViewModelBase
     /// </summary>
     private async void ExecuteDirect()
     {
+        if (RefuseWorkspaceWrite())
+        {
+            return;
+        }
+
         if (mSession == null)
         {
             return;
@@ -5911,7 +5997,8 @@ public sealed partial class ShellViewModel : ViewModelBase
         return !mIsExecuting
             && !mIsPublishing
             && HasRunnableBatch()
-            && mMode == ExecutionMode.Direct;
+            && mMode == ExecutionMode.Direct
+            && WorkspaceSyncAllowsWrite;
     }
 
     /// <summary>
@@ -6742,6 +6829,11 @@ public sealed partial class ShellViewModel : ViewModelBase
     /// </summary>
     public void ApplyStarRating(int stars)
     {
+        if (RefuseWorkspaceWrite())
+        {
+            return;
+        }
+
         if (mSession == null || stars is < 0 or > 5)
         {
             return;

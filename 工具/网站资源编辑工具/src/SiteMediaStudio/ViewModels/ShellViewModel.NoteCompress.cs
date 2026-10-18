@@ -6,7 +6,7 @@ namespace PersonalWorks.SiteMediaStudio;
 
 /// <summary>
 /// 心得配图的压缩、恢复和清理。编排在核心层，这里只接线进度窗、结果框和按钮。
-/// 不检查本地是否落后于 GitHub，那是后续步骤。
+/// 本地落后于 GitHub 时这些写入会被拒绝。
 /// </summary>
 public sealed partial class ShellViewModel
 {
@@ -47,12 +47,12 @@ public sealed partial class ShellViewModel
     /// <summary>
     /// 所选配图都已发布时，悬停说明用统一文案。否则不显示提示。
     /// </summary>
-    public string? CompressSelectedToolTip => PublishedToolTip(SelectedNoteStages());
+    public string? CompressSelectedToolTip => SyncWriteToolTip ?? PublishedToolTip(SelectedNoteStages());
 
     /// <summary>
     /// 所选配图都已发布时，恢复按钮的悬停说明。
     /// </summary>
-    public string? RestoreOriginalToolTip => PublishedToolTip(SelectedNoteStages());
+    public string? RestoreOriginalToolTip => SyncWriteToolTip ?? PublishedToolTip(SelectedNoteStages());
 
     /// <summary>
     /// 当前这张或全部所选都已发布时，重新压缩按钮的悬停说明。
@@ -61,6 +61,11 @@ public sealed partial class ShellViewModel
     {
         get
         {
+            if (SyncWriteToolTip != null)
+            {
+                return SyncWriteToolTip;
+            }
+
             var stageList = SelectedNoteStages();
             if (stageList.Count == 0)
             {
@@ -81,6 +86,11 @@ public sealed partial class ShellViewModel
     /// </summary>
     private void CompressOverLimit()
     {
+        if (RefuseWorkspaceWrite())
+        {
+            return;
+        }
+
         _ = CompressAsync(OverLimitTargets(), null, false, "正在压缩超限配图", "压缩结果", null);
     }
 
@@ -89,6 +99,11 @@ public sealed partial class ShellViewModel
     /// </summary>
     private void CompressSelected()
     {
+        if (RefuseWorkspaceWrite())
+        {
+            return;
+        }
+
         _ = CompressAsync(SelectedCompressTargets(), null, false, "正在压缩所选配图", "压缩结果", null);
     }
 
@@ -97,6 +112,11 @@ public sealed partial class ShellViewModel
     /// </summary>
     private void Recompress()
     {
+        if (RefuseWorkspaceWrite())
+        {
+            return;
+        }
+
         var stageList = SelectedNoteStages();
         var folderName = CurrentNoteId();
         if (stageList.Count != 1 || folderName == null || NoteImageGuard.PublishedReason(stageList[0]).Length > 0)
@@ -126,6 +146,11 @@ public sealed partial class ShellViewModel
     /// </summary>
     private void RestoreOriginal()
     {
+        if (RefuseWorkspaceWrite())
+        {
+            return;
+        }
+
         _ = RestoreAsync(SelectedRestoreTargets());
     }
 
@@ -134,6 +159,11 @@ public sealed partial class ShellViewModel
     /// </summary>
     private void PurgeNoteBackups()
     {
+        if (RefuseWorkspaceWrite())
+        {
+            return;
+        }
+
         _ = PurgeNoteAsync(alreadyConfirmed: false);
     }
 
@@ -142,6 +172,11 @@ public sealed partial class ShellViewModel
     /// </summary>
     private void PurgeAllNoteBackups(Window owner)
     {
+        if (RefuseWorkspaceWrite())
+        {
+            return;
+        }
+
         _ = PurgeAllAsync(owner, alreadyConfirmed: false);
     }
 
@@ -150,6 +185,11 @@ public sealed partial class ShellViewModel
     /// </summary>
     private void RetryNoteImage()
     {
+        if (RefuseWorkspaceWrite())
+        {
+            return;
+        }
+
         _ = RetryNoteImageAsync();
     }
 
@@ -195,7 +235,7 @@ public sealed partial class ShellViewModel
         string resultTitle,
         Window? owner)
     {
-        if (mIsExecuting || mSession == null)
+        if (mIsExecuting || mSession == null || RefuseWorkspaceWrite())
         {
             return;
         }
@@ -255,7 +295,7 @@ public sealed partial class ShellViewModel
     /// </summary>
     private async Task RestoreAsync(IReadOnlyList<NoteImageRestoreTarget> targetList)
     {
-        if (mIsExecuting || mSession == null)
+        if (mIsExecuting || mSession == null || RefuseWorkspaceWrite())
         {
             return;
         }
@@ -304,7 +344,7 @@ public sealed partial class ShellViewModel
     /// </summary>
     private async Task PurgeNoteAsync(bool alreadyConfirmed)
     {
-        if (mIsExecuting || !HasOpenNote())
+        if (mIsExecuting || !HasOpenNote() || RefuseWorkspaceWrite())
         {
             return;
         }
@@ -362,7 +402,7 @@ public sealed partial class ShellViewModel
     /// </summary>
     private async Task PurgeAllAsync(Window? owner, bool alreadyConfirmed)
     {
-        if (mIsExecuting || mSession == null)
+        if (mIsExecuting || mSession == null || RefuseWorkspaceWrite())
         {
             return;
         }
@@ -414,7 +454,7 @@ public sealed partial class ShellViewModel
         Window? owner,
         Func<IProgress<PublishProgress>, NoteBackupReport> purge)
     {
-        if (mIsExecuting)
+        if (mIsExecuting || RefuseWorkspaceWrite())
         {
             return null;
         }
@@ -714,6 +754,7 @@ public sealed partial class ShellViewModel
     private bool CanCompressOverLimit()
     {
         return HasOpenNote()
+            && WorkspaceSyncAllowsWrite
             && mNoteAuditError.Length == 0
             && mNoteAudit is { OverLimitCount: > 0 };
     }
@@ -723,7 +764,7 @@ public sealed partial class ShellViewModel
     /// </summary>
     private bool CanCompressSelected()
     {
-        if (!HasOpenNote() || mNoteAuditError.Length > 0)
+        if (!HasOpenNote() || !WorkspaceSyncAllowsWrite || mNoteAuditError.Length > 0)
         {
             return false;
         }
@@ -737,7 +778,7 @@ public sealed partial class ShellViewModel
     /// </summary>
     private bool CanRestoreOriginal()
     {
-        if (!HasOpenNote())
+        if (!HasOpenNote() || !WorkspaceSyncAllowsWrite)
         {
             return false;
         }
@@ -751,7 +792,7 @@ public sealed partial class ShellViewModel
     /// </summary>
     private bool CanRecompress()
     {
-        if (!HasOpenNote())
+        if (!HasOpenNote() || !WorkspaceSyncAllowsWrite)
         {
             return false;
         }
@@ -767,7 +808,7 @@ public sealed partial class ShellViewModel
     /// </summary>
     private bool CanRetryNoteImage()
     {
-        if (mSession == null || mIsExecuting || !ShowRetryNoteImage)
+        if (mSession == null || mIsExecuting || !WorkspaceSyncAllowsWrite || !ShowRetryNoteImage)
         {
             return false;
         }
@@ -786,7 +827,7 @@ public sealed partial class ShellViewModel
     /// </summary>
     private bool CanPurgeNoteBackups()
     {
-        return HasOpenNote();
+        return HasOpenNote() && WorkspaceSyncAllowsWrite;
     }
 
     /// <summary>
