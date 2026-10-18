@@ -19,6 +19,11 @@ public static class NoteConfigStore
         var path = Path.Combine(folderFullPath, FileName);
         var dirty = !File.Exists(path);
         var config = dirty ? NewConfig(folderName) : Load(path);
+        if (config.LegacyModifiedAtMigrated)
+        {
+            dirty = true;
+            config.LegacyModifiedAtMigrated = false;
+        }
         var bodyPath = Path.Combine(folderFullPath, NoteRules.BodyFileName);
         if (File.Exists(bodyPath)
             && NoteRules.TryReadFrontmatter(File.ReadAllText(bodyPath), out var fields, out var body, out _))
@@ -50,7 +55,7 @@ public static class NoteConfigStore
 
         if (string.IsNullOrWhiteSpace(config.Slug))
         {
-            config.Slug = DefaultSlug(folderName);
+            config.Slug = DefaultSlug(folderName, config.CreatedAt);
             dirty = true;
         }
 
@@ -69,30 +74,103 @@ public static class NoteConfigStore
     }
 
     /// <summary>
-    /// 用正文第一个一级标题更新配置。没有标题则不改。
+    /// 按夹名写入主标题、副标题与完整标题。时间戳夹名仍可回退到正文一级标题，但不覆盖夹名已经给出的主副标题。
     /// </summary>
     public static NoteConfig SyncTitle(string folderFullPath, string folderName)
     {
         var config = Ensure(folderFullPath, folderName);
-        var bodyPath = Path.Combine(folderFullPath, NoteRules.BodyFileName);
-        if (!File.Exists(bodyPath))
+        var resolved = ResolveTitles(folderFullPath, folderName, config);
+        if (!resolved.Resolved
+            || (string.Equals(resolved.MainTitle, config.MainTitle, StringComparison.Ordinal)
+                && string.Equals(resolved.Subtitle, config.Subtitle, StringComparison.Ordinal)
+                && string.Equals(resolved.DisplayTitle, config.Title, StringComparison.Ordinal)))
         {
             return config;
         }
 
-        var heading = NoteRules.ReadFirstHeading(File.ReadAllText(bodyPath));
-        if (string.IsNullOrWhiteSpace(heading) || string.Equals(heading, config.Title, StringComparison.Ordinal))
-        {
-            return config;
-        }
-
-        config.Title = heading;
+        config.MainTitle = resolved.MainTitle;
+        config.Subtitle = resolved.Subtitle;
+        config.Title = resolved.DisplayTitle;
         Save(folderFullPath, config);
         return config;
     }
 
     /// <summary>
-    /// 发布上线后：正文或配图比上次记录新，就追加一条修改时间。
+    /// 解析当前应写入配置的主副标题。夹名含「——」时以夹名为准；时间戳夹名回退到已有标题或正文一级标题。
+    /// </summary>
+    public static NoteTitleSet ResolveTitles(string folderFullPath, string folderName, NoteConfig config)
+    {
+        if (!NoteRules.IsTimestampFolderName(folderName))
+        {
+            var parsed = NoteRules.ParseFolderTitles(folderName);
+            if (string.IsNullOrWhiteSpace(parsed.MainTitle))
+            {
+                return new NoteTitleSet();
+            }
+
+            return new NoteTitleSet
+            {
+                Resolved = true,
+                MainTitle = parsed.MainTitle,
+                Subtitle = parsed.Subtitle,
+                DisplayTitle = parsed.DisplayTitle
+            };
+        }
+
+        var heading = ReadHeading(folderFullPath);
+        if (!string.IsNullOrWhiteSpace(heading)
+            && !string.Equals(heading, config.Title, StringComparison.Ordinal))
+        {
+            return new NoteTitleSet
+            {
+                Resolved = true,
+                MainTitle = heading,
+                Subtitle = "",
+                DisplayTitle = heading
+            };
+        }
+
+        if (!string.IsNullOrWhiteSpace(config.MainTitle))
+        {
+            var main = config.MainTitle.Trim();
+            var subtitle = (config.Subtitle ?? "").Trim();
+            return new NoteTitleSet
+            {
+                Resolved = true,
+                MainTitle = main,
+                Subtitle = subtitle,
+                DisplayTitle = NoteRules.ComposeDisplayTitle(main, subtitle)
+            };
+        }
+
+        if (!string.IsNullOrWhiteSpace(config.Title))
+        {
+            var main = config.Title.Trim();
+            return new NoteTitleSet
+            {
+                Resolved = true,
+                MainTitle = main,
+                Subtitle = "",
+                DisplayTitle = main
+            };
+        }
+
+        if (!string.IsNullOrWhiteSpace(heading))
+        {
+            return new NoteTitleSet
+            {
+                Resolved = true,
+                MainTitle = heading,
+                Subtitle = "",
+                DisplayTitle = heading
+            };
+        }
+
+        return new NoteTitleSet();
+    }
+
+    /// <summary>
+    /// 发布上线后：正文或配图比上次记录新，就追加一条修订。摘要先留空，来源记为上页。
     /// </summary>
     public static int AppendModified(WorkspaceProfile profile, DateTime localNow)
     {
@@ -134,7 +212,12 @@ public static class NoteConfigStore
                 continue;
             }
 
-            config.ModifiedAt.Add(stamp);
+            config.Revisions.Add(new NoteRevision
+            {
+                At = stamp,
+                Summary = "",
+                Source = NoteRevisionSource.Publish
+            });
             Save(dir, config);
             appended++;
         }
@@ -149,7 +232,9 @@ public static class NoteConfigStore
     {
         try
         {
-            return JsonSerializer.Deserialize<NoteConfig>(File.ReadAllText(path), JsonUtil.Options) ?? new NoteConfig();
+            var config = JsonSerializer.Deserialize<NoteConfig>(File.ReadAllText(path), JsonUtil.Options) ?? new NoteConfig();
+            Normalize(config);
+            return config;
         }
         catch (Exception)
         {
@@ -169,12 +254,77 @@ public static class NoteConfigStore
     }
 
     /// <summary>
-    /// 夹名转网址用的默认 slug。
+    /// 夹名转网址用的默认 slug。只接受能变成 ASCII slug 的夹名，中文夹名不会进对象键。
     /// </summary>
     public static string DefaultSlug(string folderName)
     {
-        var core = folderName.Replace('_', '-');
-        return "n-" + core;
+        return DefaultSlug(folderName, "");
+    }
+
+    /// <summary>
+    /// 夹名不是时间戳时，用创建时间生成 <c>n-yyyyMMdd-HHmmss</c>。
+    /// </summary>
+    public static string DefaultSlug(string folderName, string? createdAt)
+    {
+        var slug = "n-" + (folderName ?? "").Replace('_', '-');
+        if (NoteRules.IsSlug(slug))
+        {
+            return slug;
+        }
+
+        if (TryParseTime(createdAt, out var parsed))
+        {
+            return "n-" + parsed.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture);
+        }
+
+        return "n-" + DateTime.Now.ToString("yyyyMMdd-HHmmss", CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
+    /// 最近一次修订时间。没有修订时与创建时间相同。
+    /// </summary>
+    public static string RevisedAt(NoteConfig config)
+    {
+        DateTime? latest = null;
+        var latestText = "";
+        foreach (var revision in config.Revisions)
+        {
+            if (revision == null || string.IsNullOrWhiteSpace(revision.At))
+            {
+                continue;
+            }
+
+            if (!TryParseTime(revision.At, out var parsed))
+            {
+                if (latest == null && latestText.Length == 0)
+                {
+                    latestText = revision.At;
+                }
+
+                continue;
+            }
+
+            if (latest == null || parsed > latest)
+            {
+                latest = parsed;
+                latestText = revision.At;
+            }
+        }
+
+        return latestText.Length > 0 ? latestText : config.CreatedAt ?? "";
+    }
+
+    /// <summary>
+    /// 复制一条修订，避免索引与夹内配置共用同一个对象。
+    /// </summary>
+    public static NoteRevision CopyRevision(NoteRevision revision)
+    {
+        return new NoteRevision
+        {
+            At = revision.At ?? "",
+            Summary = revision.Summary ?? "",
+            Source = revision.Source ?? ""
+        };
     }
 
     private static NoteConfig NewConfig(string folderName)
@@ -229,11 +379,20 @@ public static class NoteConfigStore
 
     private static DateTime? LatestRecorded(NoteConfig config)
     {
-        DateTime? latest = Parse(config.CreatedAt);
-        foreach (var item in config.ModifiedAt)
+        DateTime? latest = null;
+        if (TryParseTime(config.CreatedAt, out var created))
         {
-            var parsed = Parse(item);
-            if (parsed != null && (latest == null || parsed > latest))
+            latest = created;
+        }
+
+        foreach (var item in config.Revisions)
+        {
+            if (item == null || !TryParseTime(item.At, out var parsed))
+            {
+                continue;
+            }
+
+            if (latest == null || parsed > latest)
             {
                 latest = parsed;
             }
@@ -242,13 +401,75 @@ public static class NoteConfigStore
         return latest;
     }
 
-    private static DateTime? Parse(string? text)
+    private static string ReadHeading(string folderFullPath)
     {
-        if (DateTime.TryParseExact(text, TimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsed))
+        var bodyPath = Path.Combine(folderFullPath, NoteRules.BodyFileName);
+        if (!File.Exists(bodyPath))
         {
-            return parsed;
+            return "";
         }
 
-        return null;
+        return NoteRules.ReadFirstHeading(File.ReadAllText(bodyPath));
+    }
+
+    /// <summary>
+    /// 把旧时间戳收进修订列表，并补齐空字符串，避免后续空引用。
+    /// </summary>
+    private static void Normalize(NoteConfig config)
+    {
+        config.CreatedAt ??= "";
+        config.Title ??= "";
+        config.MainTitle ??= "";
+        config.Subtitle ??= "";
+        config.Slug ??= "";
+        config.Summary ??= "";
+        config.Revisions ??= new List<NoteRevision>();
+        for (var i = config.Revisions.Count - 1; i >= 0; i--)
+        {
+            var revision = config.Revisions[i];
+            if (revision == null)
+            {
+                config.Revisions.RemoveAt(i);
+                continue;
+            }
+
+            revision.At ??= "";
+            revision.Summary ??= "";
+            revision.Source ??= "";
+        }
+
+        if (config.ModifiedAt != null)
+        {
+            if (config.Revisions.Count == 0)
+            {
+                foreach (var at in config.ModifiedAt)
+                {
+                    if (string.IsNullOrWhiteSpace(at))
+                    {
+                        continue;
+                    }
+
+                    config.Revisions.Add(new NoteRevision
+                    {
+                        At = at.Trim(),
+                        Summary = "",
+                        Source = NoteRevisionSource.Publish
+                    });
+                }
+            }
+
+            config.LegacyModifiedAtMigrated = true;
+            config.ModifiedAt = null;
+        }
+    }
+
+    private static bool TryParseTime(string? text, out DateTime parsed)
+    {
+        return DateTime.TryParseExact(
+            text,
+            TimeFormat,
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out parsed);
     }
 }

@@ -21,6 +21,23 @@ public static class NoteRules
     public const string SketchesSlug = "sketches";
 
     /// <summary>
+    /// 主标题与副标题的间隔。两个 U+2014，即「——」。半角 <c>--</c> 与单个破折号都不作分割。
+    /// </summary>
+    public const string TitleSeparator = "\u2014\u2014";
+
+    /// <summary>
+    /// 夹名达到该长度时警告，仍允许保存。
+    /// </summary>
+    public const int FolderNameWarnLength = 60;
+
+    /// <summary>
+    /// 夹名达到该长度时禁止保存。计数含破折号。
+    /// </summary>
+    public const int FolderNameBlockLength = 80;
+
+    private const string WindowsInvalidFolderChars = "\\/:*?\"<>|";
+
+    /// <summary>
     /// 上页预演遇到 GIF 配图时返回的说明。
     /// </summary>
     public const string GifPublishRejectedMessage = "GIF 配图暂不支持上页";
@@ -215,6 +232,117 @@ public static class NoteRules
     }
 
     /// <summary>
+    /// 夹名是否为新建时的 <c>yyyyMMdd_HHmmss</c>。这种夹名不当作展示标题。
+    /// </summary>
+    public static bool IsTimestampFolderName(string? folderName)
+    {
+        return DateTime.TryParseExact(
+            folderName,
+            "yyyyMMdd_HHmmss",
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.None,
+            out _);
+    }
+
+    /// <summary>
+    /// 是否为站点使用的 ASCII slug。
+    /// </summary>
+    public static bool IsSlug(string? slug)
+    {
+        return !string.IsNullOrWhiteSpace(slug) && SlugRegex.IsMatch(slug);
+    }
+
+    /// <summary>
+    /// 按第一次出现的「——」拆夹名。没有间隔时整段为主标题，副标题为空。
+    /// </summary>
+    public static NoteFolderTitles ParseFolderTitles(string? folderName)
+    {
+        var name = (folderName ?? "").Trim();
+        var index = name.IndexOf(TitleSeparator, StringComparison.Ordinal);
+        if (index < 0)
+        {
+            return new NoteFolderTitles
+            {
+                MainTitle = name,
+                Subtitle = "",
+                DisplayTitle = name
+            };
+        }
+
+        var main = name[..index].Trim();
+        var subtitle = name[(index + TitleSeparator.Length)..].Trim();
+        return new NoteFolderTitles
+        {
+            MainTitle = main,
+            Subtitle = subtitle,
+            DisplayTitle = ComposeDisplayTitle(main, subtitle)
+        };
+    }
+
+    /// <summary>
+    /// 有副标题时拼成「主标题——副标题」，否则只保留主标题。主标题为空时结果为空。
+    /// </summary>
+    public static string ComposeDisplayTitle(string? mainTitle, string? subtitle)
+    {
+        var main = (mainTitle ?? "").Trim();
+        if (main.Length == 0)
+        {
+            return "";
+        }
+
+        var sub = (subtitle ?? "").Trim();
+        return sub.Length == 0 ? main : main + TitleSeparator + sub;
+    }
+
+    /// <summary>
+    /// 校验用作标题的夹名。约 60 字警告，约 80 字禁止；主标题为空禁止保存。
+    /// </summary>
+    public static NoteFolderNameCheck CheckFolderName(string? folderName)
+    {
+        var name = (folderName ?? "").Trim();
+        var titles = ParseFolderTitles(name);
+        if (name.Length == 0 || name is "." or "..")
+        {
+            return Block(name, titles, "主标题不能为空。没有副标题时只写主标题，有副标题时写成「主标题——副标题」。");
+        }
+
+        if (HasIllegalFolderChar(name))
+        {
+            return Block(name, titles, "夹名不能以点开头或结尾，也不能包含 \\ / : * ? \" < > |。这与网址 slug 无关，中文夹名不必改成英文。");
+        }
+
+        if (string.IsNullOrWhiteSpace(titles.MainTitle))
+        {
+            return Block(name, titles, "主标题不能为空。没有副标题时只写主标题，有副标题时写成「主标题——副标题」。");
+        }
+
+        var dashHint = UnofficialDashHint(name);
+        if (name.Length >= FolderNameBlockLength)
+        {
+            return Block(name, titles, JoinMessage("夹名过长，请将主副标题总长度控制在 80 字以内（含破折号）。", dashHint));
+        }
+
+        if (name.Length >= FolderNameWarnLength)
+        {
+            return new NoteFolderNameCheck
+            {
+                Verdict = NoteFolderNameVerdict.Warn,
+                Message = JoinMessage("夹名偏长，列表与详情标题可能折行过多，建议缩短。", dashHint),
+                Length = name.Length,
+                Titles = titles
+            };
+        }
+
+        return new NoteFolderNameCheck
+        {
+            Verdict = NoteFolderNameVerdict.Ok,
+            Message = dashHint,
+            Length = name.Length,
+            Titles = titles
+        };
+    }
+
+    /// <summary>
     /// 正文里第一个一级标题。没有则空。
     /// </summary>
     public static string ReadFirstHeading(string markdown)
@@ -281,6 +409,15 @@ public static class NoteRules
             return Fail("没有正文.md。");
         }
 
+        if (!IsTimestampFolderName(folderName))
+        {
+            var nameCheck = CheckFolderName(folderName);
+            if (nameCheck.Verdict == NoteFolderNameVerdict.Block)
+            {
+                return Fail(nameCheck.Message);
+            }
+        }
+
         var config = NoteConfigStore.SyncTitle(folderFullPath, folderName);
         var source = File.ReadAllText(bodyPath);
         var body = source;
@@ -289,10 +426,10 @@ public static class NoteRules
             body = stripped;
         }
 
-        var title = ReadFirstHeading(body);
+        var title = config.Title;
         if (string.IsNullOrWhiteSpace(title))
         {
-            title = config.Title;
+            title = ReadFirstHeading(body);
         }
 
         var slug = config.Slug;
@@ -433,8 +570,13 @@ public static class NoteRules
             FolderName = folderName,
             Slug = slug,
             Title = title,
-            Date = string.IsNullOrWhiteSpace(date) ? folderName[..4] + "-" + folderName[4..6] + "-" + folderName[6..8] : date,
+            MainTitle = string.IsNullOrWhiteSpace(config.MainTitle) ? title : config.MainTitle,
+            Subtitle = config.Subtitle ?? "",
+            Date = date,
+            CreatedAt = config.CreatedAt ?? "",
+            RevisedAt = NoteConfigStore.RevisedAt(config),
             Summary = summary,
+            Revisions = config.Revisions.Select(NoteConfigStore.CopyRevision).ToList(),
             RewrittenMarkdown = rewritten,
             Images = jobs,
             PreviewObjects = preview.Take(3).ToList(),
@@ -539,6 +681,59 @@ public static class NoteRules
         }
 
         return targetList;
+    }
+
+    private static NoteFolderNameCheck Block(string name, NoteFolderTitles titles, string message)
+    {
+        return new NoteFolderNameCheck
+        {
+            Verdict = NoteFolderNameVerdict.Block,
+            Message = message,
+            Length = name.Length,
+            Titles = titles
+        };
+    }
+
+    private static bool HasIllegalFolderChar(string name)
+    {
+        if (name.StartsWith('.') || name.EndsWith('.'))
+        {
+            return true;
+        }
+
+        foreach (var character in name)
+        {
+            if (WindowsInvalidFolderChars.Contains(character) || char.IsControl(character))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 去掉正式间隔后，若仍有半角连字符或单个破折号，提示用户这不会拆出副标题。
+    /// </summary>
+    private static string UnofficialDashHint(string name)
+    {
+        var stripped = name.Replace(TitleSeparator, "", StringComparison.Ordinal);
+        if (stripped.Contains("--", StringComparison.Ordinal) || stripped.Contains('\u2014'))
+        {
+            return "间隔请使用中文破折号「——」。半角 -- 或单个 — 不会拆成副标题。";
+        }
+
+        return "";
+    }
+
+    private static string JoinMessage(string primary, string extra)
+    {
+        if (string.IsNullOrWhiteSpace(extra))
+        {
+            return primary;
+        }
+
+        return primary + extra;
     }
 
     private static NotePublishPlan Fail(string error, string? blockingReference = null)

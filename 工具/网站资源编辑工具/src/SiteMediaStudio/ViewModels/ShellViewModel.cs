@@ -184,6 +184,7 @@ public sealed partial class ShellViewModel : ViewModelBase
         TagCommand = new RelayCommand(OpenTags, CanTag);
         WithdrawWorkCommand = new RelayCommand(WithdrawSelectedWork, CanWithdrawWork);
         CreateNoteCommand = new RelayCommand(CreateNote, CanCreateNote);
+        EditNoteMetaCommand = new RelayCommand(EditNoteMeta, CanEditNoteMeta);
         PublishNoteCommand = new RelayCommand(PublishSelectedNote, CanPublishSelectedNote);
         HideNoteCommand = new RelayCommand(HideSelectedNote, CanHideNote);
         RestoreNoteCommand = new RelayCommand(RestoreSelectedNote, CanRestoreNote);
@@ -275,6 +276,12 @@ public sealed partial class ShellViewModel : ViewModelBase
     /// </summary>
     public RelayCommand WithdrawWorkCommand { get; }
     public RelayCommand CreateNoteCommand { get; }
+
+    /// <summary>
+    /// 编辑当前心得的夹名与修订摘要。
+    /// </summary>
+    public RelayCommand EditNoteMetaCommand { get; }
+
     public RelayCommand PublishNoteCommand { get; }
     public RelayCommand HideNoteCommand { get; }
     public RelayCommand RestoreNoteCommand { get; }
@@ -705,6 +712,7 @@ public sealed partial class ShellViewModel : ViewModelBase
                 TagCommand.RaiseCanExecute();
                 WithdrawWorkCommand.RaiseCanExecute();
                 CreateNoteCommand.RaiseCanExecute();
+                EditNoteMetaCommand.RaiseCanExecute();
                 PublishNoteCommand.RaiseCanExecute();
                 HideNoteCommand.RaiseCanExecute();
                 RestoreNoteCommand.RaiseCanExecute();
@@ -2726,6 +2734,41 @@ public sealed partial class ShellViewModel : ViewModelBase
             && mSelectedNav?.Work is { SourceKind: "note" };
     }
 
+    private bool CanEditNoteMeta() => CanPublishNote() && WorkspaceSyncAllowsWrite;
+
+    /// <summary>
+    /// 打开夹名与修订摘要编辑窗。保存后按新夹名重新选中。
+    /// </summary>
+    private void EditNoteMeta()
+    {
+        if (RefuseWorkspaceWrite())
+        {
+            return;
+        }
+
+        if (mSession == null || mSelectedNav?.Work is not { SourceKind: "note" } work)
+        {
+            return;
+        }
+
+        var saved = NoteMetaWindow.Show(mSession.Profile, NoteFolderPath(work.Id));
+        if (saved is not { Ok: true })
+        {
+            return;
+        }
+
+        var status = string.IsNullOrWhiteSpace(saved.Message)
+            ? "已保存标题与修订说明。"
+            : saved.Message;
+        _ = SelectAfterReloadAsync(
+            mSession.Profile.ProfilePath,
+            NoteRules.ChannelKey,
+            saved.FolderName,
+            false,
+            null,
+            status);
+    }
+
     private bool CanHideNote() => CanPublishNote() && WorkspaceSyncAllowsWrite;
 
     private bool CanRestoreNote() => CanPublishNote() && WorkspaceSyncAllowsWrite;
@@ -2962,6 +3005,7 @@ public sealed partial class ShellViewModel : ViewModelBase
             mIsExecuting = false;
             ExecuteCommand.RaiseCanExecute();
             PublishNoteCommand.RaiseCanExecute();
+            EditNoteMetaCommand.RaiseCanExecute();
         }
 
         if (!batch.Ok || !string.IsNullOrWhiteSpace(outcome.Error))

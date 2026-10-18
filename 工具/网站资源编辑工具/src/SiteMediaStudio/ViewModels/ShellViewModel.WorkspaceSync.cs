@@ -172,6 +172,7 @@ public sealed partial class ShellViewModel
         ExecuteCommand.RaiseCanExecute();
         TagCommand.RaiseCanExecute();
         PublishNoteCommand.RaiseCanExecute();
+        EditNoteMetaCommand.RaiseCanExecute();
         HideNoteCommand.RaiseCanExecute();
         RestoreNoteCommand.RaiseCanExecute();
         RaiseNoteImageCommands();

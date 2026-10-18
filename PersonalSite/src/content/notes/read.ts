@@ -3,6 +3,7 @@ import { lexicon } from "../lexicon";
 import type { NoteCard } from "../site";
 import {
   displayNoteDate,
+  noteDisplayMeta,
   stripNoteFrontmatter,
   visibleNotes,
   type NoteIndex,
@@ -43,6 +44,7 @@ export function listNotes(): NoteCard[] {
 }
 
 function toCard(record: NoteRecord, body: string): NoteCard {
+  const meta = noteDisplayMeta(record);
   return {
     slug: record.slug,
     title: record.title,
@@ -51,6 +53,11 @@ function toCard(record: NoteRecord, body: string): NoteCard {
     body,
     previewImages: (record.previewObjects ?? []).slice(0, 3),
     draft: false,
+    mainTitle: meta.mainTitle,
+    subtitle: meta.subtitle,
+    createdAt: meta.createdAt,
+    revisedAt: meta.revisedAt,
+    revisions: meta.revisions,
   };
 }
 
