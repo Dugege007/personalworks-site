@@ -223,11 +223,14 @@ public static class NoteRules
         Directory.CreateDirectory(folder);
         Directory.CreateDirectory(Path.Combine(folder, ReadyDirName));
         File.WriteAllText(Path.Combine(folder, BodyFileName), "", new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-        NoteConfigStore.Save(folder, new NoteConfig
+        var config = new NoteConfig
         {
             CreatedAt = NoteConfigStore.CreatedFromFolder(name),
             Slug = NoteConfigStore.DefaultSlug(name)
-        });
+        };
+        // 新建时的空正文就是第一版。之后的保存用它做差异，而不是把整篇都当成新增。
+        config.RevisionBaseline = NoteRevisionBaselineCapture.Capture(folder, config);
+        NoteConfigStore.Save(folder, config);
         return folder;
     }
 

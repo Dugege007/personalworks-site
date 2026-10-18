@@ -13,7 +13,7 @@ public static class NoteRevisionSource
     public const string Manual = "manual";
 
     /// <summary>
-    /// 助手根据内容差异生成。本阶段只预留取值，自动摘要在后续阶段接入。
+    /// 助手或本机启发式根据内容差异生成。用户之后若改写摘要，来源改为 <see cref="Manual"/>。
     /// </summary>
     public const string Assistant = "assistant";
 
@@ -60,6 +60,12 @@ public sealed class NoteConfig
     /// 列表用短摘要，与单次修订说明不是同一字段。
     /// </summary>
     public string Summary { get; set; } = "";
+
+    /// <summary>
+    /// 上次生成修订时的内容快照。只给编辑工具比较差异，不上页，也不写入站点索引。
+    /// 旧稿没有该字段时保持空；空摘要的历史时间戳仍然合法。
+    /// </summary>
+    public NoteRevisionBaseline? RevisionBaseline { get; set; }
 
     /// <summary>
     /// 本次读取把旧 <c>modifiedAt</c> 收进了修订列表，或丢弃了已被修订列表取代的旧字段。下次保存应写回。
