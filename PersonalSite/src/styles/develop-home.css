@@ -512,7 +512,7 @@
   grid-template-columns: 1fr auto;
   align-items: center;
   gap: 12px 32px;
-  padding: 28px var(--page-inset) 38px;
+  padding: 28px var(--page-inset) calc(38px + env(safe-area-inset-bottom, 0px));
   background: var(--ink-block);
   color: var(--on-ink);
 }

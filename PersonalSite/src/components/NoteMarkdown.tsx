@@ -39,6 +39,12 @@ export function NoteMarkdown({ markdown }: NoteMarkdownProps) {
                 }
                 return <img src={assetUrl(props.src)} alt={props.alt ?? ""} />;
               },
+              // 宽表单独横向滚动，避免整页被表格撑出屏幕。
+              table: (props: { children?: JSX.Element | JSX.Element[] }) => (
+                <div className="archive-table-scroll">
+                  <table>{props.children}</table>
+                </div>
+              ),
             },
           })
           .process(normalizeTexDelimiters(markdown));

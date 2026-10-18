@@ -84,8 +84,7 @@ export function SiteHeader({ onNavigate }: SiteHeaderProps) {
       }
       const syncTone = () => setHeroDark(hero.dataset.tone === "dark");
       syncTone();
-      const headerPx =
-        Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 64;
+      const headerPx = document.querySelector(".header")?.getBoundingClientRect().height || 64;
       // 实心线对齐 SHOT（或姓名）刚要进入顶栏下方，而不是等整张头图几乎滚完。
       io = new IntersectionObserver(
         ([entry]) => {

@@ -1,26 +1,27 @@
 @import "./skins/develop.css";
 
 :root {
-  --header-h: 64px;
+  /* 含刘海安全区。桌面 env 为 0，顶栏仍是 64px。 */
+  --header-h: calc(64px + env(safe-area-inset-top, 0px));
   --motion-reveal: 1;
   --motion-hint: 1;
   --motion-ticks: 1;
   /* 横屏内容栏：宽于此时只加左右留白，窄于此时才开始压缩与重排 */
   --page-max: 1200px;
-  --page-gutter: 56px;
+  --page-gutter: max(56px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
   /* 竖拍形象照头部多在画面上三分之一，裁切锚在此以免削顶 */
   --portrait-focus: 50% 18%;
 }
 
 @media (max-width: 860px) {
   :root {
-    --page-gutter: 20px;
+    --page-gutter: max(20px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
   }
 }
 
 @media (max-width: 390px) {
   :root {
-    --page-gutter: 16px;
+    --page-gutter: max(20px, env(safe-area-inset-left, 0px), env(safe-area-inset-right, 0px));
   }
 }
 

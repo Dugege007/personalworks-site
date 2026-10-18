@@ -1,6 +1,6 @@
 .page {
   min-height: calc(100vh - var(--header-h));
-  padding: 48px var(--page-inset) 80px;
+  padding: 48px var(--page-inset) calc(80px + env(safe-area-inset-bottom, 0px));
 }
 
 .page-kicker {
@@ -406,6 +406,7 @@ button.filter-sort-arrow:hover {
 
 .back {
   display: inline-flex;
+  align-items: center;
   margin-bottom: 24px;
   color: var(--accent);
   font-size: 14px;
@@ -491,10 +492,49 @@ button.filter-sort-arrow:hover {
   max-width: 42em;
   margin: 0 0 32px;
   line-height: 1.8;
+  overflow-wrap: break-word;
+}
+
+.archive-body a,
+.archive-body :not(pre) > code {
+  overflow-wrap: anywhere;
+}
+
+/* 浏览器给 figure 左右各 40px 外边距，窄屏会把代码栏挤到正文一半宽。 */
+.archive-body figure {
+  max-width: 100%;
 }
 
 .archive-body pre {
+  max-width: 100%;
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.archive-table-scroll {
+  max-width: 100%;
+  margin: 1.25em 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.archive-body table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.94em;
+}
+
+.archive-body th,
+.archive-body td {
+  border: 1px solid var(--line);
+  padding: 8px 12px;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: break-word;
+}
+
+.archive-body th {
+  font-weight: 600;
 }
 
 /* KaTeX 0.19 的 display 样式不再自己处理横向溢出，长公式在窄屏里滚动。 */
@@ -502,9 +542,11 @@ button.filter-sort-arrow:hover {
   max-width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
-.archive-body img {
+.archive-body img,
+.archive-body video {
   max-width: 100%;
   height: auto;
 }
@@ -620,7 +662,86 @@ button.media-frame {
 
 @media (max-width: 860px) {
   .page {
-    padding: 32px var(--page-inset) 64px;
+    padding: 28px var(--page-inset) calc(56px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .page h1 {
+    font-size: clamp(28px, 8vw, 40px);
+    line-height: 1.28;
+  }
+
+  .page-lead {
+    margin-bottom: 28px;
+    line-height: 1.7;
+  }
+
+  .back {
+    min-height: 44px;
+    margin-bottom: 12px;
+  }
+
+  .note-card h2 {
+    font-size: 22px;
+    line-height: 1.35;
+  }
+
+  .archive-body {
+    font-size: 17px;
+    line-height: 1.75;
+  }
+
+  .archive-body h2,
+  .archive-body h3 {
+    line-height: 1.35;
+    font-weight: 600;
+  }
+
+  .archive-body h2 {
+    margin: 1.5em 0 0.5em;
+    font-size: 1.28em;
+  }
+
+  .archive-body h3 {
+    margin: 1.25em 0 0.4em;
+    font-size: 1.08em;
+  }
+
+  .archive-body ul,
+  .archive-body ol {
+    padding-left: 1.25em;
+  }
+
+  .archive-body figure {
+    margin-inline: 0;
+  }
+
+  .archive-body pre {
+    padding: 12px 14px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .archive-body pre code {
+    font-size: inherit;
+    line-height: inherit;
+  }
+
+  /* 正文放大后公式若仍按 1.21em 放大，窄屏更难读完一行。 */
+  .archive-body .katex {
+    font-size: 1.06em;
+  }
+
+  .archive-body .katex-display {
+    padding-bottom: 0.35em;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--text) 45%, transparent) transparent;
+  }
+
+  .archive-body pre,
+  .archive-table-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--text) 45%, transparent) transparent;
   }
 
   .card-grid,
@@ -633,7 +754,6 @@ button.media-frame {
     grid-column: auto;
   }
 
-  .note-previews,
   .about-grid,
   .media-grid {
     grid-template-columns: 1fr;
