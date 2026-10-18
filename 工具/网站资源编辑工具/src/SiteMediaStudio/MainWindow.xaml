@@ -25,9 +25,15 @@
                 <MenuItem Header="设置…" Command="{Binding OpenSettingsCommand}"/>
             </MenuItem>
             <MenuItem Header="标记">
-                <MenuItem Header="上页 (I)" Command="{Binding MarkIngestCommand}"/>
+                <MenuItem Header="上页 (I)"
+                          Command="{Binding MarkIngestCommand}"
+                          ToolTip="{Binding SyncWriteToolTip}"
+                          ToolTipService.ShowOnDisabled="True"/>
                 <MenuItem Header="回收 (R)" Command="{Binding MarkRecycleCommand}"/>
-                <MenuItem Header="隐藏 (H)" Command="{Binding MarkHideCommand}"/>
+                <MenuItem Header="隐藏 (H)"
+                          Command="{Binding MarkHideCommand}"
+                          ToolTip="{Binding SyncWriteToolTip}"
+                          ToolTipService.ShowOnDisabled="True"/>
                 <MenuItem Header="撤下 (W)" Command="{Binding MarkWithdrawCommand}"/>
                 <MenuItem Header="清除选区标记 (Esc)" Command="{Binding ClearMarkCommand}"/>
             </MenuItem>
@@ -48,9 +54,18 @@
                                TextWrapping="Wrap"
                                Margin="0,4,0,0"
                                Visibility="{Binding ShowNoteImageFooter, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <TextBlock Text="{Binding SyncNotice}"
+                               Foreground="{StaticResource OxideBrush}"
+                               FontWeight="SemiBold"
+                               FontSize="13"
+                               TextWrapping="Wrap"
+                               Margin="0,4,0,0"
+                               Visibility="{Binding ShowSyncNotice, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                     <Button Style="{StaticResource GhostButton}"
                             Content="一键压缩超限配图"
                             Command="{Binding CompressOverLimitCommand}"
+                            ToolTip="{Binding SyncWriteToolTip}"
+                            ToolTipService.ShowOnDisabled="True"
                             HorizontalAlignment="Left"
                             Margin="0,8,0,0"
                             Visibility="{Binding ShowNoteCompress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
@@ -61,7 +76,10 @@
                     <Button Style="{StaticResource PrimaryButton}" Content="生成提示词"
                             Command="{Binding CopyPromptCommand}"
                             Visibility="{Binding IsPromptMode, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                    <Button Style="{StaticResource DangerButton}" Content="执行" Command="{Binding ExecuteCommand}"/>
+                    <Button Style="{StaticResource DangerButton}" Content="执行"
+                            Command="{Binding ExecuteCommand}"
+                            ToolTip="{Binding SyncWriteToolTip}"
+                            ToolTipService.ShowOnDisabled="True"/>
                     <Button Style="{StaticResource PrimaryButton}" Content="发布上线" Command="{Binding PublishCommand}"/>
                 </StackPanel>
             </Grid>
@@ -103,21 +121,31 @@
                                       Visibility="{Binding ShowNoteCreate, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             <MenuItem Header="上页心得"
                                       Command="{Binding PublishNoteCommand}"
+                                      ToolTip="{Binding SyncWriteToolTip}"
+                                      ToolTipService.ShowOnDisabled="True"
                                       Visibility="{Binding ShowNoteActions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             <MenuItem Header="隐藏心得"
                                       Command="{Binding HideNoteCommand}"
+                                      ToolTip="{Binding SyncWriteToolTip}"
+                                      ToolTipService.ShowOnDisabled="True"
                                       Visibility="{Binding ShowNoteActions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             <MenuItem Header="恢复显示"
                                       Command="{Binding RestoreNoteCommand}"
+                                      ToolTip="{Binding SyncWriteToolTip}"
+                                      ToolTipService.ShowOnDisabled="True"
                                       Visibility="{Binding ShowNoteActions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             <MenuItem Header="删除心得"
                                       Command="{Binding RecycleNoteCommand}"
                                       Visibility="{Binding ShowNoteActions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             <MenuItem Header="一键压缩超限配图"
                                       Command="{Binding CompressOverLimitCommand}"
+                                      ToolTip="{Binding SyncWriteToolTip}"
+                                      ToolTipService.ShowOnDisabled="True"
                                       Visibility="{Binding ShowNoteActions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             <MenuItem Header="清理本篇原图备份"
                                       Command="{Binding PurgeNoteBackupsCommand}"
+                                      ToolTip="{Binding SyncWriteToolTip}"
+                                      ToolTipService.ShowOnDisabled="True"
                                       Visibility="{Binding ShowNoteActions, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         </ContextMenu>
                     </TreeView.ContextMenu>
@@ -359,6 +387,8 @@
                                       Visibility="{Binding ShowNoteCompress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             <MenuItem Header="清理本篇原图备份"
                                       Command="{Binding PurgeNoteBackupsCommand}"
+                                      ToolTip="{Binding SyncWriteToolTip}"
+                                      ToolTipService.ShowOnDisabled="True"
                                       Visibility="{Binding ShowNoteCompress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         </ContextMenu>
                     </ListBox.ContextMenu>
@@ -483,6 +513,8 @@
                                       Visibility="{Binding ShowNoteCompress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             <MenuItem Header="清理本篇原图备份"
                                       Command="{Binding PurgeNoteBackupsCommand}"
+                                      ToolTip="{Binding SyncWriteToolTip}"
+                                      ToolTipService.ShowOnDisabled="True"
                                       Visibility="{Binding ShowNoteCompress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                         </ContextMenu>
                     </ListBox.ContextMenu>
@@ -589,6 +621,10 @@
             <DockPanel x:Name="InspectorPane" Grid.Column="4" Background="{StaticResource PanelBrush}">
                 <TextBlock DockPanel.Dock="Top" Margin="16,16,16,8" FontSize="11"
                            Foreground="{StaticResource MutedBrush}" Text="检视"/>
+                <TextBlock DockPanel.Dock="Top" Margin="16,0,16,8" FontSize="13" FontWeight="SemiBold"
+                           Foreground="{StaticResource OxideBrush}" TextWrapping="Wrap"
+                           Text="{Binding SyncNotice}"
+                           Visibility="{Binding ShowSyncNotice, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                 <Border x:Name="InspectorPreviewHost" DockPanel.Dock="Top" Margin="16,0,16,12"
                         Background="{StaticResource InkBrush}" HorizontalAlignment="Left"
                         Width="{Binding ElementName=InspectorColumn, Path=Width.Value,
@@ -718,6 +754,8 @@
                             <Button Style="{StaticResource GhostButton}"
                                     Content="一键压缩超限配图"
                                     Command="{Binding CompressOverLimitCommand}"
+                                    ToolTip="{Binding SyncWriteToolTip}"
+                                    ToolTipService.ShowOnDisabled="True"
                                     Margin="0,0,8,8"/>
                             <Button Style="{StaticResource GhostButton}"
                                     Content="恢复原图"

@@ -16,17 +16,20 @@ public sealed class TagWindow : Window
     private readonly Func<Task<WorkCatalogItem?>> mReloaded;
     private readonly IReadOnlyList<string> mObjectKeyList;
     private readonly TagEditor mEditor;
+    private readonly Func<string?>? mRefuseWrite;
     private WorkCatalogItem mWork;
 
     private TagWindow(
         WorkspaceSession session,
         WorkCatalogItem work,
         IReadOnlyList<string> objectKeyList,
+        Func<string?>? refuseWrite,
         Func<Task<WorkCatalogItem?>> reloaded)
     {
         mSession = session;
         mWork = work;
         mObjectKeyList = objectKeyList;
+        mRefuseWrite = refuseWrite;
         mReloaded = reloaded;
 
         Title = "标签";
@@ -103,14 +106,16 @@ public sealed class TagWindow : Window
 
     /// <summary>
     /// 打开标签窗。对象列表为空时写作品级。写盘失败时由回调重载并交回新作品。
+    /// refuseWrite 返回非空说明时，这次不写标签。
     /// </summary>
     public static void Show(
         WorkspaceSession session,
         WorkCatalogItem work,
         IReadOnlyList<string> objectKeyList,
+        Func<string?>? refuseWrite,
         Func<Task<WorkCatalogItem?>> reloaded)
     {
-        var dialog = new TagWindow(session, work, objectKeyList, reloaded)
+        var dialog = new TagWindow(session, work, objectKeyList, refuseWrite, reloaded)
         {
             Owner = Application.Current?.MainWindow
         };
@@ -147,6 +152,13 @@ public sealed class TagWindow : Window
     /// </summary>
     private void OnCommit(object? sender, TagEditorCommitEventArgs e)
     {
+        if (RefuseSyncWrite(out var blocked))
+        {
+            e.Notice = blocked;
+            e.Accepted = false;
+            return;
+        }
+
         string? inputNotice;
         var outcome = mObjectKeyList.Count == 0
             ? TagEditorHost.CommitWork(mSession, mWork, CurrentSuggestions(), e.Text, out inputNotice, OnPersistFailed)
@@ -161,6 +173,13 @@ public sealed class TagWindow : Window
     /// </summary>
     private void OnPick(object? sender, TagEditorItemEventArgs e)
     {
+        if (RefuseSyncWrite(out var blocked))
+        {
+            e.Notice = blocked;
+            e.Accepted = false;
+            return;
+        }
+
         string? inputNotice = null;
         var outcome = mObjectKeyList.Count == 0
             ? TagEditorHost.ToggleWork(mSession, mWork, e.Item, out inputNotice, OnPersistFailed)
@@ -175,6 +194,13 @@ public sealed class TagWindow : Window
     /// </summary>
     private void OnRemove(object? sender, TagEditorItemEventArgs e)
     {
+        if (RefuseSyncWrite(out var blocked))
+        {
+            e.Notice = blocked;
+            e.Accepted = false;
+            return;
+        }
+
         var outcome = mObjectKeyList.Count == 0
             ? TagEditorHost.RemoveWork(mSession, mWork, e.Item, OnPersistFailed)
             : TagEditorHost.RemoveFromFrames(mSession, mWork.Channel, CurrentFrames(), e.Item, OnPersistFailed);
@@ -187,6 +213,11 @@ public sealed class TagWindow : Window
     /// </summary>
     private void OnPresetDelete(object? sender, TagEditorItemEventArgs e)
     {
+        if (RefuseSyncWrite(out _))
+        {
+            return;
+        }
+
         if (e.Item.Kind != TagEditorKind.Free)
         {
             return;
@@ -194,6 +225,23 @@ public sealed class TagWindow : Window
 
         var outcome = TagEditorHost.DeletePreset(mSession, mWork.Channel, e.Item.Label, OnPersistFailed);
         AfterWrite(outcome);
+    }
+
+    /// <summary>
+    /// 本地落后于 GitHub 时不写标签，并关掉编辑。
+    /// </summary>
+    private bool RefuseSyncWrite(out string reason)
+    {
+        var blocked = mRefuseWrite?.Invoke();
+        if (string.IsNullOrEmpty(blocked))
+        {
+            reason = "";
+            return false;
+        }
+
+        reason = blocked;
+        mEditor.IsEditingEnabled = false;
+        return true;
     }
 
     /// <summary>

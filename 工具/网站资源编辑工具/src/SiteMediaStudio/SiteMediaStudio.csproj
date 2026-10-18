@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <!-- Linux 上还原 Windows 桌面目标，便于云端执行 dotnet test。不影响 Windows 上的运行。 -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <RootNamespace>PersonalWorks.SiteMediaStudio</RootNamespace>
     <AssemblyName>SiteMediaStudio</AssemblyName>
     <Product>网站资源编辑工具</Product>
