@@ -32,6 +32,8 @@ Desktop.ini
 !**/favicon.ico
 !**/favicon.svg
 !public/skins/*.png
+# 心得配图随静态包发布，不走 COS placeholders
+!public/notes-assets/**/*.png
 
 # 视频与音频
 *.mp4
