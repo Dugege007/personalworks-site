@@ -267,6 +267,10 @@ function TipFragment({ part }: { part: TipPart }) {
 }
 
 function readHeaderHeight(): number {
+  const header = document.querySelector(".header");
+  if (header instanceof HTMLElement && header.offsetHeight > 0) {
+    return header.offsetHeight;
+  }
   const raw = getComputedStyle(document.documentElement).getPropertyValue("--header-h").trim();
   const value = Number.parseFloat(raw);
   return Number.isFinite(value) ? value : 0;

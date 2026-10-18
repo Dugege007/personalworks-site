@@ -558,9 +558,14 @@ button.contact-icon:hover,
 
   .scroll-hint {
     position: fixed;
-    bottom: 4px;
+    bottom: max(4px, env(safe-area-inset-bottom, 0px));
     z-index: 15;
     gap: 8px;
+  }
+
+  .contact-icon {
+    width: 44px;
+    height: 44px;
   }
 }
 

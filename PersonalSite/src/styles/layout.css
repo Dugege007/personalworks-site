@@ -14,7 +14,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 0 28px;
+  padding:
+    env(safe-area-inset-top, 0px)
+    max(28px, env(safe-area-inset-right, 0px))
+    0
+    max(28px, env(safe-area-inset-left, 0px));
   border-bottom: 1px solid var(--line);
   background: var(--header-bg);
   backdrop-filter: blur(16px);
@@ -121,7 +125,11 @@
   z-index: 29;
   background: var(--drawer-bg);
   backdrop-filter: blur(18px);
-  padding: 24px 28px 48px;
+  padding:
+    24px
+    max(28px, env(safe-area-inset-right, 0px))
+    max(48px, env(safe-area-inset-bottom, 0px))
+    max(28px, env(safe-area-inset-left, 0px));
   overflow: auto;
   transform: translateY(-8px);
   opacity: 0;
@@ -286,6 +294,11 @@
 }
 
 @media (max-width: 860px) {
+  .header-btn {
+    width: 44px;
+    height: 44px;
+  }
+
   .skin-overlay {
     justify-items: stretch;
     padding-left: 16px;
@@ -299,7 +312,8 @@
 
 @media (max-width: 390px) {
   .header {
-    padding: 0 12px;
+    padding-right: max(12px, env(safe-area-inset-right, 0px));
+    padding-left: max(12px, env(safe-area-inset-left, 0px));
     gap: 8px;
   }
 
