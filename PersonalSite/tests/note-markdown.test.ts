@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { stripNoteFrontmatter } from "../src/content/notes/select.ts";
 import { normalizeTexDelimiters, renderNoteMarkdownHtml } from "../src/notes/renderMarkdown.ts";
 
 const ewmaNote = readFileSync(
@@ -104,4 +106,72 @@ test("dollar and display delimiters render, and an empty note does not throw", a
   assert.match(html, /class="katex-display"/);
   assert.match(html, /encoding="application\/x-tex"[^>]*>Y_t</);
   assert.equal(await renderNoteMarkdownHtml(""), "");
+});
+
+test("emphasis next to fullwidth punctuation stays strong when Chinese follows", async () => {
+  const opening = await renderNoteMarkdownHtml(
+    "**有向距离场（Signed Distance Field，SDF）加球面追踪（Sphere Tracing）**是前端视觉",
+  );
+  assert.match(
+    opening,
+    /<p><strong>有向距离场（Signed Distance Field，SDF）加球面追踪（Sphere Tracing）<\/strong>是前端视觉<\/p>/,
+  );
+
+  const wrapped = await renderNoteMarkdownHtml("前面**（括号）**后面");
+  assert.match(wrapped, /<p>前面<strong>（括号）<\/strong>后面<\/p>/);
+
+  const sentence = await renderNoteMarkdownHtml("结束句号**粗体。**后面");
+  assert.match(sentence, /<p>结束句号<strong>粗体。<\/strong>后面<\/p>/);
+
+  const paired = await renderNoteMarkdownHtml(
+    "**滑动窗口最大值（LeetCode 239，Sliding Window Maximum）**的标准解法是**单调双端队列（monotonic deque）**，代码只有十来行。",
+  );
+  assert.match(
+    paired,
+    /<p><strong>滑动窗口最大值（LeetCode 239，Sliding Window Maximum）<\/strong>的标准解法是<strong>单调双端队列（monotonic deque）<\/strong>，代码只有十来行。<\/p>/,
+  );
+
+  const strike = await renderNoteMarkdownHtml("文字~~删除。~~后面");
+  assert.match(strike, /<p>文字<del>删除。<\/del>后面<\/p>/);
+
+  const ascii = await renderNoteMarkdownHtml("**bold.**next");
+  assert.match(ascii, /<p>\*\*bold\.\*\*next<\/p>/);
+  const spaced = await renderNoteMarkdownHtml("**粗体**后面");
+  assert.match(spaced, /<p><strong>粗体<\/strong>后面<\/p>/);
+});
+
+test("published notes keep emphasis, links, and code, and hide frontmatter", async () => {
+  const notesDir = fileURLToPath(new URL("../src/content/notes/", import.meta.url));
+  const sdf = readFileSync(new URL("../src/content/notes/n-20261017-205600.md", import.meta.url), "utf8");
+  const body = stripNoteFrontmatter(sdf);
+  assert.equal(body.startsWith("---"), false);
+  assert.equal(body.includes("title:"), false);
+
+  const html = await renderNoteMarkdownHtml(body);
+  assert.match(
+    html,
+    /<strong>有向距离场（Signed Distance Field，SDF）加球面追踪（Sphere Tracing）<\/strong>/,
+  );
+  assert.match(html, /<a href="https:\/\/iquilezles\.org\/articles\/distfunctions\/">距离函数列表<\/a>/);
+  assert.match(html, /<a href="\/notes-code\/2026-10-17-sdf_sphere_tracing\.py">/);
+  assert.match(html, /data-language="glsl"/);
+  assert.match(html, /sdRoundBox/);
+  assert.equal(html.includes("title:"), false);
+  assert.equal(html.includes("tags:"), false);
+
+  const leftovers: string[] = [];
+  for (const file of readdirSync(notesDir).filter((name) => name.endsWith(".md"))) {
+    const markdown = stripNoteFrontmatter(readFileSync(join(notesDir, file), "utf8"));
+    const rendered = await renderNoteMarkdownHtml(markdown);
+    const prose = rendered
+      .replace(/<pre[\s\S]*?<\/pre>/g, " ")
+      .replace(/<code[\s\S]*?<\/code>/g, " ")
+      .replace(/<annotation[\s\S]*?<\/annotation>/g, " ")
+      .replace(/<[^>]+>/g, "");
+    if (prose.includes("**") || prose.includes("~~")) {
+      leftovers.push(file);
+    }
+    assert.equal(rendered.includes("\ntitle:"), false);
+  }
+  assert.deepEqual(leftovers, []);
 });

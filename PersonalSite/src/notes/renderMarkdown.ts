@@ -4,6 +4,8 @@ import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSanitize from "rehype-sanitize";
 import rehypeSlug from "rehype-slug";
 import rehypeStringify from "rehype-stringify";
+import remarkCjkFriendly from "remark-cjk-friendly/parseOnly";
+import remarkCjkFriendlyGfmStrikethrough from "remark-cjk-friendly-gfm-strikethrough/parseOnly";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import remarkParse from "remark-parse";
@@ -183,7 +185,11 @@ export function normalizeTexDelimiters(markdown: string): string {
 
 /**
  * 组装心得正文管线。每次返回新的处理器，避免插件状态串到下一篇。
- * 顺序是：GFM、数学、KaTeX、净化、标题 id、代码高亮。
+ * 顺序是：GFM、中日韩强调、中日韩删除线、数学、KaTeX、净化、标题 id、代码高亮。
+ * CommonMark 把全角括号、顿号和句号算作标点。强调或删除线以这类标点收尾，
+ * 后面又紧贴汉字时，闭合记号不成右翼，星号会留在正文里，或和后一处记号错配。
+ * 中日韩插件只放宽这类翼标判定，放在 GFM 之后、数学之前。
+ * 删除线插件必须位于 GFM 之后，否则补丁打不到 GFM 的分词器。
  * 净化必须放在 KaTeX 之后，否则公式的 class、style 和 svg 会被剥掉。
  * 标题 id 和代码高亮必须放在净化之后，否则 slug 与行内样式同样会被剥掉。
  */
@@ -191,6 +197,8 @@ export function createNoteMarkdownProcessor() {
   return unified()
     .use(remarkParse)
     .use(remarkGfm)
+    .use(remarkCjkFriendly)
+    .use(remarkCjkFriendlyGfmStrikethrough)
     .use(remarkMath, { singleDollarTextMath: false })
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeKatex)
