@@ -497,6 +497,13 @@ button.filter-sort-arrow:hover {
   overflow: auto;
 }
 
+/* KaTeX 0.19 的 display 样式不再自己处理横向溢出，长公式在窄屏里滚动。 */
+.archive-body .katex-display {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 .archive-body img {
   max-width: 100%;
   height: auto;
