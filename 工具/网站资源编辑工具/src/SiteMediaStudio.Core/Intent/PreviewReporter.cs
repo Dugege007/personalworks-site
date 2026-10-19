@@ -433,7 +433,7 @@ public static class PreviewReporter
         }
 
         var decision = plan.Ok
-            ? GateDecision.Allow("将上页整篇心得，与右键「上页心得」相同。")
+            ? GateDecision.Allow(NotePublishCopy.PreviewAllow(NotePublishCopy.IsPublished(index, folderName)))
             : GateDecision.Reject(plan.Error);
         var fallback = plan.Ok
             ? Array.Empty<string>()

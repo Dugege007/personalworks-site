@@ -7,6 +7,7 @@ public static class NoteCatalog
 {
     /// <summary>
     /// 每个含 <c>正文.md</c> 的夹一条。已上页的配图写入 <c>Media</c>。
+    /// 索引有条目但中转站没有同名夹时另列一条，只用于提示回填。
     /// </summary>
     public static IReadOnlyList<WorkCatalogItem> Discover(WorkspaceProfile profile, IReadOnlyList<StageItem> stageItems)
     {
@@ -20,78 +21,102 @@ public static class NoteCatalog
         var channelDir = Path.GetFullPath(Path.Combine(
             stageRoot,
             WorkspaceProfileLoader.ChannelStageRelative(profile, channel).Replace('/', Path.DirectorySeparatorChar)));
-        if (!Directory.Exists(channelDir))
-        {
-            return Array.Empty<WorkCatalogItem>();
-        }
-
         var index = NoteIndexStore.Load(profile);
         var list = new List<WorkCatalogItem>();
-        foreach (var dir in Directory.EnumerateDirectories(channelDir))
+        if (Directory.Exists(channelDir))
         {
-            if (!File.Exists(Path.Combine(dir, NoteRules.BodyFileName)))
+            foreach (var dir in Directory.EnumerateDirectories(channelDir))
             {
-                continue;
-            }
-
-            var folder = Path.GetFileName(dir);
-            if (folder.StartsWith('.'))
-            {
-                continue;
-            }
-
-            var entry = index.Notes.FirstOrDefault(item =>
-                string.Equals(item.Folder, folder, StringComparison.Ordinal));
-            var config = NoteConfigStore.SyncTitle(dir, folder);
-            var title = config.Title;
-            if (string.IsNullOrWhiteSpace(title))
-            {
-                title = string.IsNullOrWhiteSpace(entry?.Title) ? folder : entry!.Title;
-            }
-
-            var media = new List<WorkMediaItem>();
-            if (entry != null)
-            {
-                foreach (var image in entry.Images)
+                if (!File.Exists(Path.Combine(dir, NoteRules.BodyFileName)))
                 {
-                    if (string.IsNullOrWhiteSpace(image.ObjectKey))
-                    {
-                        continue;
-                    }
-
-                    media.Add(new WorkMediaItem
-                    {
-                        Kind = "image",
-                        Label = Path.GetFileNameWithoutExtension(image.ObjectKey),
-                        Src = image.ObjectKey,
-                        DisplayName = NullIfEmpty(image.DisplayName),
-                        Description = NullIfEmpty(image.Description),
-                        Stars = image.Stars,
-                        Tags = image.Tags
-                    });
+                    continue;
                 }
-            }
 
-            list.Add(new WorkCatalogItem
-            {
-                Id = folder,
-                Channel = NoteRules.ChannelKey,
-                Title = title,
-                Summary = string.IsNullOrWhiteSpace(config.Summary) ? entry?.Summary ?? "" : config.Summary,
-                SourceKind = "note",
-                SupportsAppend = false,
-                IsUnregistered = false,
-                IsHidden = entry?.Hidden == true,
-                NoteBodyInIndex = entry != null
-                    && !entry.Draft
-                    && !string.IsNullOrWhiteSpace(entry.Slug),
-                StageFolder = NoteRules.ChannelKey + "/" + folder,
-                Tags = entry?.Body?.Tags?.ToList() ?? new List<string>(),
-                Media = media
-            });
+                var folder = Path.GetFileName(dir);
+                if (folder.StartsWith('.'))
+                {
+                    continue;
+                }
+
+                var entry = index.Notes.FirstOrDefault(item =>
+                    string.Equals(item.Folder, folder, StringComparison.Ordinal));
+                var config = NoteConfigStore.SyncTitle(dir, folder);
+                var title = config.Title;
+                if (string.IsNullOrWhiteSpace(title))
+                {
+                    title = string.IsNullOrWhiteSpace(entry?.Title) ? folder : entry!.Title;
+                }
+
+                var media = new List<WorkMediaItem>();
+                if (entry != null)
+                {
+                    foreach (var image in entry.Images)
+                    {
+                        if (string.IsNullOrWhiteSpace(image.ObjectKey))
+                        {
+                            continue;
+                        }
+
+                        media.Add(new WorkMediaItem
+                        {
+                            Kind = "image",
+                            Label = Path.GetFileNameWithoutExtension(image.ObjectKey),
+                            Src = image.ObjectKey,
+                            DisplayName = NullIfEmpty(image.DisplayName),
+                            Description = NullIfEmpty(image.Description),
+                            Stars = image.Stars,
+                            Tags = image.Tags
+                        });
+                    }
+                }
+
+                list.Add(new WorkCatalogItem
+                {
+                    Id = folder,
+                    Channel = NoteRules.ChannelKey,
+                    Title = title,
+                    Summary = string.IsNullOrWhiteSpace(config.Summary) ? entry?.Summary ?? "" : config.Summary,
+                    SourceKind = "note",
+                    SupportsAppend = false,
+                    IsUnregistered = false,
+                    IsHidden = entry?.Hidden == true,
+                    NoteBodyInIndex = entry != null
+                        && !entry.Draft
+                        && !string.IsNullOrWhiteSpace(entry.Slug),
+                    StageFolder = NoteRules.ChannelKey + "/" + folder,
+                    Tags = entry?.Body?.Tags?.ToList() ?? new List<string>(),
+                    Media = media
+                });
+            }
+        }
+
+        foreach (var missing in NoteStagePresence.MissingEntries(index, channelDir))
+        {
+            list.Add(MissingWork(missing));
         }
 
         return list;
+    }
+
+    /// <summary>
+    /// 索引条目对应的中转站夹还不存在。不带媒体，也不能当作可上页的夹。
+    /// </summary>
+    private static WorkCatalogItem MissingWork(NoteEntry entry)
+    {
+        var title = string.IsNullOrWhiteSpace(entry.Title) ? entry.Folder : entry.Title.Trim();
+        return new WorkCatalogItem
+        {
+            Id = entry.Folder,
+            Channel = NoteRules.ChannelKey,
+            Title = title,
+            Summary = entry.Summary ?? "",
+            SourceKind = "note",
+            SupportsAppend = false,
+            IsUnregistered = false,
+            IsHidden = entry.Hidden,
+            MissingStageFolder = true,
+            Media = Array.Empty<WorkMediaItem>()
+        };
     }
 
     /// <summary>

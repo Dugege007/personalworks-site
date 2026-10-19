@@ -1,9 +1,15 @@
 {
   "createdAt": "2026-10-05 02:13:41",
-  "modifiedAt": [
-    "2026-10-05 04:10:11"
+  "revisions": [
+    {
+      "at": "2026-10-05 04:10:11",
+      "summary": "",
+      "source": "publish"
+    }
   ],
   "title": "\u6D4B\u8BD5",
+  "mainTitle": "\u6D4B\u8BD5",
+  "subtitle": "",
   "slug": "n-20261005-021341",
   "summary": ""
 }

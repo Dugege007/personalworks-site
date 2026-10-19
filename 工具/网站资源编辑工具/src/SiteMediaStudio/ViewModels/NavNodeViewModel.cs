@@ -29,7 +29,9 @@ public sealed class NavNodeViewModel : ViewModelBase
         Channel = channel;
         mWork = work;
         mTitle = work.Title;
-        mSubtitle = work.IsUnregistered ? "未登记" : work.Id;
+        mSubtitle = work.MissingStageFolder
+            ? NoteStagePresence.MissingFolderNotice
+            : work.IsUnregistered ? "未登记" : work.Id;
         Children = new ObservableCollection<NavNodeViewModel>();
     }
 
