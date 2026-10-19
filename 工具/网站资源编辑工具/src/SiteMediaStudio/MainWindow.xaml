@@ -743,6 +743,37 @@
                                    Visibility="{Binding ShowResourceTagHint, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                     </StackPanel>
                     <StackPanel Margin="0,0,0,8"
+                                Visibility="{Binding ShowNoteTitles, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <TextBlock Foreground="{StaticResource MutedBrush}" Text="标题" Margin="0,0,0,4"/>
+                        <TextBox x:Name="NoteMainTitleBox"
+                                 Text="{Binding NoteMainTitle, UpdateSourceTrigger=PropertyChanged}"
+                                 PreviewKeyDown="OnNoteTitleKeyDown"
+                                 LostFocus="OnNoteTitleLostFocus"/>
+                        <TextBlock Foreground="{StaticResource MutedBrush}" Text="副标题" Margin="0,8,0,4"/>
+                        <TextBox x:Name="NoteSubtitleBox"
+                                 Text="{Binding NoteSubtitle, UpdateSourceTrigger=PropertyChanged}"
+                                 PreviewKeyDown="OnNoteTitleKeyDown"
+                                 LostFocus="OnNoteTitleLostFocus"/>
+                        <TextBlock Foreground="{StaticResource MutedBrush}"
+                                   Text="{Binding NoteDisplayTitleText}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,8,0,0"/>
+                        <TextBlock Foreground="{StaticResource OxideBrush}"
+                                   Text="{Binding NoteTitleMessage}"
+                                   TextWrapping="Wrap"
+                                   Margin="0,4,0,0">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <Trigger Property="Text" Value="">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,0,8"
                                 Visibility="{Binding ShowCopyName, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <TextBlock Foreground="{StaticResource MutedBrush}" Text="名称" Margin="0,0,0,4"/>
                         <TextBox Text="{Binding CopyName, UpdateSourceTrigger=PropertyChanged}"

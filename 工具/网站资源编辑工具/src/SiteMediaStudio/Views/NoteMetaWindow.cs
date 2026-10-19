@@ -6,16 +6,16 @@ using PersonalWorks.SiteMediaStudio.Core;
 namespace PersonalWorks.SiteMediaStudio;
 
 /// <summary>
-/// 编辑心得夹名与修订摘要。夹名决定主副标题，达到 60 字警告、80 字禁止保存。
+/// 编辑心得标题、副标题与修订摘要。展示名自动拼接，达到 60 字警告、80 字禁止保存。
 /// </summary>
 public sealed class NoteMetaWindow : Window
 {
     private readonly WorkspaceProfile mProfile;
     private readonly string mFolderFullPath;
-    private readonly TextBox mNameBox;
+    private readonly TextBox mMainBox;
+    private readonly TextBox mSubBox;
     private readonly TextBlock mLengthText;
-    private readonly TextBlock mMainText;
-    private readonly TextBlock mSubText;
+    private readonly TextBlock mDisplayText;
     private readonly TextBlock mMessage;
     private readonly Button mSaveButton;
     private readonly List<TextBox> mSummaryBoxList = new();
@@ -68,23 +68,28 @@ public sealed class NoteMetaWindow : Window
         buttons.Children.Add(mSaveButton);
         root.Children.Add(buttons);
 
+        var folderName = Path.GetFileName(folderFullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
+        var resolved = NoteConfigStore.ResolveTitles(folderFullPath, folderName, config);
         var body = new DockPanel();
         var heading = new StackPanel();
         DockPanel.SetDock(heading, Dock.Top);
-        heading.Children.Add(Help("夹名即站点标题。有副标题时写成「主标题——副标题」，间隔是两个中文破折号 ——。没有副标题时只写主标题。"));
-        heading.Children.Add(Help("网址仍用原来的英文 slug「" + config.Slug + "」，不必把夹名改成英文。"));
-        mNameBox = InputBox(Path.GetFileName(folderFullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)));
-        mNameBox.TextChanged += (_, _) => RefreshNameCheck();
-        heading.Children.Add(mNameBox);
+        heading.Children.Add(Help("标题和副标题分开填写。有副标题时，列表和站点上的展示名自动写成「标题——副标题」，中间的中文破折号由工具加上。没有副标题时只显示标题。"));
+        heading.Children.Add(Help("网址仍用原来的英文 slug「" + config.Slug + "」，夹名保持不变。"));
+        heading.Children.Add(Label("标题"));
+        mMainBox = InputBox(resolved.Resolved ? resolved.MainTitle : "");
+        mMainBox.TextChanged += (_, _) => RefreshNameCheck();
+        heading.Children.Add(mMainBox);
+        heading.Children.Add(Label("副标题"));
+        mSubBox = InputBox(resolved.Resolved ? resolved.Subtitle : "");
+        mSubBox.TextChanged += (_, _) => RefreshNameCheck();
+        heading.Children.Add(mSubBox);
         mLengthText = Info("");
-        mMainText = Info("");
-        mSubText = Info("");
+        mDisplayText = Info("");
         mMessage = Info("");
         mMessage.TextWrapping = TextWrapping.Wrap;
         mMessage.Margin = new Thickness(0, 4, 0, 12);
         heading.Children.Add(mLengthText);
-        heading.Children.Add(mMainText);
-        heading.Children.Add(mSubText);
+        heading.Children.Add(mDisplayText);
         heading.Children.Add(mMessage);
         heading.Children.Add(Label("修订说明"));
         heading.Children.Add(Help("可改每条摘要。时间保留。手改后这条来源记为手改。发布上线时，若正文或配图有实质变化，会追加一条助手写的短说明；没有变化不会重复追加。"));
@@ -157,14 +162,15 @@ public sealed class NoteMetaWindow : Window
     }
 
     /// <summary>
-    /// 按当前夹名刷新长度提示，并在禁止保存时停用保存按钮。
+    /// 按当前标题刷新长度和展示名，并在禁止保存时停用保存按钮。
     /// </summary>
     private void RefreshNameCheck()
     {
-        var check = NoteRules.CheckFolderName(mNameBox.Text);
-        mLengthText.Text = "当前 " + check.Length + " 字。满 60 字提醒缩短，满 80 字不能保存。";
-        mMainText.Text = "主标题：" + DisplayPiece(check.Titles.MainTitle, "（空）");
-        mSubText.Text = "副标题：" + DisplayPiece(check.Titles.Subtitle, "（无）");
+        var check = NoteRules.CheckDisplayTitle(mMainBox.Text, mSubBox.Text);
+        mLengthText.Text = "当前 " + check.Length + " 字。满 60 字提醒缩短，满 80 字不能保存。字数按展示名计算。";
+        mDisplayText.Text = check.Titles.DisplayTitle.Length == 0
+            ? "展示名会随标题自动生成。"
+            : "展示名：" + check.Titles.DisplayTitle;
         mMessage.Text = check.Message;
         mMessage.Foreground = check.Verdict switch
         {
@@ -176,12 +182,12 @@ public sealed class NoteMetaWindow : Window
     }
 
     /// <summary>
-    /// 提交夹名与摘要。禁止项与重名留在窗内，不关闭。
+    /// 提交标题、副标题与摘要。禁止项留在窗内，不关闭。
     /// </summary>
     private void Save()
     {
         var summaries = mSummaryBoxList.Select(box => box.Text ?? "").ToList();
-        var result = NoteMetaEditor.Save(mProfile, mFolderFullPath, mNameBox.Text, summaries, DateTime.Now);
+        var result = NoteMetaEditor.SaveTitles(mProfile, mFolderFullPath, mMainBox.Text, mSubBox.Text, summaries, DateTime.Now);
         if (!result.Ok)
         {
             mMessage.Text = result.Message;
@@ -203,11 +209,6 @@ public sealed class NoteMetaWindow : Window
             NoteRevisionSource.Publish => "上页",
             _ => string.IsNullOrWhiteSpace(source) ? "未标记" : source
         };
-    }
-
-    private static string DisplayPiece(string? text, string empty)
-    {
-        return string.IsNullOrWhiteSpace(text) ? empty : text.Trim();
     }
 
     private static TextBlock Help(string text)

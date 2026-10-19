@@ -197,10 +197,16 @@ public static class NoteSiteDrift
     }
 
     /// <summary>
-    /// 展示标题。时间戳夹名在一级标题变化时跟随标题，与保存配置时的规则一致，但不写盘。
+    /// 展示标题。已保存的主标题按自动拼接规则比较，不写盘。
+    /// 还没有主标题时，时间戳夹名在一级标题变化时跟随标题，与保存配置时的规则一致。
     /// </summary>
     private static string ResolveDisplayTitle(string folderName, NoteConfig config, string body)
     {
+        if (!string.IsNullOrWhiteSpace(config.MainTitle))
+        {
+            return NoteRules.ComposeDisplayTitle(config.MainTitle, config.Subtitle);
+        }
+
         if (!NoteRules.IsTimestampFolderName(folderName))
         {
             var parsed = NoteRules.ParseFolderTitles(folderName);

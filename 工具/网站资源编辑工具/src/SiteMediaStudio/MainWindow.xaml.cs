@@ -91,6 +91,52 @@ public partial class MainWindow : Window
     }
 
     /// <summary>
+    /// 标题或副标题回车后移出焦点。仍停在这两个框里时不保存。
+    /// </summary>
+    private void OnNoteTitleKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter)
+        {
+            return;
+        }
+
+        e.Handled = true;
+        if (sender is TextBox box)
+        {
+            box.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
+        }
+    }
+
+    /// <summary>
+    /// 焦点离开标题和副标题这一组后写入中转站。在两个框之间移动时不保存。
+    /// </summary>
+    private void OnNoteTitleLostFocus(object sender, RoutedEventArgs e)
+    {
+        Dispatcher.BeginInvoke(new Action(() =>
+        {
+            var focused = Keyboard.FocusedElement as DependencyObject;
+            if (IsNoteTitleBox(focused))
+            {
+                return;
+            }
+
+            mViewModel.CommitNoteTitles();
+        }), DispatcherPriority.Background);
+    }
+
+    /// <summary>
+    /// 焦点是否还在标题或副标题输入框里。
+    /// </summary>
+    private bool IsNoteTitleBox(DependencyObject? focused)
+    {
+        return focused != null
+            && (ReferenceEquals(focused, NoteMainTitleBox)
+                || ReferenceEquals(focused, NoteSubtitleBox)
+                || NoteMainTitleBox.IsAncestorOf(focused)
+                || NoteSubtitleBox.IsAncestorOf(focused));
+    }
+
+    /// <summary>
     /// 标签输入框回车或空格。
     /// </summary>
     private void OnResourceTagCommit(object sender, TagEditorCommitEventArgs e)

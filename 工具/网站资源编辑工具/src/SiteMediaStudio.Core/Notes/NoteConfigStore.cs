@@ -76,7 +76,7 @@ public static class NoteConfigStore
     }
 
     /// <summary>
-    /// 按夹名写入主标题、副标题与完整标题。时间戳夹名仍可回退到正文一级标题，但不覆盖夹名已经给出的主副标题。
+    /// 把解析出的主标题、副标题与展示名写入配置。已经保存的主标题保持不动；时间戳夹名仍可回退到正文一级标题。
     /// </summary>
     public static NoteConfig SyncTitle(string folderFullPath, string folderName)
     {
@@ -98,10 +98,24 @@ public static class NoteConfigStore
     }
 
     /// <summary>
-    /// 解析当前应写入配置的主副标题。夹名含「——」时以夹名为准；时间戳夹名回退到已有标题或正文一级标题。
+    /// 解析当前应写入配置的主副标题。已经记下的主标题优先，避免正文一级标题或夹名盖掉检视栏里分开填写的标题。
+    /// 还没有主标题时，非时间戳夹名仍可拆出初始标题；时间戳夹名再回退到已有标题或正文一级标题。
     /// </summary>
     public static NoteTitleSet ResolveTitles(string folderFullPath, string folderName, NoteConfig config)
     {
+        if (!string.IsNullOrWhiteSpace(config.MainTitle))
+        {
+            var main = config.MainTitle.Trim();
+            var subtitle = (config.Subtitle ?? "").Trim();
+            return new NoteTitleSet
+            {
+                Resolved = true,
+                MainTitle = main,
+                Subtitle = subtitle,
+                DisplayTitle = NoteRules.ComposeDisplayTitle(main, subtitle)
+            };
+        }
+
         if (!NoteRules.IsTimestampFolderName(folderName))
         {
             var parsed = NoteRules.ParseFolderTitles(folderName);
@@ -129,19 +143,6 @@ public static class NoteConfigStore
                 MainTitle = heading,
                 Subtitle = "",
                 DisplayTitle = heading
-            };
-        }
-
-        if (!string.IsNullOrWhiteSpace(config.MainTitle))
-        {
-            var main = config.MainTitle.Trim();
-            var subtitle = (config.Subtitle ?? "").Trim();
-            return new NoteTitleSet
-            {
-                Resolved = true,
-                MainTitle = main,
-                Subtitle = subtitle,
-                DisplayTitle = NoteRules.ComposeDisplayTitle(main, subtitle)
             };
         }
 

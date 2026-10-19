@@ -166,7 +166,7 @@ public sealed class NoteMetaTests
     }
 
     [Fact]
-    public void Save_RenamesFolderKeepsSlugAndProjectsIndex()
+    public void Save_KeepsFolderAndLeavesSiteIndexUntilUpdate()
     {
         var root = TempDir();
         var channel = new ChannelProfile { Key = "notes", Zh = "心得" };
@@ -220,9 +220,12 @@ public sealed class NoteMetaTests
             new DateTime(2026, 10, 8, 9, 10, 11));
 
         Assert.True(saved.Ok, saved.Message);
-        Assert.Contains("夹名偏长", saved.Message, StringComparison.Ordinal);
-        Assert.False(Directory.Exists(folder));
-        Assert.True(Directory.Exists(saved.FolderFullPath));
+        Assert.Contains("标题偏长", saved.Message, StringComparison.Ordinal);
+        Assert.True(saved.Changed);
+        Assert.True(saved.PendingUpdate);
+        Assert.True(Directory.Exists(folder));
+        Assert.Equal(folder, saved.FolderFullPath);
+        Assert.Equal("20261005_125603", saved.FolderName);
         var next = NoteConfigStore.Load(Path.Combine(saved.FolderFullPath, NoteConfigStore.FileName));
         Assert.Equal("n-20261005-125603", next.Slug);
         Assert.Equal(new string('字', 57), next.MainTitle);
@@ -236,13 +239,14 @@ public sealed class NoteMetaTests
         Assert.Equal("2026-10-08 09:10:11", next.Revisions[1].At);
 
         var projected = NoteIndexStore.Load(profile);
-        Assert.Equal(NoteIndexFile.CurrentVersion, projected.Version);
-        Assert.Equal(warned, projected.Notes[0].Folder);
+        Assert.Equal(1, projected.Version);
+        Assert.Equal("20261005_125603", projected.Notes[0].Folder);
+        Assert.Equal("旧题", projected.Notes[0].Title);
+        Assert.Equal("", projected.Notes[0].MainTitle);
+        Assert.Equal("", projected.Notes[0].Subtitle);
         Assert.Equal("n-20261005-125603", projected.Notes[0].Slug);
         Assert.Equal("2026-10-05", projected.Notes[0].Date);
-        Assert.Equal(new string('字', 57), projected.Notes[0].MainTitle);
-        Assert.Equal("乙", projected.Notes[0].Subtitle);
-        Assert.Equal("2026-10-08 09:10:11", projected.Notes[0].RevisedAt);
+        Assert.Equal("", projected.Notes[0].RevisedAt);
     }
 
     [Fact]
