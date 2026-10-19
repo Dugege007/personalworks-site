@@ -171,6 +171,10 @@ public sealed class NotePublishPlan
     public List<NoteImageJob> Images { get; init; } = new();
     public List<string> PreviewObjects { get; init; } = new();
     public List<string> RetiredObjects { get; init; } = new();
+    /// <summary>
+    /// 旧版正文直接挂在 public/notes-assets 下、从未入台账的对象键；写站时删本地幽灵文件，不进撤下队列。
+    /// </summary>
+    public List<string> LegacyNotesAssetsOrphans { get; init; } = new();
     public NoteResourceMeta Body { get; init; } = new();
 }
 

@@ -271,6 +271,17 @@ public static class PublishExecutor
             }
             catch (Exception ex)
             {
+                if (IsMissingLedgerObject(ex.Message))
+                {
+                    var skipName = Path.GetFileName(objectKey.Replace('/', Path.DirectorySeparatorChar));
+                    TryDeleteLegacyNotesAssetsOrphan(profile, objectKey);
+                    resourceList.Add(CommandResourceResult.Of(skipName, true));
+                    RunLog.Append("撤下预演 " + objectKey, true, "台账无此对象，视为已撤下：" + ex.Message);
+                    withdrawOk++;
+                    tracker.CompleteCurrent();
+                    continue;
+                }
+
                 resourceList.Add(CommandResourceResult.Of(Path.GetFileName(objectKey.Replace('/', Path.DirectorySeparatorChar)), false));
                 RunLog.Append("撤下预演 " + objectKey, false, ex.Message);
                 return FailTracked(tracker, "撤下预演", ex.Message, completedList, withdrawOk, resourceList);
@@ -279,6 +290,17 @@ public static class PublishExecutor
             RunLog.Append("撤下预演 " + objectKey, dryRun.Ok, dryRun.StdOut);
             if (!dryRun.Ok)
             {
+                if (IsMissingLedgerObject(dryRun.FailureText) || IsMissingLedgerObject(dryRun.StdErr) || IsMissingLedgerObject(dryRun.StdOut))
+                {
+                    var skipName = Path.GetFileName(objectKey.Replace('/', Path.DirectorySeparatorChar));
+                    TryDeleteLegacyNotesAssetsOrphan(profile, objectKey);
+                    resourceList.Add(CommandResourceResult.Of(skipName, true));
+                    RunLog.Append("撤下预演 " + objectKey, true, "台账无此对象，视为已撤下");
+                    withdrawOk++;
+                    tracker.CompleteCurrent();
+                    continue;
+                }
+
                 resourceList.Add(CommandResourceResult.Of(Path.GetFileName(objectKey.Replace('/', Path.DirectorySeparatorChar)), false));
                 return FailTracked(tracker, "撤下预演", dryRun.FailureText, completedList, withdrawOk, resourceList);
             }
@@ -395,7 +417,56 @@ public static class PublishExecutor
     /// <summary>
     /// 队列部署方式与刷新 URL 不得含 prune。
     /// </summary>
-    public static bool ContainsPrune(PendingPublish pending)
+    
+    /// <summary>
+    /// 撤下预演／执行时若台账本无此对象，视为已撤下（常见于旧 notes-assets 路径从未入账）。
+    /// </summary>
+    private static bool IsMissingLedgerObject(string? text)
+    {
+        return !string.IsNullOrWhiteSpace(text)
+            && text.Contains("台账无此对象", StringComparison.Ordinal);
+    }
+
+
+    /// <summary>
+    /// 若撤下键是旧 notes-assets 路径，尽量删掉 public 下对应幽灵文件。
+    /// </summary>
+    private static void TryDeleteLegacyNotesAssetsOrphan(WorkspaceProfile profile, string objectKey)
+    {
+        if (!NoteRules.IsLegacyNotesAssetsObject(objectKey))
+        {
+            return;
+        }
+
+        try
+        {
+            var placeholders = WorkspaceProfileLoader.ResolveUnderRoot(profile, profile.PlaceholdersRoot);
+            var publicRoot = Path.GetDirectoryName(placeholders);
+            if (string.IsNullOrWhiteSpace(publicRoot))
+            {
+                return;
+            }
+
+            var key = objectKey.Trim().TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
+            var full = Path.GetFullPath(Path.Combine(publicRoot, key));
+            var rootFull = Path.GetFullPath(publicRoot);
+            if (!full.StartsWith(rootFull + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            if (File.Exists(full))
+            {
+                File.Delete(full);
+            }
+        }
+        catch
+        {
+            // 尽力清理；失败不阻断发布。
+        }
+    }
+
+public static bool ContainsPrune(PendingPublish pending)
     {
         return pending.Deploy.Contains("prune", StringComparison.OrdinalIgnoreCase)
             || pending.PurgeUrlList.Any(url => url.Contains("prune-assets", StringComparison.OrdinalIgnoreCase));

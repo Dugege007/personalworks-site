@@ -604,12 +604,22 @@ public static class NoteRules
         }
 
         var retired = new List<string>();
+        var legacyOrphans = new List<string>();
         if (previous != null)
         {
             var keep = new HashSet<string>(jobs.Select(item => item.ObjectKey), StringComparer.Ordinal);
             foreach (var image in previous.Images)
             {
-                if (!string.IsNullOrWhiteSpace(image.ObjectKey) && !keep.Contains(image.ObjectKey))
+                if (string.IsNullOrWhiteSpace(image.ObjectKey) || keep.Contains(image.ObjectKey))
+                {
+                    continue;
+                }
+
+                if (IsLegacyNotesAssetsObject(image.ObjectKey))
+                {
+                    legacyOrphans.Add(image.ObjectKey);
+                }
+                else
                 {
                     retired.Add(image.ObjectKey);
                 }
@@ -635,11 +645,28 @@ public static class NoteRules
             Images = jobs,
             PreviewObjects = preview.Take(3).ToList(),
             RetiredObjects = retired,
+            LegacyNotesAssetsOrphans = legacyOrphans,
             Body = previous?.Body ?? new NoteResourceMeta()
         };
     }
 
+    
     /// <summary>
+    /// 旧心得配图曾用站点路径 <c>/notes-assets/{slug}/file.png</c> 当 ObjectKey，从未写入 media-ledger。
+    /// 这类键不能走 sitemedia withdraw（会报台账无此对象），只能删 public/notes-assets 下的幽灵文件。
+    /// </summary>
+    public static bool IsLegacyNotesAssetsObject(string? objectKey)
+    {
+        if (string.IsNullOrWhiteSpace(objectKey))
+        {
+            return false;
+        }
+
+        var key = objectKey.Trim().TrimStart('/');
+        return key.StartsWith("notes-assets/", StringComparison.OrdinalIgnoreCase);
+    }
+
+/// <summary>
     /// 已上页的夹不能在本阶段回收。
     /// </summary>
     public static string? RecycleBlockReason(NoteIndexFile index, string folderName)

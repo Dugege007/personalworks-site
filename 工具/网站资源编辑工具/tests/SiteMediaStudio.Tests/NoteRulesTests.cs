@@ -244,6 +244,49 @@ public sealed class NoteRulesTests
     }
 
     [Fact]
+    public void Plan_RetiresLegacyNotesAssetsAsOrphansNotWithdraw()
+    {
+        var stage = TempDir();
+        var folder = Path.Combine(stage, "心得（notes）", "20261018_205600");
+        Directory.CreateDirectory(folder);
+        File.WriteAllBytes(Path.Combine(folder, "demo.png"), new byte[] { 1, 2, 3, 4 });
+        WriteNote(folder, "n-20261018-205600", "# 一篇\n\n![演示图](demo.png)\n");
+        var index = new NoteIndexFile
+        {
+            Notes =
+            {
+                new NoteEntry
+                {
+                    Folder = "20261018_205600",
+                    Slug = "n-20261018-205600",
+                    Images =
+                    {
+                        new NoteImageMeta
+                        {
+                            ObjectKey = "/notes-assets/n-20261018-205600/old.png"
+                        }
+                    }
+                }
+            }
+        };
+
+        var plan = NoteRules.Plan(folder, stage, index, null, null);
+        Assert.True(plan.Ok, plan.Error);
+        Assert.Empty(plan.RetiredObjects);
+        Assert.Contains("/notes-assets/n-20261018-205600/old.png", plan.LegacyNotesAssetsOrphans);
+        Assert.Equal("notes/n-20261018-205600/demo.webp", plan.Images[0].ObjectKey);
+    }
+
+    [Fact]
+    public void IsLegacyNotesAssetsObject_RecognizesSitePathKeys()
+    {
+        Assert.True(NoteRules.IsLegacyNotesAssetsObject("/notes-assets/n-1/a.png"));
+        Assert.True(NoteRules.IsLegacyNotesAssetsObject("notes-assets/n-1/a.png"));
+        Assert.False(NoteRules.IsLegacyNotesAssetsObject("notes/n-1/a.webp"));
+        Assert.False(NoteRules.IsLegacyNotesAssetsObject(null));
+    }
+
+    [Fact]
     public void Hide_DropsVisitorFlagAndKeepsFolder()
     {
         var root = TempDir();

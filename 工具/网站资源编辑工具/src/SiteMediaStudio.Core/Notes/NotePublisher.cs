@@ -98,11 +98,66 @@ public static class NotePublisher
         }
 
         NoteIndexStore.Save(profile, index);
+        DeleteLegacyNotesAssetsOrphans(profile, plan.LegacyNotesAssetsOrphans);
         return new NotePublishOutcome
         {
             Ingested = plan.Images.Select(item => item.ObjectKey).ToList(),
             Retired = plan.RetiredObjects
         };
+    }
+
+    /// <summary>
+    /// 删除从未入台账的旧 notes-assets 幽灵文件（以及空目录）。不改台账、不调 withdraw。
+    /// </summary>
+    private static void DeleteLegacyNotesAssetsOrphans(WorkspaceProfile profile, IReadOnlyList<string> objectKeys)
+    {
+        if (objectKeys.Count == 0)
+        {
+            return;
+        }
+
+        var placeholders = WorkspaceProfileLoader.ResolveUnderRoot(profile, profile.PlaceholdersRoot);
+        var publicRoot = Path.GetDirectoryName(placeholders);
+        if (string.IsNullOrWhiteSpace(publicRoot))
+        {
+            return;
+        }
+
+        foreach (var raw in objectKeys)
+        {
+            if (!NoteRules.IsLegacyNotesAssetsObject(raw))
+            {
+                continue;
+            }
+
+            var key = raw.Trim().TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
+            var full = Path.GetFullPath(Path.Combine(publicRoot, key));
+            var rootFull = Path.GetFullPath(publicRoot);
+            if (!full.StartsWith(rootFull + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(full, rootFull, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (File.Exists(full))
+            {
+                File.Delete(full);
+            }
+
+            var dir = Path.GetDirectoryName(full);
+            while (!string.IsNullOrWhiteSpace(dir)
+                && dir.StartsWith(rootFull + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(dir, rootFull, StringComparison.OrdinalIgnoreCase))
+            {
+                if (!Directory.Exists(dir) || Directory.EnumerateFileSystemEntries(dir).Any())
+                {
+                    break;
+                }
+
+                Directory.Delete(dir);
+                dir = Path.GetDirectoryName(dir);
+            }
+        }
     }
 }
 
