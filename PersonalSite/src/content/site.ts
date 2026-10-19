@@ -84,7 +84,7 @@ export type NoteCard = {
   createdAt?: string;
   revisedAt?: string;
   revisions?: NoteRevision[];
-  /** 正文级自由标签。缺省为空，筛选与详情展示留到后续。 */
+  /** 正文级自由标签。缺省或空数组视为无标签，不包含配图标签。 */
   tags?: string[];
 };
 

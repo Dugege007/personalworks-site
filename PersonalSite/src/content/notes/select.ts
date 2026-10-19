@@ -50,14 +50,44 @@ export type NoteIndex = {
 };
 
 /**
- * 正文级自由标签。缺字段、空数组或空白项视为没有标签。不读取配图标签。
+ * 正文级自由标签。缺字段、空数组或空白项视为没有标签。同篇内去重并保留首次出现的顺序。不读取配图标签。
  */
 export function noteBodyTags(record: NoteRecord): string[] {
   const tags = record.body?.tags;
   if (!tags || tags.length === 0) {
     return [];
   }
-  return tags.map((tag) => tag.trim()).filter((tag) => tag.length > 0);
+  const picked: string[] = [];
+  for (const tag of tags) {
+    const text = tag.trim();
+    if (!text || picked.includes(text)) {
+      continue;
+    }
+    picked.push(text);
+  }
+  return picked;
+}
+
+/**
+ * 把索引记录投影成列表与详情共用的卡片。正文标签只读 `body.tags`，缺字段或空数组视为无标签。
+ */
+export function toCard(record: NoteRecord, body: string) {
+  const meta = noteDisplayMeta(record);
+  return {
+    slug: record.slug,
+    title: record.title,
+    date: displayNoteDate(record.date),
+    summary: record.summary || "待填写描述",
+    body,
+    previewImages: (record.previewObjects ?? []).slice(0, 3),
+    draft: false as const,
+    mainTitle: meta.mainTitle,
+    subtitle: meta.subtitle,
+    createdAt: meta.createdAt,
+    revisedAt: meta.revisedAt,
+    revisions: meta.revisions,
+    tags: noteBodyTags(record),
+  };
 }
 
 /**

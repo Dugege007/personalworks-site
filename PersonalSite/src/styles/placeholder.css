@@ -113,6 +113,35 @@
   outline-offset: 4px;
 }
 
+.note-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: -12px 0 28px;
+}
+
+.note-tag {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid color-mix(in srgb, var(--text) 30%, transparent);
+  background: color-mix(in srgb, var(--text) 3.5%, var(--bg));
+  color: var(--text);
+  padding: 6px 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+}
+
+.note-tag:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.note-tag:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+}
+
 .note-visually-hidden {
   position: absolute;
   width: 1px;
@@ -824,6 +853,15 @@ button.media-frame {
 
   .note-meta {
     margin-bottom: 22px;
+  }
+
+  .note-tags {
+    margin-top: -6px;
+    margin-bottom: 22px;
+  }
+
+  .note-tag {
+    min-height: 44px;
   }
 
   .note-revised {
