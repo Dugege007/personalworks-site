@@ -61,6 +61,13 @@
                                TextWrapping="Wrap"
                                Margin="0,4,0,0"
                                Visibility="{Binding ShowSyncNotice, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                    <TextBlock Text="{Binding NoteStageNotice}"
+                               Foreground="{StaticResource OxideBrush}"
+                               FontWeight="SemiBold"
+                               FontSize="13"
+                               TextWrapping="Wrap"
+                               Margin="0,4,0,0"
+                               Visibility="{Binding ShowNoteStageNotice, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                     <Button Style="{StaticResource GhostButton}"
                             Content="一键压缩超限配图"
                             Command="{Binding CompressOverLimitCommand}"
@@ -119,7 +126,7 @@
                             <MenuItem Header="从模板创建"
                                       IsEnabled="False"
                                       Visibility="{Binding ShowNoteCreate, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                            <MenuItem Header="上页心得"
+                            <MenuItem Header="{Binding NotePublishMenuHeader}"
                                       Command="{Binding PublishNoteCommand}"
                                       ToolTip="{Binding SyncWriteToolTip}"
                                       ToolTipService.ShowOnDisabled="True"
@@ -630,6 +637,14 @@
                            Foreground="{StaticResource OxideBrush}" TextWrapping="Wrap"
                            Text="{Binding SyncNotice}"
                            Visibility="{Binding ShowSyncNotice, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <TextBlock DockPanel.Dock="Top" Margin="16,0,16,8" FontSize="13" FontWeight="SemiBold"
+                           Foreground="{StaticResource OxideBrush}" TextWrapping="Wrap"
+                           Text="{Binding NoteStageNotice}"
+                           Visibility="{Binding ShowNoteStageNotice, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <TextBlock DockPanel.Dock="Top" Margin="16,0,16,12" FontSize="13"
+                           Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap"
+                           Text="{Binding NotePublishHelp}"
+                           Visibility="{Binding ShowNotePublishHelp, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                 <Border x:Name="InspectorPreviewHost" DockPanel.Dock="Top" Margin="16,0,16,12"
                         Background="{StaticResource InkBrush}" HorizontalAlignment="Left"
                         Width="{Binding ElementName=InspectorColumn, Path=Width.Value,

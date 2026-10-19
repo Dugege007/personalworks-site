@@ -730,6 +730,7 @@ public sealed partial class ShellViewModel : ViewModelBase
                 ScheduleRebuildCards();
                 RefreshNoteImageAudit();
                 mNoteAuditForRebuildToken = mRebuildToken;
+                RefreshNotePublishChrome();
                 UpdateInspector();
             }
         }
@@ -2601,7 +2602,7 @@ public sealed partial class ShellViewModel : ViewModelBase
     {
         mNoteAudit = null;
         mNoteAuditError = "";
-        if (mSession == null || mSelectedNav?.Work is not { SourceKind: "note" } work)
+        if (mSession == null || mSelectedNav?.Work is not { SourceKind: "note", MissingStageFolder: false } work)
         {
             NoteImageFooter = "";
             NoteImageIssueText = "";
@@ -2731,7 +2732,7 @@ public sealed partial class ShellViewModel : ViewModelBase
     {
         return mSession != null
             && !mIsExecuting
-            && mSelectedNav?.Work is { SourceKind: "note" };
+            && mSelectedNav?.Work is { SourceKind: "note", MissingStageFolder: false };
     }
 
     private bool CanEditNoteMeta() => CanPublishNote() && WorkspaceSyncAllowsWrite;
@@ -2910,10 +2911,11 @@ public sealed partial class ShellViewModel : ViewModelBase
             return;
         }
 
+        var published = IsNoteFolderPublished(work.Id);
         var block = DescribePublishBlock(NoteFolderPath(work.Id), mSession.Profile);
         if (block.Length > 0)
         {
-            TextDialog.Show("无法上页", block);
+            TextDialog.Show(NotePublishCopy.FailureTitle(published), block);
             RefreshNoteImageAudit();
             ApplyNoteImageBadges();
             UpdateInspector();
@@ -2921,10 +2923,10 @@ public sealed partial class ShellViewModel : ViewModelBase
         }
 
         if (!ConfirmIntentDialog.Show(
-                "将上页「" + work.Title + "」。未逐张标记配图时，夹内允许的图片全部压图入库。中转站正文仍用相对路径。",
+                NotePublishCopy.ConfirmMessage(work.Title, published),
                 requireAck: false,
-                "上页心得",
-                "上页"))
+                NotePublishCopy.DialogTitle(published),
+                NotePublishCopy.ConfirmButton(published)))
         {
             return;
         }
@@ -2932,7 +2934,7 @@ public sealed partial class ShellViewModel : ViewModelBase
         var failure = PublishNoteFolder(work.Id);
         if (failure != null)
         {
-            TextDialog.Show("无法上页", failure);
+            TextDialog.Show(NotePublishCopy.FailureTitle(published), failure);
             return;
         }
 
@@ -2980,7 +2982,7 @@ public sealed partial class ShellViewModel : ViewModelBase
         BatchRunResult batch = new() { Ok = false, FailureText = "未执行" };
         try
         {
-            batch = ProgressDialog.Run("正在上页心得", _ =>
+            batch = ProgressDialog.Run(NotePublishCopy.ProgressTitle(IsNoteFolderPublished(folderId)), _ =>
             {
                 outcome = NotePublisher.Publish(
                     profile,
@@ -5358,6 +5360,15 @@ public sealed partial class ShellViewModel : ViewModelBase
         ClearNoteImageFileRow();
         if (card == null)
         {
+            if (mSelectedNav?.Work is { MissingStageFolder: true })
+            {
+                InspectorMeta = NoteStagePresence.MissingFolderDetail;
+                PreviewHint = NoteStagePresence.MissingFolderNotice;
+                InspectorImage = null;
+                ResetVideoInspector();
+                return;
+            }
+
             InspectorMeta = mSelectedNav?.IsUnregistered == true ? "未入编，不可上页。" : "";
             PreviewHint = mSelectedNav?.IsUnregistered == true
                 ? "未入编，不可上页。先登记或改选已有作品。"
@@ -6592,7 +6603,7 @@ public sealed partial class ShellViewModel : ViewModelBase
         CopyDescription = "";
         ShowCopyName = false;
         ShowCopyDescription = false;
-        if (mSession == null || mSelectedNav == null)
+        if (mSession == null || mSelectedNav == null || mSelectedNav.Work is { MissingStageFolder: true })
         {
             return;
         }

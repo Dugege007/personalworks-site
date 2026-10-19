@@ -40,8 +40,12 @@ public static class IntentGate
 
         if (intent == MediaIntent.StageIngest && NoteRules.IsNotesChannel(item.ChannelKey))
         {
+            var published = NoteRules.IsBodyStageRel(item.StageRel)
+                && NotePublishCopy.IsPublished(
+                    NotePublishCopy.LoadOrEmpty(context.Profile),
+                    NotePublishCopy.FolderNameFromStage(context.Profile, item.StageRel));
             return NoteRules.IsBodyStageRel(item.StageRel)
-                ? GateDecision.Allow("将上页整篇心得，与右键「上页心得」相同。")
+                ? GateDecision.Allow(NotePublishCopy.PreviewAllow(published))
                 : GateDecision.Allow("配图是否上页，要看同批有没有标记正文.md。");
         }
 
