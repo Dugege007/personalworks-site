@@ -2758,9 +2758,16 @@ public sealed partial class ShellViewModel : ViewModelBase
             return;
         }
 
-        var status = string.IsNullOrWhiteSpace(saved.Message)
-            ? "已保存标题与修订说明。"
-            : saved.Message;
+        if (saved.PendingUpdate)
+        {
+            NoteUpdateQueue.MarkBody(mSession.Profile, saved.FolderName);
+        }
+
+        var status = saved.PendingUpdate
+            ? NoteTitleSaveStatus(saved)
+            : string.IsNullOrWhiteSpace(saved.Message)
+                ? "已保存标题与修订说明。"
+                : saved.Message;
         _ = SelectAfterReloadAsync(
             mSession.Profile.ProfilePath,
             NoteRules.ChannelKey,
@@ -6828,6 +6835,7 @@ public sealed partial class ShellViewModel : ViewModelBase
     private void RefreshCopyEditor()
     {
         CommitCopyDraft();
+        CommitNoteTitles();
         RefreshResourceTags();
         RefreshProjectTags();
         ClearCopySubject();
@@ -6836,6 +6844,7 @@ public sealed partial class ShellViewModel : ViewModelBase
         CopyDescription = "";
         ShowCopyName = false;
         ShowCopyDescription = false;
+        HideNoteTitleFields();
         if (mSession == null || mSelectedNav == null || mSelectedNav.Work is { MissingStageFolder: true })
         {
             return;
@@ -6860,7 +6869,9 @@ public sealed partial class ShellViewModel : ViewModelBase
                     && string.Equals(item.Channel, channelKey, StringComparison.Ordinal));
                 if (NoteRules.IsBodyFile(channelKey, single.Stage?.FullPath))
                 {
-                    ApplyCopyEditor(null, work?.Title ?? "", CopyText.ForEditor(work?.Summary));
+                    ApplyCopyEditor(null, "", CopyText.ForEditor(work?.Summary));
+                    ShowCopyName = false;
+                    ShowNoteTitleFields(work?.Id);
                     return;
                 }
 
@@ -6885,14 +6896,14 @@ public sealed partial class ShellViewModel : ViewModelBase
         ShowCopyDescription = true;
         if (mSelectedNav.Work is { IsUnregistered: false } navWork)
         {
-            var noteTitle = navWork.SourceKind == "note" ? navWork.Title : "";
             ApplyCopyEditor(
                 navWork.SourceKind == "note" ? null : CopyDraftStore.WorkKey(channelKey ?? "", navWork.Id),
-                noteTitle,
+                "",
                 CopyText.ForEditor(navWork.Summary));
             if (navWork.SourceKind == "note")
             {
-                ShowCopyName = true;
+                ShowCopyName = false;
+                ShowNoteTitleFields(navWork.Id);
             }
 
             return;

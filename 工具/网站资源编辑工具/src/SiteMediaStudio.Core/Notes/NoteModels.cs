@@ -34,7 +34,7 @@ public sealed class NoteRevision
 }
 
 /// <summary>
-/// 夹内 <c>心得.json</c>。站点展示用的主副标题来自夹名，不写进 Markdown 开头。
+/// 夹内 <c>心得.json</c>。站点展示名由标题和副标题自动拼成，不写进 Markdown 开头，也不要求夹名本身就是这串标题。
 /// </summary>
 public sealed class NoteConfig
 {
@@ -238,6 +238,16 @@ public sealed class NoteMetaSaveResult
     public string Message { get; init; } = "";
     public string FolderName { get; init; } = "";
     public string FolderFullPath { get; init; } = "";
+
+    /// <summary>
+    /// 这次确实改写了中转站配置。标题和摘要都没变时为假。
+    /// </summary>
+    public bool Changed { get; init; }
+
+    /// <summary>
+    /// 索引里已有同夹的已发布条目，且这次改动还没写进站点稿。界面应据此标成待更新，不必再按 I。
+    /// </summary>
+    public bool PendingUpdate { get; init; }
 
     /// <summary>
     /// 失败结果。夹名保持原样。

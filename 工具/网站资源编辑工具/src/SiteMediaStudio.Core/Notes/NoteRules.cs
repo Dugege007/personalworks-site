@@ -298,6 +298,57 @@ public static class NoteRules
     }
 
     /// <summary>
+    /// 校验分开填写的标题和副标题。展示名由 <see cref="ComposeDisplayTitle"/> 生成，不接受手写拼接串。
+    /// 约 60 字警告，约 80 字禁止；标题为空禁止保存。这里不检查夹名非法字符，因为展示名不作为文件夹名。
+    /// </summary>
+    public static NoteFolderNameCheck CheckDisplayTitle(string? mainTitle, string? subtitle)
+    {
+        var main = (mainTitle ?? "").Trim();
+        var sub = (subtitle ?? "").Trim();
+        var display = ComposeDisplayTitle(main, sub);
+        var titles = new NoteFolderTitles
+        {
+            MainTitle = main,
+            Subtitle = sub,
+            DisplayTitle = display
+        };
+        if (main.Contains(TitleSeparator, StringComparison.Ordinal)
+            || sub.Contains(TitleSeparator, StringComparison.Ordinal))
+        {
+            return Block(display, titles, "标题和副标题里不要写「——」。有副标题时，展示名会自动写成「标题——副标题」。");
+        }
+
+        if (main.Length == 0)
+        {
+            return Block(display, titles, "标题不能为空。没有副标题时只显示标题，有副标题时展示名自动写成「标题——副标题」。");
+        }
+
+        if (display.Length >= FolderNameBlockLength)
+        {
+            return Block(display, titles, "标题过长，请将标题和副标题的总长度控制在 80 字以内。");
+        }
+
+        if (display.Length >= FolderNameWarnLength)
+        {
+            return new NoteFolderNameCheck
+            {
+                Verdict = NoteFolderNameVerdict.Warn,
+                Message = "标题偏长，列表与详情标题可能折行过多，建议缩短。",
+                Length = display.Length,
+                Titles = titles
+            };
+        }
+
+        return new NoteFolderNameCheck
+        {
+            Verdict = NoteFolderNameVerdict.Ok,
+            Message = "",
+            Length = display.Length,
+            Titles = titles
+        };
+    }
+
+    /// <summary>
     /// 校验用作标题的夹名。约 60 字警告，约 80 字禁止；主标题为空禁止保存。
     /// </summary>
     public static NoteFolderNameCheck CheckFolderName(string? folderName)
