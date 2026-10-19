@@ -7,6 +7,7 @@ import {
   noteDisplayMeta,
   noteTimestampDateTime,
   stripNoteFrontmatter,
+  toCard,
   visibleNotes,
 } from "../src/content/notes/select.ts";
 
@@ -85,6 +86,59 @@ test("body tags are read from the published body field", () => {
     }),
     [],
   );
+  assert.deepEqual(
+    noteBodyTags({
+      folder: "blank",
+      slug: "blank",
+      title: "空白",
+      date: "2026-10-07",
+      summary: "",
+      body: { tags: [] },
+    }),
+    [],
+  );
+  assert.deepEqual(
+    noteBodyTags({
+      folder: "dup",
+      slug: "dup",
+      title: "重复",
+      date: "2026-10-07",
+      summary: "",
+      body: { tags: ["算法", " 算法 ", "时序"] },
+      images: [{ tags: ["展馆", "随拍"] }],
+    }),
+    ["算法", "时序"],
+  );
+});
+
+test("toCard keeps body tags and drops image tags", () => {
+  const tagged = toCard(
+    {
+      folder: "20261007_015206",
+      slug: "n-20261007-015206",
+      title: "控制图",
+      date: "2026-10-07",
+      summary: "",
+      body: { tags: ["算法", ""] },
+      images: [{ tags: ["展馆"] }],
+    },
+    "正文",
+  );
+  assert.deepEqual(tagged.tags, ["算法"]);
+  assert.equal(tagged.body, "正文");
+  assert.equal(tagged.date, "2026.10.07");
+
+  const empty = toCard(
+    {
+      folder: "empty",
+      slug: "empty",
+      title: "空",
+      date: "2026-10-05",
+      summary: "",
+    },
+    "",
+  );
+  assert.deepEqual(empty.tags, []);
 });
 
 test("display date uses dots and frontmatter is stripped", () => {

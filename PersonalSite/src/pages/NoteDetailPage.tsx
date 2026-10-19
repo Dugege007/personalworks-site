@@ -4,6 +4,7 @@ import { NoteMarkdown } from "../components/NoteMarkdown";
 import { lexicon } from "../content/lexicon";
 import { loadNote, noteTheme } from "../content/notes/read";
 import { displayNoteTimestamp, noteTimestampDateTime } from "../content/notes/select";
+import { noteTagSearch, noteTagsOf } from "../content/notes/tagFilter";
 import type { NoteCard } from "../content/site";
 import "../styles/placeholder.css";
 
@@ -38,9 +39,33 @@ export function NoteDetailPage() {
       <h1>{heading}</h1>
       {subtitle ? <p className="note-subtitle">{subtitle}</p> : null}
       <NoteTimes key={note.slug} note={note} />
+      <NoteTags tags={note.tags} />
       <p className="page-lead">{note.summary}</p>
       <NoteMarkdown markdown={note.body} />
     </div>
+  );
+}
+
+/**
+ * 正文标签芯片。没有标签时不渲染。点击后打开带该标签筛选的列表。
+ */
+function NoteTags({ tags }: { tags: NoteCard["tags"] }) {
+  const values = noteTagsOf({ tags });
+  if (values.length === 0) {
+    return null;
+  }
+  return (
+    <nav className="note-tags" aria-label="正文标签">
+      {values.map((tag) => (
+        <Link
+          key={tag}
+          className="note-tag"
+          to={`/${lexicon.notes.key}${noteTagSearch({ tags: [tag], untagged: false })}`}
+        >
+          {tag}
+        </Link>
+      ))}
+    </nav>
   );
 }
 

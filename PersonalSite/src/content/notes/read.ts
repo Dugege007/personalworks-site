@@ -1,15 +1,7 @@
 import indexJson from "./index.json";
 import { lexicon } from "../lexicon";
 import type { NoteCard } from "../site";
-import {
-  displayNoteDate,
-  noteBodyTags,
-  noteDisplayMeta,
-  stripNoteFrontmatter,
-  visibleNotes,
-  type NoteIndex,
-  type NoteRecord,
-} from "./select";
+import { stripNoteFrontmatter, toCard, visibleNotes, type NoteIndex } from "./select";
 
 const bodies = import.meta.glob("./*.md", {
   query: "?raw",
@@ -42,25 +34,6 @@ export function loadNote(slug: string | undefined): NoteCard | null {
  */
 export function listNotes(): NoteCard[] {
   return visibleNotes(index).map((record) => toCard(record, ""));
-}
-
-function toCard(record: NoteRecord, body: string): NoteCard {
-  const meta = noteDisplayMeta(record);
-  return {
-    slug: record.slug,
-    title: record.title,
-    date: displayNoteDate(record.date),
-    summary: record.summary || "待填写描述",
-    body,
-    previewImages: (record.previewObjects ?? []).slice(0, 3),
-    draft: false,
-    mainTitle: meta.mainTitle,
-    subtitle: meta.subtitle,
-    createdAt: meta.createdAt,
-    revisedAt: meta.revisedAt,
-    revisions: meta.revisions,
-    tags: noteBodyTags(record),
-  };
 }
 
 export function noteTheme(slug: string | undefined): string {
