@@ -22,6 +22,11 @@ public sealed class WorkCatalogItem
     /// 心得整篇已隐藏。访客索引不列出，工具里资源标已隐藏。
     /// </summary>
     public bool IsHidden { get; init; }
+
+    /// <summary>
+    /// 索引里有这篇心得，中转站里还没有对应夹。只能提示回填，不能直接改站点稿。
+    /// </summary>
+    public bool MissingStageFolder { get; init; }
     public string? StageFolder { get; init; }
     public string Year { get; init; } = "";
     public string? StartedOn { get; init; }
