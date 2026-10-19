@@ -635,6 +635,27 @@ async function cmdIngest(config, stageRelRaw, flags) {
     }
     object = await allocateBumpedObject(config, ledger, requested);
   } else if (existing?.status === "published") {
+    // Same object + same stageRel (and matching source) with both files present: idempotent OK.
+    // Notes "上页" re-runs ingest after title edits; hard-reject would surface as 入库失败 and skip index write.
+    const sourceStageRelForIdem = normalizeOptionalSourceStageRel(flags.sourceStageRel, stageRel);
+    const sameStage = existing.stageRel === stageRel;
+    const existingSource = String(existing.sourceStageRel ?? "");
+    const sameSource =
+      !sourceStageRelForIdem ||
+      !existingSource ||
+      existingSource === sourceStageRelForIdem;
+    const destPresent = await isFile(destAbs(config, object));
+    const stagePresent = await isFile(stageAbs(config, stageRel));
+    if (sameStage && sameSource && destPresent && stagePresent) {
+      if (sourceStageRelForIdem && !existingSource) {
+        existing.sourceStageRel = sourceStageRelForIdem;
+        await saveLedger(config, ledger);
+      }
+      console.log(`对象已是 published，跳过重复入库：${object}`);
+      console.log(`中转站未移动，正式位已存在：${destAbs(config, object)}`);
+      console.log(`请在内容层写入 src = ${object}`);
+      return;
+    }
     throw new Error(`对象已是 published：${object}。下架后再入库，或 withdraw 后加 --bump 换键。`);
   }
 

@@ -350,6 +350,45 @@ test("撤下后的中转路径可入库到新对象键，published 仍拒绝", a
   assert.match(blocked.stderr, /中转站路径已登记给 published 对象/);
 });
 
+
+test("ingest 对已 published 的同一 object/stageRel 幂等成功", async (t) => {
+  const sourceRel = "来源/kalman.png";
+  const preparedRel = "来源/.site-ready/kalman.webp";
+  const object = "notes/n-demo/kalman.webp";
+  const { workspaceRoot, ledgerPath } = await createWorkspace(t);
+  await writeWorkspaceFile(workspaceRoot, "PersonalSite/src/content/works.ts", "export {};\n");
+  await writeWorkspaceFile(workspaceRoot, `作品中转站/${sourceRel}`, "png");
+  await writeWorkspaceFile(workspaceRoot, `作品中转站/${preparedRel}`, "webp");
+
+  const first = await runCli(workspaceRoot, [
+    "ingest",
+    preparedRel,
+    "--object",
+    object,
+    "--source-stage-rel",
+    sourceRel,
+  ]);
+  assert.equal(first.code, 0, first.stderr);
+
+  const second = await runCli(workspaceRoot, [
+    "ingest",
+    preparedRel,
+    "--object",
+    object,
+    "--source-stage-rel",
+    sourceRel,
+  ]);
+  assert.equal(second.code, 0, second.stderr);
+  assert.match(second.stdout, /跳过重复入库/);
+  assert.deepEqual(JSON.parse(await readFile(ledgerPath, "utf8")).records, [
+    { object, stageRel: preparedRel, status: "published", sourceStageRel: sourceRel },
+  ]);
+  assert.equal(
+    await readFile(`${workspaceRoot}/PersonalSite/public/placeholders/${object}`, "utf8"),
+    "webp",
+  );
+});
+
 async function pathExists(abs) {
   try {
     await stat(abs);
