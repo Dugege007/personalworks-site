@@ -267,12 +267,18 @@ internal static class TagEditorHost
         string label,
         Action<string> onPersistFailed)
     {
+        var notes = NoteRules.IsNotesChannel(channel);
         var works = session.Works
             .Where(work => !work.IsUnregistered && string.Equals(work.Channel, channel, StringComparison.Ordinal))
             .ToList();
-        var hits = TagEditorCatalog.FindFreeTagUsages(works, label);
+        var hits = notes
+            ? NoteTagRules.FindBodyUsages(works, label)
+            : TagEditorCatalog.FindFreeTagUsages(works, label);
+        var prompt = notes
+            ? NoteTagRules.DescribeBodyPresetDelete(label, hits)
+            : TagEditorCatalog.DescribePresetDelete(label, hits);
         if (!ConfirmIntentDialog.Show(
-                TagEditorCatalog.DescribePresetDelete(label, hits),
+                prompt,
                 requireAck: false,
                 title: "删除标签",
                 okLabel: "删除"))
@@ -280,7 +286,9 @@ internal static class TagEditorHost
             return TagWriteOutcome.Cancelled;
         }
 
-        var writes = TagEditorCatalog.StripFreeTag(works, label);
+        var writes = notes
+            ? NoteTagRules.StripBodyTag(works, label)
+            : TagEditorCatalog.StripFreeTag(works, label);
         var outcome = writes.Count == 0
             ? TagWriteOutcome.Written
             : Write(session, channel, writes, onPersistFailed);
@@ -315,7 +323,9 @@ internal static class TagEditorHost
         IReadOnlyList<TagFrameWrite> writes,
         Action<string> onPersistFailed)
     {
-        var document = IntentDocumentBuilder.BuildTagFrames(session, ExecutionMode.Direct, channel, writes);
+        var document = NoteRules.IsNotesChannel(channel)
+            ? IntentDocumentBuilder.BuildNoteBodyTags(session, ExecutionMode.Direct, writes)
+            : IntentDocumentBuilder.BuildTagFrames(session, ExecutionMode.Direct, channel, writes);
         var report = PreviewReporter.BuildFromDocument(session, document);
         if (report.HasHardError)
         {

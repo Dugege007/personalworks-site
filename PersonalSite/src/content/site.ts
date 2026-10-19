@@ -84,6 +84,8 @@ export type NoteCard = {
   createdAt?: string;
   revisedAt?: string;
   revisions?: NoteRevision[];
+  /** 正文级自由标签。缺省为空，筛选与详情展示留到后续。 */
+  tags?: string[];
 };
 
 export type AboutFeature = {

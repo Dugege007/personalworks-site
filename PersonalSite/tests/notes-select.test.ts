@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   displayNoteDate,
   displayNoteTimestamp,
+  noteBodyTags,
   noteDisplayMeta,
   noteTimestampDateTime,
   stripNoteFrontmatter,
@@ -60,6 +61,30 @@ test("note meta keeps subtitle and treats latest revision as the modified time",
   assert.equal(meta.revisedAt, "2026-10-07 08:00:00");
   assert.equal(meta.revisions[0].summary, "");
   assert.equal(meta.revisions[1].summary, "补了一段");
+});
+
+test("body tags are read from the published body field", () => {
+  assert.deepEqual(
+    noteBodyTags({
+      folder: "20261007_015206",
+      slug: "n-20261007-015206",
+      title: "控制图",
+      date: "2026-10-07",
+      summary: "",
+      body: { tags: [" 算法 ", "", "统计过程控制"] },
+    }),
+    ["算法", "统计过程控制"],
+  );
+  assert.deepEqual(
+    noteBodyTags({
+      folder: "empty",
+      slug: "empty",
+      title: "空",
+      date: "2026-10-07",
+      summary: "",
+    }),
+    [],
+  );
 });
 
 test("display date uses dots and frontmatter is stripped", () => {

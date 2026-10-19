@@ -17,6 +17,7 @@ public sealed class TagWindow : Window
     private readonly IReadOnlyList<string> mObjectKeyList;
     private readonly TagEditor mEditor;
     private readonly Func<string?>? mRefuseWrite;
+    private readonly bool mNotesBody;
     private WorkCatalogItem mWork;
 
     private TagWindow(
@@ -24,13 +25,15 @@ public sealed class TagWindow : Window
         WorkCatalogItem work,
         IReadOnlyList<string> objectKeyList,
         Func<string?>? refuseWrite,
-        Func<Task<WorkCatalogItem?>> reloaded)
+        Func<Task<WorkCatalogItem?>> reloaded,
+        bool notesBody = false)
     {
         mSession = session;
         mWork = work;
         mObjectKeyList = objectKeyList;
         mRefuseWrite = refuseWrite;
         mReloaded = reloaded;
+        mNotesBody = notesBody;
 
         Title = "标签";
         Width = 520;
@@ -43,7 +46,9 @@ public sealed class TagWindow : Window
         var root = new DockPanel { Margin = new Thickness(20) };
         var title = new TextBlock
         {
-            Text = objectKeyList.Count == 0 ? "作品标签" : "已选 " + objectKeyList.Count + " 张",
+            Text = notesBody
+                ? "心得标签"
+                : objectKeyList.Count == 0 ? "作品标签" : "已选 " + objectKeyList.Count + " 张",
             FontSize = 16,
             FontWeight = FontWeights.SemiBold,
             Margin = new Thickness(0, 0, 0, 12)
@@ -64,7 +69,17 @@ public sealed class TagWindow : Window
         root.Children.Add(buttons);
 
         var body = new StackPanel();
-        if (objectKeyList.Count == 0)
+        if (notesBody)
+        {
+            body.Children.Add(new TextBlock
+            {
+                Text = NoteTagRules.IndexAuthorityHint,
+                TextWrapping = TextWrapping.Wrap,
+                Foreground = BrushCache.Muted,
+                Margin = new Thickness(0, 0, 0, 12)
+            });
+        }
+        else if (objectKeyList.Count == 0)
         {
             body.Children.Add(Muted("类型"));
             body.Children.Add(LockedLine(FormatDerivedThemes(work)));
@@ -92,9 +107,11 @@ public sealed class TagWindow : Window
         body.Children.Add(mEditor);
         body.Children.Add(new TextBlock
         {
-            Text = objectKeyList.Count == 0
-                ? "回车或空格写入作品标签。四位年份不写入。不改类型与 src。"
-                : "回车或空格写入。年份与地点跟项目，不能改。类型可多选。",
+            Text = notesBody
+                ? "回车或空格写入这篇的正文标签。四位年份、摄影类型和「无标签」不写入。"
+                : objectKeyList.Count == 0
+                    ? "回车或空格写入作品标签。四位年份不写入。不改类型与 src。"
+                    : "回车或空格写入。年份与地点跟项目，不能改。类型可多选。",
             TextWrapping = TextWrapping.Wrap,
             Foreground = BrushCache.Muted,
             Margin = new Thickness(0, 8, 0, 0)
@@ -116,6 +133,28 @@ public sealed class TagWindow : Window
         Func<Task<WorkCatalogItem?>> reloaded)
     {
         var dialog = new TagWindow(session, work, objectKeyList, refuseWrite, reloaded)
+        {
+            Owner = Application.Current?.MainWindow
+        };
+        dialog.ShowDialog();
+    }
+
+    /// <summary>
+    /// 打开心得正文标签窗。只写自由标签，栏目固定为 notes。
+    /// </summary>
+    public static void ShowNoteBody(
+        WorkspaceSession session,
+        WorkCatalogItem work,
+        Func<string?>? refuseWrite,
+        Func<Task<WorkCatalogItem?>> reloaded)
+    {
+        var dialog = new TagWindow(
+            session,
+            work,
+            Array.Empty<string>(),
+            refuseWrite,
+            reloaded,
+            notesBody: true)
         {
             Owner = Application.Current?.MainWindow
         };
@@ -304,6 +343,15 @@ public sealed class TagWindow : Window
     /// </summary>
     private List<TagEditorItem> CurrentSuggestions()
     {
+        if (mNotesBody)
+        {
+            var notes = mSession.Works.Where(item =>
+                item.NoteBodyInIndex && NoteRules.IsNotesChannel(item.Channel));
+            return NoteTagRules.BuildSuggestions(
+                notes,
+                TagVocabStore.Read(mSession.Profile.ResolvedRoot, NoteRules.ChannelKey));
+        }
+
         var works = mSession.Works.Where(item =>
             !item.IsUnregistered && string.Equals(item.Channel, mWork.Channel, StringComparison.Ordinal));
         return TagEditorCatalog.BuildSuggestions(

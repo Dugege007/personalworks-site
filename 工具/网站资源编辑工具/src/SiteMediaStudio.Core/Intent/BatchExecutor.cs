@@ -16,9 +16,11 @@ public static class BatchExecutor
         IProgress<PublishProgress>? progress = null,
         string? marksPath = null)
     {
+        var pulledNoteMeta = false;
         try
         {
-            if (NoteCommands.PullMeta(session.Profile, document) && File.Exists(intentPath))
+            pulledNoteMeta = NoteCommands.PullMeta(session.Profile, document);
+            if (pulledNoteMeta && File.Exists(intentPath))
             {
                 File.WriteAllText(intentPath, IntentDocumentBuilder.ToJson(document), JsonUtil.Utf8NoBom);
             }
@@ -496,6 +498,11 @@ public static class BatchExecutor
             document,
             DistinctUrls(refreshUrlList),
             session);
+        if (pulledNoteMeta)
+        {
+            var notePending = PendingPublishStore.CreateManualSpa(session.Profile);
+            pending = pending == null ? notePending : PendingPublishStore.Merge(pending, notePending);
+        }
         tracker.Begin(ExecuteProgressPlanner.FinishKey, "正在收尾。");
         tracker.Finish("本机执行完成。");
         return tracker.Stamp(new BatchRunResult

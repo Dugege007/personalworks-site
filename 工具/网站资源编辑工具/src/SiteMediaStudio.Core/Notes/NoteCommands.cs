@@ -116,7 +116,11 @@ public static class NoteCommands
         }
         else if (intent == MediaIntent.TagsUpdate)
         {
-            var tags = item.Tags ?? new List<string>();
+            if (!NoteTagRules.TryNormalizeTags(item.Tags, out var tags, out _))
+            {
+                return;
+            }
+
             var keys = item.ObjectList ?? new List<string>();
             if (keys.Count == 0 && !string.IsNullOrWhiteSpace(item.Object))
             {
@@ -136,7 +140,7 @@ public static class NoteCommands
                 matched = true;
             }
 
-            if (!matched && IsBody(item))
+            if (!matched && (IsBody(item) || keys.Count == 0))
             {
                 entry.Body.Tags = tags.ToList();
             }

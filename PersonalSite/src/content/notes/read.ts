@@ -3,6 +3,7 @@ import { lexicon } from "../lexicon";
 import type { NoteCard } from "../site";
 import {
   displayNoteDate,
+  noteBodyTags,
   noteDisplayMeta,
   stripNoteFrontmatter,
   visibleNotes,
@@ -58,6 +59,7 @@ function toCard(record: NoteRecord, body: string): NoteCard {
     createdAt: meta.createdAt,
     revisedAt: meta.revisedAt,
     revisions: meta.revisions,
+    tags: noteBodyTags(record),
   };
 }
 

@@ -267,7 +267,7 @@ public sealed partial class ShellViewModel : ViewModelBase
     public RelayCommand EditWorkCommand { get; }
 
     /// <summary>
-    /// 给当前摄影作品或选中的多张写类型与标签。
+    /// 给当前摄影作品、选中的照片，或已上页心得正文写标签。
     /// </summary>
     public RelayCommand TagCommand { get; }
 
@@ -599,7 +599,7 @@ public sealed partial class ShellViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// 选中摄影作品里的资源后，在名称上方显示标签组件。
+    /// 选中摄影资源或心得正文后，在名称上方显示标签组件。
     /// </summary>
     public bool ShowResourceTags
     {
@@ -3475,14 +3475,114 @@ public sealed partial class ShellViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// 已入编的摄影作品可以打类型与标签。
+    /// 已入编的摄影作品可以打类型与标签。已上页心得可以改正文标签。
     /// </summary>
     private bool CanTag()
     {
-        return mSession != null
-            && WorkspaceSyncAllowsWrite
-            && mSelectedNav?.Work is { IsUnregistered: false, SourceKind: "works" } work
-            && PhotoFactRules.RequiresFacts(work.Channel);
+        if (mSession == null || !WorkspaceSyncAllowsWrite)
+        {
+            return false;
+        }
+
+        if (mSelectedNav?.Work is { IsUnregistered: false, SourceKind: "works" } work
+            && PhotoFactRules.RequiresFacts(work.Channel))
+        {
+            return true;
+        }
+
+        return CanTagNoteBody();
+    }
+
+    /// <summary>
+    /// 选中已上页心得，且目标是整篇或正文卡时，可以改正文标签。
+    /// </summary>
+    private bool CanTagNoteBody()
+    {
+        return ResolveNoteBodyTarget() is { NoteBodyInIndex: true };
+    }
+
+    /// <summary>
+    /// 左侧整篇，或当前选中的都是同一篇正文卡。配图和跨篇选择不作为正文目标。
+    /// </summary>
+    private WorkCatalogItem? ResolveNoteBodyTarget()
+    {
+        if (mSession == null || mSelectedNav == null || !NoteRules.IsNotesChannel(mSelectedNav.Channel.Key))
+        {
+            return null;
+        }
+
+        if (mSelectedNav.Work is { SourceKind: "note" } navNote)
+        {
+            return IsNoteBodySelection(navNote.Id) ? navNote : null;
+        }
+
+        if (SelectedCardList.Count == 0)
+        {
+            return null;
+        }
+
+        WorkCatalogItem? found = null;
+        foreach (var card in SelectedCardList)
+        {
+            var note = NoteForBodyCard(card);
+            if (note == null)
+            {
+                return null;
+            }
+
+            if (found == null)
+            {
+                found = note;
+                continue;
+            }
+
+            if (!string.Equals(found.Id, note.Id, StringComparison.Ordinal))
+            {
+                return null;
+            }
+        }
+
+        return found;
+    }
+
+    /// <summary>
+    /// 这张卡属于哪一篇心得的正文。
+    /// </summary>
+    private WorkCatalogItem? NoteForBodyCard(MediaCardViewModel card)
+    {
+        if (mSession == null)
+        {
+            return null;
+        }
+
+        return mSession.Works.FirstOrDefault(work =>
+            work.SourceKind == "note"
+            && NoteRules.IsNotesChannel(work.Channel)
+            && IsNoteBodyCard(card, work.Id));
+    }
+
+    /// <summary>
+    /// 没有选中卡片时视为整篇；只选中这篇的正文卡时也视为正文。配图不打开正文标签。
+    /// </summary>
+    private bool IsNoteBodySelection(string folderId)
+    {
+        if (SelectedCardList.Count == 0)
+        {
+            return true;
+        }
+
+        return SelectedCardList.All(card => IsNoteBodyCard(card, folderId));
+    }
+
+    /// <summary>
+    /// 卡片是不是这篇心得的正文。
+    /// </summary>
+    private static bool IsNoteBodyCard(MediaCardViewModel card, string folderId)
+    {
+        var rel = JsonUtil.ToRel(card.Stage?.StageRel ?? card.Site?.StageRel ?? "");
+        return !string.IsNullOrWhiteSpace(folderId)
+            && NoteRules.IsBodyStageRel(rel)
+            && rel.Contains("/" + folderId + "/", StringComparison.Ordinal);
     }
 
     /// <summary>
@@ -3492,6 +3592,12 @@ public sealed partial class ShellViewModel : ViewModelBase
     {
         if (RefuseWorkspaceWrite())
         {
+            return;
+        }
+
+        if (ResolveNoteBodyTarget() is { NoteBodyInIndex: true } note)
+        {
+            OpenNoteTags(note);
             return;
         }
 
@@ -3536,6 +3642,35 @@ public sealed partial class ShellViewModel : ViewModelBase
     }
 
     /// <summary>
+    /// 打开心得正文标签窗。不进入摄影类型窗。
+    /// </summary>
+    private void OpenNoteTags(WorkCatalogItem note)
+    {
+        var workId = note.Id;
+        var profilePath = mSession!.Profile.ProfilePath;
+        TagWindow.ShowNoteBody(mSession, note, WorkspaceSyncBlockReason, async () =>
+        {
+            var reloaded = await ReloadAsync(profilePath, coverGrid: true).ConfigureAwait(true);
+            if (mSession == null)
+            {
+                return null;
+            }
+
+            if (reloaded)
+            {
+                RestoreNav(FindNav(NoteRules.ChannelKey, workId, false));
+                await mPendingCardFill.ConfigureAwait(true);
+            }
+
+            return mSession.Works.FirstOrDefault(item =>
+                item.SourceKind == "note"
+                && item.Channel == NoteRules.ChannelKey
+                && item.Id == workId);
+        });
+        RefreshResourceTags();
+    }
+
+    /// <summary>
     /// 检视栏回车或空格提交一个标签。
     /// </summary>
     public void CommitResourceTag(TagEditorCommitEventArgs args)
@@ -3544,6 +3679,17 @@ public sealed partial class ShellViewModel : ViewModelBase
         {
             args.Notice = WorkspaceSyncGuard.BehindNotice;
             args.Accepted = false;
+            return;
+        }
+
+        if (TryNoteTagWrite(out var noteSession, out var note))
+        {
+            var noteOutcome = TagEditorHost.CommitWork(
+                noteSession, note, ResourceTagSuggestions, args.Text, out var noteNotice,
+                text => OnResourceTagPersistFailed(text, NoteRules.ChannelKey, note.Id));
+            args.Notice = noteNotice;
+            args.Accepted = noteOutcome is TagWriteOutcome.Written or TagWriteOutcome.Unchanged;
+            FinishResourceTagWrite(noteOutcome, 1, noteBody: true);
             return;
         }
 
@@ -3571,6 +3717,16 @@ public sealed partial class ShellViewModel : ViewModelBase
             return;
         }
 
+        if (TryNoteTagWrite(out var noteSession, out var note))
+        {
+            var noteOutcome = TagEditorHost.RemoveWork(
+                noteSession, note, args.Item,
+                text => OnResourceTagPersistFailed(text, NoteRules.ChannelKey, note.Id));
+            args.Accepted = noteOutcome is TagWriteOutcome.Written or TagWriteOutcome.Unchanged;
+            FinishResourceTagWrite(noteOutcome, 1, noteBody: true);
+            return;
+        }
+
         if (!TryResourceTagTarget(out var session, out var work, out var frames))
         {
             return;
@@ -3592,6 +3748,17 @@ public sealed partial class ShellViewModel : ViewModelBase
         {
             args.Notice = WorkspaceSyncGuard.BehindNotice;
             args.Accepted = false;
+            return;
+        }
+
+        if (TryNoteTagWrite(out var noteSession, out var note))
+        {
+            var noteOutcome = TagEditorHost.ToggleWork(
+                noteSession, note, args.Item, out var noteNotice,
+                text => OnResourceTagPersistFailed(text, NoteRules.ChannelKey, note.Id));
+            args.Notice = noteNotice;
+            args.Accepted = noteOutcome is TagWriteOutcome.Written or TagWriteOutcome.Unchanged;
+            FinishResourceTagWrite(noteOutcome, 1, noteBody: true);
             return;
         }
 
@@ -3617,15 +3784,17 @@ public sealed partial class ShellViewModel : ViewModelBase
             return;
         }
 
+        var notes = mSelectedNav != null && NoteRules.IsNotesChannel(mSelectedNav.Channel.Key);
         if (mSession == null
             || mSelectedNav == null
-            || !PhotoFactRules.RequiresFacts(mSelectedNav.Channel.Key)
-            || item.Kind != TagEditorKind.Free)
+            || item.Kind != TagEditorKind.Free
+            || (!notes && !PhotoFactRules.RequiresFacts(mSelectedNav.Channel.Key))
+            || (notes && ResolveNoteBodyTarget() is not { NoteBodyInIndex: true }))
         {
             return;
         }
 
-        var channel = mSelectedNav.Channel.Key;
+        var channel = notes ? NoteRules.ChannelKey : mSelectedNav.Channel.Key;
         var workId = mSelectedNav.Work?.Id ?? "";
         var outcome = TagEditorHost.DeletePreset(
             mSession, channel, item.Label,
@@ -3703,7 +3872,7 @@ public sealed partial class ShellViewModel : ViewModelBase
     /// <summary>
     /// 内存里的标签已经改完，马上重画芯片。写盘在后台。
     /// </summary>
-    private void FinishResourceTagWrite(TagWriteOutcome outcome, int frameCount)
+    private void FinishResourceTagWrite(TagWriteOutcome outcome, int frameCount, bool noteBody = false)
     {
         if (outcome != TagWriteOutcome.Written || mSession == null)
         {
@@ -3711,7 +3880,26 @@ public sealed partial class ShellViewModel : ViewModelBase
         }
 
         RefreshResourceTags();
-        StatusText = frameCount <= 1 ? "已写入这张的标签。" : $"已写入 {frameCount} 张的标签。";
+        StatusText = noteBody
+            ? "已写入这篇的标签。"
+            : frameCount <= 1 ? "已写入这张的标签。" : $"已写入 {frameCount} 张的标签。";
+    }
+
+    /// <summary>
+    /// 检视栏正在编辑已上页心得的正文标签。
+    /// </summary>
+    private bool TryNoteTagWrite(out WorkspaceSession session, out WorkCatalogItem note)
+    {
+        session = mSession!;
+        note = null!;
+        if (!ResourceTagEditable || mSession == null || ResolveNoteBodyTarget() is not { NoteBodyInIndex: true } found)
+        {
+            return false;
+        }
+
+        session = mSession;
+        note = found;
+        return true;
     }
 
     /// <summary>
@@ -3855,10 +4043,50 @@ public sealed partial class ShellViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// 选区变化时把标签装到名称上方。未选资源则收起。
+    /// 心得栏目改走正文标签。不是心得栏目时返回假，交给摄影路径。
+    /// </summary>
+    private bool TryRefreshNoteResourceTags()
+    {
+        if (mSelectedNav == null || !NoteRules.IsNotesChannel(mSelectedNav.Channel.Key))
+        {
+            return false;
+        }
+
+        if (mSession == null || ResolveNoteBodyTarget() is not { } note)
+        {
+            ClearResourceTags();
+            return true;
+        }
+
+        var listed = mSession.Works.Where(item =>
+            item.NoteBodyInIndex && NoteRules.IsNotesChannel(item.Channel));
+        ResourceTagSuggestions = NoteTagRules.BuildSuggestions(
+            listed,
+            TagVocabStore.Read(mSession.Profile.ResolvedRoot, NoteRules.ChannelKey));
+        ResourceTagSelected = TagEditorCatalog.ChipsForFrames(
+            ResourceTagSuggestions,
+            new[] { (Themes: (IReadOnlyList<string>)Array.Empty<string>(), Tags: note.Tags) });
+        ResourceTagCaption = "";
+        ShowResourceTagBatch = false;
+        ResourceTagEditable = note.NoteBodyInIndex && WorkspaceSyncAllowsWrite;
+        ShowResourceTagHint = true;
+        ResourceTagHint = note.NoteBodyInIndex
+            ? NoteTagRules.IndexAuthorityHint
+            : NoteTagRules.PublishFirstHint;
+        ShowResourceTags = true;
+        return true;
+    }
+
+    /// <summary>
+    /// 选区变化时把标签装到名称上方。未选资源则收起。心得正文另走分库路径。
     /// </summary>
     private void RefreshResourceTags()
     {
+        if (TryRefreshNoteResourceTags())
+        {
+            return;
+        }
+
         var cardList = SelectedPhotoCardList();
         if (cardList.Count == 0 || mSession == null || mSelectedNav == null)
         {

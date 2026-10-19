@@ -281,6 +281,42 @@ public static class IntentDocumentBuilder
     }
 
     /// <summary>
+    /// 把心得正文标签收成 tags.update。不带对象键，避免写进配图。
+    /// </summary>
+    public static IntentDocument BuildNoteBodyTags(
+        WorkspaceSession session,
+        ExecutionMode mode,
+        IReadOnlyList<TagFrameWrite> writes)
+    {
+        var document = Build(
+            session,
+            mode,
+            Array.Empty<(MediaIntent, StageItem?, SiteItem?)>());
+        foreach (var write in writes)
+        {
+            if (!string.IsNullOrWhiteSpace(write.ObjectKey) || string.IsNullOrWhiteSpace(write.WorkId))
+            {
+                continue;
+            }
+
+            var accepted = NoteTagRules.TryNormalizeTags(write.Tags, out var tags, out _);
+            var work = session.Works.FirstOrDefault(item =>
+                NoteRules.IsNotesChannel(item.Channel)
+                && string.Equals(item.Id, write.WorkId, StringComparison.Ordinal));
+            document.Items.Add(new IntentItem
+            {
+                Intent = MediaIntentCodes.TagsUpdate,
+                Channel = NoteRules.ChannelKey,
+                WorkId = write.WorkId,
+                StageRel = NoteTagRules.BodyStageRel(work?.StageFolder, write.WorkId),
+                Tags = accepted ? tags : write.Tags.ToList()
+            });
+        }
+
+        return document;
+    }
+
+    /// <summary>
     /// 组装一批路径重挂意图。
     /// </summary>
     public static IntentDocument BuildRelocate(
