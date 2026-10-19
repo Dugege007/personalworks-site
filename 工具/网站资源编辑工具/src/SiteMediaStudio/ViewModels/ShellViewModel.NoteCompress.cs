@@ -37,7 +37,7 @@ public sealed partial class ShellViewModel
     /// <summary>
     /// 当前打开的是一篇心得时，检视栏和底栏显示压缩按钮。
     /// </summary>
-    public bool ShowNoteCompress => mSelectedNav?.Work is { SourceKind: "note" };
+    public bool ShowNoteCompress => mSelectedNav?.Work is { SourceKind: "note", MissingStageFolder: false };
 
     /// <summary>
     /// 上一批有被占用而跳过的文件，并且仍然对着当时的笔记或工作区。
@@ -746,7 +746,7 @@ public sealed partial class ShellViewModel
     {
         return mSession != null
             && !mIsExecuting
-            && mSelectedNav?.Work is { SourceKind: "note" };
+            && mSelectedNav?.Work is { SourceKind: "note", MissingStageFolder: false };
     }
 
     /// <summary>
