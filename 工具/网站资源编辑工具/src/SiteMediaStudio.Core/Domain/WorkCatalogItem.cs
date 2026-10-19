@@ -38,9 +38,14 @@ public sealed class WorkCatalogItem
     public IReadOnlyList<string> Themes { get; set; } = Array.Empty<string>();
 
     /// <summary>
-    /// 作品级自由标签。
+    /// 作品级自由标签。心得栏目里这是正文 <c>body.tags</c>，不是配图标签。
     /// </summary>
     public IReadOnlyList<string> Tags { get; set; } = Array.Empty<string>();
+
+    /// <summary>
+    /// 心得正文已写入发布索引且不是草稿，可以改正文标签。摄影作品保持假。
+    /// </summary>
+    public bool NoteBodyInIndex { get; init; }
 
     public IReadOnlyList<WorkMediaItem> Media { get; init; } = Array.Empty<WorkMediaItem>();
 

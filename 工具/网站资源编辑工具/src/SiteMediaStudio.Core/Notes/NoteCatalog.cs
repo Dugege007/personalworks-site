@@ -80,7 +80,11 @@ public static class NoteCatalog
                     SupportsAppend = false,
                     IsUnregistered = false,
                     IsHidden = entry?.Hidden == true,
+                    NoteBodyInIndex = entry != null
+                        && !entry.Draft
+                        && !string.IsNullOrWhiteSpace(entry.Slug),
                     StageFolder = NoteRules.ChannelKey + "/" + folder,
+                    Tags = entry?.Body?.Tags?.ToList() ?? new List<string>(),
                     Media = media
                 });
             }

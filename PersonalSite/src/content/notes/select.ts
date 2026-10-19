@@ -31,7 +31,8 @@ export type NoteRecord = {
   draft?: boolean;
   hidden?: boolean;
   previewObjects?: string[];
-  bodyMeta?: NoteResource;
+  /** 发布索引里的正文元数据。属性名与 index.json 的 body 一致。 */
+  body?: NoteResource;
   images?: NoteImageRecord[];
 };
 
@@ -47,6 +48,17 @@ export type NoteIndex = {
   version?: number;
   notes?: NoteRecord[];
 };
+
+/**
+ * 正文级自由标签。缺字段、空数组或空白项视为没有标签。不读取配图标签。
+ */
+export function noteBodyTags(record: NoteRecord): string[] {
+  const tags = record.body?.tags;
+  if (!tags || tags.length === 0) {
+    return [];
+  }
+  return tags.map((tag) => tag.trim()).filter((tag) => tag.length > 0);
+}
 
 /**
  * 访客能看见的心得：去掉草稿和隐藏，日期新的在前。

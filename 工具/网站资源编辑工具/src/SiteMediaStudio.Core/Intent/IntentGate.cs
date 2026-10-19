@@ -594,7 +594,7 @@ public static class IntentGate
 
         if (NoteRules.IsNotesChannel(item.Channel))
         {
-            return GateDecision.Allow("标签写入心得索引，不写摄影类型。");
+            return EvaluateNoteTags(item);
         }
 
         if (string.Equals(item.Channel, "profile", StringComparison.Ordinal))
@@ -666,6 +666,37 @@ public static class IntentGate
         }
 
         return GateDecision.Allow("将写入 " + objectList.Count + " 张的类型与标签，不改 src。");
+    }
+
+    /// <summary>
+    /// 心得只收自由标签。有对象键时仍可写配图，这不是一期编辑入口；没有对象键则写正文。
+    /// </summary>
+    private static GateDecision EvaluateNoteTags(IntentItem item)
+    {
+        if (item.Themes?.Any(theme => !string.IsNullOrWhiteSpace(theme)) == true)
+        {
+            return GateDecision.Reject("心得不写摄影类型。");
+        }
+
+        if (!NoteTagRules.TryNormalizeTags(item.Tags, out _, out var tagError))
+        {
+            return GateDecision.Reject(tagError ?? "标签无法写入。");
+        }
+
+        var objectList = (item.ObjectList ?? new List<string>())
+            .Where(key => !string.IsNullOrWhiteSpace(key))
+            .ToList();
+        if (objectList.Count == 0 && string.IsNullOrWhiteSpace(item.Object))
+        {
+            return GateDecision.Allow("标签写入心得索引正文，不写摄影类型。");
+        }
+
+        if (NoteTagRules.IsBodyTarget(item) && objectList.Count == 0)
+        {
+            return GateDecision.Allow("标签写入心得索引正文，不写摄影类型。");
+        }
+
+        return GateDecision.Allow("标签写入心得索引，不写摄影类型。");
     }
 
     /// <summary>

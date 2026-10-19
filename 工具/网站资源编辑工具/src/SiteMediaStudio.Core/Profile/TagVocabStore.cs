@@ -68,7 +68,10 @@ public static class TagVocabStore
     public static void Remember(string workspaceRoot, string channel, string tag, string? path = null)
     {
         var text = (tag ?? "").Trim();
-        if (text.Length == 0 || !PhotoFactRules.TryNormalizeTags(new[] { text }, out _, out _))
+        var accepted = NoteRules.IsNotesChannel(channel)
+            ? NoteTagRules.CanRemember(text)
+            : text.Length > 0 && PhotoFactRules.TryNormalizeTags(new[] { text }, out _, out _);
+        if (!accepted)
         {
             return;
         }
