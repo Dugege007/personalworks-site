@@ -1,0 +1,252 @@
+/* 一页 A4 投递稿。边距只放在 @page，避免和 Playwright margin 叠成两页。 */
+
+@page {
+  size: A4 portrait;
+  margin: 12mm 13mm 12mm 13mm;
+}
+
+html[data-resume-print],
+html[data-resume-print] body,
+html[data-resume-print] #root {
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+  background: #e6e6e6;
+  color: #1a1c1f;
+}
+
+html[data-resume-print] #boot-gate,
+html[data-resume-print] .grain,
+html[data-resume-print] .stage,
+html[data-resume-print] .header {
+  display: none !important;
+}
+
+.resume-print {
+  box-sizing: border-box;
+  margin: 0;
+  color: #1a1c1f;
+  background: #fff;
+  font-family: "Noto Sans SC", "Noto Sans CJK SC", "Noto Sans CJK", "Source Han Sans SC", "PingFang SC",
+    "Microsoft YaHei", sans-serif;
+  font-size: 11pt;
+  font-weight: 400;
+  line-height: 1.48;
+  letter-spacing: 0;
+}
+
+.resume-print * {
+  box-sizing: border-box;
+}
+
+.resume-print h1,
+.resume-print h2,
+.resume-print p,
+.resume-print ul,
+.resume-print ol {
+  margin: 0;
+}
+
+.resume-print a {
+  color: #1a3e72;
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.resume-print a.is-short {
+  white-space: nowrap;
+}
+
+.resume-print-header {
+  padding-bottom: 4mm;
+  border-bottom: 0.35mm solid #1a1c1f;
+}
+
+.resume-print-id {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6mm;
+}
+
+.resume-print-name {
+  font-size: 22pt;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.14em;
+}
+
+.resume-print-en {
+  margin: 0;
+  color: #3a4046;
+  font-size: 10.5pt;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  white-space: nowrap;
+}
+
+.resume-print-role {
+  margin-top: 2.2mm;
+  font-size: 12pt;
+  line-height: 1.4;
+}
+
+.resume-print-contacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6mm 4.5mm;
+  margin-top: 1.8mm;
+  padding: 0;
+  list-style: none;
+  color: #2a2e33;
+  font-size: 9pt;
+}
+
+.resume-print-kicker {
+  margin-right: 1.2mm;
+  color: #5c636b;
+}
+
+.resume-print-site {
+  margin-top: 1.2mm;
+  font-size: 9pt;
+}
+
+.resume-print-split {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  column-gap: 8mm;
+  align-items: start;
+}
+
+.resume-print-foot {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  column-gap: 8mm;
+  margin-top: 5.5mm;
+  align-items: start;
+}
+
+.resume-print-foot > .resume-print-block,
+.resume-print-foot > div > .resume-print-block:first-child {
+  margin-top: 0;
+}
+
+.resume-print-block {
+  margin-top: 5mm;
+}
+
+.resume-print-block h2 {
+  margin: 0 0 2.2mm;
+  padding-bottom: 0.8mm;
+  border-bottom: 0.25mm solid #c5c8cc;
+  font-size: 12pt;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.14em;
+}
+
+.resume-print-jobs,
+.resume-print-skills,
+.resume-print-schools {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.resume-print-jobs,
+.resume-print-schools {
+  display: grid;
+  gap: 3.8mm;
+}
+
+.resume-print-job-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4mm;
+}
+
+.resume-print-job-head strong {
+  font-size: 10.5pt;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.resume-print-job-head time {
+  flex: 0 0 auto;
+  color: #3a4046;
+  font-size: 9pt;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.resume-print-org {
+  margin-top: 0.3mm;
+  color: #2a2e33;
+  font-size: 9.5pt;
+}
+
+.resume-print-body,
+.resume-print-line,
+.resume-print-more,
+.resume-print-skills li {
+  color: #1f2328;
+  font-size: 10.5pt;
+  line-height: 1.45;
+  white-space: pre-line;
+}
+
+.resume-print-body {
+  margin-top: 0.8mm;
+}
+
+.resume-print-skills {
+  display: grid;
+  gap: 1.8mm;
+}
+
+.resume-print-skills li {
+  padding-left: 3.2mm;
+  text-indent: -3.2mm;
+}
+
+.resume-print-skills li::before {
+  content: "·";
+  margin-right: 1.4mm;
+}
+
+.resume-print-more {
+  margin-top: 1.4mm;
+}
+
+.resume-print-job {
+  break-inside: avoid;
+}
+
+@media screen {
+  .resume-print {
+    width: 210mm;
+    min-height: 297mm;
+    margin: 12px auto;
+    padding: 12mm 13mm;
+    box-shadow: 0 10px 28px rgba(22, 24, 28, 0.12);
+  }
+}
+
+@media print {
+  html[data-resume-print],
+  html[data-resume-print] body,
+  html[data-resume-print] #root {
+    background: #fff !important;
+    overflow: visible !important;
+  }
+
+  .resume-print {
+    width: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+}

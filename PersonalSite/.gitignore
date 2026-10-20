@@ -63,3 +63,6 @@ Desktop.ini
 *.zip
 *.7z
 *.rar
+
+# 本地导出的一页简历 PDF，不随站点部署
+artifacts/
