@@ -2,6 +2,33 @@
   "version": 2,
   "notes": [
     {
+      "folder": "20261021_205600",
+      "slug": "n-20261021-205600",
+      "title": "RANSAC：用随机抽样一致性从飞点里捞出真直线",
+      "date": "2026-10-21",
+      "summary": "用 RANSAC 在含约三分之一飞点的二维点集上拟合直线，并与普通最小二乘对照斜率与截距误差。",
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "/notes-assets/n-20261021-205600/ransac_line_fit_demo.png"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "RANSAC",
+          "鲁棒估计",
+          "点云标定",
+          "数字孪生"
+        ],
+        "displayName": "",
+        "description": "用 RANSAC 在含约三分之一飞点的二维点集上拟合直线，并与普通最小二乘对照斜率与截距误差。"
+      },
+      "images": [
+        "/notes-assets/n-20261021-205600/ransac_line_fit_demo.png"
+      ]
+    },
+    {
       "folder": "20261020_205600",
       "slug": "n-20261020-205600",
       "title": "粒子滤波：用一群假设应对多峰观测与非线性状态估计",
