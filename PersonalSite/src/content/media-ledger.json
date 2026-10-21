@@ -7439,6 +7439,12 @@
       "stageRel": "心得（notes）/20261019_205600/.site-ready/images/thompson_sampling_demo.webp",
       "status": "published",
       "sourceStageRel": "心得（notes）/20261019_205600/images/thompson_sampling_demo.png"
+    },
+    {
+      "object": "notes/n-20261020-205600/images/particle_filter_demo.webp",
+      "stageRel": "心得（notes）/20261020_205600/.site-ready/images/particle_filter_demo.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261020_205600/images/particle_filter_demo.png"
     }
   ]
 }

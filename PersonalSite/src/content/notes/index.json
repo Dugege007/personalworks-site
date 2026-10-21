@@ -2,10 +2,699 @@
   "version": 2,
   "notes": [
     {
+      "folder": "20261020_205600",
+      "slug": "n-20261020-205600",
+      "title": "粒子滤波：用一群假设应对多峰观测与非线性状态估计",
+      "mainTitle": "粒子滤波",
+      "subtitle": "用一群假设应对多峰观测与非线性状态估计",
+      "date": "2026-10-20",
+      "createdAt": "2026-10-20 20:56:00",
+      "revisedAt": "2026-10-21 09:37:30",
+      "summary": "用 SIR 粒子滤波在多径／离群测距下估计一维轨道位置，并与线性高斯卡尔曼对照 RMSE。",
+      "revisions": [
+        {
+          "at": "2026-10-21 09:37:30",
+          "summary": "上页发布",
+          "source": "manual"
+        }
+      ],
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "notes/n-20261020-205600/images/particle_filter_demo.webp"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "粒子滤波",
+          "序贯蒙特卡洛",
+          "状态估计",
+          "数字孪生",
+          "AI写作"
+        ],
+        "displayName": "",
+        "description": "用 SIR 粒子滤波在多径／离群测距下估计一维轨道位置，并与线性高斯卡尔曼对照 RMSE。"
+      },
+      "images": [
+        {
+          "stageRel": "心得（notes）/20261020_205600/images/particle_filter_demo.png",
+          "objectKey": "notes/n-20261020-205600/images/particle_filter_demo.webp",
+          "stars": 0,
+          "tags": [],
+          "displayName": "",
+          "description": "",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "folder": "20261019_205600",
+      "slug": "n-20261019-205600",
+      "title": "汤普森采样——用后验抽样做探索与利用的概率匹配",
+      "mainTitle": "汤普森采样",
+      "subtitle": "用后验抽样做探索与利用的概率匹配",
+      "date": "2026-10-19",
+      "createdAt": "2026-10-19 20:56:00",
+      "revisedAt": "2026-10-20 00:24:49",
+      "summary": "在 Bernoulli 多臂老虎机上用汤普森采样做后验概率匹配，并与 ε-greedy、UCB1 对照累计遗憾。",
+      "revisions": [
+        {
+          "at": "2026-10-20 00:24:49",
+          "summary": "更新标题",
+          "source": "manual"
+        }
+      ],
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "notes/n-20261019-205600/images/thompson_sampling_demo.webp"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "AI写作",
+          "算法"
+        ],
+        "displayName": "",
+        "description": ""
+      },
+      "images": [
+        {
+          "stageRel": "心得（notes）/20261019_205600/images/thompson_sampling_demo.png",
+          "objectKey": "notes/n-20261019-205600/images/thompson_sampling_demo.webp",
+          "stars": 0,
+          "tags": [],
+          "displayName": "",
+          "description": "",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "folder": "20261018_205600",
+      "slug": "n-20261018-205600",
+      "title": "快速傅里叶变换——从振动波形里抠出轴承故障频率",
+      "mainTitle": "快速傅里叶变换",
+      "subtitle": "从振动波形里抠出轴承故障频率",
+      "date": "2026-10-18",
+      "createdAt": "2026-10-18 20:56:00",
+      "revisedAt": "2026-10-20 00:30:04",
+      "summary": "用快速傅里叶变换把振动波形转到频域，对照轴承故障特征频率做简易诊断演示。",
+      "revisions": [
+        {
+          "at": "2026-10-20 00:30:04",
+          "summary": "更新标题",
+          "source": "manual"
+        }
+      ],
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "notes/n-20261018-205600/fft_vibration_fault_demo.webp"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "信号处理",
+          "FFT",
+          "预测性维护",
+          "AI写作"
+        ],
+        "displayName": "",
+        "description": "用快速傅里叶变换把振动波形转到频域，对照轴承故障特征频率做简易诊断演示。"
+      },
+      "images": [
+        {
+          "stageRel": "心得（notes）/20261018_205600/fft_vibration_fault_demo.png",
+          "objectKey": "notes/n-20261018-205600/fft_vibration_fault_demo.webp",
+          "stars": 0,
+          "tags": [],
+          "displayName": "",
+          "description": "",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "folder": "20261017_205600",
+      "slug": "n-20261017-205600",
+      "title": "有向距离场与球面追踪——只用一个距离函数画出三维零件",
+      "mainTitle": "有向距离场与球面追踪",
+      "subtitle": "只用一个距离函数画出三维零件",
+      "date": "2026-10-17",
+      "createdAt": "2026-10-17 20:56:00",
+      "revisedAt": "2026-10-20 00:29:57",
+      "summary": "介绍有向距离场与球面追踪：用单个距离函数完成渲染，并可复用到碰撞与间隙检查。",
+      "revisions": [
+        {
+          "at": "2026-10-20 00:29:57",
+          "summary": "更新标题",
+          "source": "manual"
+        }
+      ],
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "notes/n-20261017-205600/sdf_sphere_tracing_render.webp",
+        "notes/n-20261017-205600/sdf_sphere_tracing_2d.webp"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "图形学",
+          "SDF",
+          "球面追踪",
+          "AI写作"
+        ],
+        "displayName": "",
+        "description": "介绍有向距离场与球面追踪：用单个距离函数完成渲染，并可复用到碰撞与间隙检查。"
+      },
+      "images": [
+        {
+          "stageRel": "心得（notes）/20261017_205600/sdf_sphere_tracing_2d.png",
+          "objectKey": "notes/n-20261017-205600/sdf_sphere_tracing_2d.webp",
+          "stars": 0,
+          "tags": [],
+          "displayName": "",
+          "description": "",
+          "hidden": false
+        },
+        {
+          "stageRel": "心得（notes）/20261017_205600/sdf_sphere_tracing_render.png",
+          "objectKey": "notes/n-20261017-205600/sdf_sphere_tracing_render.webp",
+          "stars": 0,
+          "tags": [],
+          "displayName": "",
+          "description": "",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "folder": "20261016_205600",
+      "slug": "n-20261016-205600",
+      "title": "Platt scaling——把分类分数收成可用概率",
+      "mainTitle": "Platt scaling",
+      "subtitle": "把分类分数收成可用概率",
+      "date": "2026-10-16",
+      "createdAt": "2026-10-16 20:56:00",
+      "revisedAt": "2026-10-20 00:29:48",
+      "summary": "用 sigmoid 形式的 Platt 标定把分类器分数校准成接近真实频率的概率，并给出可靠性图示例。",
+      "revisions": [
+        {
+          "at": "2026-10-20 00:29:48",
+          "summary": "更新标题",
+          "source": "manual"
+        }
+      ],
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "notes/n-20261016-205600/platt_scaling_reliability.webp"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "概率标定",
+          "机器学习",
+          "Platt",
+          "AI写作"
+        ],
+        "displayName": "",
+        "description": "用 sigmoid 形式的 Platt 标定把分类器分数校准成接近真实频率的概率，并给出可靠性图示例。"
+      },
+      "images": [
+        {
+          "stageRel": "心得（notes）/20261016_205600/platt_scaling_reliability.png",
+          "objectKey": "notes/n-20261016-205600/platt_scaling_reliability.webp",
+          "stars": 0,
+          "tags": [],
+          "displayName": "",
+          "description": "",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "folder": "20261015_205600",
+      "slug": "n-20261015-205600",
+      "title": "加法型 Holt–Winters——带趋势与季节的三次指数平滑",
+      "mainTitle": "加法型 Holt–Winters",
+      "subtitle": "带趋势与季节的三次指数平滑",
+      "date": "2026-10-15",
+      "createdAt": "2026-10-15 20:56:00",
+      "revisedAt": "2026-10-20 00:29:37",
+      "summary": "讲解加法型 Holt–Winters 三次指数平滑：在水平项之外加入趋势与季节，用于需求与产能形态预测。",
+      "revisions": [
+        {
+          "at": "2026-10-20 00:29:37",
+          "summary": "更新标题",
+          "source": "manual"
+        }
+      ],
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "notes/n-20261015-205600/holt_winters_demo.webp"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "时间序列",
+          "Holt-Winters",
+          "预测",
+          "AI写作"
+        ],
+        "displayName": "",
+        "description": "讲解加法型 Holt–Winters 三次指数平滑：在水平项之外加入趋势与季节，用于需求与产能形态预测。"
+      },
+      "images": [
+        {
+          "stageRel": "心得（notes）/20261015_205600/holt_winters_demo.png",
+          "objectKey": "notes/n-20261015-205600/holt_winters_demo.webp",
+          "stars": 0,
+          "tags": [],
+          "displayName": "",
+          "description": "",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "folder": "20261014_205600",
+      "slug": "n-20261014-205600",
+      "title": "表格型 CUSUM——抓住过程均值的小幅持续偏移",
+      "mainTitle": "表格型 CUSUM",
+      "subtitle": "抓住过程均值的小幅持续偏移",
+      "date": "2026-10-14",
+      "createdAt": "2026-10-14 20:56:00",
+      "revisedAt": "2026-10-20 00:29:29",
+      "summary": "介绍表格型累积和控制图，说明如何对小而持续的均值阶跃比 Shewhart 更早报警。",
+      "revisions": [
+        {
+          "at": "2026-10-20 00:29:29",
+          "summary": "更新标题",
+          "source": "manual"
+        }
+      ],
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "notes/n-20261014-205600/cusum_demo.webp"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "统计过程控制",
+          "CUSUM",
+          "数字孪生",
+          "AI写作"
+        ],
+        "displayName": "",
+        "description": "介绍表格型累积和控制图，说明如何对小而持续的均值阶跃比 Shewhart 更早报警。"
+      },
+      "images": [
+        {
+          "stageRel": "心得（notes）/20261014_205600/cusum_demo.png",
+          "objectKey": "notes/n-20261014-205600/cusum_demo.webp",
+          "stars": 0,
+          "tags": [],
+          "displayName": "",
+          "description": "",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "folder": "20261013_205600",
+      "slug": "n-20261013-205600",
+      "title": "单调双端队列——O(n) 求滑动窗口最大值和最小值",
+      "mainTitle": "单调双端队列",
+      "subtitle": "O(n) 求滑动窗口最大值和最小值",
+      "date": "2026-10-13",
+      "createdAt": "2026-10-13 20:56:00",
+      "revisedAt": "2026-10-20 00:29:23",
+      "summary": "讲解单调双端队列在滑动窗口最大／最小值问题上的 O(n) 解法，并联系传感器与行情窗口统计。",
+      "revisions": [
+        {
+          "at": "2026-10-20 00:29:22",
+          "summary": "更新标题",
+          "source": "manual"
+        },
+        {
+          "at": "2026-10-20 00:29:23",
+          "summary": "更新标题",
+          "source": "manual"
+        }
+      ],
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "notes/n-20261013-205600/monotonic_deque_demo.webp"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "数据结构",
+          "滑动窗口",
+          "单调队列",
+          "AI写作"
+        ],
+        "displayName": "",
+        "description": "讲解单调双端队列在滑动窗口最大／最小值问题上的 O(n) 解法，并联系传感器与行情窗口统计。"
+      },
+      "images": [
+        {
+          "stageRel": "心得（notes）/20261013_205600/monotonic_deque_demo.png",
+          "objectKey": "notes/n-20261013-205600/monotonic_deque_demo.webp",
+          "stars": 0,
+          "tags": [],
+          "displayName": "",
+          "description": "",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "folder": "20261012_205600",
+      "slug": "n-20261012-205600",
+      "title": "Little 定律与 M/M/1——产线工位拥堵、在制品与产能粗算",
+      "mainTitle": "Little 定律与 M/M/1",
+      "subtitle": "产线工位拥堵、在制品与产能粗算",
+      "date": "2026-10-12",
+      "createdAt": "2026-10-12 20:56:00",
+      "revisedAt": "2026-10-20 00:29:15",
+      "summary": "用 Little 定律与 M/M/1 排队模型粗算在制品、周期时间与工位拥堵，解释利用率接近满载时的排队暴涨。",
+      "revisions": [
+        {
+          "at": "2026-10-20 00:29:15",
+          "summary": "更新标题",
+          "source": "manual"
+        }
+      ],
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "notes/n-20261012-205600/littles_law_mm1_demo.webp"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "排队论",
+          "数字孪生",
+          "产线",
+          "产能",
+          "AI写作"
+        ],
+        "displayName": "",
+        "description": "用 Little 定律与 M/M/1 排队模型粗算在制品、周期时间与工位拥堵，解释利用率接近满载时的排队暴涨。"
+      },
+      "images": [
+        {
+          "stageRel": "心得（notes）/20261012_205600/littles_law_mm1_demo.png",
+          "objectKey": "notes/n-20261012-205600/littles_law_mm1_demo.webp",
+          "stars": 0,
+          "tags": [],
+          "displayName": "",
+          "description": "",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "folder": "20261011_205600",
+      "slug": "n-20261011-205600",
+      "title": "独立泊松比分模型（Maher 1982）——用攻防强度拆开足球比分概率",
+      "mainTitle": "独立泊松比分模型（Maher 1982）",
+      "subtitle": "用攻防强度拆开足球比分概率",
+      "date": "2026-10-11",
+      "createdAt": "2026-10-11 20:56:00",
+      "revisedAt": "2026-10-20 00:29:08",
+      "summary": "用独立泊松模型由攻防强度与主场优势估计进球期望，再汇总成比分矩阵与胜平负概率。",
+      "revisions": [
+        {
+          "at": "2026-10-20 00:29:08",
+          "summary": "更新标题",
+          "source": "manual"
+        }
+      ],
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "notes/n-20261011-205600/independent_poisson_football_demo.webp"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "足球预测",
+          "泊松分布",
+          "概率模型",
+          "AI写作"
+        ],
+        "displayName": "",
+        "description": "用独立泊松模型由攻防强度与主场优势估计进球期望，再汇总成比分矩阵与胜平负概率。"
+      },
+      "images": [
+        {
+          "stageRel": "心得（notes）/20261011_205600/independent_poisson_football_demo.png",
+          "objectKey": "notes/n-20261011-205600/independent_poisson_football_demo.webp",
+          "stars": 0,
+          "tags": [],
+          "displayName": "",
+          "description": "",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "folder": "20261009_205600",
+      "slug": "n-20261009-205600",
+      "title": "孤立森林（Isolation Forest）——用随机切分把异常「隔离」出来",
+      "mainTitle": "孤立森林（Isolation Forest）",
+      "subtitle": "用随机切分把异常「隔离」出来",
+      "date": "2026-10-09",
+      "createdAt": "2026-10-09 20:56:00",
+      "revisedAt": "2026-10-20 00:29:00",
+      "summary": "介绍无监督异常检测算法孤立森林：用随机轴对齐切分更快隔离稀疏离群点，并配合产线多传感器演示。",
+      "revisions": [
+        {
+          "at": "2026-10-20 00:29:00",
+          "summary": "更新标题",
+          "source": "manual"
+        }
+      ],
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "notes/n-20261009-205600/isolation_forest_demo.webp"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "机器学习",
+          "异常检测",
+          "孤立森林",
+          "数字孪生",
+          "AI写作"
+        ],
+        "displayName": "",
+        "description": "介绍无监督异常检测算法孤立森林：用随机轴对齐切分更快隔离稀疏离群点，并配合产线多传感器演示。"
+      },
+      "images": [
+        {
+          "stageRel": "心得（notes）/20261009_205600/isolation_forest_demo.png",
+          "objectKey": "notes/n-20261009-205600/isolation_forest_demo.webp",
+          "stars": 0,
+          "tags": [],
+          "displayName": "",
+          "description": "",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "folder": "20261008_205600",
+      "slug": "n-20261008-205600",
+      "title": "卡尔曼滤波（一维）——传感器噪声下的状态估计与一步预测",
+      "mainTitle": "卡尔曼滤波（一维）",
+      "subtitle": "传感器噪声下的状态估计与一步预测",
+      "date": "2026-10-08",
+      "createdAt": "2026-10-08 20:56:00",
+      "revisedAt": "2026-10-20 00:28:53",
+      "summary": "用一维卡尔曼滤波把过程模型与带噪观测合成状态估计，并给出可跑示例与轨迹图。",
+      "revisions": [
+        {
+          "at": "2026-10-20 00:28:49",
+          "summary": "更新标题",
+          "source": "manual"
+        },
+        {
+          "at": "2026-10-20 00:28:50",
+          "summary": "更新标题",
+          "source": "manual"
+        },
+        {
+          "at": "2026-10-20 00:28:53",
+          "summary": "更新标题",
+          "source": "manual"
+        }
+      ],
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "notes/n-20261008-205600/kalman_1d.webp"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "状态估计",
+          "卡尔曼滤波",
+          "数字孪生",
+          "传感器",
+          "AI写作"
+        ],
+        "displayName": "",
+        "description": "用一维卡尔曼滤波把过程模型与带噪观测合成状态估计，并给出可跑示例与轨迹图。"
+      },
+      "images": [
+        {
+          "stageRel": "心得（notes）/20261008_205600/kalman_1d.png",
+          "objectKey": "notes/n-20261008-205600/kalman_1d.webp",
+          "stars": 0,
+          "tags": [],
+          "displayName": "",
+          "description": "",
+          "hidden": false
+        }
+      ]
+    },
+    {
+      "folder": "20261008_120000",
+      "slug": "n-20261008-120000",
+      "title": "MAPF多AGV寻路",
+      "mainTitle": "MAPF多AGV寻路",
+      "subtitle": "",
+      "date": "2026-10-08",
+      "createdAt": "2026-10-08 12:00:00",
+      "revisedAt": "2026-10-20 00:28:44",
+      "summary": "从单车 A* 升级到多智能体路径规划（MAPF），拆解冲突搜索（CBS）的高低两层，并用窄廊换位例子说明让路代价。",
+      "revisions": [
+        {
+          "at": "2026-10-20 00:28:15",
+          "summary": "更新标题",
+          "source": "manual"
+        },
+        {
+          "at": "2026-10-20 00:28:44",
+          "summary": "更新标题",
+          "source": "manual"
+        }
+      ],
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "路径规划",
+          "MAPF",
+          "CBS",
+          "数字孪生",
+          "AGV",
+          "AI写作"
+        ],
+        "displayName": "",
+        "description": "从单车 A* 升级到多智能体路径规划（MAPF），拆解冲突搜索（CBS）的高低两层，并用窄廊换位例子说明让路代价。"
+      },
+      "images": []
+    },
+    {
+      "folder": "20261007_205600",
+      "slug": "n-20261007-205600",
+      "title": "A* 寻路——一边算走了多远，一边估还剩多远",
+      "mainTitle": "A* 寻路",
+      "subtitle": "一边算走了多远，一边估还剩多远",
+      "date": "2026-10-07",
+      "createdAt": "2026-10-07 20:56:00",
+      "revisedAt": "2026-10-20 00:27:58",
+      "summary": "讲解 A* 寻路的 g、h、f 代价与启发函数，并用车间 AGV 栅格示例说明实现要点。",
+      "revisions": [
+        {
+          "at": "2026-10-20 00:27:58",
+          "summary": "更新标题",
+          "source": "manual"
+        }
+      ],
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "路径规划",
+          "A*",
+          "数字孪生",
+          "AGV",
+          "AI写作"
+        ],
+        "displayName": "",
+        "description": "讲解 A* 寻路的 g、h、f 代价与启发函数，并用车间 AGV 栅格示例说明实现要点。"
+      },
+      "images": []
+    },
+    {
+      "folder": "20261007_015206",
+      "slug": "n-20261007-015206",
+      "title": "指数加权移动平均（EWMA）控制图——产线传感器时序的早期异常察觉",
+      "mainTitle": "指数加权移动平均（EWMA）控制图",
+      "subtitle": "产线传感器时序的早期异常察觉",
+      "date": "2026-10-07",
+      "createdAt": "2026-10-07 01:52:06",
+      "revisedAt": "2026-10-20 00:27:51",
+      "summary": "",
+      "revisions": [
+        {
+          "at": "2026-10-20 00:27:51",
+          "summary": "更新标题",
+          "source": "manual"
+        }
+      ],
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "统计过程控制",
+          "数字孪生",
+          "时序",
+          "异常检测",
+          "AI写作"
+        ],
+        "displayName": "",
+        "description": "用指数加权移动平均控制图监控产线传感器的缓慢漂移，并说明如何对预测残差做在线告警。适合数字孪生与统计过程控制场景。"
+      },
+      "images": []
+    },
+    {
       "folder": "20261005_021341",
       "slug": "n-20261005-021341",
-      "title": "\u6D4B\u8BD5",
-      "mainTitle": "\u6D4B\u8BD5",
+      "title": "测试",
+      "mainTitle": "测试",
       "subtitle": "",
       "date": "2026-10-05",
       "createdAt": "2026-10-05 02:13:41",
@@ -28,648 +717,6 @@
         "description": ""
       },
       "images": []
-    },
-    {
-      "folder": "20261007_015206",
-      "slug": "n-20261007-015206",
-      "title": "\u6307\u6570\u52A0\u6743\u79FB\u52A8\u5E73\u5747\uFF08EWMA\uFF09\u63A7\u5236\u56FE\u2014\u2014\u4EA7\u7EBF\u4F20\u611F\u5668\u65F6\u5E8F\u7684\u65E9\u671F\u5F02\u5E38\u5BDF\u89C9",
-      "mainTitle": "\u6307\u6570\u52A0\u6743\u79FB\u52A8\u5E73\u5747\uFF08EWMA\uFF09\u63A7\u5236\u56FE",
-      "subtitle": "\u4EA7\u7EBF\u4F20\u611F\u5668\u65F6\u5E8F\u7684\u65E9\u671F\u5F02\u5E38\u5BDF\u89C9",
-      "date": "2026-10-07",
-      "createdAt": "2026-10-07 01:52:06",
-      "revisedAt": "2026-10-20 00:27:51",
-      "summary": "",
-      "revisions": [
-        {
-          "at": "2026-10-20 00:27:51",
-          "summary": "\u66F4\u65B0\u6807\u9898",
-          "source": "manual"
-        }
-      ],
-      "draft": false,
-      "hidden": false,
-      "previewObjects": [],
-      "body": {
-        "stars": 0,
-        "tags": [
-          "\u7B97\u6CD5",
-          "\u7EDF\u8BA1\u8FC7\u7A0B\u63A7\u5236",
-          "\u6570\u5B57\u5B6A\u751F",
-          "\u65F6\u5E8F",
-          "\u5F02\u5E38\u68C0\u6D4B",
-          "AI\u5199\u4F5C"
-        ],
-        "displayName": "",
-        "description": "\u7528\u6307\u6570\u52A0\u6743\u79FB\u52A8\u5E73\u5747\u63A7\u5236\u56FE\u76D1\u63A7\u4EA7\u7EBF\u4F20\u611F\u5668\u7684\u7F13\u6162\u6F02\u79FB\uFF0C\u5E76\u8BF4\u660E\u5982\u4F55\u5BF9\u9884\u6D4B\u6B8B\u5DEE\u505A\u5728\u7EBF\u544A\u8B66\u3002\u9002\u5408\u6570\u5B57\u5B6A\u751F\u4E0E\u7EDF\u8BA1\u8FC7\u7A0B\u63A7\u5236\u573A\u666F\u3002"
-      },
-      "images": []
-    },
-    {
-      "folder": "20261007_205600",
-      "slug": "n-20261007-205600",
-      "title": "A* \u5BFB\u8DEF\u2014\u2014\u4E00\u8FB9\u7B97\u8D70\u4E86\u591A\u8FDC\uFF0C\u4E00\u8FB9\u4F30\u8FD8\u5269\u591A\u8FDC",
-      "mainTitle": "A* \u5BFB\u8DEF",
-      "subtitle": "\u4E00\u8FB9\u7B97\u8D70\u4E86\u591A\u8FDC\uFF0C\u4E00\u8FB9\u4F30\u8FD8\u5269\u591A\u8FDC",
-      "date": "2026-10-07",
-      "createdAt": "2026-10-07 20:56:00",
-      "revisedAt": "2026-10-20 00:27:58",
-      "summary": "\u8BB2\u89E3 A* \u5BFB\u8DEF\u7684 g\u3001h\u3001f \u4EE3\u4EF7\u4E0E\u542F\u53D1\u51FD\u6570\uFF0C\u5E76\u7528\u8F66\u95F4 AGV \u6805\u683C\u793A\u4F8B\u8BF4\u660E\u5B9E\u73B0\u8981\u70B9\u3002",
-      "revisions": [
-        {
-          "at": "2026-10-20 00:27:58",
-          "summary": "\u66F4\u65B0\u6807\u9898",
-          "source": "manual"
-        }
-      ],
-      "draft": false,
-      "hidden": false,
-      "previewObjects": [],
-      "body": {
-        "stars": 0,
-        "tags": [
-          "\u7B97\u6CD5",
-          "\u8DEF\u5F84\u89C4\u5212",
-          "A*",
-          "\u6570\u5B57\u5B6A\u751F",
-          "AGV",
-          "AI\u5199\u4F5C"
-        ],
-        "displayName": "",
-        "description": "\u8BB2\u89E3 A* \u5BFB\u8DEF\u7684 g\u3001h\u3001f \u4EE3\u4EF7\u4E0E\u542F\u53D1\u51FD\u6570\uFF0C\u5E76\u7528\u8F66\u95F4 AGV \u6805\u683C\u793A\u4F8B\u8BF4\u660E\u5B9E\u73B0\u8981\u70B9\u3002"
-      },
-      "images": []
-    },
-    {
-      "folder": "20261008_120000",
-      "slug": "n-20261008-120000",
-      "title": "MAPF\u591AAGV\u5BFB\u8DEF",
-      "mainTitle": "MAPF\u591AAGV\u5BFB\u8DEF",
-      "subtitle": "",
-      "date": "2026-10-08",
-      "createdAt": "2026-10-08 12:00:00",
-      "revisedAt": "2026-10-20 00:28:44",
-      "summary": "\u4ECE\u5355\u8F66 A* \u5347\u7EA7\u5230\u591A\u667A\u80FD\u4F53\u8DEF\u5F84\u89C4\u5212\uFF08MAPF\uFF09\uFF0C\u62C6\u89E3\u51B2\u7A81\u641C\u7D22\uFF08CBS\uFF09\u7684\u9AD8\u4F4E\u4E24\u5C42\uFF0C\u5E76\u7528\u7A84\u5ECA\u6362\u4F4D\u4F8B\u5B50\u8BF4\u660E\u8BA9\u8DEF\u4EE3\u4EF7\u3002",
-      "revisions": [
-        {
-          "at": "2026-10-20 00:28:15",
-          "summary": "\u66F4\u65B0\u6807\u9898",
-          "source": "manual"
-        },
-        {
-          "at": "2026-10-20 00:28:44",
-          "summary": "\u66F4\u65B0\u6807\u9898",
-          "source": "manual"
-        }
-      ],
-      "draft": false,
-      "hidden": false,
-      "previewObjects": [],
-      "body": {
-        "stars": 0,
-        "tags": [
-          "\u7B97\u6CD5",
-          "\u8DEF\u5F84\u89C4\u5212",
-          "MAPF",
-          "CBS",
-          "\u6570\u5B57\u5B6A\u751F",
-          "AGV",
-          "AI\u5199\u4F5C"
-        ],
-        "displayName": "",
-        "description": "\u4ECE\u5355\u8F66 A* \u5347\u7EA7\u5230\u591A\u667A\u80FD\u4F53\u8DEF\u5F84\u89C4\u5212\uFF08MAPF\uFF09\uFF0C\u62C6\u89E3\u51B2\u7A81\u641C\u7D22\uFF08CBS\uFF09\u7684\u9AD8\u4F4E\u4E24\u5C42\uFF0C\u5E76\u7528\u7A84\u5ECA\u6362\u4F4D\u4F8B\u5B50\u8BF4\u660E\u8BA9\u8DEF\u4EE3\u4EF7\u3002"
-      },
-      "images": []
-    },
-    {
-      "folder": "20261008_205600",
-      "slug": "n-20261008-205600",
-      "title": "\u5361\u5C14\u66FC\u6EE4\u6CE2\uFF08\u4E00\u7EF4\uFF09\u2014\u2014\u4F20\u611F\u5668\u566A\u58F0\u4E0B\u7684\u72B6\u6001\u4F30\u8BA1\u4E0E\u4E00\u6B65\u9884\u6D4B",
-      "mainTitle": "\u5361\u5C14\u66FC\u6EE4\u6CE2\uFF08\u4E00\u7EF4\uFF09",
-      "subtitle": "\u4F20\u611F\u5668\u566A\u58F0\u4E0B\u7684\u72B6\u6001\u4F30\u8BA1\u4E0E\u4E00\u6B65\u9884\u6D4B",
-      "date": "2026-10-08",
-      "createdAt": "2026-10-08 20:56:00",
-      "revisedAt": "2026-10-20 00:28:53",
-      "summary": "\u7528\u4E00\u7EF4\u5361\u5C14\u66FC\u6EE4\u6CE2\u628A\u8FC7\u7A0B\u6A21\u578B\u4E0E\u5E26\u566A\u89C2\u6D4B\u5408\u6210\u72B6\u6001\u4F30\u8BA1\uFF0C\u5E76\u7ED9\u51FA\u53EF\u8DD1\u793A\u4F8B\u4E0E\u8F68\u8FF9\u56FE\u3002",
-      "revisions": [
-        {
-          "at": "2026-10-20 00:28:49",
-          "summary": "\u66F4\u65B0\u6807\u9898",
-          "source": "manual"
-        },
-        {
-          "at": "2026-10-20 00:28:50",
-          "summary": "\u66F4\u65B0\u6807\u9898",
-          "source": "manual"
-        },
-        {
-          "at": "2026-10-20 00:28:53",
-          "summary": "\u66F4\u65B0\u6807\u9898",
-          "source": "manual"
-        }
-      ],
-      "draft": false,
-      "hidden": false,
-      "previewObjects": [
-        "notes/n-20261008-205600/kalman_1d.webp"
-      ],
-      "body": {
-        "stars": 0,
-        "tags": [
-          "\u7B97\u6CD5",
-          "\u72B6\u6001\u4F30\u8BA1",
-          "\u5361\u5C14\u66FC\u6EE4\u6CE2",
-          "\u6570\u5B57\u5B6A\u751F",
-          "\u4F20\u611F\u5668",
-          "AI\u5199\u4F5C"
-        ],
-        "displayName": "",
-        "description": "\u7528\u4E00\u7EF4\u5361\u5C14\u66FC\u6EE4\u6CE2\u628A\u8FC7\u7A0B\u6A21\u578B\u4E0E\u5E26\u566A\u89C2\u6D4B\u5408\u6210\u72B6\u6001\u4F30\u8BA1\uFF0C\u5E76\u7ED9\u51FA\u53EF\u8DD1\u793A\u4F8B\u4E0E\u8F68\u8FF9\u56FE\u3002"
-      },
-      "images": [
-        {
-          "stageRel": "\u5FC3\u5F97\uFF08notes\uFF09/20261008_205600/kalman_1d.png",
-          "objectKey": "notes/n-20261008-205600/kalman_1d.webp",
-          "stars": 0,
-          "tags": [],
-          "displayName": "",
-          "description": "",
-          "hidden": false
-        }
-      ]
-    },
-    {
-      "folder": "20261009_205600",
-      "slug": "n-20261009-205600",
-      "title": "\u5B64\u7ACB\u68EE\u6797\uFF08Isolation Forest\uFF09\u2014\u2014\u7528\u968F\u673A\u5207\u5206\u628A\u5F02\u5E38\u300C\u9694\u79BB\u300D\u51FA\u6765",
-      "mainTitle": "\u5B64\u7ACB\u68EE\u6797\uFF08Isolation Forest\uFF09",
-      "subtitle": "\u7528\u968F\u673A\u5207\u5206\u628A\u5F02\u5E38\u300C\u9694\u79BB\u300D\u51FA\u6765",
-      "date": "2026-10-09",
-      "createdAt": "2026-10-09 20:56:00",
-      "revisedAt": "2026-10-20 00:29:00",
-      "summary": "\u4ECB\u7ECD\u65E0\u76D1\u7763\u5F02\u5E38\u68C0\u6D4B\u7B97\u6CD5\u5B64\u7ACB\u68EE\u6797\uFF1A\u7528\u968F\u673A\u8F74\u5BF9\u9F50\u5207\u5206\u66F4\u5FEB\u9694\u79BB\u7A00\u758F\u79BB\u7FA4\u70B9\uFF0C\u5E76\u914D\u5408\u4EA7\u7EBF\u591A\u4F20\u611F\u5668\u6F14\u793A\u3002",
-      "revisions": [
-        {
-          "at": "2026-10-20 00:29:00",
-          "summary": "\u66F4\u65B0\u6807\u9898",
-          "source": "manual"
-        }
-      ],
-      "draft": false,
-      "hidden": false,
-      "previewObjects": [
-        "notes/n-20261009-205600/isolation_forest_demo.webp"
-      ],
-      "body": {
-        "stars": 0,
-        "tags": [
-          "\u7B97\u6CD5",
-          "\u673A\u5668\u5B66\u4E60",
-          "\u5F02\u5E38\u68C0\u6D4B",
-          "\u5B64\u7ACB\u68EE\u6797",
-          "\u6570\u5B57\u5B6A\u751F",
-          "AI\u5199\u4F5C"
-        ],
-        "displayName": "",
-        "description": "\u4ECB\u7ECD\u65E0\u76D1\u7763\u5F02\u5E38\u68C0\u6D4B\u7B97\u6CD5\u5B64\u7ACB\u68EE\u6797\uFF1A\u7528\u968F\u673A\u8F74\u5BF9\u9F50\u5207\u5206\u66F4\u5FEB\u9694\u79BB\u7A00\u758F\u79BB\u7FA4\u70B9\uFF0C\u5E76\u914D\u5408\u4EA7\u7EBF\u591A\u4F20\u611F\u5668\u6F14\u793A\u3002"
-      },
-      "images": [
-        {
-          "stageRel": "\u5FC3\u5F97\uFF08notes\uFF09/20261009_205600/isolation_forest_demo.png",
-          "objectKey": "notes/n-20261009-205600/isolation_forest_demo.webp",
-          "stars": 0,
-          "tags": [],
-          "displayName": "",
-          "description": "",
-          "hidden": false
-        }
-      ]
-    },
-    {
-      "folder": "20261011_205600",
-      "slug": "n-20261011-205600",
-      "title": "\u72EC\u7ACB\u6CCA\u677E\u6BD4\u5206\u6A21\u578B\uFF08Maher 1982\uFF09\u2014\u2014\u7528\u653B\u9632\u5F3A\u5EA6\u62C6\u5F00\u8DB3\u7403\u6BD4\u5206\u6982\u7387",
-      "mainTitle": "\u72EC\u7ACB\u6CCA\u677E\u6BD4\u5206\u6A21\u578B\uFF08Maher 1982\uFF09",
-      "subtitle": "\u7528\u653B\u9632\u5F3A\u5EA6\u62C6\u5F00\u8DB3\u7403\u6BD4\u5206\u6982\u7387",
-      "date": "2026-10-11",
-      "createdAt": "2026-10-11 20:56:00",
-      "revisedAt": "2026-10-20 00:29:08",
-      "summary": "\u7528\u72EC\u7ACB\u6CCA\u677E\u6A21\u578B\u7531\u653B\u9632\u5F3A\u5EA6\u4E0E\u4E3B\u573A\u4F18\u52BF\u4F30\u8BA1\u8FDB\u7403\u671F\u671B\uFF0C\u518D\u6C47\u603B\u6210\u6BD4\u5206\u77E9\u9635\u4E0E\u80DC\u5E73\u8D1F\u6982\u7387\u3002",
-      "revisions": [
-        {
-          "at": "2026-10-20 00:29:08",
-          "summary": "\u66F4\u65B0\u6807\u9898",
-          "source": "manual"
-        }
-      ],
-      "draft": false,
-      "hidden": false,
-      "previewObjects": [
-        "notes/n-20261011-205600/independent_poisson_football_demo.webp"
-      ],
-      "body": {
-        "stars": 0,
-        "tags": [
-          "\u7B97\u6CD5",
-          "\u8DB3\u7403\u9884\u6D4B",
-          "\u6CCA\u677E\u5206\u5E03",
-          "\u6982\u7387\u6A21\u578B",
-          "AI\u5199\u4F5C"
-        ],
-        "displayName": "",
-        "description": "\u7528\u72EC\u7ACB\u6CCA\u677E\u6A21\u578B\u7531\u653B\u9632\u5F3A\u5EA6\u4E0E\u4E3B\u573A\u4F18\u52BF\u4F30\u8BA1\u8FDB\u7403\u671F\u671B\uFF0C\u518D\u6C47\u603B\u6210\u6BD4\u5206\u77E9\u9635\u4E0E\u80DC\u5E73\u8D1F\u6982\u7387\u3002"
-      },
-      "images": [
-        {
-          "stageRel": "\u5FC3\u5F97\uFF08notes\uFF09/20261011_205600/independent_poisson_football_demo.png",
-          "objectKey": "notes/n-20261011-205600/independent_poisson_football_demo.webp",
-          "stars": 0,
-          "tags": [],
-          "displayName": "",
-          "description": "",
-          "hidden": false
-        }
-      ]
-    },
-    {
-      "folder": "20261012_205600",
-      "slug": "n-20261012-205600",
-      "title": "Little \u5B9A\u5F8B\u4E0E M/M/1\u2014\u2014\u4EA7\u7EBF\u5DE5\u4F4D\u62E5\u5835\u3001\u5728\u5236\u54C1\u4E0E\u4EA7\u80FD\u7C97\u7B97",
-      "mainTitle": "Little \u5B9A\u5F8B\u4E0E M/M/1",
-      "subtitle": "\u4EA7\u7EBF\u5DE5\u4F4D\u62E5\u5835\u3001\u5728\u5236\u54C1\u4E0E\u4EA7\u80FD\u7C97\u7B97",
-      "date": "2026-10-12",
-      "createdAt": "2026-10-12 20:56:00",
-      "revisedAt": "2026-10-20 00:29:15",
-      "summary": "\u7528 Little \u5B9A\u5F8B\u4E0E M/M/1 \u6392\u961F\u6A21\u578B\u7C97\u7B97\u5728\u5236\u54C1\u3001\u5468\u671F\u65F6\u95F4\u4E0E\u5DE5\u4F4D\u62E5\u5835\uFF0C\u89E3\u91CA\u5229\u7528\u7387\u63A5\u8FD1\u6EE1\u8F7D\u65F6\u7684\u6392\u961F\u66B4\u6DA8\u3002",
-      "revisions": [
-        {
-          "at": "2026-10-20 00:29:15",
-          "summary": "\u66F4\u65B0\u6807\u9898",
-          "source": "manual"
-        }
-      ],
-      "draft": false,
-      "hidden": false,
-      "previewObjects": [
-        "notes/n-20261012-205600/littles_law_mm1_demo.webp"
-      ],
-      "body": {
-        "stars": 0,
-        "tags": [
-          "\u7B97\u6CD5",
-          "\u6392\u961F\u8BBA",
-          "\u6570\u5B57\u5B6A\u751F",
-          "\u4EA7\u7EBF",
-          "\u4EA7\u80FD",
-          "AI\u5199\u4F5C"
-        ],
-        "displayName": "",
-        "description": "\u7528 Little \u5B9A\u5F8B\u4E0E M/M/1 \u6392\u961F\u6A21\u578B\u7C97\u7B97\u5728\u5236\u54C1\u3001\u5468\u671F\u65F6\u95F4\u4E0E\u5DE5\u4F4D\u62E5\u5835\uFF0C\u89E3\u91CA\u5229\u7528\u7387\u63A5\u8FD1\u6EE1\u8F7D\u65F6\u7684\u6392\u961F\u66B4\u6DA8\u3002"
-      },
-      "images": [
-        {
-          "stageRel": "\u5FC3\u5F97\uFF08notes\uFF09/20261012_205600/littles_law_mm1_demo.png",
-          "objectKey": "notes/n-20261012-205600/littles_law_mm1_demo.webp",
-          "stars": 0,
-          "tags": [],
-          "displayName": "",
-          "description": "",
-          "hidden": false
-        }
-      ]
-    },
-    {
-      "folder": "20261013_205600",
-      "slug": "n-20261013-205600",
-      "title": "\u5355\u8C03\u53CC\u7AEF\u961F\u5217\u2014\u2014O(n) \u6C42\u6ED1\u52A8\u7A97\u53E3\u6700\u5927\u503C\u548C\u6700\u5C0F\u503C",
-      "mainTitle": "\u5355\u8C03\u53CC\u7AEF\u961F\u5217",
-      "subtitle": "O(n) \u6C42\u6ED1\u52A8\u7A97\u53E3\u6700\u5927\u503C\u548C\u6700\u5C0F\u503C",
-      "date": "2026-10-13",
-      "createdAt": "2026-10-13 20:56:00",
-      "revisedAt": "2026-10-20 00:29:23",
-      "summary": "\u8BB2\u89E3\u5355\u8C03\u53CC\u7AEF\u961F\u5217\u5728\u6ED1\u52A8\u7A97\u53E3\u6700\u5927\uFF0F\u6700\u5C0F\u503C\u95EE\u9898\u4E0A\u7684 O(n) \u89E3\u6CD5\uFF0C\u5E76\u8054\u7CFB\u4F20\u611F\u5668\u4E0E\u884C\u60C5\u7A97\u53E3\u7EDF\u8BA1\u3002",
-      "revisions": [
-        {
-          "at": "2026-10-20 00:29:22",
-          "summary": "\u66F4\u65B0\u6807\u9898",
-          "source": "manual"
-        },
-        {
-          "at": "2026-10-20 00:29:23",
-          "summary": "\u66F4\u65B0\u6807\u9898",
-          "source": "manual"
-        }
-      ],
-      "draft": false,
-      "hidden": false,
-      "previewObjects": [
-        "notes/n-20261013-205600/monotonic_deque_demo.webp"
-      ],
-      "body": {
-        "stars": 0,
-        "tags": [
-          "\u7B97\u6CD5",
-          "\u6570\u636E\u7ED3\u6784",
-          "\u6ED1\u52A8\u7A97\u53E3",
-          "\u5355\u8C03\u961F\u5217",
-          "AI\u5199\u4F5C"
-        ],
-        "displayName": "",
-        "description": "\u8BB2\u89E3\u5355\u8C03\u53CC\u7AEF\u961F\u5217\u5728\u6ED1\u52A8\u7A97\u53E3\u6700\u5927\uFF0F\u6700\u5C0F\u503C\u95EE\u9898\u4E0A\u7684 O(n) \u89E3\u6CD5\uFF0C\u5E76\u8054\u7CFB\u4F20\u611F\u5668\u4E0E\u884C\u60C5\u7A97\u53E3\u7EDF\u8BA1\u3002"
-      },
-      "images": [
-        {
-          "stageRel": "\u5FC3\u5F97\uFF08notes\uFF09/20261013_205600/monotonic_deque_demo.png",
-          "objectKey": "notes/n-20261013-205600/monotonic_deque_demo.webp",
-          "stars": 0,
-          "tags": [],
-          "displayName": "",
-          "description": "",
-          "hidden": false
-        }
-      ]
-    },
-    {
-      "folder": "20261014_205600",
-      "slug": "n-20261014-205600",
-      "title": "\u8868\u683C\u578B CUSUM\u2014\u2014\u6293\u4F4F\u8FC7\u7A0B\u5747\u503C\u7684\u5C0F\u5E45\u6301\u7EED\u504F\u79FB",
-      "mainTitle": "\u8868\u683C\u578B CUSUM",
-      "subtitle": "\u6293\u4F4F\u8FC7\u7A0B\u5747\u503C\u7684\u5C0F\u5E45\u6301\u7EED\u504F\u79FB",
-      "date": "2026-10-14",
-      "createdAt": "2026-10-14 20:56:00",
-      "revisedAt": "2026-10-20 00:29:29",
-      "summary": "\u4ECB\u7ECD\u8868\u683C\u578B\u7D2F\u79EF\u548C\u63A7\u5236\u56FE\uFF0C\u8BF4\u660E\u5982\u4F55\u5BF9\u5C0F\u800C\u6301\u7EED\u7684\u5747\u503C\u9636\u8DC3\u6BD4 Shewhart \u66F4\u65E9\u62A5\u8B66\u3002",
-      "revisions": [
-        {
-          "at": "2026-10-20 00:29:29",
-          "summary": "\u66F4\u65B0\u6807\u9898",
-          "source": "manual"
-        }
-      ],
-      "draft": false,
-      "hidden": false,
-      "previewObjects": [
-        "notes/n-20261014-205600/cusum_demo.webp"
-      ],
-      "body": {
-        "stars": 0,
-        "tags": [
-          "\u7B97\u6CD5",
-          "\u7EDF\u8BA1\u8FC7\u7A0B\u63A7\u5236",
-          "CUSUM",
-          "\u6570\u5B57\u5B6A\u751F",
-          "AI\u5199\u4F5C"
-        ],
-        "displayName": "",
-        "description": "\u4ECB\u7ECD\u8868\u683C\u578B\u7D2F\u79EF\u548C\u63A7\u5236\u56FE\uFF0C\u8BF4\u660E\u5982\u4F55\u5BF9\u5C0F\u800C\u6301\u7EED\u7684\u5747\u503C\u9636\u8DC3\u6BD4 Shewhart \u66F4\u65E9\u62A5\u8B66\u3002"
-      },
-      "images": [
-        {
-          "stageRel": "\u5FC3\u5F97\uFF08notes\uFF09/20261014_205600/cusum_demo.png",
-          "objectKey": "notes/n-20261014-205600/cusum_demo.webp",
-          "stars": 0,
-          "tags": [],
-          "displayName": "",
-          "description": "",
-          "hidden": false
-        }
-      ]
-    },
-    {
-      "folder": "20261015_205600",
-      "slug": "n-20261015-205600",
-      "title": "\u52A0\u6CD5\u578B Holt\u2013Winters\u2014\u2014\u5E26\u8D8B\u52BF\u4E0E\u5B63\u8282\u7684\u4E09\u6B21\u6307\u6570\u5E73\u6ED1",
-      "mainTitle": "\u52A0\u6CD5\u578B Holt\u2013Winters",
-      "subtitle": "\u5E26\u8D8B\u52BF\u4E0E\u5B63\u8282\u7684\u4E09\u6B21\u6307\u6570\u5E73\u6ED1",
-      "date": "2026-10-15",
-      "createdAt": "2026-10-15 20:56:00",
-      "revisedAt": "2026-10-20 00:29:37",
-      "summary": "\u8BB2\u89E3\u52A0\u6CD5\u578B Holt\u2013Winters \u4E09\u6B21\u6307\u6570\u5E73\u6ED1\uFF1A\u5728\u6C34\u5E73\u9879\u4E4B\u5916\u52A0\u5165\u8D8B\u52BF\u4E0E\u5B63\u8282\uFF0C\u7528\u4E8E\u9700\u6C42\u4E0E\u4EA7\u80FD\u5F62\u6001\u9884\u6D4B\u3002",
-      "revisions": [
-        {
-          "at": "2026-10-20 00:29:37",
-          "summary": "\u66F4\u65B0\u6807\u9898",
-          "source": "manual"
-        }
-      ],
-      "draft": false,
-      "hidden": false,
-      "previewObjects": [
-        "notes/n-20261015-205600/holt_winters_demo.webp"
-      ],
-      "body": {
-        "stars": 0,
-        "tags": [
-          "\u7B97\u6CD5",
-          "\u65F6\u95F4\u5E8F\u5217",
-          "Holt-Winters",
-          "\u9884\u6D4B",
-          "AI\u5199\u4F5C"
-        ],
-        "displayName": "",
-        "description": "\u8BB2\u89E3\u52A0\u6CD5\u578B Holt\u2013Winters \u4E09\u6B21\u6307\u6570\u5E73\u6ED1\uFF1A\u5728\u6C34\u5E73\u9879\u4E4B\u5916\u52A0\u5165\u8D8B\u52BF\u4E0E\u5B63\u8282\uFF0C\u7528\u4E8E\u9700\u6C42\u4E0E\u4EA7\u80FD\u5F62\u6001\u9884\u6D4B\u3002"
-      },
-      "images": [
-        {
-          "stageRel": "\u5FC3\u5F97\uFF08notes\uFF09/20261015_205600/holt_winters_demo.png",
-          "objectKey": "notes/n-20261015-205600/holt_winters_demo.webp",
-          "stars": 0,
-          "tags": [],
-          "displayName": "",
-          "description": "",
-          "hidden": false
-        }
-      ]
-    },
-    {
-      "folder": "20261016_205600",
-      "slug": "n-20261016-205600",
-      "title": "Platt scaling\u2014\u2014\u628A\u5206\u7C7B\u5206\u6570\u6536\u6210\u53EF\u7528\u6982\u7387",
-      "mainTitle": "Platt scaling",
-      "subtitle": "\u628A\u5206\u7C7B\u5206\u6570\u6536\u6210\u53EF\u7528\u6982\u7387",
-      "date": "2026-10-16",
-      "createdAt": "2026-10-16 20:56:00",
-      "revisedAt": "2026-10-20 00:29:48",
-      "summary": "\u7528 sigmoid \u5F62\u5F0F\u7684 Platt \u6807\u5B9A\u628A\u5206\u7C7B\u5668\u5206\u6570\u6821\u51C6\u6210\u63A5\u8FD1\u771F\u5B9E\u9891\u7387\u7684\u6982\u7387\uFF0C\u5E76\u7ED9\u51FA\u53EF\u9760\u6027\u56FE\u793A\u4F8B\u3002",
-      "revisions": [
-        {
-          "at": "2026-10-20 00:29:48",
-          "summary": "\u66F4\u65B0\u6807\u9898",
-          "source": "manual"
-        }
-      ],
-      "draft": false,
-      "hidden": false,
-      "previewObjects": [
-        "notes/n-20261016-205600/platt_scaling_reliability.webp"
-      ],
-      "body": {
-        "stars": 0,
-        "tags": [
-          "\u7B97\u6CD5",
-          "\u6982\u7387\u6807\u5B9A",
-          "\u673A\u5668\u5B66\u4E60",
-          "Platt",
-          "AI\u5199\u4F5C"
-        ],
-        "displayName": "",
-        "description": "\u7528 sigmoid \u5F62\u5F0F\u7684 Platt \u6807\u5B9A\u628A\u5206\u7C7B\u5668\u5206\u6570\u6821\u51C6\u6210\u63A5\u8FD1\u771F\u5B9E\u9891\u7387\u7684\u6982\u7387\uFF0C\u5E76\u7ED9\u51FA\u53EF\u9760\u6027\u56FE\u793A\u4F8B\u3002"
-      },
-      "images": [
-        {
-          "stageRel": "\u5FC3\u5F97\uFF08notes\uFF09/20261016_205600/platt_scaling_reliability.png",
-          "objectKey": "notes/n-20261016-205600/platt_scaling_reliability.webp",
-          "stars": 0,
-          "tags": [],
-          "displayName": "",
-          "description": "",
-          "hidden": false
-        }
-      ]
-    },
-    {
-      "folder": "20261017_205600",
-      "slug": "n-20261017-205600",
-      "title": "\u6709\u5411\u8DDD\u79BB\u573A\u4E0E\u7403\u9762\u8FFD\u8E2A\u2014\u2014\u53EA\u7528\u4E00\u4E2A\u8DDD\u79BB\u51FD\u6570\u753B\u51FA\u4E09\u7EF4\u96F6\u4EF6",
-      "mainTitle": "\u6709\u5411\u8DDD\u79BB\u573A\u4E0E\u7403\u9762\u8FFD\u8E2A",
-      "subtitle": "\u53EA\u7528\u4E00\u4E2A\u8DDD\u79BB\u51FD\u6570\u753B\u51FA\u4E09\u7EF4\u96F6\u4EF6",
-      "date": "2026-10-17",
-      "createdAt": "2026-10-17 20:56:00",
-      "revisedAt": "2026-10-20 00:29:57",
-      "summary": "\u4ECB\u7ECD\u6709\u5411\u8DDD\u79BB\u573A\u4E0E\u7403\u9762\u8FFD\u8E2A\uFF1A\u7528\u5355\u4E2A\u8DDD\u79BB\u51FD\u6570\u5B8C\u6210\u6E32\u67D3\uFF0C\u5E76\u53EF\u590D\u7528\u5230\u78B0\u649E\u4E0E\u95F4\u9699\u68C0\u67E5\u3002",
-      "revisions": [
-        {
-          "at": "2026-10-20 00:29:57",
-          "summary": "\u66F4\u65B0\u6807\u9898",
-          "source": "manual"
-        }
-      ],
-      "draft": false,
-      "hidden": false,
-      "previewObjects": [
-        "notes/n-20261017-205600/sdf_sphere_tracing_render.webp",
-        "notes/n-20261017-205600/sdf_sphere_tracing_2d.webp"
-      ],
-      "body": {
-        "stars": 0,
-        "tags": [
-          "\u7B97\u6CD5",
-          "\u56FE\u5F62\u5B66",
-          "SDF",
-          "\u7403\u9762\u8FFD\u8E2A",
-          "AI\u5199\u4F5C"
-        ],
-        "displayName": "",
-        "description": "\u4ECB\u7ECD\u6709\u5411\u8DDD\u79BB\u573A\u4E0E\u7403\u9762\u8FFD\u8E2A\uFF1A\u7528\u5355\u4E2A\u8DDD\u79BB\u51FD\u6570\u5B8C\u6210\u6E32\u67D3\uFF0C\u5E76\u53EF\u590D\u7528\u5230\u78B0\u649E\u4E0E\u95F4\u9699\u68C0\u67E5\u3002"
-      },
-      "images": [
-        {
-          "stageRel": "\u5FC3\u5F97\uFF08notes\uFF09/20261017_205600/sdf_sphere_tracing_2d.png",
-          "objectKey": "notes/n-20261017-205600/sdf_sphere_tracing_2d.webp",
-          "stars": 0,
-          "tags": [],
-          "displayName": "",
-          "description": "",
-          "hidden": false
-        },
-        {
-          "stageRel": "\u5FC3\u5F97\uFF08notes\uFF09/20261017_205600/sdf_sphere_tracing_render.png",
-          "objectKey": "notes/n-20261017-205600/sdf_sphere_tracing_render.webp",
-          "stars": 0,
-          "tags": [],
-          "displayName": "",
-          "description": "",
-          "hidden": false
-        }
-      ]
-    },
-    {
-      "folder": "20261018_205600",
-      "slug": "n-20261018-205600",
-      "title": "\u5FEB\u901F\u5085\u91CC\u53F6\u53D8\u6362\u2014\u2014\u4ECE\u632F\u52A8\u6CE2\u5F62\u91CC\u62A0\u51FA\u8F74\u627F\u6545\u969C\u9891\u7387",
-      "mainTitle": "\u5FEB\u901F\u5085\u91CC\u53F6\u53D8\u6362",
-      "subtitle": "\u4ECE\u632F\u52A8\u6CE2\u5F62\u91CC\u62A0\u51FA\u8F74\u627F\u6545\u969C\u9891\u7387",
-      "date": "2026-10-18",
-      "createdAt": "2026-10-18 20:56:00",
-      "revisedAt": "2026-10-20 00:30:04",
-      "summary": "\u7528\u5FEB\u901F\u5085\u91CC\u53F6\u53D8\u6362\u628A\u632F\u52A8\u6CE2\u5F62\u8F6C\u5230\u9891\u57DF\uFF0C\u5BF9\u7167\u8F74\u627F\u6545\u969C\u7279\u5F81\u9891\u7387\u505A\u7B80\u6613\u8BCA\u65AD\u6F14\u793A\u3002",
-      "revisions": [
-        {
-          "at": "2026-10-20 00:30:04",
-          "summary": "\u66F4\u65B0\u6807\u9898",
-          "source": "manual"
-        }
-      ],
-      "draft": false,
-      "hidden": false,
-      "previewObjects": [
-        "notes/n-20261018-205600/fft_vibration_fault_demo.webp"
-      ],
-      "body": {
-        "stars": 0,
-        "tags": [
-          "\u7B97\u6CD5",
-          "\u4FE1\u53F7\u5904\u7406",
-          "FFT",
-          "\u9884\u6D4B\u6027\u7EF4\u62A4",
-          "AI\u5199\u4F5C"
-        ],
-        "displayName": "",
-        "description": "\u7528\u5FEB\u901F\u5085\u91CC\u53F6\u53D8\u6362\u628A\u632F\u52A8\u6CE2\u5F62\u8F6C\u5230\u9891\u57DF\uFF0C\u5BF9\u7167\u8F74\u627F\u6545\u969C\u7279\u5F81\u9891\u7387\u505A\u7B80\u6613\u8BCA\u65AD\u6F14\u793A\u3002"
-      },
-      "images": [
-        {
-          "stageRel": "\u5FC3\u5F97\uFF08notes\uFF09/20261018_205600/fft_vibration_fault_demo.png",
-          "objectKey": "notes/n-20261018-205600/fft_vibration_fault_demo.webp",
-          "stars": 0,
-          "tags": [],
-          "displayName": "",
-          "description": "",
-          "hidden": false
-        }
-      ]
-    },
-    {
-      "folder": "20261019_205600",
-      "slug": "n-20261019-205600",
-      "title": "\u6C64\u666E\u68EE\u91C7\u6837\u2014\u2014\u7528\u540E\u9A8C\u62BD\u6837\u505A\u63A2\u7D22\u4E0E\u5229\u7528\u7684\u6982\u7387\u5339\u914D",
-      "mainTitle": "\u6C64\u666E\u68EE\u91C7\u6837",
-      "subtitle": "\u7528\u540E\u9A8C\u62BD\u6837\u505A\u63A2\u7D22\u4E0E\u5229\u7528\u7684\u6982\u7387\u5339\u914D",
-      "date": "2026-10-19",
-      "createdAt": "2026-10-19 20:56:00",
-      "revisedAt": "2026-10-20 00:24:49",
-      "summary": "\u5728 Bernoulli \u591A\u81C2\u8001\u864E\u673A\u4E0A\u7528\u6C64\u666E\u68EE\u91C7\u6837\u505A\u540E\u9A8C\u6982\u7387\u5339\u914D\uFF0C\u5E76\u4E0E \u03B5-greedy\u3001UCB1 \u5BF9\u7167\u7D2F\u8BA1\u9057\u61BE\u3002",
-      "revisions": [
-        {
-          "at": "2026-10-20 00:24:49",
-          "summary": "\u66F4\u65B0\u6807\u9898",
-          "source": "manual"
-        }
-      ],
-      "draft": false,
-      "hidden": false,
-      "previewObjects": [
-        "notes/n-20261019-205600/images/thompson_sampling_demo.webp"
-      ],
-      "body": {
-        "stars": 0,
-        "tags": [
-          "AI\u5199\u4F5C",
-          "\u7B97\u6CD5"
-        ],
-        "displayName": "",
-        "description": ""
-      },
-      "images": [
-        {
-          "stageRel": "\u5FC3\u5F97\uFF08notes\uFF09/20261019_205600/images/thompson_sampling_demo.png",
-          "objectKey": "notes/n-20261019-205600/images/thompson_sampling_demo.webp",
-          "stars": 0,
-          "tags": [],
-          "displayName": "",
-          "description": "",
-          "hidden": false
-        }
-      ]
     }
   ]
 }
