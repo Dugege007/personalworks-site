@@ -2,6 +2,33 @@
   "version": 2,
   "notes": [
     {
+      "folder": "20261022_205600",
+      "slug": "n-20261022-205600",
+      "title": "离散 PID：用比例、积分、微分把一阶惯性对象拉到设定值",
+      "date": "2026-10-22",
+      "summary": "在带纯滞后的一阶惯性对象上对比 P、PI、完整 PID 的阶跃响应，核对稳态误差、超调与调节时间。",
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "/notes-assets/n-20261022-205600/pid_step_response_demo.png"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "PID",
+          "控制",
+          "数字孪生",
+          "产线"
+        ],
+        "displayName": "",
+        "description": "在带纯滞后的一阶惯性对象上对比 P、PI、完整 PID 的阶跃响应，核对稳态误差、超调与调节时间。"
+      },
+      "images": [
+        "/notes-assets/n-20261022-205600/pid_step_response_demo.png"
+      ]
+    },
+    {
       "folder": "20261021_205600",
       "slug": "n-20261021-205600",
       "title": "RANSAC：用随机抽样一致性从飞点里捞出真直线",
