@@ -14,6 +14,7 @@ import { NotesPage } from "./pages/NotesPage";
 import { PhotoCatalogPage } from "./pages/PhotoCatalogPage";
 import { PhotoShootsPage } from "./pages/PhotoShootsPage";
 import { ResumePage } from "./pages/ResumePage";
+import { ResumePrintPage } from "./pages/ResumePrintPage";
 import { SkillsPage } from "./pages/SkillsPage";
 import { WorkChannelPage } from "./pages/WorkChannelPage";
 import { WorkDetailPage } from "./pages/WorkDetailPage";
@@ -56,6 +57,7 @@ const gameMenu = `${gameDev}/${lexicon.gameMenu.key}`;
 export function App() {
   return (
     <Routes>
+      <Route path={`/${lexicon.profileResume.key}/print`} element={<ResumePrintPage />} />
       <Route element={<SiteShell />}>
         <Route path="/" element={<HomePage />} />
         <Route path={`/${lexicon.workIndex.key}`} element={<WorkIndexPage />} />
