@@ -2,6 +2,33 @@
   "version": 2,
   "notes": [
     {
+      "folder": "20261024_205600",
+      "slug": "n-20261024-205600",
+      "title": "三次贝塞尔缓动：CSS cubic-bezier 如何把时间弯成「先慢后快再慢」",
+      "date": "2026-10-24",
+      "summary": "用 CSS 规范中的三次贝塞尔缓动对比线性插值，核对 ease-in-out 在四分之一时长处的进度差，并演示产线仪表盘数值动画。",
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "/notes-assets/n-20261024-205600/cubic_bezier_easing_demo.png"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "贝塞尔",
+          "CSS",
+          "前端动效",
+          "数字孪生"
+        ],
+        "displayName": "",
+        "description": "用 CSS 规范中的三次贝塞尔缓动对比线性插值，核对 ease-in-out 在四分之一时长处的进度差，并演示产线仪表盘数值动画。"
+      },
+      "images": [
+        "/notes-assets/n-20261024-205600/cubic_bezier_easing_demo.png"
+      ]
+    },
+    {
       "folder": "20261022_205600",
       "slug": "n-20261022-205600",
       "title": "离散 PID：用比例、积分、微分把一阶惯性对象拉到设定值",
