@@ -251,9 +251,9 @@
 
 ### ProdLineSim_RTE
 
-别名：ProdLineSim
-解释：自研的产线仿真工具，用来推工厂布局、节拍和物流。
-英文解释：An in-house production-line simulation tool for factory layout, takt, and material flow.
+别名：ProdLineSim、PLS
+解释：自研的产线仿真工具，用来推工厂布局、节拍和物流。详细介绍见站内心得《PLS／ProdLineSim_RTE 产线仿真平台模块功能介绍》：[打开这篇心得](/notes/n-20261027-010100)。
+英文解释：An in-house production-line simulation tool for factory layout, takt, and material flow. See the site note for a full module walkthrough: [Open note](/notes/n-20261027-010100).
 
 ### SimPy
 

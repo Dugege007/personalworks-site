@@ -285,6 +285,19 @@ const registeredWorks: WorkRecord[] = [
   }
 ,
   {
+    id: "prodlinesim-rte",
+    channel: "line-sim",
+    title: "ProdLineSim_RTE 产线仿真平台",
+    year: "2025",
+    startedOn: "2025-10-21",
+    summary: "自研三维产线仿真平台：Unity 搭线与回放、DataForge3D 维护工艺主数据、SimPy 跑离散事件仿真。详细介绍见站内心得《PLS／ProdLineSim_RTE 产线仿真平台模块功能介绍》。",
+    body: "",
+    consent: "granted",
+    stageFolder: "line-sim/ProdLineSim_自研平台/20251021_ProdLineSim_RTE",
+    media: [ { kind: "video", src: "line-sim/prodlinesim-rte/01.mp4", poster: "line-sim/prodlinesim-rte/01.poster.webp", label: "工艺参数网页流程" }, { kind: "video", src: "line-sim/prodlinesim-rte/02.mp4", poster: "line-sim/prodlinesim-rte/02.poster.webp", label: "导航图创建" }, { kind: "video", src: "line-sim/prodlinesim-rte/03.mp4", poster: "line-sim/prodlinesim-rte/03.poster.webp", label: "运输动画" }, { kind: "video", src: "line-sim/prodlinesim-rte/04.mp4", poster: "line-sim/prodlinesim-rte/04.poster.webp", label: "传送带搭建" }, { kind: "image", src: "line-sim/prodlinesim-rte/05.webp", label: "三维主界面" }, { kind: "image", src: "line-sim/prodlinesim-rte/06.webp", label: "产品流向" }, { kind: "image", src: "line-sim/prodlinesim-rte/07.webp", label: "故障高亮" }, { kind: "image", src: "line-sim/prodlinesim-rte/08.webp", label: "总体架构" }, { kind: "image", src: "line-sim/prodlinesim-rte/09.webp", label: "导航图系统" }, { kind: "image", src: "line-sim/prodlinesim-rte/10.webp", label: "初始界面" } ],
+  }
+,
+  {
     id: "hangyu-assembly-workshop",
     channel: "line-sim",
     title: "某工厂车间装配线仿真",

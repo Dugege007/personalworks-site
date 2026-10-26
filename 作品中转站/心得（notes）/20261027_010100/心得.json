@@ -1,0 +1,7 @@
+{
+  "createdAt": "2026-10-27 01:01:00",
+  "modifiedAt": [],
+  "title": "PLS／ProdLineSim_RTE 产线仿真平台模块功能介绍",
+  "slug": "n-20261027-010100",
+  "summary": "介绍自研产线仿真平台 ProdLineSim_RTE：Unity 三维客户端、DataForge3D 工艺主数据网页与 SimPy 离散事件内核如何用场景／回放契约协同，覆盖搭线、仿真、回放与 KPI／水位诊断。"
+}

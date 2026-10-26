@@ -2,6 +2,57 @@
   "version": 2,
   "notes": [
     {
+      "folder": "20261027_010100",
+      "slug": "n-20261027-010100",
+      "title": "PLS／ProdLineSim_RTE 产线仿真平台模块功能介绍",
+      "date": "2026-10-27",
+      "summary": "介绍自研产线仿真平台 ProdLineSim_RTE：Unity 三维客户端、DataForge3D 工艺主数据网页与 SimPy 离散事件内核如何用场景／回放契约协同，覆盖搭线、仿真、回放与 KPI／水位诊断。",
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "/notes-assets/n-20261027-010100/arch_contract.webp"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "产线仿真",
+          "ProdLineSim",
+          "Unity",
+          "SimPy",
+          "数字孪生",
+          "离散事件仿真"
+        ],
+        "displayName": "",
+        "description": "介绍自研产线仿真平台 ProdLineSim_RTE：Unity 三维客户端、DataForge3D 工艺主数据网页与 SimPy 离散事件内核如何用场景／回放契约协同，覆盖搭线、仿真、回放与 KPI／水位诊断。"
+      },
+      "images": [
+        "/notes-assets/n-20261027-010100/arch_contract.webp",
+        "/notes-assets/n-20261027-010100/arch_overall.webp",
+        "/notes-assets/n-20261027-010100/arch_simpy.webp",
+        "/notes-assets/n-20261027-010100/conveyor_build_still.webp",
+        "/notes-assets/n-20261027-010100/device_panel.webp",
+        "/notes-assets/n-20261027-010100/fault_highlight.webp",
+        "/notes-assets/n-20261027-010100/inventory_cap.webp",
+        "/notes-assets/n-20261027-010100/kpi_manual.webp",
+        "/notes-assets/n-20261027-010100/kpi_oee.webp",
+        "/notes-assets/n-20261027-010100/kpi_throughput.webp",
+        "/notes-assets/n-20261027-010100/main_ui.webp",
+        "/notes-assets/n-20261027-010100/navgraph_build_still.webp",
+        "/notes-assets/n-20261027-010100/navgraph_system.webp",
+        "/notes-assets/n-20261027-010100/playback_load.webp",
+        "/notes-assets/n-20261027-010100/product_flow.webp",
+        "/notes-assets/n-20261027-010100/scene_manager.webp",
+        "/notes-assets/n-20261027-010100/transport_anim_still.webp",
+        "/notes-assets/n-20261027-010100/transport_static.webp",
+        "/notes-assets/n-20261027-010100/web_base_data.webp",
+        "/notes-assets/n-20261027-010100/web_device.webp",
+        "/notes-assets/n-20261027-010100/web_output_dir.webp",
+        "/notes-assets/n-20261027-010100/web_process_still.webp",
+        "/notes-assets/n-20261027-010100/web_route_tree.webp",
+        "/notes-assets/n-20261027-010100/web_run_sim.webp"
+      ]
+    },
+    {
       "folder": "20261026_205600",
       "slug": "n-20261026-205600",
       "title": "匈牙利算法：把 n 个工位和 n 个任务配成总代价最小的一对一",

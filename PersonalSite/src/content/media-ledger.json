@@ -7445,6 +7445,86 @@
       "stageRel": "心得（notes）/20261020_205600/.site-ready/images/particle_filter_demo.webp",
       "status": "published",
       "sourceStageRel": "心得（notes）/20261020_205600/images/particle_filter_demo.png"
+    },
+    {
+      "object": "line-sim/prodlinesim-rte/01.mp4",
+      "stageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/.site-ready/prodlinesim-rte/01.mp4",
+      "status": "published",
+      "sourceStageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/web_process.gif"
+    },
+    {
+      "object": "line-sim/prodlinesim-rte/01.poster.webp",
+      "stageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/.site-ready/prodlinesim-rte/01.poster.webp",
+      "status": "published"
+    },
+    {
+      "object": "line-sim/prodlinesim-rte/02.mp4",
+      "stageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/.site-ready/prodlinesim-rte/02.mp4",
+      "status": "published",
+      "sourceStageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/navgraph_build.gif"
+    },
+    {
+      "object": "line-sim/prodlinesim-rte/02.poster.webp",
+      "stageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/.site-ready/prodlinesim-rte/02.poster.webp",
+      "status": "published"
+    },
+    {
+      "object": "line-sim/prodlinesim-rte/03.mp4",
+      "stageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/.site-ready/prodlinesim-rte/03.mp4",
+      "status": "published",
+      "sourceStageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/transport_anim.gif"
+    },
+    {
+      "object": "line-sim/prodlinesim-rte/03.poster.webp",
+      "stageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/.site-ready/prodlinesim-rte/03.poster.webp",
+      "status": "published"
+    },
+    {
+      "object": "line-sim/prodlinesim-rte/04.mp4",
+      "stageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/.site-ready/prodlinesim-rte/04.mp4",
+      "status": "published",
+      "sourceStageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/conveyor_build.gif"
+    },
+    {
+      "object": "line-sim/prodlinesim-rte/04.poster.webp",
+      "stageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/.site-ready/prodlinesim-rte/04.poster.webp",
+      "status": "published"
+    },
+    {
+      "object": "line-sim/prodlinesim-rte/05.webp",
+      "stageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/.site-ready/prodlinesim-rte/05.webp",
+      "status": "published",
+      "sourceStageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/main_ui.png"
+    },
+    {
+      "object": "line-sim/prodlinesim-rte/06.webp",
+      "stageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/.site-ready/prodlinesim-rte/06.webp",
+      "status": "published",
+      "sourceStageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/product_flow.png"
+    },
+    {
+      "object": "line-sim/prodlinesim-rte/07.webp",
+      "stageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/.site-ready/prodlinesim-rte/07.webp",
+      "status": "published",
+      "sourceStageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/fault_highlight.png"
+    },
+    {
+      "object": "line-sim/prodlinesim-rte/08.webp",
+      "stageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/.site-ready/prodlinesim-rte/08.webp",
+      "status": "published",
+      "sourceStageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/arch_overall.png"
+    },
+    {
+      "object": "line-sim/prodlinesim-rte/09.webp",
+      "stageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/.site-ready/prodlinesim-rte/09.webp",
+      "status": "published",
+      "sourceStageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/navgraph_system.png"
+    },
+    {
+      "object": "line-sim/prodlinesim-rte/10.webp",
+      "stageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/.site-ready/prodlinesim-rte/10.webp",
+      "status": "published",
+      "sourceStageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/01 初始界面.png"
     }
   ]
 }
