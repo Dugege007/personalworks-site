@@ -2,6 +2,34 @@
   "version": 2,
   "notes": [
     {
+      "folder": "20261026_205600",
+      "slug": "n-20261026-205600",
+      "title": "匈牙利算法：把 n 个工位和 n 个任务配成总代价最小的一对一",
+      "date": "2026-10-26",
+      "summary": "用匈牙利／Kuhn–Munkres 核对 Wikipedia 3×3 最优代价 15 与产线 4×4 最优代价 28，并对照暴力枚举、贪心与随机基线。",
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "/notes-assets/n-20261026-205600/hungarian_assignment_demo.png"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "指派问题",
+          "匈牙利算法",
+          "数字孪生",
+          "调度",
+          "Kuhn-Munkres"
+        ],
+        "displayName": "",
+        "description": "用匈牙利／Kuhn–Munkres 核对 Wikipedia 3×3 最优代价 15 与产线 4×4 最优代价 28，并对照暴力枚举、贪心与随机基线。"
+      },
+      "images": [
+        "/notes-assets/n-20261026-205600/hungarian_assignment_demo.png"
+      ]
+    },
+    {
       "folder": "20261024_205600",
       "slug": "n-20261024-205600",
       "title": "三次贝塞尔缓动：CSS cubic-bezier 如何把时间弯成「先慢后快再慢」",
