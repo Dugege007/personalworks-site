@@ -877,6 +877,34 @@
         "description": ""
       },
       "images": []
+    },
+    {
+      "folder": "20261027_205600",
+      "slug": "n-20261027-205600",
+      "title": "改进版 Perlin 噪声：把格子角点的梯度织成可复现的平滑程序化场",
+      "date": "2026-10-27",
+      "summary": "用 Ken Perlin 官方排列表核对 Improved Perlin 在 (0.5,0.5,0) 取值 −0.250000，并对照 64×64 高度图与白噪声的平滑差异及 4 octave fBm。",
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "/notes-assets/n-20261027-205600/perlin_noise_demo.png"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "算法",
+          "Perlin噪声",
+          "程序化纹理",
+          "数字孪生",
+          "Unity",
+          "程序化生成"
+        ],
+        "displayName": "",
+        "description": "用 Ken Perlin 官方排列表核对 Improved Perlin 在 (0.5,0.5,0) 取值 −0.250000，并对照 64×64 高度图与白噪声的平滑差异及 4 octave fBm。"
+      },
+      "images": [
+        "/notes-assets/n-20261027-205600/perlin_noise_demo.png"
+      ]
     }
   ]
 }
