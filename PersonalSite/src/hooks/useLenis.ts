@@ -30,6 +30,25 @@ export function scrollPageToTop() {
   document.body.scrollTop = 0;
 }
 
+/**
+ * 滚到笔记标题。顶栏偏移写在标题的 scroll-margin-top 上。
+ * Lenis 滚到元素时会读这个值；Lenis 未启动时按同一个已用值即时定位。
+ * 调用方要求即时，或系统偏好减动效时，也不做平滑滚动。
+ */
+export function scrollPageToElement(element: HTMLElement, immediate = false) {
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const instant = immediate || reduced;
+  if (pageLenis) {
+    // 正文异步插入后，Lenis 的可滚高度可能还停在插入前，直接滚会被夹短。
+    pageLenis.resize();
+    pageLenis.scrollTo(element, { immediate: instant, force: true });
+    return;
+  }
+  const margin = Number.parseFloat(getComputedStyle(element).scrollMarginTop);
+  const top = window.scrollY + element.getBoundingClientRect().top - (Number.isFinite(margin) ? margin : 0);
+  window.scrollTo({ top: Math.max(0, top), behavior: "auto" });
+}
+
 export function useLenis() {
   useEffect(() => {
     history.scrollRestoration = "manual";

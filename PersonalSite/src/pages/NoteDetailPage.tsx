@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { NoteMarkdown } from "../components/NoteMarkdown";
+import { NoteToc } from "../components/NoteToc";
 import { lexicon } from "../content/lexicon";
 import { loadNote, noteTheme } from "../content/notes/read";
 import { displayNoteTimestamp, noteTimestampDateTime } from "../content/notes/select";
@@ -30,18 +31,23 @@ export function NoteDetailPage() {
 
   return (
     <div className="page" data-theme={theme}>
-      <Link className="back" to={`/${lexicon.notes.key}`}>
-        ← 返回{lexicon.notes.zh}
-      </Link>
-      {note.slug === lexicon.sketching.key ? (
-        <div className="page-kicker">{lexicon.sketching.deco}</div>
-      ) : null}
-      <h1>{heading}</h1>
-      {subtitle ? <p className="note-subtitle">{subtitle}</p> : null}
-      <NoteTimes key={note.slug} note={note} />
-      <NoteTags tags={note.tags} />
-      <p className="page-lead">{note.summary}</p>
-      <NoteMarkdown markdown={note.body} />
+      <div className="note-sheet">
+        <div className="note-intro">
+          <Link className="back" to={`/${lexicon.notes.key}`}>
+            ← 返回{lexicon.notes.zh}
+          </Link>
+          {note.slug === lexicon.sketching.key ? (
+            <div className="page-kicker">{lexicon.sketching.deco}</div>
+          ) : null}
+          <h1>{heading}</h1>
+          {subtitle ? <p className="note-subtitle">{subtitle}</p> : null}
+          <NoteTimes key={note.slug} note={note} />
+          <NoteTags tags={note.tags} />
+          <p className="page-lead">{note.summary}</p>
+        </div>
+        <NoteToc resetKey={note.slug} />
+        <NoteMarkdown markdown={note.body} />
+      </div>
     </div>
   );
 }

@@ -3,6 +3,9 @@
 :root {
   /* 含刘海安全区。桌面 env 为 0，顶栏仍是 64px。 */
   --header-h: calc(64px + env(safe-area-inset-top, 0px));
+  /* 心得正文链接。浅底用可辨的深蓝，与顶栏、返回链的强调色分开。 */
+  --note-link: #1d4ed8;
+  --note-link-hover: #1e40af;
   --motion-reveal: 1;
   --motion-hint: 1;
   --motion-ticks: 1;
@@ -48,6 +51,12 @@
 [data-skin="strata"] [data-theme="profile-resume"],
 [data-skin="strata"] [data-theme="profile-skills"] { --accent: var(--gold); --accent-soft: rgba(196, 165, 116, 0.12); }
 [data-skin="strata"] [data-theme="sketches"] { --accent: #b08968; --accent-soft: rgba(176, 137, 104, 0.18); }
+
+/* 层境是深底。同一枚链接令牌提亮，避免深蓝沉进背景。 */
+[data-skin="strata"] {
+  --note-link: #9ec1ff;
+  --note-link-hover: #d5e4ff;
+}
 
 @media (prefers-reduced-motion: reduce) {
   :root {
