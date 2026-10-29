@@ -7,6 +7,7 @@ import { noteDirectives } from "../notes/directives";
 
 type NoteMarkdownProps = {
   markdown: string;
+  pageHeading?: string;
 };
 
 type NoteCodeButtonProps = {
@@ -119,7 +120,7 @@ function NoteCodeButton(props: NoteCodeButtonProps) {
  * 用 unified 管线渲染发布稿。图片对象键经 assetUrl 出站。
  * 公式使用 KaTeX。样式和解析器按需加载，避免首页带上字体和公式运行时。
  */
-export function NoteMarkdown({ markdown }: NoteMarkdownProps) {
+export function NoteMarkdown({ markdown, pageHeading }: NoteMarkdownProps) {
   const [node, setNode] = useState<JSX.Element | null>(null);
 
   useEffect(() => {
@@ -133,7 +134,7 @@ export function NoteMarkdown({ markdown }: NoteMarkdownProps) {
         if (cancelled) {
           return;
         }
-        const file = await createNoteMarkdownProcessor()
+        const file = await createNoteMarkdownProcessor(pageHeading)
           .use(rehypeReact, {
             Fragment,
             jsx,
@@ -168,7 +169,7 @@ export function NoteMarkdown({ markdown }: NoteMarkdownProps) {
     return () => {
       cancelled = true;
     };
-  }, [markdown]);
+  }, [markdown, pageHeading]);
 
   return (
     <div className="archive-body" data-directives={Object.keys(noteDirectives).length}>

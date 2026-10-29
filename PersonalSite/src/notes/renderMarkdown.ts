@@ -186,15 +186,16 @@ export function normalizeTexDelimiters(markdown: string): string {
 
 /**
  * 组装心得正文管线。每次返回新的处理器，避免插件状态串到下一篇。
- * 顺序是：GFM、中日韩强调、中日韩删除线、数学、KaTeX、净化、标题 id、代码高亮、代码块语言标记。
+ * 顺序是：GFM、中日韩强调、中日韩删除线、数学、KaTeX、净化、标题 id、去掉重复大标题、代码高亮、代码块语言标记。
  * CommonMark 把全角括号、顿号和句号算作标点。强调或删除线以这类标点收尾，
  * 后面又紧贴汉字时，闭合记号不成右翼，星号会留在正文里，或和后一处记号错配。
  * 中日韩插件只放宽这类翼标判定，放在 GFM 之后、数学之前。
  * 删除线插件必须位于 GFM 之后，否则补丁打不到 GFM 的分词器。
  * 净化必须放在 KaTeX 之后，否则公式的 class、style 和 svg 会被剥掉。
  * 标题 id 和代码高亮必须放在净化之后，否则 slug 与行内样式同样会被剥掉。
+ * 与页面大标题同文的首个 h1 也在净化之后去掉，避免详情页出现两个相同标题。
  */
-export function createNoteMarkdownProcessor() {
+export function createNoteMarkdownProcessor(pageHeading?: string) {
   return unified()
     .use(remarkParse)
     .use(remarkGfm)
@@ -205,6 +206,7 @@ export function createNoteMarkdownProcessor() {
     .use(rehypeKatex)
     .use(rehypeSanitize, noteSanitizeSchema)
     .use(rehypeSlug)
+    .use(omitDuplicateLeadHeading(pageHeading))
     .use(rehypePrettyCode, {
       theme: "github-light",
       // 按钮默认常显。细指针的悬停显隐改由样式表处理，触控端保持可见。
@@ -216,6 +218,7 @@ export function createNoteMarkdownProcessor() {
 type HastLike = {
   type: string;
   tagName?: string;
+  value?: string;
   properties?: Record<string, unknown>;
   children?: HastLike[];
 };
@@ -246,10 +249,39 @@ function stampCodeFigureLanguage() {
 }
 
 /**
+ * 把连续空白收成一个空格。页面大标题和正文 h1 用同一规则比较。
+ */
+export function normalizeNoteHeading(value: string): string {
+  return value.replace(/\s+/gu, " ").trim();
+}
+
+function hastText(node: HastLike): string {
+  if (node.type === "text") return node.value ?? "";
+  if (!node.children) return "";
+  return node.children.map(hastText).join("");
+}
+
+/**
+ * 详情页 intro 已经渲染同文大标题时，去掉正文里的首个 h1。
+ * 只比较第一个 h1；对不上就保留，后面的 h1 也不动。
+ */
+function omitDuplicateLeadHeading(pageHeading: string | undefined) {
+  const expected = normalizeNoteHeading(pageHeading ?? "");
+  return () => (tree: HastLike) => {
+    if (!expected || !tree.children) return;
+    const index = tree.children.findIndex((child) => child.type === "element" && child.tagName === "h1");
+    if (index < 0) return;
+    const lead = tree.children[index];
+    if (!lead || normalizeNoteHeading(hastText(lead)) !== expected) return;
+    tree.children.splice(index, 1);
+  };
+}
+
+/**
  * 把心得 Markdown 渲染成 HTML，供测试和纯文本核对使用。
  */
-export async function renderNoteMarkdownHtml(markdown: string): Promise<string> {
-  const file = await createNoteMarkdownProcessor()
+export async function renderNoteMarkdownHtml(markdown: string, pageHeading?: string): Promise<string> {
+  const file = await createNoteMarkdownProcessor(pageHeading)
     .use(rehypeStringify)
     .process(normalizeTexDelimiters(markdown));
   return String(file);

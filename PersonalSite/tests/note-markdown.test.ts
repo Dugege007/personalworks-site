@@ -133,6 +133,34 @@ plain
   assert.match(html, /data-theme="github-light"/);
 });
 
+test("the dtw sample keeps a single page heading and drops the matching body h1", async () => {
+  const markdown = stripNoteFrontmatter(
+    readFileSync(fileURLToPath(new URL("../src/content/notes/n-20261028-205600.md", import.meta.url)), "utf8"),
+  );
+  const heading = "动态时间规整：把长短不一的两条曲线掰到同一套节拍上再比距离";
+  const html = await renderNoteMarkdownHtml(markdown, heading);
+  assert.equal(/<h1\b/.test(html), false);
+  assert.match(html, /<h2[^>]*>是什么<\/h2>/);
+  assert.match(html, /<h3[^>]*>直觉画面<\/h3>/);
+});
+
+test("the first h1 is omitted only when it matches the page heading", async () => {
+  const duplicate = await renderNoteMarkdownHtml("# 同文  标题\n\n正文\n\n# 另一个标题\n", "同文 标题");
+  assert.equal(duplicate.includes("同文"), false);
+  assert.match(duplicate, /<p>正文<\/p>/);
+  assert.match(duplicate, /<h1[^>]*>另一个标题<\/h1>/);
+
+  const spaced = await renderNoteMarkdownHtml("# 标题\u3000甲\n\n段落\n", "标题 甲");
+  assert.equal(/<h1\b/.test(spaced), false);
+  assert.match(spaced, /<p>段落<\/p>/);
+
+  const different = await renderNoteMarkdownHtml("# 正文标题\n\n段落\n", "页面标题");
+  assert.match(different, /<h1[^>]*>正文标题<\/h1>/);
+
+  const untouched = await renderNoteMarkdownHtml("# 标题\n\n段落\n");
+  assert.match(untouched, /<h1[^>]*>标题<\/h1>/);
+});
+
 test("dollar and display delimiters render, and an empty note does not throw", async () => {
   const html = await renderNoteMarkdownHtml("行内 $Y_t$，以及\n\n$$\nZ_t = \\lambda\n$$\n");
   assert.match(html, /<p>行内 <span class="katex">/);

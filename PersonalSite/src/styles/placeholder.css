@@ -856,19 +856,22 @@ button.filter-sort-arrow:hover {
   justify-content: start;
 }
 
-.note-sheet:has(.note-toc) > .note-intro,
-.note-sheet:has(.note-toc) > .archive-body {
-  grid-column: 1;
+.note-sheet:has(.note-toc) > .note-intro {
+  grid-column: 1 / -1;
+  grid-row: 1;
   min-width: 0;
 }
 
 .note-sheet:has(.note-toc) > .archive-body {
+  grid-column: 1;
+  grid-row: 2;
   max-width: none;
+  min-width: 0;
 }
 
 .note-sheet:has(.note-toc) > .note-toc-slot {
   grid-column: 2;
-  grid-row: 1 / span 2;
+  grid-row: 2;
   align-self: start;
   position: sticky;
   top: calc(var(--header-h) + 12px);
@@ -1204,6 +1207,11 @@ button.media-frame {
   .note-sheet:has(.note-toc) {
     display: flex;
     flex-direction: column;
+  }
+
+  .note-sheet:has(.note-toc) > .note-intro,
+  .note-sheet:has(.note-toc) > .note-toc-slot {
+    width: 100%;
   }
 
   .note-sheet:has(.note-toc) > .note-toc-slot {

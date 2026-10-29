@@ -46,7 +46,7 @@ export function NoteDetailPage() {
           <p className="page-lead">{note.summary}</p>
         </div>
         <NoteToc resetKey={note.slug} />
-        <NoteMarkdown markdown={note.body} />
+        <NoteMarkdown markdown={note.body} pageHeading={heading} />
       </div>
     </div>
   );
