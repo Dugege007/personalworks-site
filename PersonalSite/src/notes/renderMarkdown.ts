@@ -1,5 +1,6 @@
 import { defaultSchema, type Schema } from "hast-util-sanitize";
 import rehypeKatex from "rehype-katex";
+import { transformerCopyButton } from "@rehype-pretty/transformers";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSanitize from "rehype-sanitize";
 import rehypeSlug from "rehype-slug";
@@ -185,7 +186,7 @@ export function normalizeTexDelimiters(markdown: string): string {
 
 /**
  * 组装心得正文管线。每次返回新的处理器，避免插件状态串到下一篇。
- * 顺序是：GFM、中日韩强调、中日韩删除线、数学、KaTeX、净化、标题 id、代码高亮。
+ * 顺序是：GFM、中日韩强调、中日韩删除线、数学、KaTeX、净化、标题 id、代码高亮、代码块语言标记。
  * CommonMark 把全角括号、顿号和句号算作标点。强调或删除线以这类标点收尾，
  * 后面又紧贴汉字时，闭合记号不成右翼，星号会留在正文里，或和后一处记号错配。
  * 中日韩插件只放宽这类翼标判定，放在 GFM 之后、数学之前。
@@ -204,7 +205,44 @@ export function createNoteMarkdownProcessor() {
     .use(rehypeKatex)
     .use(rehypeSanitize, noteSanitizeSchema)
     .use(rehypeSlug)
-    .use(rehypePrettyCode, { theme: "github-light" });
+    .use(rehypePrettyCode, {
+      theme: "github-light",
+      // 按钮默认常显。细指针的悬停显隐改由样式表处理，触控端保持可见。
+      transformers: [transformerCopyButton({ visibility: "always", feedbackDuration: 3_000 })],
+    })
+    .use(stampCodeFigureLanguage);
+}
+
+type HastLike = {
+  type: string;
+  tagName?: string;
+  properties?: Record<string, unknown>;
+  children?: HastLike[];
+};
+
+/**
+ * 把围栏语言抄到 figure 上，供角标读取。
+ * 复制按钮由高亮器在净化之后写入，此处只补语言，不改按钮。
+ */
+function stampCodeFigureLanguage() {
+  return (tree: HastLike) => {
+    const walk = (node: HastLike) => {
+      if (
+        node.type === "element" &&
+        node.tagName === "figure" &&
+        node.properties &&
+        Object.prototype.hasOwnProperty.call(node.properties, "data-rehype-pretty-code-figure")
+      ) {
+        const pre = node.children?.find((child) => child.type === "element" && child.tagName === "pre");
+        const lang = pre?.properties?.["data-language"];
+        if (typeof lang === "string" && lang) {
+          node.properties["data-language"] = lang;
+        }
+      }
+      node.children?.forEach(walk);
+    };
+    walk(tree);
+  };
 }
 
 /**

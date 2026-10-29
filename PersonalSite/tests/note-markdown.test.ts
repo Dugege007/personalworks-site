@@ -100,6 +100,39 @@ test("gfm constructs survive sanitize, including footnotes and relative images",
   assert.equal(codeText.includes("katex"), false);
 });
 
+test("fences keep a copy button, optional line numbers, and unlabeled blocks", async () => {
+  const html = await renderNoteMarkdownHtml(`
+\`\`\`python
+print("hi")
+\`\`\`
+
+\`\`\`js showLineNumbers
+const n = 1;
+\`\`\`
+
+\`\`\`
+plain
+\`\`\`
+`);
+
+  const pythonEnd = html.indexOf("</figure>");
+  const python = html.slice(0, pythonEnd);
+  assert.match(python, /<figure[^>]*data-language="python"/);
+  assert.match(python, /class="rehype-pretty-copy"/);
+  assert.match(python, /data="print\(&#x22;hi&#x22;\)"/);
+  assert.equal(python.includes("data-line-numbers"), false);
+
+  const js = html.slice(pythonEnd, html.lastIndexOf("</figure>") + "</figure>".length);
+  assert.match(js, /data-line-numbers=""/);
+  assert.match(js, /data-language="js"/);
+  assert.match(js, /class="rehype-pretty-copy"/);
+
+  const tail = html.slice(html.lastIndexOf("</figure>"));
+  assert.match(tail, /<pre><code>plain/);
+  assert.equal(tail.includes("rehype-pretty-copy"), false);
+  assert.match(html, /data-theme="github-light"/);
+});
+
 test("dollar and display delimiters render, and an empty note does not throw", async () => {
   const html = await renderNoteMarkdownHtml("行内 $Y_t$，以及\n\n$$\nZ_t = \\lambda\n$$\n");
   assert.match(html, /<p>行内 <span class="katex">/);
@@ -153,7 +186,7 @@ test("published notes keep emphasis, links, and code, and hide frontmatter", asy
     /<strong>有向距离场（Signed Distance Field，SDF）加球面追踪（Sphere Tracing）<\/strong>/,
   );
   assert.match(html, /<a href="https:\/\/iquilezles\.org\/articles\/distfunctions\/">距离函数列表<\/a>/);
-  assert.match(html, /<a href="\/notes-code\/2026-10-17-sdf_sphere_tracing\.py">/);
+  assert.match(html, /<code>code\/2026-10-17-sdf_sphere_tracing\.py<\/code>/);
   assert.match(html, /data-language="glsl"/);
   assert.match(html, /sdRoundBox/);
   assert.equal(html.includes("title:"), false);

@@ -671,15 +671,302 @@ button.filter-sort-arrow:hover {
   overflow-wrap: anywhere;
 }
 
+/* 只染正文里的链接。顶栏、返回链、标签芯片不在 .archive-body 内。 */
+.archive-body a:any-link {
+  color: var(--note-link);
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  text-decoration-color: color-mix(in srgb, var(--note-link) 48%, transparent);
+}
+
+.archive-body a:visited {
+  color: var(--note-link);
+}
+
+.archive-body a:hover {
+  color: var(--note-link-hover);
+  text-decoration-color: currentColor;
+}
+
+.archive-body a:focus-visible {
+  outline: 2px solid var(--note-link);
+  outline-offset: 2px;
+}
+
+.archive-body h2,
+.archive-body h3,
+.archive-body h4 {
+  scroll-margin-top: calc(var(--header-h) + 12px);
+}
+
+.archive-body h2:focus,
+.archive-body h3:focus,
+.archive-body h4:focus {
+  outline: none;
+}
+
+.archive-body h2:focus-visible,
+.archive-body h3:focus-visible,
+.archive-body h4:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 3px;
+}
+
 /* 浏览器给 figure 左右各 40px 外边距，窄屏会把代码栏挤到正文一半宽。 */
 .archive-body figure {
   max-width: 100%;
+  min-width: 0;
 }
 
 .archive-body pre {
   max-width: 100%;
-  overflow: auto;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.archive-body pre,
+.archive-body pre code {
+  white-space: pre;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.archive-body > pre,
+.archive-body :not(figure) > pre {
+  margin: 1.25em 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+/* 高亮块保持 github-light。边框固定在浅色卡片上，避免深色皮肤的线条看不见。 */
+.archive-body figure[data-rehype-pretty-code-figure] {
+  position: relative;
+  margin: 1.25em 0;
+  border: 1px solid #d0d7de;
+  background: #fff;
+}
+
+.archive-body figure[data-rehype-pretty-code-figure][data-language]::before {
+  content: attr(data-language);
+  display: block;
+  box-sizing: border-box;
+  min-height: 36px;
+  padding: 9px 48px 9px 12px;
+  border-bottom: 1px solid #d0d7de;
+  background: #f6f8fa;
+  color: #57606a;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  line-height: 18px;
+}
+
+.archive-body figure[data-rehype-pretty-code-figure] pre {
+  margin: 0;
+  padding: 14px 16px;
+  position: static;
+}
+
+.archive-body figure[data-rehype-pretty-code-figure] pre code {
+  width: max-content;
+  min-width: 100%;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.archive-body pre button.rehype-pretty-copy {
+  top: 4px;
+  right: 8px;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  margin: 0;
+  border-radius: 2px;
+  color: #57606a;
+}
+
+.archive-body pre button.rehype-pretty-copy span {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px 16px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .archive-body pre button.rehype-pretty-copy {
+    opacity: 0;
+  }
+
+  .archive-body figure[data-rehype-pretty-code-figure]:hover pre button.rehype-pretty-copy,
+  .archive-body pre button.rehype-pretty-copy:focus-visible,
+  .archive-body pre button.rehype-pretty-copy.rehype-pretty-copied {
+    opacity: 1;
+  }
+}
+
+.archive-body pre button.rehype-pretty-copy:focus-visible {
+  outline: 2px solid var(--note-link);
+  outline-offset: 2px;
+}
+
+.archive-body code[data-line-numbers] {
+  counter-reset: line;
+}
+
+.archive-body code[data-line-numbers] > [data-line]::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 1.25em;
+  margin-right: 1em;
+  text-align: right;
+  color: #6e7781;
+  user-select: none;
+}
+
+.archive-body code[data-line-numbers-max-digits="2"] > [data-line]::before {
+  width: 1.8em;
+}
+
+.archive-body code[data-line-numbers-max-digits="3"] > [data-line]::before {
+  width: 2.4em;
+}
+
+.archive-body code[data-line-numbers-max-digits="4"] > [data-line]::before {
+  width: 3em;
+}
+
+/* 文末留出一屏，最后一节也能滚到顶栏下方，而不是停在视口中部。 */
+.note-sheet {
+  padding-bottom: calc(100dvh - var(--header-h) - 32px);
+}
+
+.note-sheet:has(.note-toc) {
+  display: grid;
+  grid-template-columns: minmax(0, 42em) minmax(12em, 16em);
+  column-gap: clamp(20px, 2.4vw, 36px);
+  align-items: start;
+  justify-content: start;
+}
+
+.note-sheet:has(.note-toc) > .note-intro,
+.note-sheet:has(.note-toc) > .archive-body {
+  grid-column: 1;
+  min-width: 0;
+}
+
+.note-sheet:has(.note-toc) > .archive-body {
+  max-width: none;
+}
+
+.note-sheet:has(.note-toc) > .note-toc-slot {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: start;
+  position: sticky;
+  top: calc(var(--header-h) + 12px);
+  max-height: calc(100dvh - var(--header-h) - 24px);
+  min-width: 0;
+}
+
+.note-toc {
+  max-height: calc(100dvh - var(--header-h) - 24px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 2px 4px 16px 0;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--text) 35%, transparent) transparent;
+}
+
+.note-toc-label {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 0 0 8px;
+  padding: 2px 0 6px 10px;
+  background: var(--bg);
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+}
+
+.note-toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.note-toc-list .note-toc-list {
+  padding-left: 0.85em;
+}
+
+.note-toc-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 2px;
+}
+
+.note-toc a {
+  display: block;
+  min-width: 0;
+  padding: 4px 0 4px 10px;
+  border-left: 1px solid transparent;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.note-toc a:hover {
+  color: var(--text);
+}
+
+.note-toc a:focus-visible,
+.note-toc-toggle:focus-visible,
+.note-toc-summary:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.note-toc a[aria-current="location"] {
+  color: var(--text);
+  border-left-color: var(--accent);
+}
+
+.note-toc-toggle {
+  width: 28px;
+  height: 28px;
+  margin-top: 1px;
+  color: var(--muted);
+}
+
+.note-toc-toggle::before {
+  content: "";
+  display: block;
+  width: 0.4em;
+  height: 0.4em;
+  margin: 0.35em auto 0;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+}
+
+.note-toc-toggle[aria-expanded="true"]::before {
+  margin-top: 0.22em;
+  transform: rotate(45deg);
+}
+
+.note-toc-summary {
+  display: none;
 }
 
 .archive-table-scroll {
@@ -914,7 +1201,62 @@ button.media-frame {
     margin-inline: 0;
   }
 
-  .archive-body pre {
+  .note-sheet:has(.note-toc) {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .note-sheet:has(.note-toc) > .note-toc-slot {
+    position: static;
+    max-height: none;
+    margin: 0 0 8px;
+  }
+
+  .note-sheet:has(.note-toc) > .archive-body {
+    max-width: 42em;
+  }
+
+  .note-toc {
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+  }
+
+  .note-toc-summary {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    background: color-mix(in srgb, var(--text) 3%, var(--surface));
+    font-size: 14px;
+    text-align: left;
+  }
+
+  .note-toc-summary::after {
+    content: "";
+    width: 0.45em;
+    height: 0.45em;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(45deg);
+  }
+
+  .note-toc-summary[aria-expanded="true"]::after {
+    transform: translateY(0.12em) rotate(225deg);
+  }
+
+  .note-toc.is-panel > div > .note-toc-list {
+    margin: 0;
+    padding: 8px 10px 12px;
+    border: 1px solid var(--line);
+    border-top: 0;
+  }
+
+  .archive-body pre,
+  .archive-body figure[data-rehype-pretty-code-figure] pre {
     padding: 12px 14px;
     font-family: var(--font-mono);
     font-size: 14px;
