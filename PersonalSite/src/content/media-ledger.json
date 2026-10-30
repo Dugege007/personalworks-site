@@ -7525,6 +7525,258 @@
       "stageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/.site-ready/prodlinesim-rte/10.webp",
       "status": "published",
       "sourceStageRel": "产线仿真（line-sim）/ProdLineSim_自研平台/20251021_ProdLineSim_RTE/01 初始界面.png"
+    },
+    {
+      "object": "notes/n-20261029-205600/images/icp_demo.webp",
+      "stageRel": "心得（notes）/20261029_205600/.site-ready/images/icp_demo.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261029_205600/images/icp_demo.png"
+    },
+    {
+      "object": "notes/n-20261028-205600/images/dtw_demo.webp",
+      "stageRel": "心得（notes）/20261028_205600/.site-ready/images/dtw_demo.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261028_205600/images/dtw_demo.png"
+    },
+    {
+      "object": "notes/n-20261027-205600/images/perlin_noise_demo.webp",
+      "stageRel": "心得（notes）/20261027_205600/.site-ready/images/perlin_noise_demo.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_205600/images/perlin_noise_demo.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/arch_contract.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/arch_contract.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/arch_contract.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/arch_overall.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/arch_overall.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/arch_overall.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/arch_simpy.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/arch_simpy.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/arch_simpy.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/conveyor_build_still.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/conveyor_build_still.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/conveyor_build_still.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/device_panel.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/device_panel.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/device_panel.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/fault_highlight.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/fault_highlight.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/fault_highlight.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/inventory_cap.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/inventory_cap.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/inventory_cap.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/kpi_manual.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/kpi_manual.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/kpi_manual.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/kpi_oee.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/kpi_oee.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/kpi_oee.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/kpi_throughput.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/kpi_throughput.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/kpi_throughput.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/main_ui.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/main_ui.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/main_ui.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/navgraph_build_still.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/navgraph_build_still.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/navgraph_build_still.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/navgraph_system.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/navgraph_system.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/navgraph_system.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/playback_load.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/playback_load.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/playback_load.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/product_flow.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/product_flow.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/product_flow.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/scene_manager.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/scene_manager.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/scene_manager.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/transport_anim_still.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/transport_anim_still.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/transport_anim_still.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/transport_static.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/transport_static.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/transport_static.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/web_base_data.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/web_base_data.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/web_base_data.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/web_device.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/web_device.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/web_device.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/web_output_dir.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/web_output_dir.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/web_output_dir.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/web_process_still.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/web_process_still.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/web_process_still.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/web_route_tree.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/web_route_tree.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/web_route_tree.png"
+    },
+    {
+      "object": "notes/n-20261027-010100/images/web_run_sim.webp",
+      "stageRel": "心得（notes）/20261027_010100/.site-ready/images/web_run_sim.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261027_010100/images/web_run_sim.png"
+    },
+    {
+      "object": "notes/n-20261026-205600/images/hungarian_assignment_demo.webp",
+      "stageRel": "心得（notes）/20261026_205600/.site-ready/images/hungarian_assignment_demo.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261026_205600/images/hungarian_assignment_demo.png"
+    },
+    {
+      "object": "notes/n-20261024-205600/images/cubic_bezier_easing_demo.webp",
+      "stageRel": "心得（notes）/20261024_205600/.site-ready/images/cubic_bezier_easing_demo.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261024_205600/images/cubic_bezier_easing_demo.png"
+    },
+    {
+      "object": "notes/n-20261022-205600/images/pid_step_response_demo.webp",
+      "stageRel": "心得（notes）/20261022_205600/.site-ready/images/pid_step_response_demo.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261022_205600/images/pid_step_response_demo.png"
+    },
+    {
+      "object": "notes/n-20261021-205600/images/ransac_line_fit_demo.webp",
+      "stageRel": "心得（notes）/20261021_205600/.site-ready/images/ransac_line_fit_demo.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261021_205600/images/ransac_line_fit_demo.png"
+    },
+    {
+      "object": "notes/n-20261018-205600/images/fft_vibration_fault_demo.webp",
+      "stageRel": "心得（notes）/20261018_205600/.site-ready/images/fft_vibration_fault_demo.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261018_205600/images/fft_vibration_fault_demo.png"
+    },
+    {
+      "object": "notes/n-20261017-205600/images/sdf_sphere_tracing_2d.webp",
+      "stageRel": "心得（notes）/20261017_205600/.site-ready/images/sdf_sphere_tracing_2d.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261017_205600/images/sdf_sphere_tracing_2d.png"
+    },
+    {
+      "object": "notes/n-20261017-205600/images/sdf_sphere_tracing_render.webp",
+      "stageRel": "心得（notes）/20261017_205600/.site-ready/images/sdf_sphere_tracing_render.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261017_205600/images/sdf_sphere_tracing_render.png"
+    },
+    {
+      "object": "notes/n-20261016-205600/images/platt_scaling_reliability.webp",
+      "stageRel": "心得（notes）/20261016_205600/.site-ready/images/platt_scaling_reliability.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261016_205600/images/platt_scaling_reliability.png"
+    },
+    {
+      "object": "notes/n-20261015-205600/images/holt_winters_demo.webp",
+      "stageRel": "心得（notes）/20261015_205600/.site-ready/images/holt_winters_demo.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261015_205600/images/holt_winters_demo.png"
+    },
+    {
+      "object": "notes/n-20261014-205600/images/cusum_demo.webp",
+      "stageRel": "心得（notes）/20261014_205600/.site-ready/images/cusum_demo.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261014_205600/images/cusum_demo.png"
+    },
+    {
+      "object": "notes/n-20261013-205600/images/monotonic_deque_demo.webp",
+      "stageRel": "心得（notes）/20261013_205600/.site-ready/images/monotonic_deque_demo.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261013_205600/images/monotonic_deque_demo.png"
+    },
+    {
+      "object": "notes/n-20261012-205600/images/littles_law_mm1_demo.webp",
+      "stageRel": "心得（notes）/20261012_205600/.site-ready/images/littles_law_mm1_demo.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261012_205600/images/littles_law_mm1_demo.png"
+    },
+    {
+      "object": "notes/n-20261011-205600/images/independent_poisson_football_demo.webp",
+      "stageRel": "心得（notes）/20261011_205600/.site-ready/images/independent_poisson_football_demo.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261011_205600/images/independent_poisson_football_demo.png"
+    },
+    {
+      "object": "notes/n-20261009-205600/images/isolation_forest_demo.webp",
+      "stageRel": "心得（notes）/20261009_205600/.site-ready/images/isolation_forest_demo.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261009_205600/images/isolation_forest_demo.png"
+    },
+    {
+      "object": "notes/n-20261008-205600/images/kalman_1d.webp",
+      "stageRel": "心得（notes）/20261008_205600/.site-ready/images/kalman_1d.webp",
+      "status": "published",
+      "sourceStageRel": "心得（notes）/20261008_205600/images/kalman_1d.png"
     }
   ]
 }
