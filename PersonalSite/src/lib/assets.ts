@@ -1,7 +1,7 @@
 /**
  * 把内容层的 COS 相对键拼成可请求地址。
  * 本地 `VITE_ASSET_BASE` 为空时走 `/placeholders`；上线指向 CDN。
- * `/notes-assets/` 随站点 `public/` 进静态包，保持站点根路径，不改写到对象存储。
+ * `/notes-assets/` 与 `/notes/` 随站点 `public/` 进静态包，保持站点根路径，不改写到对象存储。
  */
 export function assetUrl(path: string): string {
   const base = import.meta.env?.VITE_ASSET_BASE;
@@ -16,7 +16,7 @@ export function resolveAssetUrl(path: string, assetBase: string): string {
   if (!raw) {
     return "";
   }
-  if (/^https?:\/\//i.test(raw) || raw.startsWith("/notes-assets/")) {
+  if (/^https?:\/\//i.test(raw) || raw.startsWith("/notes-assets/") || raw.startsWith("/notes/")) {
     return raw;
   }
   const relative = raw.replace(/^\/+/, "").replace(/^placeholders\//, "");

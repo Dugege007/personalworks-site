@@ -34,6 +34,7 @@ Desktop.ini
 !public/skins/*.png
 # 心得配图随静态包发布，不走 COS placeholders
 !public/notes-assets/**/*.png
+!public/notes/**/*.png
 
 # 视频与音频
 *.mp4

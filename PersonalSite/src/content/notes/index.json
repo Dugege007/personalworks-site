@@ -531,7 +531,7 @@
       "draft": false,
       "hidden": false,
       "previewObjects": [
-        "notes/n-20261018-205600/fft_vibration_fault_demo.webp"
+        "notes/n-20261018-205600/images/fft_vibration_fault_demo.png"
       ],
       "body": {
         "stars": 0,
@@ -547,8 +547,8 @@
       },
       "images": [
         {
-          "stageRel": "心得（notes）/20261018_205600/fft_vibration_fault_demo.png",
-          "objectKey": "notes/n-20261018-205600/fft_vibration_fault_demo.webp",
+          "stageRel": "心得（notes）/20261018_205600/images/fft_vibration_fault_demo.png",
+          "objectKey": "notes/n-20261018-205600/images/fft_vibration_fault_demo.png",
           "stars": 0,
           "tags": [],
           "displayName": "",
@@ -577,8 +577,8 @@
       "draft": false,
       "hidden": false,
       "previewObjects": [
-        "notes/n-20261017-205600/sdf_sphere_tracing_render.webp",
-        "notes/n-20261017-205600/sdf_sphere_tracing_2d.webp"
+        "notes/n-20261017-205600/images/sdf_sphere_tracing_render.png",
+        "notes/n-20261017-205600/images/sdf_sphere_tracing_2d.png"
       ],
       "body": {
         "stars": 0,
@@ -594,8 +594,8 @@
       },
       "images": [
         {
-          "stageRel": "心得（notes）/20261017_205600/sdf_sphere_tracing_2d.png",
-          "objectKey": "notes/n-20261017-205600/sdf_sphere_tracing_2d.webp",
+          "stageRel": "心得（notes）/20261017_205600/images/sdf_sphere_tracing_render.png",
+          "objectKey": "notes/n-20261017-205600/images/sdf_sphere_tracing_render.png",
           "stars": 0,
           "tags": [],
           "displayName": "",
@@ -603,8 +603,8 @@
           "hidden": false
         },
         {
-          "stageRel": "心得（notes）/20261017_205600/sdf_sphere_tracing_render.png",
-          "objectKey": "notes/n-20261017-205600/sdf_sphere_tracing_render.webp",
+          "stageRel": "心得（notes）/20261017_205600/images/sdf_sphere_tracing_2d.png",
+          "objectKey": "notes/n-20261017-205600/images/sdf_sphere_tracing_2d.png",
           "stars": 0,
           "tags": [],
           "displayName": "",
@@ -633,7 +633,7 @@
       "draft": false,
       "hidden": false,
       "previewObjects": [
-        "notes/n-20261016-205600/platt_scaling_reliability.webp"
+        "notes/n-20261016-205600/images/platt_scaling_reliability.png"
       ],
       "body": {
         "stars": 0,
@@ -649,8 +649,8 @@
       },
       "images": [
         {
-          "stageRel": "心得（notes）/20261016_205600/platt_scaling_reliability.png",
-          "objectKey": "notes/n-20261016-205600/platt_scaling_reliability.webp",
+          "stageRel": "心得（notes）/20261016_205600/images/platt_scaling_reliability.png",
+          "objectKey": "notes/n-20261016-205600/images/platt_scaling_reliability.png",
           "stars": 0,
           "tags": [],
           "displayName": "",
@@ -679,7 +679,7 @@
       "draft": false,
       "hidden": false,
       "previewObjects": [
-        "notes/n-20261015-205600/holt_winters_demo.webp"
+        "notes/n-20261015-205600/images/holt_winters_demo.png"
       ],
       "body": {
         "stars": 0,
@@ -695,8 +695,8 @@
       },
       "images": [
         {
-          "stageRel": "心得（notes）/20261015_205600/holt_winters_demo.png",
-          "objectKey": "notes/n-20261015-205600/holt_winters_demo.webp",
+          "stageRel": "心得（notes）/20261015_205600/images/holt_winters_demo.png",
+          "objectKey": "notes/n-20261015-205600/images/holt_winters_demo.png",
           "stars": 0,
           "tags": [],
           "displayName": "",
@@ -725,7 +725,7 @@
       "draft": false,
       "hidden": false,
       "previewObjects": [
-        "notes/n-20261014-205600/cusum_demo.webp"
+        "notes/n-20261014-205600/images/cusum_demo.png"
       ],
       "body": {
         "stars": 0,
@@ -741,8 +741,8 @@
       },
       "images": [
         {
-          "stageRel": "心得（notes）/20261014_205600/cusum_demo.png",
-          "objectKey": "notes/n-20261014-205600/cusum_demo.webp",
+          "stageRel": "心得（notes）/20261014_205600/images/cusum_demo.png",
+          "objectKey": "notes/n-20261014-205600/images/cusum_demo.png",
           "stars": 0,
           "tags": [],
           "displayName": "",
@@ -776,7 +776,7 @@
       "draft": false,
       "hidden": false,
       "previewObjects": [
-        "notes/n-20261013-205600/monotonic_deque_demo.webp"
+        "notes/n-20261013-205600/images/monotonic_deque_demo.png"
       ],
       "body": {
         "stars": 0,
@@ -792,8 +792,8 @@
       },
       "images": [
         {
-          "stageRel": "心得（notes）/20261013_205600/monotonic_deque_demo.png",
-          "objectKey": "notes/n-20261013-205600/monotonic_deque_demo.webp",
+          "stageRel": "心得（notes）/20261013_205600/images/monotonic_deque_demo.png",
+          "objectKey": "notes/n-20261013-205600/images/monotonic_deque_demo.png",
           "stars": 0,
           "tags": [],
           "displayName": "",
@@ -822,7 +822,7 @@
       "draft": false,
       "hidden": false,
       "previewObjects": [
-        "notes/n-20261012-205600/littles_law_mm1_demo.webp"
+        "notes/n-20261012-205600/images/littles_law_mm1_demo.png"
       ],
       "body": {
         "stars": 0,
@@ -839,8 +839,8 @@
       },
       "images": [
         {
-          "stageRel": "心得（notes）/20261012_205600/littles_law_mm1_demo.png",
-          "objectKey": "notes/n-20261012-205600/littles_law_mm1_demo.webp",
+          "stageRel": "心得（notes）/20261012_205600/images/littles_law_mm1_demo.png",
+          "objectKey": "notes/n-20261012-205600/images/littles_law_mm1_demo.png",
           "stars": 0,
           "tags": [],
           "displayName": "",
@@ -869,7 +869,7 @@
       "draft": false,
       "hidden": false,
       "previewObjects": [
-        "notes/n-20261011-205600/independent_poisson_football_demo.webp"
+        "notes/n-20261011-205600/images/independent_poisson_football_demo.png"
       ],
       "body": {
         "stars": 0,
@@ -885,8 +885,8 @@
       },
       "images": [
         {
-          "stageRel": "心得（notes）/20261011_205600/independent_poisson_football_demo.png",
-          "objectKey": "notes/n-20261011-205600/independent_poisson_football_demo.webp",
+          "stageRel": "心得（notes）/20261011_205600/images/independent_poisson_football_demo.png",
+          "objectKey": "notes/n-20261011-205600/images/independent_poisson_football_demo.png",
           "stars": 0,
           "tags": [],
           "displayName": "",
@@ -915,7 +915,7 @@
       "draft": false,
       "hidden": false,
       "previewObjects": [
-        "notes/n-20261009-205600/isolation_forest_demo.webp"
+        "notes/n-20261009-205600/images/isolation_forest_demo.png"
       ],
       "body": {
         "stars": 0,
@@ -932,8 +932,8 @@
       },
       "images": [
         {
-          "stageRel": "心得（notes）/20261009_205600/isolation_forest_demo.png",
-          "objectKey": "notes/n-20261009-205600/isolation_forest_demo.webp",
+          "stageRel": "心得（notes）/20261009_205600/images/isolation_forest_demo.png",
+          "objectKey": "notes/n-20261009-205600/images/isolation_forest_demo.png",
           "stars": 0,
           "tags": [],
           "displayName": "",
@@ -972,7 +972,7 @@
       "draft": false,
       "hidden": false,
       "previewObjects": [
-        "notes/n-20261008-205600/kalman_1d.webp"
+        "notes/n-20261008-205600/images/kalman_1d.png"
       ],
       "body": {
         "stars": 0,
@@ -989,8 +989,8 @@
       },
       "images": [
         {
-          "stageRel": "心得（notes）/20261008_205600/kalman_1d.png",
-          "objectKey": "notes/n-20261008-205600/kalman_1d.webp",
+          "stageRel": "心得（notes）/20261008_205600/images/kalman_1d.png",
+          "objectKey": "notes/n-20261008-205600/images/kalman_1d.png",
           "stars": 0,
           "tags": [],
           "displayName": "",
