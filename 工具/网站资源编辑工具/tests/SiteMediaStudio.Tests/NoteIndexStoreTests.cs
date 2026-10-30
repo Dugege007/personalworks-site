@@ -116,6 +116,144 @@ public sealed class NoteIndexStoreTests
         Assert.Equal(before, File.ReadAllBytes(path));
     }
 
+    [Fact]
+    public void Load_ImagesAsStringPaths_FillsObjectKeyWithoutLeadingSlash()
+    {
+        var json = """
+            {
+              "version": 2,
+              "notes": [
+                {
+                  "folder": "20261029_205600",
+                  "slug": "demo",
+                  "title": "Demo",
+                  "images": [
+                    "/notes-assets/n-20261029-205600/icp_demo.png",
+                    "notes-assets/n-20261029-205600/other.webp"
+                  ]
+                }
+              ]
+            }
+            """;
+        var (_, path) = WriteIndex(json);
+
+        var index = NoteIndexStore.LoadFile(path);
+
+        Assert.Single(index.Notes);
+        Assert.Equal(2, index.Notes[0].Images.Count);
+        Assert.Equal("notes-assets/n-20261029-205600/icp_demo.png", index.Notes[0].Images[0].ObjectKey);
+        Assert.Equal("", index.Notes[0].Images[0].StageRel);
+        Assert.Equal("notes-assets/n-20261029-205600/other.webp", index.Notes[0].Images[1].ObjectKey);
+    }
+
+    [Fact]
+    public void Load_ImagesAsObjects_KeepsExistingFields()
+    {
+        var json = """
+            {
+              "version": 2,
+              "notes": [
+                {
+                  "folder": "20261029_205600",
+                  "slug": "demo",
+                  "title": "Demo",
+                  "images": [
+                    {
+                      "stageRel": "心得（notes）/20261029_205600/images/icp_demo.png",
+                      "objectKey": "notes-assets/n-20261029-205600/icp_demo.png",
+                      "stars": 3,
+                      "tags": ["图解"],
+                      "displayName": "ICP",
+                      "description": "演示图",
+                      "hidden": true
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
+        var (_, path) = WriteIndex(json);
+
+        var index = NoteIndexStore.LoadFile(path);
+        var image = Assert.Single(index.Notes[0].Images);
+
+        Assert.Equal("心得（notes）/20261029_205600/images/icp_demo.png", image.StageRel);
+        Assert.Equal("notes-assets/n-20261029-205600/icp_demo.png", image.ObjectKey);
+        Assert.Equal(3, image.Stars);
+        Assert.Equal(new[] { "图解" }, image.Tags);
+        Assert.Equal("ICP", image.DisplayName);
+        Assert.Equal("演示图", image.Description);
+        Assert.True(image.Hidden);
+    }
+
+    [Fact]
+    public void Load_ImagesMixedStringAndObject_ParsesBoth()
+    {
+        var json = """
+            {
+              "version": 2,
+              "notes": [
+                {
+                  "folder": "mixed",
+                  "slug": "mixed",
+                  "title": "Mixed",
+                  "images": [
+                    "/notes-assets/n-mixed/a.png",
+                    {
+                      "stageRel": "心得（notes）/mixed/images/b.png",
+                      "objectKey": "/notes-assets/n-mixed/b.webp",
+                      "stars": 1,
+                      "tags": [],
+                      "displayName": "",
+                      "description": "",
+                      "hidden": false
+                    }
+                  ]
+                }
+              ]
+            }
+            """;
+        var (_, path) = WriteIndex(json);
+
+        var index = NoteIndexStore.LoadFile(path);
+
+        Assert.Equal(2, index.Notes[0].Images.Count);
+        Assert.Equal("notes-assets/n-mixed/a.png", index.Notes[0].Images[0].ObjectKey);
+        Assert.Equal("notes-assets/n-mixed/b.webp", index.Notes[0].Images[1].ObjectKey);
+        Assert.Equal("心得（notes）/mixed/images/b.png", index.Notes[0].Images[1].StageRel);
+        Assert.Equal(1, index.Notes[0].Images[1].Stars);
+    }
+
+    [Fact]
+    public void Save_AfterLoadingStringImages_WritesObjectsNotStrings()
+    {
+        var json = """
+            {
+              "version": 2,
+              "notes": [
+                {
+                  "folder": "20261029_205600",
+                  "slug": "demo",
+                  "title": "Demo",
+                  "images": [ "/notes-assets/n-20261029-205600/icp_demo.png" ]
+                }
+              ]
+            }
+            """;
+        var (_, path) = WriteIndex(json);
+        var index = NoteIndexStore.LoadFile(path);
+
+        NoteIndexStore.SaveFile(path, index);
+        var written = File.ReadAllText(path);
+
+        Assert.DoesNotContain("\"/notes-assets/", written, StringComparison.Ordinal);
+        Assert.Contains("\"objectKey\": \"notes-assets/n-20261029-205600/icp_demo.png\"", written, StringComparison.Ordinal);
+        Assert.Contains("\"stageRel\":", written, StringComparison.Ordinal);
+
+        var reloaded = NoteIndexStore.LoadFile(path);
+        Assert.Equal("notes-assets/n-20261029-205600/icp_demo.png", Assert.Single(reloaded.Notes[0].Images).ObjectKey);
+    }
+
     private static (WorkspaceProfile Profile, string Path) WriteIndex(string content)
     {
         var profile = Profile();
