@@ -7,6 +7,7 @@ import { TermText } from "../TermText";
 import { resolveLead, resolveMediaDescription } from "../../content/copyDisplay";
 import { ImageLightbox, type LightboxShot } from "./ImageLightbox";
 import { InlineWorkVideo } from "./InlineWorkVideo";
+import { PhotoMasonry } from "./PhotoMasonry";
 import "../../styles/photo-masonry.css";
 import "../../styles/placeholder.css";
 import "../../styles/project-gallery.css";
@@ -237,12 +238,15 @@ export function ProjectGallery({
               ) : null}
             </header>
           ) : null}
-          <div
-            className={
-              useMasonry ? "photo-masonry" : useTwinFlow ? "project-gallery-flow" : "project-gallery-images"
-            }
-            data-count={useMasonry || useTwinFlow ? tiles.length : undefined}
-          >
+          {useMasonry ? (
+            <PhotoMasonry count={tiles.length}>
+              {tiles.map((image, index) => renderShot(image, index))}
+            </PhotoMasonry>
+          ) : (
+            <div
+              className={useTwinFlow ? "project-gallery-flow" : "project-gallery-images"}
+              data-count={useTwinFlow ? tiles.length : undefined}
+            >
             {isTwinPreview && mainTile && sideTiles.length > 0 ? (
               <>
                 {renderShot(mainTile, 0)}
@@ -267,7 +271,8 @@ export function ProjectGallery({
             ) : (
               tiles.map((image, index) => renderShot(image, index))
             )}
-          </div>
+            </div>
+          )}
         </article>
         );
       })}

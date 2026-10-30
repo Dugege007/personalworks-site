@@ -1,7 +1,10 @@
-/* 摄影图墙：按列宽缩放、保持原比例，不裁切。 */
+/* 摄影图墙：按列宽缩放、保持原比例，不裁切。
+   列数断点与 photoMasonryColumnCount 一致。
+   真正分列走最短列（.is-row）；column-count 只在没挂脚本时兜底。 */
 .photo-masonry {
+  --photo-masonry-gap: 14px;
   column-count: 3;
-  column-gap: 14px;
+  column-gap: var(--photo-masonry-gap);
 }
 
 .photo-masonry[data-count="1"],
@@ -85,109 +88,24 @@
   }
 }
 
-/* 总览按行分列：横读即排序。详情图墙仍用上面的纵向多列。 */
+/* 最短列：子项按源顺序留在文档流外，再按列高绝对定位。 */
 .photo-masonry.is-row,
 .photo-masonry.is-row[data-count="1"],
 .photo-masonry.is-row[data-count="2"] {
-  display: flex;
-  align-items: flex-start;
+  position: relative;
+  display: block;
   column-count: auto;
-  gap: 14px;
 }
 
-.photo-masonry.is-row .photo-masonry-col {
-  flex: 1 1 0;
+.photo-masonry.is-row .photo-masonry-item {
+  position: absolute;
+  margin: 0;
   min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
 }
 
-.photo-masonry.is-row .photo-masonry-col > .card,
-.photo-masonry.is-row .photo-masonry-col > .project-gallery-shot {
-  margin-bottom: 0;
-}
-
-@media (min-width: 1400px) {
-  .photo-masonry.is-row:not([data-count="1"]):not([data-count="2"]) {
-    column-count: auto;
-  }
-}
-
-@media (max-width: 900px) {
-  .photo-masonry.is-row {
-    column-count: auto;
-  }
-}
-
-@media (max-width: 560px) {
-  .photo-masonry.is-row:not([data-count="1"]):not([data-count="2"]) {
-    column-count: auto;
-  }
-}
-
-/* 总览按行分列：横读即排序。详情图墙仍用上面的纵向多列。 */
-.photo-masonry.is-row,
-.photo-masonry.is-row[data-count="1"],
-.photo-masonry.is-row[data-count="2"] {
-  display: flex;
-  align-items: flex-start;
-  column-count: auto;
-  gap: 14px;
-}
-
-.photo-masonry.is-row .photo-masonry-col {
-  flex: 1 1 0;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.photo-masonry.is-row .photo-masonry-col > .card,
-.photo-masonry.is-row .photo-masonry-col > .project-gallery-shot {
-  margin-bottom: 0;
-}
-
-@media (min-width: 1400px) {
-  .photo-masonry.is-row:not([data-count="1"]):not([data-count="2"]) {
-    column-count: auto;
-  }
-}
-
-@media (max-width: 900px) {
-  .photo-masonry.is-row {
-    column-count: auto;
-  }
-}
-
-@media (max-width: 560px) {
-  .photo-masonry.is-row:not([data-count="1"]):not([data-count="2"]) {
-    column-count: auto;
-  }
-}
-
-/* 总览按行分列：横读即排序。详情图墙仍用上面的纵向多列。 */
-.photo-masonry.is-row,
-.photo-masonry.is-row[data-count="1"],
-.photo-masonry.is-row[data-count="2"] {
-  display: flex;
-  align-items: flex-start;
-  column-count: auto;
-  gap: 14px;
-}
-
-.photo-masonry.is-row .photo-masonry-col {
-  flex: 1 1 0;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.photo-masonry.is-row .photo-masonry-col > .card,
-.photo-masonry.is-row .photo-masonry-col > .project-gallery-shot {
-  margin-bottom: 0;
+.photo-masonry.is-row .card,
+.photo-masonry.is-row .project-gallery-shot {
+  margin: 0;
 }
 
 @media (min-width: 1400px) {
