@@ -120,6 +120,7 @@ public sealed class NoteResourceMeta
 /// <summary>
 /// 一张已入库或待入库的配图。
 /// </summary>
+[JsonConverter(typeof(NoteImageMetaJsonConverter))]
 public sealed class NoteImageMeta
 {
     public string StageRel { get; set; } = "";
