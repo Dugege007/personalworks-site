@@ -707,7 +707,7 @@ const registeredWorks: WorkRecord[] = [
     year: "2026",
     startedOn: "2026-07-25",
     place: "上海",
-    summary: "和小不点出来逛街",
+    summary: "",
     body: "",
     consent: "granted",
     stageFolder: "real-world-photo/2026/20260725 上海 南京路 小不点",
