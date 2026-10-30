@@ -54,28 +54,6 @@
                                TextWrapping="Wrap"
                                Margin="0,4,0,0"
                                Visibility="{Binding ShowNoteImageFooter, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                    <TextBlock Text="{Binding SyncNotice}"
-                               Foreground="{StaticResource OxideBrush}"
-                               FontWeight="SemiBold"
-                               FontSize="13"
-                               TextWrapping="Wrap"
-                               Margin="0,4,0,0"
-                               Visibility="{Binding ShowSyncNotice, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                    <TextBlock Text="{Binding NoteStageNotice}"
-                               Foreground="{StaticResource OxideBrush}"
-                               FontWeight="SemiBold"
-                               FontSize="13"
-                               TextWrapping="Wrap"
-                               Margin="0,4,0,0"
-                               Visibility="{Binding ShowNoteStageNotice, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                    <Button Style="{StaticResource GhostButton}"
-                            Content="一键压缩超限配图"
-                            Command="{Binding CompressOverLimitCommand}"
-                            ToolTip="{Binding SyncWriteToolTip}"
-                            ToolTipService.ShowOnDisabled="True"
-                            HorizontalAlignment="Left"
-                            Margin="0,8,0,0"
-                            Visibility="{Binding ShowNoteCompress, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                     <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource MutedBrush}" Margin="0,4,0,0"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
