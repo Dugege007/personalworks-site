@@ -2,6 +2,53 @@
   "version": 2,
   "notes": [
     {
+      "folder": "20261030_205600",
+      "slug": "n-20261030-205600",
+      "title": "\u6700\u77ED\u5217\u7011\u5E03\u6D41\u2014\u2014\u4E0B\u4E00\u5F20\u5361\u7247\u603B\u662F\u5806\u5230\u5F53\u524D\u6700\u77EE\u7684\u90A3\u4E00\u5217",
+      "mainTitle": "\u6700\u77ED\u5217\u7011\u5E03\u6D41",
+      "subtitle": "\u4E0B\u4E00\u5F20\u5361\u7247\u603B\u662F\u5806\u5230\u5F53\u524D\u6700\u77EE\u7684\u90A3\u4E00\u5217",
+      "date": "2026-10-30",
+      "createdAt": "2026-10-30 20:56:00",
+      "revisedAt": "2026-10-30 20:56:00",
+      "summary": "SEED=42\u300130 \u5F20\u5BF9\u7167\uFF1A3 \u5217 height_spread round-robin\u2248338.82 vs \u6700\u77ED\u5217\u2248111.93\uFF1B4 \u5217\u2248732.64 vs\u2248136.83\uFF1B\u6700\u77ED\u5217\u9876\u8FB9\u9006\u5E8F\u5BF9=0\u3001Kendall \u03C4=1.0\u3002",
+      "revisions": [
+        {
+          "at": "2026-10-30 20:56:00",
+          "summary": "",
+          "source": "publish"
+        }
+      ],
+      "draft": false,
+      "hidden": false,
+      "previewObjects": [
+        "notes/n-20261030-205600/images/shortest_column_masonry_demo.webp"
+      ],
+      "body": {
+        "stars": 0,
+        "tags": [
+          "\u7B97\u6CD5",
+          "\u7011\u5E03\u6D41",
+          "Masonry",
+          "\u524D\u7AEF\u5E03\u5C40",
+          "\u6700\u77ED\u5217\u8D2A\u5FC3",
+          "\u4E2A\u4EBA\u7AD9"
+        ],
+        "displayName": "",
+        "description": "SEED=42\u300130 \u5F20\u5BF9\u7167\uFF1A3 \u5217 height_spread round-robin\u2248338.82 vs \u6700\u77ED\u5217\u2248111.93\uFF1B4 \u5217\u2248732.64 vs\u2248136.83\uFF1B\u6700\u77ED\u5217\u9876\u8FB9\u9006\u5E8F\u5BF9=0\u3001Kendall \u03C4=1.0\u3002"
+      },
+      "images": [
+        {
+          "stageRel": "\u5FC3\u5F97\uFF08notes\uFF09/20261030_205600/images/shortest_column_masonry_demo.png",
+          "objectKey": "notes/n-20261030-205600/images/shortest_column_masonry_demo.webp",
+          "stars": 0,
+          "tags": [],
+          "displayName": "",
+          "description": "",
+          "hidden": false
+        }
+      ]
+    },
+    {
       "folder": "20261029_205600",
       "slug": "n-20261029-205600",
       "title": "ICP \u8FED\u4EE3\u6700\u8FD1\u70B9\u2014\u2014\u628A\u5E26\u566A\u58F0\u7684\u626B\u63CF\u70B9\u4E91\u521A\u4F53\u62E7\u56DE CAD \u5750\u6807\u7CFB",
