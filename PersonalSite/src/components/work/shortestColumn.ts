@@ -18,6 +18,7 @@ export type ShortestColumnLayout = {
 /**
  * 最短列贪心。下一项放入当前高度最小的列；多列同高时取最左列。
  * `itemHeights` 是卡片内容高度，不含列间距。放置后把间距计入列高，便于和下一张比较。
+ * 高度不是正数时不占槽：仍记下坐标，但不推进列高，也不把间距算进去。
  */
 export function placeShortestColumns(
   itemHeights: readonly number[],
@@ -39,6 +40,9 @@ export function placeShortestColumns(
     const top = running[column];
     const itemHeight = rawHeight > 0 && Number.isFinite(rawHeight) ? rawHeight : 0;
     placements.push({ column, top });
+    if (itemHeight === 0) {
+      continue;
+    }
     running[column] = top + itemHeight + safeGap;
   }
 
@@ -48,12 +52,15 @@ export function placeShortestColumns(
 }
 
 /**
- * 还没测到高度的卡片用已知高度的中位数占位，避免在高度仍为 0 时全部堆进最左列。
+ * 还没测到高度、且尚未失败的卡片用已知高度的中位数占位，避免在高度仍为 0 时全部堆进最左列。
  * 一张都还没测到时，用 `unknownFallback`（通常是列宽）让各列先按并列规则从左向右铺开。
+ * `failed` 与 `measured` 对齐。已失败且高度仍非正数时保留 0，不吃中位数，调用方据此跳过占槽。
+ * 中位数只来自已经测到的正高度；尚未加载的 0 才用它。
  */
 export function masonryHeightsForPlacement(
   measured: readonly number[],
   unknownFallback = 1,
+  failed?: readonly boolean[],
 ): number[] {
   const known: number[] = [];
   for (const height of measured) {
@@ -66,5 +73,13 @@ export function masonryHeightsForPlacement(
     known.sort((left, right) => left - right);
     fallback = known[Math.floor((known.length - 1) / 2)];
   }
-  return measured.map((height) => (height > 0 && Number.isFinite(height) ? height : fallback));
+  return measured.map((height, index) => {
+    if (height > 0 && Number.isFinite(height)) {
+      return height;
+    }
+    if (failed?.[index]) {
+      return 0;
+    }
+    return fallback;
+  });
 }

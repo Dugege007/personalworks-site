@@ -103,6 +103,12 @@
   min-width: 0;
 }
 
+/* 失败且没有高度的格子不显示，避免叠在下一张上。占位高度已按 0 跳过。 */
+.photo-masonry.is-row .photo-masonry-item.is-load-failed {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .photo-masonry.is-row .card,
 .photo-masonry.is-row .project-gallery-shot {
   margin: 0;
