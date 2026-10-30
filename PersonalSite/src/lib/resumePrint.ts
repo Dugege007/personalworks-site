@@ -1,27 +1,31 @@
 /**
- * 简历打印态的纯转换：相对链接写成线上绝对地址，并按一页 A4 投递视图压缩正文。
- * 不读取 Markdown，页面把 `文稿/resume.md` 的解析结果传进来。
+ * 简历打印态：正文取当前文稿，站内链接补成线上绝对地址。
+ * 一页放不下时按档位收行距、压缩实习与自学，再依次去掉 Github 与个人主页。
  */
 
 export const RESUME_PRINT_ORIGIN = "https://duhongbo.com";
 
-export const RESUME_PRINT_BLOG_HREF = "https://blog.csdn.net/Dugege007";
+/** 投递稿手机号。公开形象页不写全文，只在打印稿出现。 */
+export const PRINT_PHONE_LABEL = "手机号(同微信)";
+export const PRINT_PHONE_TEXT = "15139219231";
 
-/** 网站上已公开、且允许写进一页纸的数字孪生客户。顺序与投递叙事一致。 */
-export const PRINT_TWIN_CLIENT_IDS = [
-  "akzonobel-shanghai-songjiang",
-  "weichai-spark-plug",
-  "ningbo-siweier",
-  "shanghai-mansheng-packaging",
-] as const;
+export const PRINT_HOME_LABEL = "个人主页";
+export const PRINT_HOME_TEXT = "www.duhongbo.com";
+export const PRINT_HOME_HREF = "https://duhongbo.com";
 
-const SECONDARY_SKILL = /Photoshop/;
-const SITE_META_SKILL = /Vibe Coding|\[网站\]/;
+/** 与 `resume-print.css` 的 `@page` 边距一致。打印态可用高度要扣掉上下边距。 */
+export const PRINT_PAGE_HEIGHT_MM = 297;
+export const PRINT_PAGE_MARGIN_MM = 12;
 
-export type PrintContactInput = {
-  id: string;
-  value?: string;
-  href?: string;
+export type PrintContactSource = {
+  mail?: string;
+  githubText?: string;
+  githubHref?: string;
+};
+
+export type PrintContactDrop = {
+  github?: boolean;
+  homepage?: boolean;
 };
 
 export type PrintContact = {
@@ -39,18 +43,43 @@ export type PrintJobInput = {
   span: string;
 };
 
-export type PrintWorkTitle = {
-  id: string;
-  title: string;
-  channel: string;
+export type PrintFitLevel = {
+  density: 0 | 1 | 2 | 3;
+  compressSecondary: boolean;
+  dropGithub: boolean;
+  dropHomepage: boolean;
 };
 
-const CONTACT_LABEL: Record<string, string> = {
-  profilePhone: "手机",
-  profileMail: "邮箱",
-  profileBase: "现居地",
-  profileGithub: "GitHub",
-};
+/**
+ * 从疏到密。先收行距和栏间距，再压缩实习与自学，最后才删联系项。
+ * Github 先于个人主页去掉。
+ */
+export const PRINT_FIT_LEVELS: readonly PrintFitLevel[] = [
+  { density: 0, compressSecondary: false, dropGithub: false, dropHomepage: false },
+  { density: 1, compressSecondary: false, dropGithub: false, dropHomepage: false },
+  { density: 2, compressSecondary: false, dropGithub: false, dropHomepage: false },
+  { density: 2, compressSecondary: true, dropGithub: false, dropHomepage: false },
+  { density: 3, compressSecondary: true, dropGithub: false, dropHomepage: false },
+  { density: 3, compressSecondary: true, dropGithub: true, dropHomepage: false },
+  { density: 3, compressSecondary: true, dropGithub: true, dropHomepage: true },
+];
+
+/**
+ * 下载文件名：当前页面显示的中文姓名，加当天日期。例：杜红勃简历-20261031.pdf。
+ */
+export function resumePdfFilename(displayName: string, date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${displayName}简历-${year}${month}${day}.pdf`;
+}
+
+/**
+ * 打印对话框用来建议文件名的标题。不带扩展名，避免被存成 `.pdf.pdf`。
+ */
+export function resumePdfSaveTitle(displayName: string, date: Date): string {
+  return resumePdfFilename(displayName, date).replace(/\.pdf$/i, "");
+}
 
 /**
  * 站内路径补成 https 绝对地址；`http://duhongbo.com` 升为 https。其余地址原样返回。
@@ -67,126 +96,109 @@ export function toResumePrintHref(href: string, origin = RESUME_PRINT_ORIGIN): s
 }
 
 /**
- * 笔记栏外链。稿面未写时仍保留已公开的 CSDN 地址。
+ * 打印态一页的可用高度（毫米）。屏幕预览含内边距，按整页 297mm 量；打印时边距在 `@page`。
  */
-export function printBlogHref(href?: string): string {
-  const next = href?.trim() ? toResumePrintHref(href) : "";
-  return next || RESUME_PRINT_BLOG_HREF;
+export function printSheetLimitMm(printMedia: boolean): number {
+  if (!printMedia) {
+    return PRINT_PAGE_HEIGHT_MM;
+  }
+  return PRINT_PAGE_HEIGHT_MM - PRINT_PAGE_MARGIN_MM * 2;
 }
 
 /**
- * 联系区全文。只取站点已有文字；微信与 QQ 仅有二维码，打印稿不放。
- * 手机号仅在形象数据里写了全文时出现。
+ * 联系区按三列排。第三列第一行是现居地。邮箱、Github 取形象数据。
+ * 个人主页与 Github 带超链接，邮箱和现居地只留文字。地方不够时先去掉 Github，再去掉个人主页。
  */
-export function printContactLines(channels: PrintContactInput[]): PrintContact[] {
-  const lines: PrintContact[] = [];
-  for (const channel of channels) {
-    const label = CONTACT_LABEL[channel.id];
-    const text = channel.value?.trim() ?? "";
-    if (!label || !text) {
-      continue;
-    }
-    let href = channel.href?.trim() ? toResumePrintHref(channel.href) : undefined;
-    if (!href && channel.id === "profileMail") {
-      href = `mailto:${text}`;
-    }
-    if (!href && channel.id === "profilePhone") {
-      href = `tel:${text.replace(/\s+/g, "")}`;
-    }
-    lines.push({ id: channel.id, label, text, href });
+export function printContacts(source: PrintContactSource, drop: PrintContactDrop = {}): PrintContact[] {
+  const lines: PrintContact[] = [
+    { id: "phone", label: PRINT_PHONE_LABEL, text: PRINT_PHONE_TEXT },
+  ];
+  const mail = source.mail?.trim() ?? "";
+  if (mail) {
+    lines.push({ id: "mail", label: "邮箱", text: mail });
+  }
+  lines.push({ id: "base", label: "现居地", text: "上海 青浦区" });
+  if (!drop.homepage) {
+    lines.push({
+      id: "homepage",
+      label: PRINT_HOME_LABEL,
+      text: PRINT_HOME_TEXT,
+      href: PRINT_HOME_HREF,
+    });
+  }
+  const githubText = source.githubText?.trim() ?? "";
+  if (!drop.github && githubText) {
+    const githubHref = source.githubHref?.trim() ?? "";
+    lines.push({
+      id: "github",
+      label: "Github",
+      text: githubText,
+      href: githubHref ? toResumePrintHref(githubHref) : undefined,
+    });
   }
   return lines;
 }
 
 /**
- * 标题里地点后缀不进一页纸的客户列举，避免和简历原文重复堆叠。
+ * 页眉简介只留前两行。
  */
-export function shortClientTitle(title: string): string {
-  const head = title.split("·")[0]?.trim() ?? "";
-  return head || title.trim();
+export function printIntroLines(summary: string, count = 2): string {
+  return summary
+    .split(/\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, count)
+    .join("\n");
 }
 
 /**
- * 从公开作品记录里按固定顺序取出客户短名。站点未收录的项目不会被写进 PDF。
+ * 实习看职务或组织。打印稿的此前经历不收录实习。
  */
-export function digitalTwinClientNames(works: PrintWorkTitle[]): string[] {
-  const names: string[] = [];
-  for (const id of PRINT_TWIN_CLIENT_IDS) {
-    const work = works.find((item) => item.id === id && item.channel === "digital-twin");
-    if (!work) {
-      continue;
-    }
-    const name = shortClientTitle(work.title);
-    if (name && !names.includes(name)) {
-      names.push(name);
-    }
+export function isPrintInternship(job: { role: string; org?: string }): boolean {
+  return secondaryKind(job) === "intern";
+}
+
+/**
+ * 实习看职务或组织；自学看组织里的「自学」。不按项目名单取舍。
+ */
+export function isPrintSecondaryJob(job: { role: string; org?: string }): boolean {
+  return secondaryKind(job) !== "";
+}
+
+/**
+ * 默认整段照录。仅在档位要求压缩时，实习留第一行，自学留含「奖」的行。
+ */
+export function printJobSummary(job: PrintJobInput, compressSecondary: boolean): string {
+  const summary = job.summary.trim();
+  if (!compressSecondary) {
+    return summary;
   }
-  return names;
-}
-
-/**
- * 技能保留数字孪生主线，并留下景观施工图这一句。次要的后期软件与站点自述不进一页纸。
- */
-export function selectPrintSkillItems(items: string[]): string[] {
-  return items.filter((item) => !SECONDARY_SKILL.test(item) && !SITE_META_SKILL.test(item));
-}
-
-/**
- * 简介取第一句，作为页眉定位。
- */
-export function printRoleLine(summary: string): string {
-  return summary.split(/\n/).map((line) => line.trim()).find(Boolean) ?? "";
-}
-
-/**
- * 实习与古建园林院不进投递页。
- */
-export function isOmittedPrintJob(job: { role: string; org?: string }): boolean {
-  const org = job.org ?? "";
-  return job.role.includes("实习") || org.includes("古建园林设计院");
-}
-
-/**
- * 默派段：客户名与网站公开作品对齐，ProdLineSim 写成自研并链到站内产线仿真索引，不写仓库地址。
- */
-export function compressMopaiSummary(summary: string, lineSimHref: string, clientNames: string[]): string {
-  let text = summary.replace(/\s*\[查看功能简介\]/g, "");
-  text = text.replace(/[；;]\s*ProdLineSim\s*产线仿真项目\s*。?/g, "。");
-  const detail = `自研产线仿真平台 ProdLineSim。\n[详见网站](${lineSimHref})`;
-  if (text.includes("；自研开发产线仿真平台")) {
-    text = text.replace("；自研开发产线仿真平台", `。\n${detail}`);
-  } else if (text.includes("自研开发产线仿真平台")) {
-    text = text.replace("自研开发产线仿真平台", detail);
-  } else if (!text.includes(lineSimHref)) {
-    text = `${text.trim()}\n${detail}。`;
+  const kind = secondaryKind(job);
+  if (!kind) {
+    return summary;
   }
-  const missing = clientNames.filter((name) => name && !text.includes(name));
-  if (missing.length > 0 && text.includes("等多个项目")) {
-    text = text.replace("等多个项目", `、${missing.join("、")}等多个项目`);
-  }
-  text = text.replace(/\s*(\[查看项目简介\]\([^)]+\))/g, "\n$1");
-  return text.replace(/。{2,}/g, "。").replace(/[ \t]+。/g, "。").trim();
-}
-
-/**
- * 自学段只留获奖句。游戏 Demo 枚举与独立项目条不进一页纸。
- */
-export function compressStudySummary(summary: string): string {
   const lines = summary.split(/\n/).map((line) => line.trim()).filter(Boolean);
-  const award = lines.find((line) => line.includes("奖"));
-  return award ?? lines[lines.length - 1] ?? summary.trim();
+  if (lines.length === 0) {
+    return summary;
+  }
+  if (kind === "study") {
+    const awards = lines.filter((line) => line.includes("奖"));
+    return (awards.length > 0 ? awards : [lines[0]]).join("\n");
+  }
+  return lines[0] ?? summary;
 }
 
 /**
- * 按组织把经历收成打印正文。景观两段保持稿面，已是两行量级。
+ * 去掉加粗记号后再判断，避免文稿里的 `**` 挡住「实习」「自学」。
  */
-export function compressJobSummary(job: PrintJobInput, lineSimHref: string, clientNames: string[]): string {
-  const org = job.org ?? "";
-  if (org.includes("默派") || job.role.includes("数字孪生与产线仿真")) {
-    return compressMopaiSummary(job.summary, lineSimHref, clientNames);
+function secondaryKind(job: { role: string; org?: string }): "" | "intern" | "study" {
+  const role = (job.role ?? "").replace(/\*/g, "");
+  const org = (job.org ?? "").replace(/\*/g, "");
+  if (role.includes("实习") || org.includes("实习")) {
+    return "intern";
   }
-  if (org.includes("自学") || org.includes("独立开发")) {
-    return compressStudySummary(job.summary);
+  if (org.includes("自学")) {
+    return "study";
   }
-  return job.summary.trim();
+  return "";
 }

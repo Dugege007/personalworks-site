@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   PROFILE_NAME_KEY,
   parseProfileNameMode,
+  profileDisplayName,
   readProfileNameMode,
   siteDocumentTitle,
   toggleProfileNameMode,
@@ -12,6 +13,11 @@ import {
 test("标签页标题跟随曾用名与现用名", () => {
   assert.equal(siteDocumentTitle("杜宏博"), "杜宏博-个人网站");
   assert.equal(siteDocumentTitle("杜红勃"), "杜红勃-个人网站");
+});
+
+test("展示名跟随当前姓名模式", () => {
+  assert.equal(profileDisplayName("alias", "杜宏博", "杜红勃"), "杜宏博");
+  assert.equal(profileDisplayName("legal", "杜宏博", "杜红勃"), "杜红勃");
 });
 
 test("姓名模式只认 legal，其余回到曾用名", () => {

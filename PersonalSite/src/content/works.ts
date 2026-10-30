@@ -290,7 +290,7 @@ const registeredWorks: WorkRecord[] = [
     title: "ProdLineSim_RTE 产线仿真平台",
     year: "2025",
     startedOn: "2025-10-21",
-    summary: "自研三维产线仿真平台：Unity 搭线与回放、DataForge3D 维护工艺主数据、SimPy 跑离散事件仿真。详细介绍见站内心得《PLS／ProdLineSim_RTE 产线仿真平台模块功能介绍》。",
+    summary: "自研三维产线仿真平台：Unity 搭线与回放、DataForge3D 维护工艺主数据、SimPy 跑离散事件仿真。详细介绍见站内心得《PLS_RTE 产线仿真平台模块功能介绍》。",
     body: "",
     consent: "granted",
     stageFolder: "line-sim/ProdLineSim_自研平台/20251021_ProdLineSim_RTE",

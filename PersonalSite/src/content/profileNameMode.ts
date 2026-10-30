@@ -20,6 +20,13 @@ export function siteDocumentTitle(name: string): string {
 }
 
 /**
+ * 当前要显示的中文姓名。只有现用名模式用身份证名，其余用曾用名。
+ */
+export function profileDisplayName(mode: ProfileNameMode, aliasName: string, legalName: string): string {
+  return mode === "legal" ? legalName : aliasName;
+}
+
+/**
  * 在曾用名与现用名之间对调。
  */
 export function toggleProfileNameMode(mode: ProfileNameMode): ProfileNameMode {

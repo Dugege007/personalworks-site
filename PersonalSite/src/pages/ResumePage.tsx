@@ -16,11 +16,10 @@ import type { Locale } from "../prefs/types";
 import { profile } from "../content/site";
 import { queryNotes } from "../ia/query";
 import { assetUrl } from "../lib/assets";
+import { resumeNoteLabel, selectResumeNotes } from "../lib/resumeNotes";
 import { tx } from "../prefs/tx";
 import { usePrefs } from "../prefs/PrefsProvider";
 import "../styles/resume.css";
-
-const RESUME_NOTE_LIMIT = 3;
 
 /**
  * 简历单页：左栏钉住身份，右栏时间线。缺字段不渲染。
@@ -29,11 +28,9 @@ export function ResumePage() {
   const { locale } = usePrefs();
   const [failed, setFailed] = useState(false);
   const portrait = !failed && profile.portraitSrc ? assetUrl(profile.portraitSrc) : "";
-  const noteCards = queryNotes({ source: "notes" })
-    .filter((note) => !note.draft)
-    .slice(0, RESUME_NOTE_LIMIT);
+  const pageNotes = selectResumeNotes(queryNotes({ source: "notes" }));
   const blogLabel = resume.blogLabel ? tx(resume.blogLabel, locale) : "CSDN 笔记";
-  const hasNotesCol = noteCards.length > 0 || Boolean(resume.blogHref);
+  const hasNotesCol = pageNotes.length > 0 || Boolean(resume.blogHref);
   const hasSkillCol = resume.skills.some((group) => group.items.length > 0) || resume.skillLinks.length > 0;
   const hasPair = resume.languages.length > 0 || hasNotesCol;
   const summary = tx(resume.summary, locale);
@@ -147,11 +144,6 @@ export function ResumePage() {
               <div>
                 <h2>笔记</h2>
                 <ul className="resume-notes">
-                  {noteCards.map((note) => (
-                    <li key={note.slug}>
-                      <Link to={`/${lexicon.notes.key}/${note.slug}`}>{note.title}</Link>
-                    </li>
-                  ))}
                   {resume.blogHref ? (
                     <li>
                       <a href={resume.blogHref} target="_blank" rel="noreferrer noopener">
@@ -159,11 +151,25 @@ export function ResumePage() {
                       </a>
                     </li>
                   ) : null}
+                  {pageNotes.map((note) => (
+                    <li key={note.slug}>
+                      <Link
+                        to={`/${lexicon.notes.key}/${note.slug}`}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                      >
+                        {resumeNoteLabel(note)}
+                      </Link>
+                    </li>
+                  ))}
                 </ul>
               </div>
             ) : null}
           </section>
         ) : null}
+        <p className="resume-export">
+          <Link to={`/${lexicon.profileResume.key}/print`}>导出PDF</Link>
+        </p>
       </div>
     </div>
   );
@@ -215,12 +221,12 @@ function ResumeJobItem({ job, index, locale }: { job: ResumeJob; index: number; 
 }
 
 /**
- * 履历里的 `[文字](地址)`。站内走路由，站外新开页。
+ * 履历里的 `[文字](地址)`。站内、站外都新开标签页。
  */
 function ResumeLink({ href, children }: { href: string; children: string }) {
   if (href.startsWith("/")) {
     return (
-      <Link className="resume-text-link" to={href}>
+      <Link className="resume-text-link" to={href} target="_blank" rel="noreferrer noopener">
         <span className="jump-link-label">{children}</span>
         <JumpLinkIcon />
       </Link>
@@ -249,7 +255,7 @@ function ResumeMarks({ text, annotate }: { text: string; annotate?: boolean }) {
             </ResumeLink>
           );
         }
-        const body = annotate ? <TermText text={mark.text} /> : mark.text;
+        const body = annotate ? <TermText text={mark.text} newTab /> : mark.text;
         return mark.bold ? <strong key={key}>{body}</strong> : <Fragment key={key}>{body}</Fragment>;
       })}
     </>

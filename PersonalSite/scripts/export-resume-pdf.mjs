@@ -1,5 +1,6 @@
 /**
- * 把打印态简历导出为一页 A4 PDF，并保留可点击的 https 链接。
+ * 按当前文稿导出一页 A4 PDF。打印页读取 `文稿/resume.md`，改文稿后重新执行即可。
+ * 页内链接写成绝对地址；放不下时打印页会收行距，并压缩实习与自学。
  *
  * 用法：npm run export:resume-pdf
  * 可选：--url http://127.0.0.1:5173  复用已打开的开发服务，跳过构建
@@ -18,11 +19,6 @@ import { fileURLToPath } from "node:url";
 
 const PRINT_PATH = "/profile-resume/print";
 const OUTPUT_NAME = "杜宏博-Unity数字孪生-简历.pdf";
-const REQUIRED_HREFS = [
-  "https://duhongbo.com/profile-resume",
-  "https://duhongbo.com/work-index/twin-sim/digital-twin",
-  "https://blog.csdn.net/Dugege007",
-];
 const A4_WIDTH = 595.28;
 const A4_HEIGHT = 841.89;
 
@@ -200,11 +196,19 @@ async function main() {
     const browser = await playwright.chromium.launch({ headless: true });
     const page = await browser.newPage({ viewport: { width: 794, height: 1123 } });
     try {
+      await page.emulateMedia({ media: "print" });
       await page.goto(target, { waitUntil: "load", timeout: 60000 });
-      await page.waitForSelector(".resume-print[data-ready='true']", { timeout: 20000 });
       await page.waitForFunction(() => !document.documentElement.hasAttribute("data-boot"), null, {
         timeout: 15000,
       });
+      await page.waitForFunction(() => {
+        const fit = document.querySelector(".resume-print")?.getAttribute("data-fit");
+        return fit === "done" || fit === "overflow";
+      }, null, { timeout: 20000 });
+      const fitState = await page.getAttribute(".resume-print", "data-fit");
+      if (fitState === "overflow") {
+        throw new Error("内容超过一页。已压缩行距、实习与自学经历，并依次去掉 Github 与个人主页后仍放不下。");
+      }
       const fontState = await page.evaluate(async () => {
         const fonts = document.fonts;
         if (fonts?.ready) {
@@ -229,11 +233,20 @@ async function main() {
         throw new Error("中文字体未加载。请安装 Noto Sans SC 或 Noto Sans CJK SC 后重试。");
       }
 
-      const hrefs = await page.$$eval("a[href]", (nodes) => nodes.map((node) => node.getAttribute("href") ?? ""));
-      const missing = REQUIRED_HREFS.filter((href) => !hrefs.includes(href));
-      if (missing.length > 0) {
-        throw new Error(`打印页缺少链接：${missing.join("，")}`);
-      }
+      const hrefs = await page.$$eval("a[href]", (nodes) => [
+        ...new Set(
+          nodes
+            .map((node) => node.getAttribute("href") ?? "")
+            .filter((href) => /^https?:/i.test(href)),
+        ),
+      ]);
+      const fitMeta = await page.evaluate(() => {
+        const el = document.querySelector(".resume-print");
+        return {
+          density: el?.getAttribute("data-density") ?? "0",
+          compress: el?.getAttribute("data-compress") === "1",
+        };
+      });
 
       const buffer = await page.pdf({
         format: "A4",
@@ -248,13 +261,14 @@ async function main() {
       }
       assertA4(readMediaBox(buffer));
       const raw = buffer.toString("latin1");
-      const missingInFile = REQUIRED_HREFS.filter((href) => !raw.includes(href));
+      const missingInFile = hrefs.filter((href) => !raw.includes(href));
       if (missingInFile.length > 0) {
         throw new Error(`PDF 内缺少可点击链接：${missingInFile.join("，")}`);
       }
       await writeFile(outFile, buffer);
       const kilo = (buffer.length / 1024).toFixed(1);
-      console.log(`已写入 ${outFile}（${kilo} KB，1 页 A4）`);
+      const compressNote = fitMeta.compress ? "，已压缩实习与自学" : "";
+      console.log(`已写入 ${outFile}（${kilo} KB，1 页 A4，行距档 ${fitMeta.density}${compressNote}）`);
       if (buffer.length > 2 * 1024 * 1024) {
         console.warn("文件超过 2MB，上传附件前请再压缩。");
       }

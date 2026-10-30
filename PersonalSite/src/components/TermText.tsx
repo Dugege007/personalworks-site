@@ -12,6 +12,8 @@ const BRIDGE_MS = 120;
 
 type TermTextProps = {
   text: string;
+  /** 为真时，提示里的站内链接也新开标签页。 */
+  newTab?: boolean;
 };
 
 type TermLabelProps = {
@@ -32,7 +34,7 @@ type TipBox = {
 /**
  * 在允许的说明文字里标出名词，并展开对应提示。
  */
-export function TermText({ text }: TermTextProps) {
+export function TermText({ text, newTab }: TermTextProps) {
   const pieces = annotateTerms(text, glossaryBook);
   return (
     <>
@@ -40,7 +42,7 @@ export function TermText({ text }: TermTextProps) {
         piece.kind === "text" ? (
           <Fragment key={index}>{piece.text}</Fragment>
         ) : (
-          <TermMark key={`${piece.text}-${index}`} label={piece.text} entry={piece.entry} />
+          <TermMark key={`${piece.text}-${index}`} label={piece.text} entry={piece.entry} newTab={newTab} />
         ),
       )}
     </>
@@ -59,11 +61,13 @@ function TermMark({
   entry,
   plain,
   className,
+  newTab,
 }: {
   label: string;
   entry: GlossaryEntry;
   plain?: boolean;
   className?: string;
+  newTab?: boolean;
 }) {
   const { locale } = usePrefs();
   const tipId = useId();
@@ -231,7 +235,7 @@ function TermMark({
                 ) : null}
                 <span className="term-tip-body">
                   {parts.map((part, index) => (
-                    <TipFragment key={index} part={part} />
+                    <TipFragment key={index} part={part} newTab={newTab} />
                   ))}
                 </span>
               </span>
@@ -243,14 +247,19 @@ function TermMark({
   );
 }
 
-function TipFragment({ part }: { part: TipPart }) {
+function TipFragment({ part, newTab }: { part: TipPart; newTab?: boolean }) {
   if (part.kind === "bold") {
     return <strong>{part.text}</strong>;
   }
   if (part.kind === "link") {
     if (part.href.startsWith("/") && !part.href.startsWith("//")) {
       return (
-        <Link className="term-tip-link" to={part.href}>
+        <Link
+          className="term-tip-link"
+          to={part.href}
+          target={newTab ? "_blank" : undefined}
+          rel={newTab ? "noreferrer noopener" : undefined}
+        >
           <span className="jump-link-label">{part.text}</span>
           <JumpLinkIcon />
         </Link>

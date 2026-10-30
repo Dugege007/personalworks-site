@@ -103,6 +103,25 @@
   background: var(--surface);
 }
 
+.resume-export {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0;
+}
+
+.resume-export a {
+  color: #2b4c7e;
+  font-size: 14px;
+  line-height: 1.4;
+  text-decoration: none;
+  border: 1px solid currentColor;
+  padding: 6px 14px;
+}
+
+[data-skin="strata"] .resume-export a {
+  color: #8eb4e6;
+}
+
 .resume-block {
   margin: 0 0 40px;
 }
@@ -462,5 +481,9 @@
     height: auto;
     background: #fff;
     color: #16181c;
+  }
+
+  .resume-export {
+    display: none;
   }
 }
