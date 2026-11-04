@@ -89,6 +89,89 @@ public sealed class NoteRulesTests
     }
 
     [Fact]
+    public void ToSiteObjectKey_CollapsesStackedNotesSlugPrefixes()
+    {
+        Assert.Equal(
+            "notes/hello/images/demo.webp",
+            NoteImageLocation.ToSiteObjectKey("hello", "images/demo.webp"));
+        Assert.Equal(
+            "notes/hello/images/demo.webp",
+            NoteImageLocation.ToSiteObjectKey("hello", "notes/hello/images/demo.webp"));
+        Assert.Equal(
+            "notes/hello/images/demo.webp",
+            NoteImageLocation.ToSiteObjectKey(
+                "hello",
+                "notes/hello/notes/hello/notes/hello/images/demo.webp"));
+        Assert.Equal(
+            "notes/hello/images/demo.webp",
+            NoteImageLocation.ToSiteObjectKey("hello", "/notes/hello/images/demo.webp"));
+        Assert.True(NoteImageLocation.TryStripSiteNotesPath(
+            "notes/hello/notes/hello/images/demo.webp",
+            "hello",
+            out var relative));
+        Assert.Equal("images/demo.webp", relative);
+    }
+
+    [Fact]
+    public void Plan_KeepsSingleLayer_WhenBodyAlreadyHasSiteImagePath()
+    {
+        var stage = TempDir();
+        var folder = Path.Combine(stage, "心得（notes）", "20261005_125603");
+        Directory.CreateDirectory(Path.Combine(folder, "images"));
+        File.WriteAllBytes(Path.Combine(folder, "images", "demo.png"), TinyPng);
+        // 夹内误放的站点镜像不应再参与拼前缀。
+        var nested = Path.Combine(folder, "notes", "hello", "images");
+        Directory.CreateDirectory(nested);
+        File.WriteAllBytes(Path.Combine(nested, "demo.webp"), TinyPng);
+        WriteNote(folder, "hello", "# 一篇\n\n![图](notes/hello/images/demo.webp)\n");
+
+        var plan = NoteRules.Plan(folder, stage, new NoteIndexFile(), null, null);
+
+        Assert.True(plan.Ok, plan.Error);
+        Assert.Contains("![图](notes/hello/images/demo.webp)", plan.RewrittenMarkdown, StringComparison.Ordinal);
+        Assert.DoesNotContain("notes/hello/notes/hello", plan.RewrittenMarkdown, StringComparison.Ordinal);
+        Assert.Equal("notes/hello/images/demo.webp", Assert.Single(plan.Images).ObjectKey);
+        Assert.Equal(new[] { "notes/hello/images/demo.webp" }, plan.PreviewObjects);
+    }
+
+    [Fact]
+    public void Plan_RewritesRelativeImages_ToSingleLayerSitePath()
+    {
+        var stage = TempDir();
+        var folder = Path.Combine(stage, "心得（notes）", "20261005_125603");
+        Directory.CreateDirectory(Path.Combine(folder, "images"));
+        File.WriteAllBytes(Path.Combine(folder, "images", "demo.png"), TinyPng);
+        WriteNote(folder, "hello", "# 一篇\n\n![图](images/demo.png)\n");
+
+        var plan = NoteRules.Plan(folder, stage, new NoteIndexFile(), null, null);
+
+        Assert.True(plan.Ok, plan.Error);
+        Assert.Contains("![图](notes/hello/images/demo.webp)", plan.RewrittenMarkdown, StringComparison.Ordinal);
+        Assert.DoesNotContain("notes/hello/notes/", plan.RewrittenMarkdown, StringComparison.Ordinal);
+        Assert.Equal("notes/hello/images/demo.webp", Assert.Single(plan.Images).ObjectKey);
+    }
+
+    [Fact]
+    public void Plan_CollapsesAlreadyStackedSitePath_InBody()
+    {
+        var stage = TempDir();
+        var folder = Path.Combine(stage, "心得（notes）", "20261005_125603");
+        Directory.CreateDirectory(Path.Combine(folder, "images"));
+        File.WriteAllBytes(Path.Combine(folder, "images", "demo.png"), TinyPng);
+        WriteNote(
+            folder,
+            "hello",
+            "# 一篇\n\n![图](notes/hello/notes/hello/notes/hello/images/demo.webp)\n");
+
+        var plan = NoteRules.Plan(folder, stage, new NoteIndexFile(), null, null);
+
+        Assert.True(plan.Ok, plan.Error);
+        Assert.Contains("![图](notes/hello/images/demo.webp)", plan.RewrittenMarkdown, StringComparison.Ordinal);
+        Assert.DoesNotContain("notes/hello/notes/hello", plan.RewrittenMarkdown, StringComparison.Ordinal);
+        Assert.All(plan.Images, job => Assert.DoesNotContain("notes/hello/notes/", job.ObjectKey, StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void Plan_PublishesEveryImageButBodyOnlyRewritesReferenced()
     {
         var stage = TempDir();

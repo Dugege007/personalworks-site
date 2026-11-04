@@ -540,7 +540,7 @@ public static class NoteRules
         List<NoteImageRef> referenced;
         try
         {
-            referenced = ReadImageRefs(folderFullPath, body);
+            referenced = ReadImageRefs(folderFullPath, body, slug);
         }
         catch (InvalidOperationException ex)
         {
@@ -562,7 +562,9 @@ public static class NoteRules
             var readyRelative = Path.Combine(ReadyDirName, Path.ChangeExtension(relative, ".webp"));
             var readyFull = Path.Combine(folderFullPath, readyRelative);
             var readyStage = JsonUtil.ToRel(Path.GetRelativePath(stageRoot, readyFull));
-            var objectKey = ChannelKey + "/" + slug + "/" + JsonUtil.ToRel(Path.ChangeExtension(relative, ".webp"));
+            var objectKey = NoteImageLocation.ToSiteObjectKey(
+                slug,
+                JsonUtil.ToRel(Path.ChangeExtension(relative, ".webp")));
             var prior = previous?.Images.FirstOrDefault(item =>
                 string.Equals(item.StageRel, stageRel, StringComparison.Ordinal));
             var stars = prior?.Stars ?? 0;
@@ -596,7 +598,7 @@ public static class NoteRules
         List<string> preview;
         try
         {
-            rewrittenBody = RewriteBody(folderFullPath, body, objectBySource, out preview);
+            rewrittenBody = RewriteBody(folderFullPath, body, slug, objectBySource, out preview);
         }
         catch (InvalidOperationException ex)
         {
@@ -885,6 +887,12 @@ public static class NoteRules
                 continue;
             }
 
+            // 夹内误放的 notes/<slug>/… 镜像不当作本地源图，否则相对路径再拼前缀会叠层。
+            if (rel.StartsWith(ChannelKey + "/", StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
             var ext = Path.GetExtension(file);
             if (PublishImageExtSet.Contains(ext))
             {
@@ -931,20 +939,20 @@ public static class NoteRules
         return (chosen, null);
     }
 
-    private static List<NoteImageRef> ReadImageRefs(string folderFullPath, string body)
+    private static List<NoteImageRef> ReadImageRefs(string folderFullPath, string body, string slug)
     {
         var list = new List<NoteImageRef>();
         foreach (var raw in ListImageTargets(body))
         {
-            list.Add(ResolveRef(folderFullPath, raw));
+            list.Add(ResolveRef(folderFullPath, raw, slug));
         }
 
         return list;
     }
 
-    private static NoteImageRef ResolveRef(string folderFullPath, string raw)
+    private static NoteImageRef ResolveRef(string folderFullPath, string raw, string slug)
     {
-        var location = NoteImageLocation.Resolve(folderFullPath, raw);
+        var location = NoteImageLocation.Resolve(folderFullPath, raw, slug);
         var target = location.Reference;
         if (location.Kind == NoteImageLocationKind.Remote)
         {
@@ -983,6 +991,7 @@ public static class NoteRules
     private static string RewriteBody(
         string folderFullPath,
         string body,
+        string slug,
         Dictionary<string, string> objectBySource,
         out List<string> preview)
     {
@@ -991,12 +1000,12 @@ public static class NoteRules
         {
             var alt = match.Groups[1].Value;
             var raw = match.Groups[2].Value;
-            var next = RewriteOne(folderFullPath, raw, objectBySource, found);
+            var next = RewriteOne(folderFullPath, raw, slug, objectBySource, found);
             return "![" + alt + "](" + next + ")";
         });
         rewritten = HtmlImageRegex.Replace(rewritten, match =>
         {
-            var next = RewriteOne(folderFullPath, match.Groups[2].Value, objectBySource, found);
+            var next = RewriteOne(folderFullPath, match.Groups[2].Value, slug, objectBySource, found);
             return match.Groups[1].Value + next + match.Groups[3].Value;
         });
         preview = found;
@@ -1006,21 +1015,46 @@ public static class NoteRules
     private static string RewriteOne(
         string folderFullPath,
         string raw,
+        string slug,
         Dictionary<string, string> objectBySource,
         List<string> preview)
     {
-        var location = NoteImageLocation.Resolve(folderFullPath, raw);
+        var location = NoteImageLocation.Resolve(folderFullPath, raw, slug);
         if (location.Kind == NoteImageLocationKind.Remote)
         {
             return raw;
         }
 
-        if (location.Kind != NoteImageLocationKind.Inside
-            || !objectBySource.TryGetValue(location.FullPath, out var objectKey))
+        string? objectKey = null;
+        if (location.Kind == NoteImageLocationKind.Inside)
+        {
+            objectBySource.TryGetValue(location.FullPath, out objectKey);
+        }
+
+        // 正文已是单层或叠层站点态时，直接收成单层 objectKey，不再依赖夹内嵌套镜像文件。
+        if (string.IsNullOrWhiteSpace(objectKey)
+            && NoteImageLocation.TryStripSiteNotesPath(raw, slug, out var siteRelative))
+        {
+            var asKey = NoteImageLocation.ToSiteObjectKey(
+                slug,
+                Path.ChangeExtension(siteRelative, ".webp"));
+            foreach (var candidate in objectBySource.Values)
+            {
+                if (string.Equals(candidate, asKey, StringComparison.OrdinalIgnoreCase))
+                {
+                    objectKey = candidate;
+                    break;
+                }
+            }
+        }
+
+        if (string.IsNullOrWhiteSpace(objectKey))
         {
             throw new BlockingFileException(NotChosenPrefix + raw, raw);
         }
 
+        // 防御：即使字典里曾写入叠层 key，写出时仍收成单层。
+        objectKey = NoteImageLocation.ToSiteObjectKey(slug, objectKey);
         preview.Add(objectKey);
         return objectKey;
     }
