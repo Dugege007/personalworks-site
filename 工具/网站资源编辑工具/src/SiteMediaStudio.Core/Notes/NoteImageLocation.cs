@@ -34,8 +34,11 @@ public readonly record struct NoteImageLocation(
     /// <summary>
     /// 解析一个正文地址。百分号编码不完整时保留原文，不因此中断后面的引用。
     /// 路径里含有系统不接受的字符时，仍抛出与原来相同的异常。
+    /// <paramref name="noteSlug"/> 有值时，会把已是站点态的
+    /// <c>notes/&lt;slug&gt;/...</c>（可叠多层、可带前导 /）收成夹内相对路径再解析，
+    /// 避免把站点前缀再拼进心得夹导致叠层。
     /// </summary>
-    public static NoteImageLocation Resolve(string folderFullPath, string raw)
+    public static NoteImageLocation Resolve(string folderFullPath, string raw, string? noteSlug = null)
     {
         var reference = raw.Trim();
         if (IsRemote(reference))
@@ -44,13 +47,27 @@ public readonly record struct NoteImageLocation(
         }
 
         var decoded = DecodePercent(reference);
+        var lookup = decoded;
+        if (!string.IsNullOrWhiteSpace(noteSlug)
+            && TryStripSiteNotesPath(decoded, noteSlug, out var stripped))
+        {
+            lookup = stripped;
+        }
+
         var fullPath = Path.GetFullPath(Path.Combine(
             folderFullPath,
-            decoded.Replace('/', Path.DirectorySeparatorChar)));
+            lookup.Replace('/', Path.DirectorySeparatorChar)));
         var folderPath = Path.GetFullPath(folderFullPath);
         if (!IsInsideFolder(fullPath, folderPath))
         {
             return new NoteImageLocation(reference, NoteImageLocationKind.Outside, fullPath, "");
+        }
+
+        if (!File.Exists(fullPath)
+            && !string.IsNullOrWhiteSpace(noteSlug)
+            && TryFindPublishableAlternate(fullPath, out var alternate))
+        {
+            fullPath = alternate;
         }
 
         var relativePath = JsonUtil.ToRel(Path.GetRelativePath(folderPath, fullPath));
@@ -64,6 +81,63 @@ public readonly record struct NoteImageLocation(
     {
         return reference.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
             || reference.StartsWith("https://", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// 去掉重复的 <c>notes/&lt;slug&gt;/</c> 前缀（含前导 /），得到夹内相对路径或空串。
+    /// 不是该 slug 的站点态时返回原路径（仍去掉首尾空白并把 \ 收成 /）。
+    /// </summary>
+    public static string CollapseNotesSlugPrefixes(string? pathOrKey, string slug)
+    {
+        var text = NormalizeSlashes(pathOrKey);
+        if (string.IsNullOrWhiteSpace(slug))
+        {
+            return text;
+        }
+
+        var prefix = NoteRules.ChannelKey + "/" + slug.Trim() + "/";
+        while (text.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+        {
+            text = text[prefix.Length..];
+        }
+
+        return text;
+    }
+
+    /// <summary>
+    /// 把夹内相对路径或已是站点态的地址收成单层 <c>notes/&lt;slug&gt;/...</c>，不会叠多层。
+    /// </summary>
+    public static string ToSiteObjectKey(string slug, string? pathOrKey)
+    {
+        var rest = CollapseNotesSlugPrefixes(pathOrKey, slug);
+        if (string.IsNullOrWhiteSpace(rest))
+        {
+            return NoteRules.ChannelKey + "/" + slug.Trim();
+        }
+
+        return NoteRules.ChannelKey + "/" + slug.Trim() + "/" + rest;
+    }
+
+    /// <summary>
+    /// 是否为该 slug 的站点态配图路径（可叠多层、可带前导 /）。
+    /// </summary>
+    public static bool TryStripSiteNotesPath(string? pathOrKey, string slug, out string relativeInsideFolder)
+    {
+        relativeInsideFolder = "";
+        var text = NormalizeSlashes(pathOrKey);
+        if (string.IsNullOrWhiteSpace(slug) || string.IsNullOrWhiteSpace(text))
+        {
+            return false;
+        }
+
+        var prefix = NoteRules.ChannelKey + "/" + slug.Trim() + "/";
+        if (!text.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        relativeInsideFolder = CollapseNotesSlugPrefixes(text, slug);
+        return relativeInsideFolder.Length > 0;
     }
 
     /// <summary>
@@ -88,5 +162,41 @@ public readonly record struct NoteImageLocation(
         {
             return reference;
         }
+    }
+
+    private static string NormalizeSlashes(string? pathOrKey)
+    {
+        return (pathOrKey ?? "").Trim().Replace('\\', '/').TrimStart('/');
+    }
+
+    /// <summary>
+    /// 站点态常为 .webp，中转站源文件可能仍是 png／jpg。同主名且可上页的扩展名视为同一张图。
+    /// </summary>
+    private static bool TryFindPublishableAlternate(string fullPath, out string alternate)
+    {
+        alternate = "";
+        var dir = Path.GetDirectoryName(fullPath);
+        var stem = Path.GetFileNameWithoutExtension(fullPath);
+        if (string.IsNullOrWhiteSpace(dir) || string.IsNullOrWhiteSpace(stem))
+        {
+            return false;
+        }
+
+        foreach (var ext in NoteRules.PublishImageExtSet)
+        {
+            var candidate = Path.Combine(dir, stem + ext);
+            if (string.Equals(candidate, fullPath, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (File.Exists(candidate))
+            {
+                alternate = Path.GetFullPath(candidate);
+                return true;
+            }
+        }
+
+        return false;
     }
 }
