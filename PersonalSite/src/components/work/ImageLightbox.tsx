@@ -11,7 +11,7 @@ import {
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import type { PhotoExif } from "../../content/photoExif";
-import { pausePageLenis, resumePageLenis } from "../../hooks/useLenis";
+import { lockPageForLightbox, unlockPageForLightbox } from "../../hooks/useLenis";
 import { resolveLead } from "../../content/copyDisplay";
 import { TermText } from "../TermText";
 import { assetUrl } from "../../lib/assets";
@@ -495,17 +495,13 @@ export function ImageLightbox({
   const tapRef = useRef<{ t: number; x: number; y: number } | null>(null);
   const current = images[index];
 
-  useEffect(() => {
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    document.documentElement.dataset.lightbox = "open";
-    pausePageLenis();
+  useLayoutEffect(() => {
+    lockPageForLightbox();
     closeRef.current?.focus();
     return () => {
       cancelAnimationFrame(swipeRafRef.current);
-      document.body.style.overflow = previous;
-      delete document.documentElement.dataset.lightbox;
-      resumePageLenis();
+      // 与换页滚顶同在布局阶段：卸载清理先于父级滚顶，或由父级先解开，两边都安全。
+      unlockPageForLightbox();
     };
   }, []);
 

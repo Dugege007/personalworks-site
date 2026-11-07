@@ -1,5 +1,6 @@
 /* 摄影图墙：按列宽缩放、保持原比例，不裁切。
-   列数断点与 photoMasonryColumnCount 一致。
+   列数断点与 photoMasonryColumnCount 一致：至少两列。
+   900 及以下两列，1400 起四列，其间三列。一两项时仍为两列。
    真正分列走最短列（.is-row）；column-count 只在没挂脚本时兜底。 */
 .photo-masonry {
   --photo-masonry-gap: 14px;
@@ -82,12 +83,6 @@
   }
 }
 
-@media (max-width: 560px) {
-  .photo-masonry:not([data-count="1"]):not([data-count="2"]) {
-    column-count: 1;
-  }
-}
-
 /* 最短列：子项按源顺序留在文档流外，再按列高绝对定位。 */
 .photo-masonry.is-row,
 .photo-masonry.is-row[data-count="1"],
@@ -122,12 +117,6 @@
 
 @media (max-width: 900px) {
   .photo-masonry.is-row {
-    column-count: auto;
-  }
-}
-
-@media (max-width: 560px) {
-  .photo-masonry.is-row:not([data-count="1"]):not([data-count="2"]) {
     column-count: auto;
   }
 }

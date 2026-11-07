@@ -18,11 +18,43 @@ export function resumePageLenis() {
   pageLenis?.start();
 }
 
+/** 灯箱锁页面前记下的行内 overflow。null 表示当前没有锁。 */
+let lightboxOverflow: string | null = null;
+
+/**
+ * 灯箱打开时锁住页面滚动。重复调用不覆盖最初记下的 overflow。
+ */
+export function lockPageForLightbox() {
+  if (lightboxOverflow === null) {
+    lightboxOverflow = document.body.style.overflow;
+  }
+  document.body.style.overflow = "hidden";
+  document.documentElement.dataset.lightbox = "open";
+  pausePageLenis();
+}
+
+/**
+ * 灯箱关闭，或未关就换页时恢复滚动。可重复调用。
+ * 换页滚顶必须发生在这次恢复之后，否则 overflow:hidden 与 Lenis 暂停会让滚顶落空。
+ */
+export function unlockPageForLightbox() {
+  const locked = lightboxOverflow !== null || document.documentElement.dataset.lightbox === "open";
+  if (!locked) {
+    return;
+  }
+  document.body.style.overflow = lightboxOverflow ?? "";
+  lightboxOverflow = null;
+  delete document.documentElement.dataset.lightbox;
+  resumePageLenis();
+}
+
 /**
  * 换页时回到文档顶部。不记忆上一页滚动位置。
  */
 export function scrollPageToTop() {
   if (pageLenis) {
+    // 换页后可滚高度还停在上一页时，先量再滚，避免滚顶被旧高度夹住。
+    pageLenis.resize();
     pageLenis.scrollTo(0, { immediate: true, force: true });
   }
   window.scrollTo(0, 0);
