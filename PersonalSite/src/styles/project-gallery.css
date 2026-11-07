@@ -15,6 +15,8 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  /* 未进视口前几乎全透明。is-visible 在任意像素进入视口时加上。
+     高于视口的图组若按面积比例设阈值，会一直停在这里，看起来发白。 */
   .project-gallery-item {
     opacity: 0.01;
     transform: translateY(24px);

@@ -13,25 +13,9 @@ import {
   masonryHeightsForPlacement,
   placeShortestColumns,
 } from "./shortestColumn";
+import { photoMasonryColumnCount } from "./photoMasonryColumns";
 
-/**
- * 与 photo-masonry.css 的列数断点一致。一两项时仍为两列。
- */
-export function photoMasonryColumnCount(itemCount: number, width: number): number {
-  if (itemCount <= 2) {
-    return 2;
-  }
-  if (width <= 560) {
-    return 1;
-  }
-  if (width <= 900) {
-    return 2;
-  }
-  if (width >= 1400) {
-    return 4;
-  }
-  return 3;
-}
+export { photoMasonryColumnCount };
 
 function readColumnCount(itemCount: number): number {
   if (typeof window === "undefined") {
@@ -210,8 +194,8 @@ export function PhotoMasonry({ count, children }: PhotoMasonryProps) {
     root.addEventListener("error", onMedia, true);
     root.addEventListener("loadedmetadata", onMedia, true);
 
+    // 列数只在 900 与 1400 处分档。窄屏不再单独收成一列。
     const queries = [
-      window.matchMedia("(max-width: 560px)"),
       window.matchMedia("(max-width: 900px)"),
       window.matchMedia("(min-width: 1400px)"),
     ];

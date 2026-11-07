@@ -49,6 +49,28 @@ function shotIndexInSequence(sequence: ProjectGalleryShot[], src: string): numbe
   return index >= 0 ? index : 0;
 }
 
+/**
+ * 目标与视口有任意像素重叠即视为已进入。
+ * 摄影详情把整组照片收在一个高于视口的条目里，不能按条目面积比例判断。
+ */
+function shownInViewport(item: HTMLElement): boolean {
+  const rect = item.getBoundingClientRect();
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+  const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+  return (
+    rect.width > 0 &&
+    rect.height > 0 &&
+    rect.bottom > 0 &&
+    rect.right > 0 &&
+    rect.top < viewportHeight &&
+    rect.left < viewportWidth
+  );
+}
+
+function revealGalleryItem(item: HTMLElement) {
+  item.classList.add("is-visible");
+}
+
 function AlbumFace({ image, bootFirst = false }: { image: ProjectGalleryShot; bootFirst?: boolean }) {
   const bootAttr = bootFirst ? { "data-boot-first": "" } : {};
   if (image.kind === "video" && !image.poster) {
@@ -135,24 +157,60 @@ export function ProjectGallery({
       return;
     }
     const items = [...gallery.querySelectorAll<HTMLElement>(".project-gallery-item")];
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      items.forEach((item) => item.classList.add("is-visible"));
+    if (
+      items.length === 0 ||
+      typeof IntersectionObserver === "undefined" ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      items.forEach(revealGalleryItem);
       return;
     }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (!entry.isIntersecting) {
             return;
           }
-          entry.target.classList.add("is-visible");
+          revealGalleryItem(entry.target as HTMLElement);
           observer.unobserve(entry.target);
         });
       },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.12 },
+      { threshold: 0 },
     );
-    items.forEach((item) => observer.observe(item));
-    return () => observer.disconnect();
+
+    const revealShown = () => {
+      items.forEach((item) => {
+        if (item.classList.contains("is-visible")) {
+          return;
+        }
+        if (shownInViewport(item)) {
+          revealGalleryItem(item);
+          observer.unobserve(item);
+        }
+      });
+    };
+
+    items.forEach((item) => {
+      if (!shownInViewport(item)) {
+        observer.observe(item);
+      } else {
+        revealGalleryItem(item);
+      }
+    });
+
+    // 瀑布流测高会在首帧之后改变条目高度。高度变化后再查一次已在视口内的项。
+    const resize = new ResizeObserver(() => {
+      revealShown();
+    });
+    items.forEach((item) => resize.observe(item));
+    const frame = window.requestAnimationFrame(revealShown);
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      resize.disconnect();
+      observer.disconnect();
+    };
   }, [projects, variant]);
 
   return (
